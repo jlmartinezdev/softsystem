@@ -1,0 +1,1 @@
+Vue.component('busquedaproveedor', require('./components/busqueda_proveedor.vue').default);
