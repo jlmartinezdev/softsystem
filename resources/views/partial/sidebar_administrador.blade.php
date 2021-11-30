@@ -61,6 +61,12 @@
                   <p>Seccion</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{{route('reffactura.index')}}" class="nav-link">
+                  <i class="fa fa-chevron-right nav-icon"></i>
+                  <p>Referencia Factura</p>
+                </a>
+              </li>
             </ul>
           </li>
           <li class="nav-item">

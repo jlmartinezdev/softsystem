@@ -127,7 +127,7 @@
 							<strong>FINALIZAR</strong> 
 						</button>
 						<hr>
-						<button class="btn btn-secondary"> <span class="fa fa-print"></span> Imprimir</button>
+						<a href="venta/imprimir" class="btn btn-secondary"> <span class="fa fa-print"></span> Imprimir</a>
 						<button class="btn btn-secondary"><span class="fa fa-file-alt"></span> Informe</button>
 				</div>
 			</div>

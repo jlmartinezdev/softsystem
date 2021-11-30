@@ -18,11 +18,13 @@ Route::post('stock/{id}','StockController@update');
 //VENTA
 Route::get('infventa','VentaController@indexInf')->name('infventa');
 Route::get('infventa/fecha','VentaController@getVentaByFecha')->name('infventa.fecha');
+Route::get('infventa/cliente','VentaController@getVentaByCliente')->name('infventa.cliente');
 Route::post('infventa/chart','VentaController@getVentaChart')->name('infventa.chart');
 Route::get('infventa/detalle/{id}','VentaController@getDetalle');
 Route::get('infventa/articulo','VentaController@getVentaArticulo');
 Route::get('venta','VentaController@index')->name('venta');
 Route::post('venta','VentaController@store');
+Route::get('venta/imprimir','VentaController@imprimir');
 //COMPRA
 Route::get('infcompra','CompraController@indexInf')->name('infcompra');
 Route::get('infcompra/detalle/{id}','CompraController@getDetalle');
@@ -61,6 +63,10 @@ Route::get('seccion','SeccionController@index')->name('seccion.index');
 Route::post('seccion','SeccionController@store');
 Route::post('seccion/{id}','SeccionController@update');
 Route::delete('seccion/{id}','SeccionController@destroy');
+Route::get('reffactura','ReffacturaController@index')->name('reffactura.index');
+Route::get('reffactura/all','ReffacturaController@getAll');
+Route::post('reffactura','ReffacturaController@store');
+Route::post('reffactura','ReffacturaController@update');
 //SUCURSAL
 Route::get('sucursal/all','SucursalController@All');
 Route::get('sucursal/set','SucursalController@set')->name('sucursal.set');

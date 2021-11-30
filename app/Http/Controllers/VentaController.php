@@ -43,6 +43,16 @@ class VentaController extends Controller
         ->get();
 
     }
+    public function getVentaByCliente(Request $request){
+        return Venta::select('ventas.nro_fact_ventas','ventas.documento','ventas.venta_total',DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y %H:%i") AS fecha'),'c.cliente_nombre', 'c.cliente_direccion', 'c.cliente_ruc','s.suc_desc','ventas.tipo_factura')
+        ->join('clientes as c','ventas.clientes_cod','=','c.clientes_cod')
+        ->join('sucursales as s','ventas.suc_cod','=','s.suc_cod')
+        ->filtrocliente($request->cliente)
+        ->filtrosuc($request->alls)
+        ->orderBy('ventas.nro_fact_ventas','desc')
+        ->limit(100)
+        ->get();
+    }
     public function getVentaArticulo(Request $request){
         $suc= $request->arts!='0' ? 'v.suc_cod='.$request->arts.' AND ' :'';
          return DB::select("SELECT SUM(dv.venta_cantidad) AS vendida, dv.ARTICULOS_cod, a.producto_c_barra, a.producto_nombre, s.cantidad, p.present_descripcion FROM detalle_venta dv INNER JOIN ventas v ON dv.nro_fact_ventas=v.nro_fact_ventas INNER JOIN articulos a ON dv.ARTICULOS_cod=a.ARTICULOS_cod INNER JOIN stock s ON a.ARTICULOS_cod= s.ARTICULOS_cod INNER JOIN presentacion p ON a.present_cod=p.present_cod WHERE ".$suc." DATE(v.venta_fecha) BETWEEN '".$request->artd."' AND '".$request->arth."' GROUP BY dv.ARTICULOS_cod ORDER BY vendida DESC");
@@ -123,5 +133,8 @@ class VentaController extends Controller
    public function ticketfactura(){
        $empresa= Empresa::first();
        return view('ticket.factura',compact('empresa'));
+   }
+   public function imprimir(){
+       return view('venta.imprimir');
    }
 }
