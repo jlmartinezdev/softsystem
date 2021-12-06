@@ -25,6 +25,9 @@ Route::get('infventa/articulo','VentaController@getVentaArticulo');
 Route::get('venta','VentaController@index')->name('venta');
 Route::post('venta','VentaController@store');
 Route::get('venta/imprimir','VentaController@imprimir');
+Route::get('venta/facturar/{id}','FacturarController@index');
+Route::post('venta/facturar','FacturarController@store');
+Route::delete('venta/facturar/{id}','FacturarController@destroy');
 //COMPRA
 Route::get('infcompra','CompraController@indexInf')->name('infcompra');
 Route::get('infcompra/detalle/{id}','CompraController@getDetalle');
@@ -85,7 +88,7 @@ Route::get('pdf/boletacompra/{id}','CompraController@pdfboleta')->name('pdf.bole
 
 Route::get('/clear-cache', 'AperturaController@comando');
 //TICKET
-Route::get('ticket/factura','VentaController@ticketfactura');
+Route::get('ticket/factura/{id}','FacturarController@ticket');
 
 /*
 Modificar fecha en informe

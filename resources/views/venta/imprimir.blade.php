@@ -45,7 +45,7 @@
             <tr style="font-family: Arial,Helvetica,sans-serif;">
                 <td>
                     <button class="btn btn-link" @click="showDetalle(venta)"><span class="fa fa-file-alt"></span> Detalle</button>
-                    <a :href="'pdf/boletaventa/'+venta.nro_fact_ventas+'/'" class="btn btn-link"><span class="fa fa-print"></span> Facturar</a>
+                    <a :href="'facturar/'+venta.nro_fact_ventas+''" class="btn btn-link"><span class="fa fa-print"></span> Facturar</a>
                    
                 </td>
                 <td>@{{venta.nro_fact_ventas}}</td>
