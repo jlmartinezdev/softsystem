@@ -85,7 +85,6 @@
                                     </td>
 								</tr>
 							</template>
-|
                         </table>
                     </div>
                     <!-- *********** SECCION CHART ************* -->

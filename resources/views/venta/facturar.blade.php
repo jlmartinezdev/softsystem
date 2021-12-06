@@ -129,6 +129,8 @@
                 </div>
             </div>
         </div>
+
+        
     </div>
 @endsection
 @section('script')
@@ -137,7 +139,7 @@
             el: '#app',
             data: {
                 nro_venta: {{ $venta[0]->nro_fact_ventas }},
-                status: {{ $venta[0]->factura_status == '1' ? '1' : '0' }}
+                status: {{ $venta[0]->factura_status == '1' ? '1' : '0' }},
             },
             methods: {
                 facturar: function() {
