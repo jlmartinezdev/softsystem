@@ -32,10 +32,10 @@
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
 
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          <li class="nav-item" >
+            <a href="#" class="nav-link" id="m_mantenimiento">
               <i class="nav-icon fa fa-cog"></i>
               <p>
                 Mantimiento
@@ -44,25 +44,25 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{route('usuario')}}" class="nav-link">
+                <a href="{{route('usuario')}}" id="m_usuario" class="nav-link">
                   <i class="fa fa-chevron-right nav-icon"></i>
                   <p>Usuario</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('cliente.index')}}" class="nav-link">
+                <a href="{{route('cliente.index')}}" id="m_cliente" class="nav-link">
                   <i class="fa fa-chevron-right nav-icon"></i>
                   <p>Cliente</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('seccion.index')}}" class="nav-link">
+                <a href="{{route('seccion.index')}}" id="m_seccion" class="nav-link">
                   <i class="fa fa-chevron-right nav-icon"></i>
                   <p>Seccion</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('reffactura.index')}}" class="nav-link">
+                <a href="{{route('reffactura.index')}}" id="m_reffactura" class="nav-link">
                   <i class="fa fa-chevron-right nav-icon"></i>
                   <p>Referencia Factura</p>
                 </a>
@@ -70,7 +70,7 @@
             </ul>
           </li>
           <li class="nav-item">
-            <a href="{{ route('articulo') }}" class="nav-link">
+            <a href="{{ route('articulo') }}" id="m_articulo" class="nav-link">
               <i class="nav-icon fa fa-clone"></i>
               <p>
                 Articulos
@@ -78,7 +78,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="{{route('compra')}}" class="nav-link">
+            <a href="{{route('compra')}}" id="m_compra" class="nav-link">
               <i class="nav-icon fas fa-th"></i>
               <p>
                 Compra
@@ -86,7 +86,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="{{ route('venta') }}" class="nav-link">
+            <a href="{{ route('venta') }}" id="m_venta" class="nav-link">
               <i class="nav-icon fa fa-cog"></i>
               <p>
                 Venta
@@ -94,7 +94,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link" id="m_caja">
               <i class="nav-icon fa fa-cash-register"></i>
               <p>
                 Caja
@@ -104,13 +104,13 @@
             <ul class="nav nav-treeview">
 
               <li class="nav-item">
-                <a href="{{ route('apertura') }}" class="nav-link">
+                <a href="{{ route('apertura') }}" id="m_apertura" class="nav-link">
                   <i class="fa fa-chevron-right nav-icon"></i>
                   <p>Apert. - Cierre Caja</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('movimiento') }}" class="nav-link">
+                <a href="{{ route('movimiento') }}" id="m_movimiento" class="nav-link">
                   <i class="fa fa-chevron-right nav-icon"></i>
                   <p>Movimiento caja</p>
                 </a>
@@ -119,27 +119,27 @@
           </li>
           <li class="nav-item">
             <a href="#" class="nav-link">
-              <i class="nav-icon fa fa-sticky-note"></i>
+              <i class="nav-icon fa fa-sticky-note" id="m_informe"></i>
               <p>
                 Informes
                 <i class="fas fa-angle-left right"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item">
+              <li class="nav-item" id="m_icompra">
                 <a href="{{ route('infcompra') }}" class="nav-link">
                   <i class="fa fa-chevron-right nav-icon"></i>
                   <p>Compras</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('infventa') }}" class="nav-link">
+                <a href="{{ route('infventa') }}" class="nav-link" id="m_iventa">
                   <i class="fa fa-chevron-right nav-icon"></i>
                   <p>Ventas</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('infctacobrar') }}" class="nav-link">
+                <a href="{{ route('infctacobrar') }}" id="m_ictacobrar" class="nav-link">
                   <i class="fa fa-chevron-right nav-icon"></i>
                   <p>Cuentas a cobrar</p>
                 </a>
@@ -148,7 +148,7 @@
             </ul>
           </li>
           <li class="nav-item">
-              <a href="{{route('sucursal.set')}}" class="nav-link">
+              <a href="{{route('sucursal.set')}}" class="nav-link" id="m_sucursal">
                 <i class="fa fa-warehouse nav-icon"></i>
                 <p><span id="sucursal"></span></p> 
               </a>

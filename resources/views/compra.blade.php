@@ -422,6 +422,7 @@
 		this.getFecha();
 	}
 })
+activarMenu('m_compra','');
 </script>
 
 

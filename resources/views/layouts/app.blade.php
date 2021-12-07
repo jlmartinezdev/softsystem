@@ -45,6 +45,19 @@
     <script src="{{ asset('js/adminlte.min.js') }}"></script>
     <script src="{{ asset('js/date.format.js')}}"></script>
     <script type="text/javascript">
+    	function activarMenu(nivel1,subnivel){
+           let menu_nivel1= document.getElementById(nivel1);
+           menu_nivel1.className += " active";
+          
+          
+           if(subnivel.length > 0){
+                let menu_subnivel= document.getElementById(subnivel);
+                menu_subnivel.className += " active";
+              
+           }
+          // menu_nivel1.click();
+           
+        }
         function soloNumero(event)
         {
             if(event.charCode >= 48 && event.charCode <= 57)

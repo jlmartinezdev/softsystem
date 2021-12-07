@@ -150,5 +150,6 @@
 			
 		}
 	})
+	activarMenu('m_caja','m_movimiento');
 </script>
 @endsection

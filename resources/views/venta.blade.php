@@ -485,5 +485,6 @@
 			this.getSucursal();
 		}
 	});
+	activarMenu('m_venta','');
 </script>
 @endsection

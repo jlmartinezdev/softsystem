@@ -156,5 +156,6 @@
 
 		}
 	})
+	activarMenu('m_mantenimiento','m_seccion');
 </script>
 @endsection

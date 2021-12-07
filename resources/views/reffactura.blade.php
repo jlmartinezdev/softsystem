@@ -104,5 +104,6 @@
 			this.getAll();
 		}
 	})
+	activarMenu('m_mantenimiento','m_reffactura');
 </script>
 @endsection

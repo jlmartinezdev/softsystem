@@ -46,3 +46,8 @@
 </div>
 
 @endsection
+@section('script')
+	<script>
+		activarMenu('m_caja','m_apertura');
+	</script>
+@endsection

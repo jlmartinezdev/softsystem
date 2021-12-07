@@ -89,5 +89,6 @@
 			document.getElementById("selsucursal").value= obj.getAttribute('data-id');
 	}
 	setSurcursal();
+	activarMenu('m_caja','m_apertura');
 </script>
 @endsection

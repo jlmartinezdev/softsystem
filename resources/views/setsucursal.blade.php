@@ -52,5 +52,6 @@
 		}
 	}
 	checkSucursal();
+	activarMenu('m_sucursal','';
 </script>
 @endsection

@@ -58,6 +58,7 @@
 @endsection
 @section('script')
 <script type="text/javascript">
+	
 	var app= new Vue({
 		el: '#app',
 		data: {
@@ -153,7 +154,9 @@
 		},
 		mounted(){
 			this.buscar();
+			
 		}
 	})
+	activarMenu('m_mantenimiento','m_cliente');
 </script>
 @endsection

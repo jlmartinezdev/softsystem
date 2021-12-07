@@ -508,6 +508,7 @@ $('#addArticulo').on('hidden.bs.modal',function(e){
 $('#editArticulo').on('hidden.bs.modal',function(e){
 	app.vaciarTodos();
 });
+activarMenu('m_articulo','');
 
 </script>
 

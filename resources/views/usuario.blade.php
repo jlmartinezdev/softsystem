@@ -175,5 +175,6 @@
 
 		}
 	})
+	activarMenu('m_mantenimiento','m_usuario');
 </script>
 @endsection
