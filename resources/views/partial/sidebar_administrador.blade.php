@@ -67,6 +67,12 @@
                   <p>Referencia Factura</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{{route('proveedor.index')}}" id="m_proveedor" class="nav-link">
+                  <i class="fa fa-chevron-right nav-icon"></i>
+                  <p>Proveedor</p>
+                </a>
+              </li>
             </ul>
           </li>
           <li class="nav-item">

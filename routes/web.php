@@ -38,6 +38,10 @@ Route::get('infcompra/fecha','CompraController@getCompraByFecha');
 //PROVEEDOR
 Route::get('proveedor/all','ProveedorController@getAll');
 Route::get('proveedor/buscar','ProveedorController@buscar');
+Route::get('proveedor','ProveedorController@index')->name('proveedor.index');
+Route::post('proveedor','ProveedorController@store');
+Route::post('proveedor/{id}','ProveedorController@update');
+Route::delete('proveedor/{id}','ProveedorController@destroy');
 
 //CAJA
 Route::get('aperturacierre','AperturaController@index')->name('apertura');
