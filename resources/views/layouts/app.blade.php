@@ -56,7 +56,14 @@
               
            }
           // menu_nivel1.click();
+          setTimeout(() => {
+              hacerClick(nivel1);
+          }, 500);
            
+        }
+        function hacerClick(n){
+            let menu= document.getElementById(n);
+            menu.click();
         }
         function soloNumero(event)
         {
