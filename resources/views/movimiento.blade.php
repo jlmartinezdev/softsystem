@@ -38,7 +38,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="card mt-2">
+		<div class="card mt-2 table-responsive-sm">
 			<table class="table table-sm table-striped">
 				<tr>
 					<th>#</th>

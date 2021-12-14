@@ -35,8 +35,8 @@
 			            </div>
 				
 					<!-- TABLA ......................... -->
-				<div class="card mt-2">
-					<table class="table table-striped table-sm table-responsive-sm">
+				<div class="card mt-2 table-responsive-sm">
+					<table class="table table-striped table-sm ">
 						<tr>
 							<th>Codigo</th>
 							<th>Descripcion</th>
@@ -54,15 +54,18 @@
 								<td>@{{new Intl.NumberFormat("de-DE").format(item.precio)}}</td>
 								<td>@{{new Intl.NumberFormat("de-DE").format(item.precio * item.cantidad)}}</td>
 								<td>
-									<button class="btn btn-primary btn-sm" @click="setCantidad(index,item.cantidad,item.stock)" title="Modificar cantidad">
-										<span class="fa fa-cubes"></span>	
-									</button>
-									<button class="btn btn-info btn-sm" @click="setPrecio(index,item)" title="Seleccionar precio">
-										<span class="fa fa-dollar-sign"></span>	
-									</button>
-									<button class="btn btn-danger btn-sm" @click="delArticulo(item)" title="Quitar articulo">
-										<span class="fa fa-times-circle"></span>	
-									</button>
+									<div class="text-nowrap">
+										<button class="btn btn-primary btn-sm" @click="setCantidad(index,item.cantidad,item.stock)" title="Modificar cantidad">
+											<span class="fa fa-cubes"></span>	
+										</button>
+										<button class="btn btn-info btn-sm" @click="setPrecio(index,item)" title="Seleccionar precio">
+											<span class="fa fa-dollar-sign"></span>   
+										</button>
+										<button class="btn btn-danger btn-sm" @click="delArticulo(item)" title="Quitar articulo">
+											<span class="fa fa-times-circle"></span>	
+										</button>
+									</div>
+									
 								</td>
 								</tr>
 							</template>

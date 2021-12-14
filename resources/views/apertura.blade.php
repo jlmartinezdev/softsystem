@@ -48,7 +48,8 @@
 		</form>
 		</div>
 		<br>
-		<table class="table table-striped table-hover table-sm">
+		<div class="table-responsive-sm">
+			<table class="table table-striped table-hover table-sm">
 			<tr>
 				<th>Nro. Operacion</th>
 				<th>Sucursal</th>
@@ -78,6 +79,8 @@
 			@endforeach
 
 		</table>
+		</div>
+		
 	</div>
 </div>
 @endsection
