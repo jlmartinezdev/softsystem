@@ -275,5 +275,6 @@
             }
         }
     })
+    activarMenu('m_informe','m_ictacobrar');
 </script>
 @endsection

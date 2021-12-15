@@ -124,16 +124,16 @@
             </ul>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fa fa-sticky-note" id="m_informe"></i>
+            <a href="#" class="nav-link" id="m_informe">
+              <i class="nav-icon fa fa-sticky-note" ></i>
               <p>
                 Informes
                 <i class="fas fa-angle-left right"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item" id="m_icompra">
-                <a href="{{ route('infcompra') }}" class="nav-link">
+              <li class="nav-item">
+                <a href="{{ route('infcompra') }}" class="nav-link"  id="m_icompra">
                   <i class="fa fa-chevron-right nav-icon"></i>
                   <p>Compras</p>
                 </a>

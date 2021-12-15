@@ -408,5 +408,7 @@
         $('a[data-toggle="tab"]').on("shown.bs.tab", function(e) {
             app.showChart();
         });
+
+        activarMenu('m_informe','m_iventa');
     </script>
 @endsection
