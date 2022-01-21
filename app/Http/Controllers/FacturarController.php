@@ -20,6 +20,9 @@ class FacturarController extends Controller
     private function getDetalle($nro_venta){
         return DB::select('SELECT v.*,c.cliente_nombre,c.cliente_direccion,c.cliente_ruc,dv.*,a.producto_nombre,a.producto_c_barra FROM ventas v INNER JOIN detalle_venta dv ON v.nro_fact_ventas= dv.nro_fact_ventas INNER JOIN articulos a ON dv.ARTICULOS_cod=a.ARTICULOS_cod INNER JOIN clientes c ON v.clientes_cod= c.clientes_cod where v.nro_fact_ventas=?',[$nro_venta]);
     }
+    private function getIva($nro_venta){
+        return DB::select('SELECT SUM(IF(p.iva=5, dv.venta_precio* dv.venta_cantidad,0)) AS iva5, SUM(IF(p.iva=10, dv.venta_precio* dv.venta_cantidad,0)) AS iva10 FROM detalle_venta dv INNER JOIN articulos a ON dv.ARTICULOS_cod= a.ARTICULOS_cod INNER JOIN presentacion p ON a.present_cod= p.present_cod WHERE dv.nro_fact_ventas=?',[$nro_venta]);
+    }
     private function getNrofactura($nro_venta){
        return  Facturar::where('nro_fact_ventas',$nro_venta)->get();
     }
@@ -92,7 +95,8 @@ class FacturarController extends Controller
     public function ticket($id){
         $venta= $this->getDetalle($id);
         $factura= $this->getNrofactura($id);
+        $iva= $this->getIva($id);
         $empresa= Empresa::first();
-       return view('ticket.factura',compact('empresa','venta','factura'));
+       return view('ticket.factura',compact('empresa','venta','factura','iva')); 
     }
 }

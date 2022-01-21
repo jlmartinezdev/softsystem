@@ -87,6 +87,7 @@ class ArticuloController extends Controller
         $articulo->present_cod =  $request->articulo['seccion'];
         $articulo->producto_nombre = $request->articulo['descripcion'];
         $articulo->producto_costo_compra = $request->articulo['costo'];
+        $articulo->producto_costo_venta = $request->articulo['p1'];
         $articulo->foto= '';
         $articulo->producto_fecHab = '0';
         $articulo->producto_vencimiento = '2030-01-01';
@@ -94,15 +95,17 @@ class ArticuloController extends Controller
         $articulo->pre_venta2 = $request->articulo['p2'];
         $articulo->pre_venta3 = $request->articulo['p3'];
         $articulo->pre_venta4 = $request->articulo['p4'];
-        $articulo->producto_ubicacion =$request->articulo['ubicacion'];
+        $articulo->pre_venta5= $request->articulo['p5'];
+        $articulo->producto_ubicacion = is_null($request->articulo['ubicacion'])? '' : $request->articulo['ubicacion'];
         $articulo->producto_peso = '0';
         $articulo->producto_factor =$request->articulo['factor'];
         $articulo->pre_margen1 = $request->articulo['m1'];
         $articulo->pre_margen2 = $request->articulo['m2'];
         $articulo->pre_margen3 = $request->articulo['m3'];
         $articulo->pre_margen4 = $request->articulo['m4'];
-        $articulo->producto_indicaciones= $request->articulo['indicaciones'];
-        $articulo->producto_dosis= $request->articulo['modouso'];
+        $articulo->pre_margen5 = $request->articulo['m5'];
+        $articulo->producto_indicaciones= is_null($request->articulo['indicaciones']) ? '' : $request->articulo['indicaciones'];
+        $articulo->producto_dosis= is_null($request->articulo['modouso']) ? '' :$request->articulo['modouso'] ;
         $articulo->producto_formula= '';
         $articulo->producto_dimagen= '';
         $articulo->save();
@@ -131,6 +134,7 @@ class ArticuloController extends Controller
             'present_cod' =>  $request->articulo['seccion'],
             'producto_nombre' => $request->articulo['descripcion'],
             'producto_costo_compra' => $request->articulo['costo'],
+            'producto_costo_venta' => $request->articulo['p1'],
             'foto'=> '',
             'producto_fecHab' => '0',
             'producto_vencimiento' => '2030-01-01',
@@ -138,15 +142,17 @@ class ArticuloController extends Controller
             'pre_venta2' => $request->articulo['p2'],
             'pre_venta3' => $request->articulo['p3'],
             'pre_venta4' => $request->articulo['p4'],
-            'producto_ubicacion' =>$request->articulo['ubicacion'],
+            'pre_venta5' => $request->articulo['p5'],
+            'producto_ubicacion' => is_null($request->articulo['ubicacion']) ? '' : $request->articulo['ubicacion'] ,
             'producto_peso' => '0',
             'producto_factor' =>$request->articulo['factor'],
             'pre_margen1' => $request->articulo['m1'],
             'pre_margen2' => $request->articulo['m2'],
             'pre_margen3' => $request->articulo['m3'],
             'pre_margen4' => $request->articulo['m4'],
-            'producto_indicaciones'=> $request->articulo['indicaciones'],
-            'producto_dosis'=> $request->articulo['modouso'],
+            'pre_margen5' => $request->articulo['m5'],
+            'producto_indicaciones'=> is_null($request->articulo['indicaciones']) ? '' : $request->articulo['indicaciones'],
+            'producto_dosis'=> is_null($request->articulo['modouso']) ? '' :$request->articulo['modouso'] ,
             'producto_formula'=> '',
             'producto_dimagen'=> ''
         ]);
@@ -171,6 +177,8 @@ class ArticuloController extends Controller
      */
     public function destroy($id)
     {
+        DB::select("delete from stock where articulos_cod=?",[$id]);
+        DB::select("delete from precios where articulos_cod=?",[$id]);
         $articulo= Articulo::where('ARTICULOS_cod',$id)->delete();
         if($articulo){
             return "OK";

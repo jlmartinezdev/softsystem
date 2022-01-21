@@ -70,13 +70,13 @@
         {{ NumeroALetras::convertir($venta[0]->venta_total,"GUARANIES")}}
         <br>
         <br>
-        <strong>Liq. IVA. (5%):</strong> 0
+        <strong>Liq. IVA. (5%):</strong> {{ number_format($iva[0]->iva5 * 0.05 ,0,',','.')}}
         <br>
-        <strong>Liq. IVA (10%):</strong> {{ number_format($venta[0]->venta_total * 0.090909 ,0,',','.')}}
+        <strong>Liq. IVA (10%):</strong> {{ number_format($iva[0]->iva10 * 0.090909 ,0,',','.')}}
         <br>
-        <strong>Total IVA:</strong> {{ number_format($venta[0]->venta_total * 0.090909,0,',','.') }}
+        <strong>Total IVA:</strong> {{ number_format(($iva[0]->iva10 * 0.090909) + ($iva[0]->iva5 * 0.05),0,',','.') }}
         <br>
-        <p class="centrado">¡GRACIAS POR SU PREFERENCIA!</p>
+        <p class="centrado">¡GRACIAS POR SU PREFERENCIA!</p> 
     </div>
 </body>
 

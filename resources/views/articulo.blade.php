@@ -242,7 +242,7 @@ var app = new Vue({
   	},
   	setPrecioVenta: function(){
   		if(this.articulo.costo>0){
-  			for (var i = 1; i < 5; i++) {
+  			for (var i = 1; i < 6; i++) {
   				this.articulo['p'+i]= ((this.articulo.costo * this.articulo['m'+i])/100) + parseFloat(this.articulo.costo);
 				
   			}
@@ -366,7 +366,7 @@ var app = new Vue({
         confirmButtonClass: 'bg-danger'
       }).then((result) => {
         if (result.value) {
-          axios.delete(this.url,{data:{articulocod: id}})
+          axios.delete('articulo/res/'+id)
           .then(r=>{
             Swal.fire(
               'Eliminado!',
@@ -410,6 +410,8 @@ var app = new Vue({
     },
   	saveArticulo: function(){
   		if(this.articulo.descripcion && this.articulo.costo && this.articulo.p1){
+        this.validar_Cbarra();
+
   			this.error="";
   			if(this.stocks.length>0){
   				axios.put('articulo/'+this.articulo.codigo,{

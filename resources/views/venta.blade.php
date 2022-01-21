@@ -277,7 +277,8 @@
 	  					p1: a.pre_venta1,
 	  					p2: a.pre_venta2,
 	  					p3: a.pre_venta3,
-	  					p4: a.pre_venta4}
+	  					p4: a.pre_venta4,
+						costo: a.producto_costo_compra}
 			  		this.carro.push(art);
 				}else{
 					this.carro[i].cantidad= parseInt(this.carro[i].cantidad) + 1;//Actualizar cantidad

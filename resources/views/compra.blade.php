@@ -171,16 +171,12 @@
 			this.saveDatos();
 		},
 		validarArticulo: function(a){
-			if(a.cantidad == 0) {
-		  			Swal.fire('Articulo en stock 0','No se puede agregar este articulo!','error');
-		  			return;
-		  		}
 		  		this.requestLote= true;
 				if(this.compraCabecera.idSucursal=== undefined){
 					Swal.fire('Por seleccione una sucursal!','warning');
 				}
 		  		//Traer lotes
-		  		axios.get('{{env("APP_APIDB")}}',{params:{ lote : a.ARTICULOS_cod, bus_suc : this.compraCabecera.idSucursal}})
+		  		axios.get('{{env("APP_APIDB")}}',{params:{ lotecompra : a.ARTICULOS_cod, bus_suc : this.compraCabecera.idSucursal}})
         		.then(response =>{
         			const stocks= response.data;
         			this.requestLote= false;
@@ -252,7 +248,7 @@
 				title: 'Escriba cantidad a Comprar...',
 				input: 'number',
 				inputValue: cantidad,
-				inputAttributes: { min :0 , max : stock},
+				inputAttributes: { min :0 , max : 1000},
 				showCancelButton: true,
 				confirmButtonText: 'Aceptar',
 				cancelButtonText: 'Cancelar'
