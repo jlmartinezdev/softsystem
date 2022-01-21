@@ -86,7 +86,7 @@
           <th>Seccion</th>
           <th class="text-right">Precio</th>
           <th>Stock</th>
-          <th>Acciones</th>
+          <th>Opciones</th>
         </tr>
         </thead>
         <tbody style="font-family: Arial,Helvetica,sans-serif;">
@@ -98,11 +98,16 @@
               <td class="font-weight-bold text-right">@{{ separador(a.pre_venta1) }}</td>
               <td class="text-center font-weight-bold">@{{ a.cantidad }}</td>
               <td>
-                <div class="btn-group btn-group-sm">
-                    <button class='btn btn-outline-primary' data-toggle="tooltip" @click="showEArticulo(a)" data-placement="top" style="width: 28pt;" title="Editar"><span class="fa fa-edit"></span></button>
-                    <button class='btn btn-outline-danger' data-toggle="tooltip" data-placement="top" @click="modalDelete(a.ARTICULOS_cod,a.producto_nombre)" style="width: 28pt;" title="Eliminar"><span class="fa fa-trash"></span></button>
-                    <button class='btn btn-outline-warning' data-toggle="tooltip" @click="showDetalle(a.ARTICULOS_cod,a.producto_nombre)" data-placement="top"  style="width: 28pt;" title="Transferir"><span class="fa fa-retweet"></span></button>
-                </div>
+                <div class="btn-group">
+                  <button class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="fa fa-bars"></span>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right">
+                    <button class='dropdown-item' @click="showEArticulo(a)"><span class="fa fa-edit"></span> Editar</button>
+                    <button class='dropdown-item'  @click="modalDelete(a.ARTICULOS_cod,a.producto_nombre)"><span class="fa fa-trash"></span> Eliminar</button>
+                    <button class='dropdown-item'  @click="showDetalle(a.ARTICULOS_cod,a.producto_nombre)"><span class="fa fa-retweet"></span> Transferir</button>
+                  </div>
+                  </div>
                 
               </td>
             </tr>

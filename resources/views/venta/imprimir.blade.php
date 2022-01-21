@@ -28,7 +28,7 @@
     <br>
     <table class="table table-sm table-hover table-striped table-responsive-sm ">
         <tr>
-            <th>Acciones</th>
+            <th>Opciones</th>
             <th>Nro Venta</th>
             <th>Fecha Hora</th>
             <th>Cliente</th>
@@ -44,9 +44,20 @@
         <template v-for="venta in ventas">
             <tr style="font-family: Arial,Helvetica,sans-serif;">
                 <td>
-                    <button class="btn btn-link" @click="showDetalle(venta)"><span class="fa fa-file-alt"></span> Detalle</button>
+                <div class="btn-group">
+                    <button class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="fa fa-bars"></span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-left">
+                        <button class="dropdown-item" @click="showDetalle(venta)"><span class="fa fa-file-alt"></span> Detalle</button>
+                        <button class="dropdown-item"><span class="fa fa-print"></span> Recibo</button>
+                        <button class="dropdown-item"><span class="fa fa-print"></span> Comprobante</button>
+                        <a :href="'facturar/'+venta.nro_fact_ventas+''" class="dropdown-item"><span class="fa fa-print"></span> Facturar</a>
+                    </div>
+                </div>
+                   <!-- <button class="btn btn-link" @click="showDetalle(venta)"><span class="fa fa-file-alt"></span> Detalle</button>
                     <a :href="'facturar/'+venta.nro_fact_ventas+''" class="btn btn-link"><span class="fa fa-print"></span> Facturar</a>
-                   
+                   -->
                 </td>
                 <td>@{{venta.nro_fact_ventas}}</td>
                 <td>@{{venta.fecha}}</td>
@@ -92,9 +103,9 @@
                             </tr>
                         </template>
                     </table>
+                    <strong>Total @{{new Intl.NumberFormat("de-DE").format(venta.venta_total)}}</strong>
                 </div>
                 <div class="modal-footer">
-                    <strong>Total @{{new Intl.NumberFormat("de-DE").format(venta.venta_total)}}</strong>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal"><span class="fa fa-times"></span> Cerrar</button>
                 </div>
             </div><!-- /.modal-content -->

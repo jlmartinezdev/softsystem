@@ -43,7 +43,7 @@
 							<th>Cantidad</th>
 							<th>Precio</th>
 							<th>Importe</th>
-							<th>Acciones</th>
+							<th>Opciones</th>
 						</tr>
 						<template v-if="carro.length>0">
 							<template v-for="(item,index) in carro">
@@ -54,16 +54,21 @@
 								<td>@{{new Intl.NumberFormat("de-DE").format(item.precio)}}</td>
 								<td>@{{new Intl.NumberFormat("de-DE").format(item.precio * item.cantidad)}}</td>
 								<td>
-									<div class="text-nowrap">
-										<button class="btn btn-primary btn-sm" @click="setCantidad(index,item.cantidad,item.stock)" title="Modificar cantidad">
-											<span class="fa fa-cubes"></span>	
+									<div class="btn-group">
+										<button class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+											<span class="fa fa-bars"></span>
 										</button>
-										<button class="btn btn-info btn-sm" @click="setPrecio(index,item)" title="Seleccionar precio">
-											<span class="fa fa-dollar-sign"></span>   
+										<div class="dropdown-menu dropdown-menu-right">
+										<button class="dropdown-item" @click="setCantidad(index,item.cantidad,item.stock)">
+											<span class="fa fa-cubes text-primary" style="width: 13pt"></span> Cantidad	
 										</button>
-										<button class="btn btn-danger btn-sm" @click="delArticulo(item)" title="Quitar articulo">
-											<span class="fa fa-times-circle"></span>	
+										<button class="dropdown-item" @click="setPrecio(index,item)">
+											<span class="fa fa-dollar-sign  text-info" style="width: 13pt"></span> Precio
 										</button>
+										<button class="dropdown-item" @click="delArticulo(item)">
+											<span class="fa fa-times-circle text-danger" style="width: 13pt"></span> Quitar
+										</button>
+										</div>
 									</div>
 									
 								</td>
@@ -77,12 +82,7 @@
 					</table>
 					
 				</div>
-				<div>
-						
-					<span class="text-muted"> Acciones: </span><span class="text-primary font-italic"><span class="fa fa-cubes"></span> Cantidad</span> <span class="text-muted"> |</span>
-					<span class="text-info font-italic"><span class="fa fa-dollar-sign"></span> Precio </span><span class="text-muted"> |</span>
-					<span class="text-danger font-italic"><span class="fa fa-times-circle"></span> Quitar </span>
-				</div>
+				
 			</div>
 			<!-- PANEL DERECHA  -->
 			<div class="col-md-4">
