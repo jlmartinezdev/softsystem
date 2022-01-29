@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Empresa;
+use App\Ciudad;
+use App\Sucursal;
 use Illuminate\Http\Request;
 
 class EmpresaController extends Controller
@@ -14,7 +16,10 @@ class EmpresaController extends Controller
      */
     public function index()
     {
-        //
+        $empresa = Empresa::first();
+        $ciudades = Ciudad::All();
+        $sucursales = Sucursal::All();
+        return view('empresa',compact('empresa','ciudades','sucursales'));
     }
 
     /**
@@ -67,9 +72,20 @@ class EmpresaController extends Controller
      * @param  \App\Empresa  $empresa
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Empresa $empresa)
+    public function update(Request $request)
     {
-        //
+        Empresa::where('emp_codigo',0)->update([
+            'emp_nombre'=>$request->nombre,
+            'suc_cod'=> $request->sucursal,
+            'CIUDAD_cod' => $request->ciudad,
+            'emp_direccion' => $request->direccion,
+            'emp_ruc' => $request->ruc,
+            'emp_celular' => $request->celular,
+            'emp_telefono' => $request->telefono,
+            'emp_correo' => $request->correo,
+            'emp_web' => $request->web,
+            'emp_descripcion' => $request->descripcion
+        ]);
     }
 
     /**

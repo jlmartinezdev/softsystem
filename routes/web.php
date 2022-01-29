@@ -73,6 +73,9 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('sucursal/set', 'SucursalController@set')->name('sucursal.set');
     //STOCK
     Route::get('stock/{id}', 'StockController@show');
+    //EMPRESA
+    Route::get('empresa','EmpresaController@index')->name('empresa.index');
+    Route::post('empresa','EmpresaController@update');
 
  
     

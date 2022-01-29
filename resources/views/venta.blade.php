@@ -123,7 +123,8 @@
 							<input type="number" @keyup="saveDatos" class="form-control form-control-sm" v-model="ventaCabecera.descuento" placeholder="Descuento...">
 						</fieldset>
 						<hr>
-						<h3>TOTAL: @{{totalVenta}}</h3>
+						
+						<h3><template>TOTAL: @{{totalVenta}}</template></h3>
 						<hr>
 						<button class="btn btn-success btn-block" @click="showFinalizar">
 							<span class="fa fa-check"></span>

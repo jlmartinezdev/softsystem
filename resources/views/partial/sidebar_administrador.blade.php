@@ -73,6 +73,12 @@
                                 <p>Proveedor</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('empresa.index') }}" id="m_empresa" class="nav-link">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Empresa</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li class="nav-item">
