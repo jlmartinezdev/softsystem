@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Seccion;
 use Illuminate\Http\Request;
+use Auth;
 
 class SeccionController extends Controller
 {
@@ -11,6 +12,10 @@ class SeccionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function index()
     {
         $secciones = $this->ALL();
@@ -20,16 +25,7 @@ class SeccionController extends Controller
         return Seccion::All();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
+   
     /**
      * Store a newly created resource in storage.
      *
@@ -43,28 +39,6 @@ class SeccionController extends Controller
         $seccion->iva= $request->iva;
         $seccion->save();
         return 'OK';
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**

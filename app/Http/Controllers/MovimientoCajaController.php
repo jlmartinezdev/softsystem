@@ -6,8 +6,13 @@ use Illuminate\Http\Request;
 use App\Apertura;
 use App\MovimientoCaja;
 use DB;
+use Auth;
 class MovimientoCajaController extends Controller
 {
+	public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function index(){
     	return view('movimiento');
     }

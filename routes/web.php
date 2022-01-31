@@ -76,8 +76,11 @@ Route::group(['middleware' => ['administrador']], function () {
     //EMPRESA
     Route::get('empresa','EmpresaController@index')->name('empresa.index');
     Route::post('empresa','EmpresaController@update');
-
- 
+    //CIUDAD
+    Route::get('ciudad','CiudadController@index')->name('ciudad.index');
+    Route::post('ciudad', 'CiudadController@store');
+    Route::post('ciudad/{id}', 'CiudadController@update');
+    Route::delete('ciudad/{id}', 'CiudadController@destroy');
     
     //PDF
     Route::get('pdf/boletaventa/{id}', 'VentaController@pdfboleta')->name('pfd.boletaventa');

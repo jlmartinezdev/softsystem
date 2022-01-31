@@ -79,6 +79,12 @@
                                 <p>Empresa</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('ciudad.index') }}" id="m_ciudad" class="nav-link">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Ciudad</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li class="nav-item">

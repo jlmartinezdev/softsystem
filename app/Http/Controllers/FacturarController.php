@@ -8,9 +8,13 @@ use App\Facturar;
 use App\Venta;
 use App\Empresa;
 use DB;
-
+use Auth;
 class FacturarController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function index($id){
         $ultimo= reffactura::first();
         $venta= $this->getDetalle($id);

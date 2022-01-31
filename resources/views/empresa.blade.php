@@ -102,6 +102,7 @@
                     location.reload();
                 }
             }
-        })
+        });
+        activarMenu('m_mantenimiento', 'm_empresa');
     </script>
 @endsection
