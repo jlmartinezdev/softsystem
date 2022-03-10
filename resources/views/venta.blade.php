@@ -140,7 +140,7 @@
 		</div> <!--end container -->
 		@include('articulo.buscar')
 		@include('venta.finalizar')
-		@include('cliente.buscar')
+		@include('cliente.buscar') 
 	</div><!-- end app -->
 @endsection
 @section('footer')

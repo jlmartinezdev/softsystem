@@ -9,8 +9,9 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('articulo', 'ArticuloController@index')->name('articulo');
     Route::get('articulo/buscar', 'ArticuloController@getArticulo')->name('articulo@buscar');
     Route::get('articulo/ultimo', 'ArticuloController@getUltimo')->name('articulo@ultimo');
+    Route::get('articulo/precios/{id}','ArticuloController@getPrecios');
     Route::put('articulo', 'ArticuloController@getByCodigo');
-    Route::post('articulo/res', 'ArticuloController@reservarCodigo')->name('articulo@reservarCodigo');
+    Route::post('articulo', 'ArticuloController@store');
     Route::put('articulo/{id}', 'ArticuloController@update')->name('articulo.update');
     Route::delete('articulo/res/{id}', 'ArticuloController@destroy')->name('articulo.destroy');
     //STOCK

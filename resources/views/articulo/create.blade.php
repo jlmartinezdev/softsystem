@@ -10,7 +10,7 @@
 			<div class="modal-body">
 				<nav>
 					<div class="nav nav-tabs" role="tablist">
-						<a class="nav-item nav-link active" data-toggle="tab" role="tab" href="#frmdescrip" aria-controls="frmdescrip" aria-select="true">Descripcion</a>
+						<a class="nav-item nav-link active" data-toggle="tab" role="tab" href="#frmdescrip" aria-controls="frmdescrip" aria-select="true"><strong>Descripcion</strong></a>
 						<a class="nav-item nav-link" data-toggle="tab" role="tab" href="#frmstock" aria-controls="frmstock" aria-select="false">Stock</a>
 						<a class="nav-item nav-link" data-toggle="tab" role="tab" href="#frmprecio" aria-controls="frmprecio" aria-select="false">Precio</a>
 					</div>
@@ -27,8 +27,8 @@
 							<div class="col">
 								<div class="form-group">
 							      <strong><label for="cbarra">Codigo de Barra</label></strong>
-							      <input type="text" v-model="articulo.c_barra" @blur="validar_Cbarra" class="form-control form-control-sm" name="cbarra" placeholder="Codigo de Barra">
-							    </div>
+							      <input type="text" v-model="articulo.c_barra" class="form-control form-control-sm" name="cbarraN" id="cbarraN" placeholder="Codigo de Barra">
+							    </div> 
 							</div>
 						</div>
 						<div class="form-row">
@@ -168,9 +168,10 @@
 							      <strong><label for="costo">Precio Compra *</label></strong>
 							      <input type="number" onkeypress="return soloNumero(event)" v-model="articulo.costo" v-on:keyup="setPrecioVenta()" onfocus="this.select()" class="form-control form-control-sm font-weight-bold" name="costo" placeholder="Precio Compra">
 							    </div>
+								<button class="btn btn-primary" @click="mostrarPrecios"><span class="fa fa-plus"></span> Precios</button>
 							</div>
 						</div>
-						<div class="card border-warning py-2 px-2 m-1">
+						<div class="card border-warning py-2 px-2 mt-2">
 							<strong>Margen de Utilidad %</strong>
 							<div class="form-row">
 								<div class="col">
@@ -205,7 +206,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="card border-warning py-2 px-2 m-1">
+						<div class="card border-warning py-2 px-2 mt-1">
 							<strong>Precio de Venta</strong>
 							<div class="form-row">
 								<div class="col">
@@ -251,6 +252,7 @@
 			        @{{ error }}
 			      </div>
 			    </template>
+				
 				<button type="button" class="btn btn-secondary" data-dismiss="modal"><span class="fa fa-times"></span> Cerrar</button>
 				<button type="button" class="btn btn-primary" @click="saveArticulo"><span class="fa fa-save"></span> Guardar</button>
 			</div>

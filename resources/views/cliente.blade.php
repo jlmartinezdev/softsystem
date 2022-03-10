@@ -41,10 +41,10 @@
                 </tr>
                 <template v-for="cliente in clientes">
                     <tr>
-                        <td>@{{ cliente . cliente_ci }}</td>
-                        <td>@{{ cliente . cliente_nombre }}</td>
-                        <td>@{{ cliente . cliente_direccion }}</td>
-                        <td>@{{ cliente . cliente_cel }}</td>
+                        <td>@{{ cliente.cliente_ci }}</td>
+                        <td>@{{ cliente.cliente_nombre }}</td>
+                        <td>@{{ cliente.cliente_direccion }}</td>
+                        <td>@{{ cliente.cliente_cel }}</td>
                         <td>
 							<div class="btn-group btn-group-sm">
                             <button class="btn btn-outline-primary btn-sm" @click="showEdit(cliente)" title="Seleccionar">

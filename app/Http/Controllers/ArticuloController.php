@@ -10,7 +10,10 @@ use DB;
 
 class ArticuloController extends Controller
 {
-   
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function index()
     {
         $secciones= Seccion::All();
@@ -49,6 +52,9 @@ class ArticuloController extends Controller
             'articulos' => $articulos
         ];
     }
+    public function getPrecios($id){
+        return DB::select("SELECT truncate(precio,0) as p, truncate(margen,0) as m, truncate(monto_cuota,0) as c FROM precios where ARTICULOS_cod=".$id);
+    }
     public function getByCodigo(Request $request){
         return Articulo::join('stock', 'articulos.articulos_cod', '=', 'stock.articulos_cod')
             ->join('presentacion','articulos.present_cod','=','presentacion.present_cod')
@@ -83,7 +89,6 @@ class ArticuloController extends Controller
     {
         $articulo= new Articulo();
         $articulo->uni_codigo=$request->articulo['unidad']; 
-        $articulo->producto_c_barra=$request->articulo['c_barra'];
         $articulo->present_cod =  $request->articulo['seccion'];
         $articulo->producto_nombre = $request->articulo['descripcion'];
         $articulo->producto_costo_compra = $request->articulo['costo'];
@@ -109,13 +114,27 @@ class ArticuloController extends Controller
         $articulo->producto_formula= '';
         $articulo->producto_dimagen= '';
         $articulo->save();
-        
+        $articulo= Articulo::latest('ARTICULOS_cod', 'desc')->first();
+        $cbarra= null;
+        if (!is_null($request->c_barra)){
+            $cbarra=$request->articulo['c_barra'];
+        }else{
+            $cbarra= $this->rellenar($articulo->ARTICULOS_cod);
+        }
+        Articulo::where('articulos_cod',$articulo->ARTICULOS_cod)->update([
+            'producto_c_barra'=>$cbarra
+        ]);
         for ($i=0; $i <count($request->stock) ; $i++) { 
             DB::select('call insert_stock(?,?,?,?,?,?)',[$articulo->ARTICULOS_cod,$request->stock[$i]['sucursal'],$request->stock[$i]['cantidad'],$this->setVencimiento($request->stock[$i]['vencimiento']),$request->stock[$i]['loteold'],$request->stock[$i]['lotenew']]);
         }
+        for($i=2;$i<=18;$i++){
+            DB::insert('INSERT INTO precios VALUES (?,?,?,?,?,?)',[$i,$articulo->ARTICULOS_cod,$request->precios[$i-2]["p"],$request->precios[$i-2]["m"],$i,$request->precios[$i-2]["c"]]);
+        }
     }
 
-  
+    private function rellenar($codigo){
+       return str_pad($codigo,7,"0",STR_PAD_LEFT);
+    }
 
  
 
@@ -156,8 +175,16 @@ class ArticuloController extends Controller
             'producto_formula'=> '',
             'producto_dimagen'=> ''
         ]);
-        for ($i=0; $i <count($request->stock) ; $i++) { 
+        for ($i=0; $i < count($request->stock) ; $i++) { 
             DB::select('call insert_stock(?,?,?,?,?,?)',[$id,$request->stock[$i]['sucursal'],$request->stock[$i]['cantidad'],$this->setVencimiento($request->stock[$i]['vencimiento']),$request->stock[$i]['loteold'],$request->stock[$i]['lotenew']]);
+        }
+        for($i=0;$i< count($request->precios);$i++){
+            if($request->articulo['existePrecios']){
+                DB::update('UPDATE precios SET precio= ?,margen=?, cant_cuota=?, monto_cuota=? WHERE id_precio=? AND articulos_cod=?',[$request->precios[$i]["p"],$request->precios[$i]["m"],$i+2,$request->precios[$i]["c"],$i+2,$id]);
+            }else{
+                DB::insert('INSERT INTO precios VALUES (?,?,?,?,?,?)',[$i+2,$articulo->ARTICULOS_cod,$request->precios[$i]["p"],$request->precios[$i]["m"],$i+2,$request->precios[$i]["c"]]);
+            }
+            
         }
         //$ok= $ok ? "OK": "ERROR";
         return $ok;

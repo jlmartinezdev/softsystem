@@ -9,12 +9,13 @@
             </div>
             <div class="form-group">
                 <label>Entrega</label>
-                <input type="text" class="form-control number-separator" id="entrega" placeholder="Monto ..."  style="text-align:right;" @keyup="getSaldo" >
+                <input type="text" class="form-control number-separator form-control-sm" id="entrega" placeholder="Monto ..."  style="text-align:right;" @keyup="getSaldo" >
             </div>
             <div class="form-group">
                 <label>Cantidad Cuota</label>
-                <input type="Number" class="form-control" v-model="cant_cuota" placeholder="Cant. Cuota ...">
+                <input type="Number" class="form-control form-control-sm" v-model="cant_cuota" placeholder="Cant. Cuota ...">
             </div>
+            <label><input type="checkbox" v-model="primeracuota"> Entrega primera cuota</label>
         </div>
         <div class="col-6">
             <div class="form-group">
@@ -24,11 +25,11 @@
             
             <div class="form-group">
                 <label>Interes %</label>
-                <input type="number" class="form-control" v-model="interes" placeholder="Porcentaje ...">
+                <input type="number" class="form-control form-control-sm" v-model="interes" placeholder="Porcentaje ...">
             </div>
             <div class="form-group">
                 <label><input type="checkbox" v-model="redondear"> Redondear Monto Cuota</label>
-                <button @click="generar" class="btn btn-primary btn-block"><span class="fa fa-cog"></span> Generar Cuota</button>
+                <button @click="generar" class="btn btn-primary btn-sm btn-block"><span class="fa fa-cog"></span> Generar Cuota</button>
             </div>
         </div>
     </div>
@@ -54,12 +55,13 @@
 <script>
 export default {
     name: 'generar_cuota',
-    props: ['total'],
+    props: ['total', 'fecha'],
     data(){
         return{
             cant_cuota: 1,
             sentrega: '',
             entrega: 0,
+            primeracuota: 0,
             saldo: 0,
             interes: 0,
             cuota: { nro: 0, interes: 0, vencimiento: 0, monto: 0, tipo: 0 },
@@ -155,6 +157,9 @@ export default {
     },
     mounted(){
         this.saldo= this.total;
+    },
+    updated(){
+       // this.saldo= this.total;
     }
 
 };

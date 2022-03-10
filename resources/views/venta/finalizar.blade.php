@@ -47,7 +47,7 @@
 					</div>
 					<div class="tab-pane fade" id="generar" role="tabpanel">
 					
-						<generar_cuota :total="ventaCabecera.total"/>
+						<generar_cuota :total="ventaCabecera.total" ref="generarcuota"/>
 
 					</div>
 				</div>

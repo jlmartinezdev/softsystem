@@ -165,6 +165,7 @@
 							      <strong><label for="costo">Precio Compra *</label></strong>
 							      <input type="text" onkeypress="return soloNumero(event)" v-model="articulo.costo" v-on:keyup="setPrecioVenta()" onfocus="this.select()" class="form-control form-control-sm font-weight-bold" name="costo" placeholder="Precio Compra">
 							    </div>
+								<button class="btn btn-primary" @click="mostrarPrecios"><span class="fa fa-plus"></span> Precios</button>
 							</div>
 						</div>
 						<div class="card border-warning py-2 px-2 m-1">
@@ -194,6 +195,12 @@
 								      <input v-model="articulo.m4" onfocus="this.select()" type="number" v-on:keyup="setUtilPrecio('M',4)" class="form-control form-control-sm" name="margen4" placeholder="Margen Precio 4">
 								    </div>
 								</div>
+								<div class="col">
+								    <div class="form-group">
+								      <strong><label for="margen5">Precio 5</label></strong>
+								      <input v-model="articulo.m5" onfocus="this.select()" type="number" v-on:keyup="setUtilPrecio('M',5)" class="form-control form-control-sm" name="margen4" placeholder="Margen Precio 5">
+								    </div>
+								</div>
 							</div>
 						</div>
 						<div class="card border-warning py-2 px-2 m-1">
@@ -221,6 +228,12 @@
 								    <div class="form-group">
 								      <strong><label for="venta4">Precio Venta 4</label></strong>
 								      <input v-model="articulo.p4" onfocus="this.select()" v-on:keyup="setUtilPrecio('P',4)" type="number" class="form-control form-control-sm" name="venta4" placeholder="Precio Venta 4">
+								    </div>
+								</div>
+								<div class="col">
+								    <div class="form-group">
+								      <strong><label for="venta5">Precio Venta 5</label></strong>
+								      <input v-model="articulo.p5" onfocus="this.select()" v-on:keyup="setUtilPrecio('P',5)" type="number" class="form-control form-control-sm" name="venta5" placeholder="Precio Venta 5">
 								    </div>
 								</div>
 							</div>
