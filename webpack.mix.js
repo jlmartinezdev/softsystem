@@ -11,9 +11,9 @@ const mix = require('laravel-mix');
  | file for the application as well as bundling up all the JS files.
  |
  */
- mix.js('resources/js/venta.js','public/js')
- .version();
-/*
+//  mix.js('resources/js/venta.js','public/js')
+//  .version();
+
 mix.js('resources/js/app.js', 'public/js')
     .js('resources/js/login.js','public/js')
     .js('resources/js/busqueda.js','public/js')
@@ -26,5 +26,5 @@ if(mix.inProduction())
 	mix.version();
 }
 
-*/
+
 //mix.browserSync('http://softsystem.test:8080');

@@ -59,6 +59,7 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('infctacobrar', 'CtaCobrarController@indexInf')->name('infctacobrar');
     Route::get('ctas_cobrar/buscar', 'CtaCobrarController@getCtaCobrar')->name('ctas_cobrar@buscar');
     Route::post('infctacobrar', 'CtaCobrarController@infToPdf')->name('infctacobrar@pdf');
+    Route::get('cobro','CtaCobrarController@index')->name('cobro');
     //Usuario
     Route::get('usuario', 'UserController@index')->name('usuario');
     

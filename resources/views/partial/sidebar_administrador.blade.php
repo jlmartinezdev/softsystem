@@ -38,7 +38,7 @@
                     <a href="#" class="nav-link" id="m_mantenimiento">
                         <i class="nav-icon fa fa-cog"></i>
                         <p>
-                            Mantimiento
+                            MANTENIMIENTO
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -91,7 +91,7 @@
                     <a href="{{ route('articulo') }}" id="m_articulo" class="nav-link">
                         <i class="nav-icon fa fa-clone"></i>
                         <p>
-                            Articulos
+                            ARTICULOS
                         </p>
                     </a>
                 </li>
@@ -99,7 +99,7 @@
                     <a href="{{ route('compra') }}" id="m_compra" class="nav-link">
                         <i class="nav-icon fas fa-th"></i>
                         <p>
-                            Compra
+                            COMPRA
                         </p>
                     </a>
                 </li>
@@ -107,7 +107,7 @@
                     <a href="{{ route('venta') }}" id="m_venta" class="nav-link">
                         <i class="nav-icon fa fa-cog"></i>
                         <p>
-                            Venta
+                            VENTA
                         </p>
                     </a>
                 </li>
@@ -115,7 +115,7 @@
                     <a href="#" class="nav-link" id="m_caja">
                         <i class="nav-icon fa fa-cash-register"></i>
                         <p>
-                            Caja
+                            CAJA
                             <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
@@ -136,10 +136,18 @@
                     </ul>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('cobro') }}" id="m_cobro" class="nav-link">
+                        <i class="nav-icon fa fa-money-bill"></i>
+                        <p>
+                            COBRO DE CUENTAS
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="#" class="nav-link" id="m_informe">
                         <i class="nav-icon fa fa-sticky-note"></i>
                         <p>
-                            Informes
+                            INFORMES
                             <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
@@ -176,7 +184,7 @@
                         onclick="event.preventDefault();document.getElementById('logout-form').submit();">
                         <i class="nav-icon fa fa-sign-out-alt"></i>
                         <p>
-                            Cerrar Sesion
+                            CERRAR SESION
                         </p>
                     </a>
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

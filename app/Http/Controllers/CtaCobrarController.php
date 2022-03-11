@@ -9,6 +9,9 @@ use DB;
 use PDF;
 class CtaCobrarController extends Controller
 {
+    public function index(){
+        return view('cobros');
+    }
     public function indexInf(){
         return view('informes.ctacobrar');
     }

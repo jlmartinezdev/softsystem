@@ -144,6 +144,7 @@
     </div>
 @endsection
 @section('script')
+    <script src="{{ asset('js/separator.js')}}"></script>
     <script>
         var app = new Vue({
             el: '#app',
@@ -189,7 +190,7 @@
                     seccion: 0, columna: 0, orden: 'ASC'
                 },
                 articulo: {
-                    codigo: '',c_barra: '',descripcion: '',indicaciones: '',modouso: '',seccion: 1,unidad: 1,factor: 1,ubicacion: '',costo: 100000,p1: 0,p2: 0,p3: 0,p4: 0,p5: 0,m1: 0,m2: 0,m3: 0,m4: 0,m5: 0, svenc: '0', existePrecios: false
+                    codigo: '',c_barra: '',descripcion: '',indicaciones: '',modouso: '',seccion: 1,unidad: 1,factor: 1,ubicacion: '',costo: 0,p1: 0,p2: 0,p3: 0,p4: 0,p5: 0,m1: 0,m2: 0,m3: 0,m4: 0,m5: 0, svenc: '0', existePrecios: false
                 },
                 stock: {
                     id: 0, cantidad: 0, loteold: '', lotenew: '', vencimiento: '', sucursal: 1

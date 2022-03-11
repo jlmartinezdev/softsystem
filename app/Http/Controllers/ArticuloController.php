@@ -182,7 +182,7 @@ class ArticuloController extends Controller
             if($request->articulo['existePrecios']){
                 DB::update('UPDATE precios SET precio= ?,margen=?, cant_cuota=?, monto_cuota=? WHERE id_precio=? AND articulos_cod=?',[$request->precios[$i]["p"],$request->precios[$i]["m"],$i+2,$request->precios[$i]["c"],$i+2,$id]);
             }else{
-                DB::insert('INSERT INTO precios VALUES (?,?,?,?,?,?)',[$i+2,$articulo->ARTICULOS_cod,$request->precios[$i]["p"],$request->precios[$i]["m"],$i+2,$request->precios[$i]["c"]]);
+                DB::insert('INSERT INTO precios VALUES (?,?,?,?,?,?)',[$i+2,$id,$request->precios[$i]["p"],$request->precios[$i]["m"],$i+2,$request->precios[$i]["c"]]);
             }
             
         }

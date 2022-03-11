@@ -166,7 +166,7 @@
 	    					<div class="col">
 	    						<div class="form-group">
 							      <strong><label for="costo">Precio Compra *</label></strong>
-							      <input type="number" onkeypress="return soloNumero(event)" v-model="articulo.costo" v-on:keyup="setPrecioVenta()" onfocus="this.select()" class="form-control form-control-sm font-weight-bold" name="costo" placeholder="Precio Compra">
+								  <in-number  v-model="articulo.costo" placeholder="Precio Compra" @change="setPrecioVenta"></in-number>
 							    </div>
 								<button class="btn btn-primary" @click="mostrarPrecios"><span class="fa fa-plus"></span> Precios</button>
 							</div>

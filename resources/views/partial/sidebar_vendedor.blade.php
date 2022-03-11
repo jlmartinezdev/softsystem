@@ -118,7 +118,14 @@
                         </li>
                     </ul>
                 </li>
-
+                <li class="nav-item">
+                    <a href="{{ route('cobro') }}" id="m_cobro" class="nav-link">
+                        <i class="nav-icon fa fa-money-bill"></i>
+                        <p>
+                            COBRO DE CUENTAS
+                        </p>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a href="{{ route('sucursal.set') }}" class="nav-link" id="m_sucursal">
                         <i class="fa fa-warehouse nav-icon"></i>

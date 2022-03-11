@@ -9,7 +9,13 @@
 		margin-bottom: 0.2rem;
 		font-weight: bold;
 	}
-
+	.modal-dialog{
+		overflow-y: initial !important
+	}
+	.modal-body{
+		height: 350px;
+		overflow-y: auto;
+	}
 </style>
 @endsection
 @section('main')
@@ -62,7 +68,7 @@
 										<button class="dropdown-item" @click="setCantidad(index,item.cantidad,item.stock)">
 											<span class="fa fa-cubes text-primary" style="width: 13pt"></span> Cantidad	
 										</button>
-										<button class="dropdown-item" @click="setPrecio(index,item)">
+										<button class="dropdown-item" @click="showModalPrecio(index,item)">
 											<span class="fa fa-dollar-sign  text-info" style="width: 13pt"></span> Precio
 										</button>
 										<button class="dropdown-item" @click="delArticulo(item)">
@@ -141,6 +147,7 @@
 		@include('articulo.buscar')
 		@include('venta.finalizar')
 		@include('cliente.buscar') 
+		@include('venta.selprecio')
 	</div><!-- end app -->
 @endsection
 @section('footer')
@@ -163,11 +170,15 @@
 			carro:[],
 			caja: '...',
 			nrooperacion: '...',
+			tmpIndexPrecio: {iPrecio:'CO1',iArticulo:0},
 			txtbuscar: '',
 			txtcliente: '',
 			filtro: {seccion: 0, columna: 0, orden: 'ASC'},
 			error:'',
 			articulos:[],
+			preciosContado: {p1:0,m1:10,p2:0,m2:20,p3:0,m3:30,p4:0,m4:40,p5:0,m5:0,articulo:''},
+			preciosCredito:[],
+			articulo: null,
 			clientes:[],
 			requestLote: false
 		},
@@ -265,6 +276,7 @@
 		  		
 		  	},
 		  	addCarrito: function(a,idStock){
+				console.log(a);
 		  		//Buscar articulo si no esta en la lista
 				let i=this.carro.findIndex(x=> x.codigo == a.ARTICULOS_cod &&  x.idstock==idStock);
 				if(i == -1){
@@ -279,7 +291,15 @@
 	  					p2: a.pre_venta2,
 	  					p3: a.pre_venta3,
 	  					p4: a.pre_venta4,
-						costo: a.producto_costo_compra}
+						p5: a.pre_venta5,
+						m1: a.pre_margen1,
+						m2: a.pre_margen2,
+						m3: a.pre_margen3,
+						m4: a.pre_margen4,
+						m5: a.pre_margen5,
+						costo: a.producto_costo_compra,
+						iPrecio: 'CO1',
+					}
 			  		this.carro.push(art);
 				}else{
 					this.carro[i].cantidad= parseInt(this.carro[i].cantidad) + 1;//Actualizar cantidad
@@ -316,40 +336,45 @@
 				  this.saveDatos();
 				}
             },
-            setPrecio: async function(index,articulo){
-            	var preselect=0;
-            	const { value: precio } = await Swal.fire({
-					title: 'Seleccione Precio',
-					input: 'select',
-					inputOptions: {
-					1 : this.format(articulo.p1),
-					2 : this.format(articulo.p2),
-					3 : this.format(articulo.p3),
-					4 : this.format(articulo.p4),
-					},
-					inputPlaceholder: 'Seleccione precio',
-					showCancelButton: true,
-					confirmButtonText: 'Aceptar',
-				  	cancelButtonText: 'Cancelar'
-					})
-            	if(precio){
-            		switch(precio){
-            			case '1':
-            			preselect= articulo.p1;
-            			break;
-            			case '2':
-            			preselect= articulo.p2;
-            			break;
-            			case '3':
-            			preselect= articulo.p3;
-            			break;
-            			case '4':
-            			preselect= articulo.p4;
-            			break;
-            		}
-            		this.carro[index].precio= preselect;
-            		this.saveDatos();
-            	}
+			showModalPrecio: function(index,articulo){
+				this.articulo= articulo;
+				this.tmpIndexPrecio.iArticulo= index;
+				for(i=1;i<6;i++){
+					this.preciosContado['m'+i]=parseInt(articulo['m'+i]);
+					this.preciosContado['p'+i]=parseInt(articulo['p'+i]);
+				}
+				this.preciosContado.articulo= articulo.descripcion;
+				$('#selPrecio').modal('show');
+				axios.get('articulo/precios/'+articulo.codigo).then(response =>{
+					if(response.data.length> 0)
+						this.preciosCredito=[];
+						for(i=0;i<response.data.length; i++){
+							let precios={p:response.data[i].p,c: response.data[i].c, m:response.data[i].m}
+							this.preciosCredito.push(precios);
+						}
+					
+				}).catch( error => {
+					this.error= error.message;
+				})
+			},
+            setPrecio: function(){
+				$('#selPrecio').modal('hide');
+				let iPrecio= this.tmpIndexPrecio.iPrecio;
+				let x= iPrecio.substr(2);
+				let index= this.tmpIndexPrecio.iArticulo;
+				if(iPrecio.includes('CO')){
+					this.ventaCabecera.condicionventa= 1
+					let newPrecio= this.articulo['p' + x];
+					if(newPrecio > 0 )
+						this.carro[index].precio= newPrecio;
+				}else{
+					this.ventaCabecera.condicionventa= 2
+					let newPrecio= this.preciosCredito[x].p;
+					if( newPrecio > 0)
+						this.carro[index].precio= newPrecio;
+				}
+				
+            	this.saveDatos(); 
             },
             delArticulo: function(articulo){
             	this.carro.pop(articulo);
