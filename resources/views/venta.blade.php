@@ -132,13 +132,14 @@
 						
 						<h3><template>TOTAL: @{{totalVenta}}</template></h3>
 						<hr>
-						<button class="btn btn-success btn-block" @click="showFinalizar">
+						<button class="btn btn-success" @click="showFinalizar">
 							<span class="fa fa-check"></span>
 							<strong>FINALIZAR</strong> 
 						</button>
+						<button class="btn btn-secondary" @click="cancelar"> <span class="fa fa-times"></span> CANCELAR</button>
 						<hr>
-						<a href="venta/imprimir" class="btn btn-secondary"> <span class="fa fa-print"></span> Imprimir</a>
-						<button class="btn btn-secondary"><span class="fa fa-file-alt"></span> Informe</button>
+						<a href="venta/imprimir" class="btn btn-link"> <span class="fa fa-print"></span> Imprimir</a>
+						<button class="btn btn-link"><span class="fa fa-file-alt"></span> Informe</button>
 				</div>
 			</div>
 			</div>
@@ -166,11 +167,11 @@
 		    bootstrapPaginationClasses: { ul: 'pagination',li: 'page-item',liActive: 'active',liDisable: 'disabled', button: 'page-link'},
 		    customLabels: { first: 'Primer', prev: 'Ant',next: 'Sig', last: 'Ultimo' },
 		    paginacion: {'total': 0,'pagina_actual': 1, 'por_pagina': 0,'ultima_pagina': 0,'desde': 0,'hasta': 0 },
-			ventaCabecera: {fecha: '2020-01-01', clienteId: '1', clienteNombre:'Ocasional', documento: 'Ticket',idSucursal: 1,formacobro:1,condicionventa: 1, total: 0,descuento: 0,nro_operacion:0},
+			ventaCabecera: {fecha: '2020-01-01', clienteId: '1', clienteNombre:'Cliente Ocasional', documento: 'Ticket',idSucursal: 1,formacobro:1,condicionventa: 1, total: 0,descuento: 0,nro_operacion:0, generarcuota: true},
 			carro:[],
 			caja: '...',
 			nrooperacion: '...',
-			tmpIndexPrecio: {iPrecio:'CO1',iArticulo:0},
+			tmpIndexPrecio: {iPrecio:'CO1',iArticulo:0,monto_cuota: 0},
 			txtbuscar: '',
 			txtcliente: '',
 			filtro: {seccion: 0, columna: 0, orden: 'ASC'},
@@ -180,7 +181,8 @@
 			preciosCredito:[],
 			articulo: null,
 			clientes:[],
-			requestLote: false
+			requestLote: false,
+			cuotas: []
 		},
 		methods:{
 			onChange: function () {//Al cambiar pagina
@@ -188,6 +190,9 @@
 		         this.buscar(true);
 		      }
 		    },
+			setCuotas: function(cuotas){
+				this.cuotas= cuotas;
+			},
 			buscar: function(isPaginate){
 		        this.requestSend= true;
 		        if(this.txtbuscar.length == 0) {
@@ -276,7 +281,6 @@
 		  		
 		  	},
 		  	addCarrito: function(a,idStock){
-				console.log(a);
 		  		//Buscar articulo si no esta en la lista
 				let i=this.carro.findIndex(x=> x.codigo == a.ARTICULOS_cod &&  x.idstock==idStock);
 				if(i == -1){
@@ -363,15 +367,20 @@
 				let x= iPrecio.substr(2);
 				let index= this.tmpIndexPrecio.iArticulo;
 				if(iPrecio.includes('CO')){
-					this.ventaCabecera.condicionventa= 1
+					this.ventaCabecera.condicionventa= 1;
+					this.ventaCabecera.generarcuota= true;
 					let newPrecio= this.articulo['p' + x];
 					if(newPrecio > 0 )
 						this.carro[index].precio= newPrecio;
 				}else{
 					this.ventaCabecera.condicionventa= 2
+					this.ventaCabecera.generarcuota= false;
 					let newPrecio= this.preciosCredito[x].p;
-					if( newPrecio > 0)
+					if( newPrecio > 0){
 						this.carro[index].precio= newPrecio;
+						this.tmpIndexPrecio.monto_cuota= this.preciosCredito[x].c;
+					}
+						
 				}
 				
             	this.saveDatos(); 
@@ -413,14 +422,17 @@
             	
             },
             finalizar: function(){
-            	
-            	axios.post('venta',{ventaCabecera: this.ventaCabecera, detalle: this.carro})
+            	if(this.ventaCabecera.condicionventa==2 && this.cuotas.length < 1){
+					Swal.fire('Error','Por favor genere las cuotas','error');
+					return false;
+				}
+            	axios.post('venta',{ventaCabecera: this.ventaCabecera, detalle: this.carro, cuotas: this.cuotas})
             	.then(response =>{
-            		console.log(response.data);
             		this.carro= [];
             		localStorage.removeItem('carro_venta');
             		localStorage.removeItem('ventaCabecera');
             		$('#finalizarventa').modal('hide');
+					window.location.reload();
             	})
             	.catch(error =>{
             		Swal.fire('Error',error.message,'error');
@@ -492,7 +504,14 @@
             	if(lote){
             		this.addCarrito(articulo,lotes[lote].id_stock);
             	}
-            }
+            },
+			cancelar: function(){
+				this.carro= [];
+            	localStorage.removeItem('carro_venta');
+            	localStorage.removeItem('ventaCabecera');
+				this.getFecha();
+				window.location.reload();
+			}
 		},
 		computed: {
 			totalVenta: function(){
@@ -512,6 +531,7 @@
 			this.getFecha();
 			this.getApertura();
 			this.recuperarDatos();
+			this.getFecha();
 			this.getSucursal();
 		}
 	});

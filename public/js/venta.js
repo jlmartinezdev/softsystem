@@ -149,15 +149,23 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'generar_cuota',
-  props: ['total', 'fecha'],
+  props: ['total', 'fecha', 'datoscuota', 'calcularcuota'],
   data: function data() {
     return {
       cant_cuota: 1,
       sentrega: '',
       entrega: 0,
-      primeracuota: 0,
+      primeracuota: false,
       saldo: 0,
       interes: 0,
       cuota: {
@@ -167,9 +175,35 @@ __webpack_require__.r(__webpack_exports__);
         monto: 0,
         tipo: 0
       },
+      oldDatos: {
+        entrega: 0,
+        saldo: 0
+      },
       cuotas: [],
-      redondear: true
+      redondear: false
     };
+  },
+  watch: {
+    total: function total() {
+      this.saldo = this.total;
+    },
+    calcularcuota: function calcularcuota(newVal, oldVal) {
+      if (!newVal) {
+        //Extraer cantidad de cuota Ej:(CR2)
+        this.cant_cuota = Number(this.datoscuota.iPrecio.substr(2));
+      }
+    },
+    primeracuota: function primeracuota(newVal, oldVal) {
+      if (newVal) {
+        this.oldDatos.saldo = this.saldo;
+        this.oldDatos.entrega = this.entrega;
+        this.saldo = this.total;
+        this.entrega = 0;
+      } else {
+        this.saldo = this.oldDatos.saldo;
+        this.entrega = this.oldDatos.entrega;
+      }
+    }
   },
   methods: {
     generar: function generar() {
@@ -177,6 +211,7 @@ __webpack_require__.r(__webpack_exports__);
       var monto_cuota, Importe, cantidad, restoDivision;
       var Dia;
       var i_plus = 0;
+      var indexcuota = 0;
       Importe = this.saldo;
       cantidad = this.cant_cuota;
 
@@ -190,18 +225,29 @@ __webpack_require__.r(__webpack_exports__);
         return;
       }
 
-      monto_cuota = Number.parseInt(Importe / cantidad);
+      if (this.calcularcuota) {
+        monto_cuota = Number.parseInt(Importe / cantidad);
+      } else {
+        monto_cuota = this.datoscuota.monto_cuota;
+      }
+
       restoDivision = Importe % cantidad;
-      console.log("Monto cuota:", monto_cuota);
 
       if (this.interes > 0) {
         monto_cuota = monto_cuota + monto_cuota * this.interes / 100;
       }
 
-      var d = new Date();
+      var d = new Date(this.fecha);
 
-      this._setCuota(0, this._nextMonth(d, false), this.entrega, 'Entrega'); //Entrega 
+      if (!this.primeracuota) {
+        if (this.entrega > 0) {
+          this._setCuota(1, this._nextMonth(d, false), this.entrega, 'Entrega'); //Entrega
 
+
+          indexcuota = 1;
+          i_plus++;
+        }
+      }
 
       if (this.redondear && cantidad > 1 && restoDivision != 0) {
         if (monto_cuota.toString().length > 3) {
@@ -212,7 +258,7 @@ __webpack_require__.r(__webpack_exports__);
             var primera_cuota = monto_cuota.toString().substr(0, monto_cuota.toString().length - 4);
             primera_cuota = (Number.parseInt(primera_cuota) + 1) * 10000;
 
-            this._setCuota(1, this._nextMonth(d, true), primera_cuota, 'Cuota');
+            this._setCuota(i_plus + 1, this._nextMonth(d, this.primeracuota ? false : true), primera_cuota, this.primeracuota ? 'Entrega' : 'Cuota');
 
             cantidad--;
             i_plus++;
@@ -222,7 +268,7 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       for (var i = 1; i <= cantidad; i++) {
-        this._setCuota(i + i_plus, this._nextMonth(d, true), monto_cuota, 'Cuota');
+        this._setCuota(i + i_plus, this._nextMonth(d, i == 1 && this.primeracuota ? false : true), monto_cuota, i == 1 && this.primeracuota ? 'Entrega' : 'Cuota');
       }
 
       this.getCuotas();
@@ -261,8 +307,6 @@ __webpack_require__.r(__webpack_exports__);
   },
   mounted: function mounted() {
     this.saldo = this.total;
-  },
-  updated: function updated() {// this.saldo= this.total;
   }
 });
 
@@ -285,7 +329,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", [
     _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-6" }, [
+      _c("div", { staticClass: "col-4" }, [
         _c("div", { staticClass: "form-group" }, [
           _c("label", [_vm._v("Monto de Venta")]),
           _vm._v(" "),
@@ -295,37 +339,26 @@ var render = function() {
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "form-group" }, [
-          _c("label", [_vm._v("Entrega")]),
-          _vm._v(" "),
-          _c("input", {
-            staticClass: "form-control number-separator form-control-sm",
-            staticStyle: { "text-align": "right" },
-            attrs: { type: "text", id: "entrega", placeholder: "Monto ..." },
-            on: { keyup: _vm.getSaldo }
-          })
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "form-group" }, [
-          _c("label", [_vm._v("Cantidad Cuota")]),
+          _c("label", [_vm._v("Interes %")]),
           _vm._v(" "),
           _c("input", {
             directives: [
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.cant_cuota,
-                expression: "cant_cuota"
+                value: _vm.interes,
+                expression: "interes"
               }
             ],
             staticClass: "form-control form-control-sm",
-            attrs: { type: "Number", placeholder: "Cant. Cuota ..." },
-            domProps: { value: _vm.cant_cuota },
+            attrs: { type: "number", placeholder: "Porcentaje ..." },
+            domProps: { value: _vm.interes },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.cant_cuota = $event.target.value
+                _vm.interes = $event.target.value
               }
             }
           })
@@ -373,7 +406,7 @@ var render = function() {
         ])
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "col-6" }, [
+      _c("div", { staticClass: "col-4" }, [
         _c("div", { staticClass: "form-group" }, [
           _c("label", [_vm._v("Saldo")]),
           _vm._v(" "),
@@ -383,28 +416,50 @@ var render = function() {
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "form-group" }, [
-          _c("label", [_vm._v("Interes %")]),
+          _c("label", [_vm._v("Cantidad Cuota")]),
           _vm._v(" "),
           _c("input", {
             directives: [
               {
                 name: "model",
                 rawName: "v-model",
-                value: _vm.interes,
-                expression: "interes"
+                value: _vm.cant_cuota,
+                expression: "cant_cuota"
               }
             ],
             staticClass: "form-control form-control-sm",
-            attrs: { type: "number", placeholder: "Porcentaje ..." },
-            domProps: { value: _vm.interes },
+            attrs: {
+              type: "Number",
+              disabled: !_vm.calcularcuota,
+              placeholder: "Cant. Cuota ..."
+            },
+            domProps: { value: _vm.cant_cuota },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.interes = $event.target.value
+                _vm.cant_cuota = $event.target.value
               }
             }
+          })
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-4" }, [
+        _c("div", { staticClass: "form-group" }, [
+          _c("label", [_vm._v("Entrega")]),
+          _vm._v(" "),
+          _c("input", {
+            staticClass: "form-control number-separator form-control-sm",
+            staticStyle: { "text-align": "right" },
+            attrs: {
+              type: "text",
+              id: "entrega",
+              disabled: _vm.primeracuota,
+              placeholder: "Monto ..."
+            },
+            on: { keyup: _vm.getSaldo }
           })
         ]),
         _vm._v(" "),
@@ -465,6 +520,8 @@ var render = function() {
     _c("hr"),
     _vm._v(" "),
     _c("table", { staticClass: "table table-striped table-hover table-sm" }, [
+      _vm._m(0),
+      _vm._v(" "),
       _c(
         "tbody",
         [
@@ -489,7 +546,22 @@ var render = function() {
     ])
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [
+      _c("th", [_vm._v("#")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Cuota")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("vencimiento")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Tipo")])
+    ])
+  }
+]
 render._withStripped = true
 
 

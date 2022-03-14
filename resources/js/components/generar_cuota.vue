@@ -2,30 +2,33 @@
 <div>
 
     <div class="row">
-        <div class="col-6">
+        <div class="col-4">
             <div class="form-group">
                 <label>Monto de Venta</label>
                 <p class="font-weight-bold text-primary">{{new Intl.NumberFormat("de-DE").format(total)}}</p>
             </div>
             <div class="form-group">
-                <label>Entrega</label>
-                <input type="text" class="form-control number-separator form-control-sm" id="entrega" placeholder="Monto ..."  style="text-align:right;" @keyup="getSaldo" >
-            </div>
-            <div class="form-group">
-                <label>Cantidad Cuota</label>
-                <input type="Number" class="form-control form-control-sm" v-model="cant_cuota" placeholder="Cant. Cuota ...">
+                <label>Interes %</label>
+                <input type="number" class="form-control form-control-sm" v-model="interes" placeholder="Porcentaje ...">
             </div>
             <label><input type="checkbox" v-model="primeracuota"> Entrega primera cuota</label>
         </div>
-        <div class="col-6">
+        <div class="col-4">
             <div class="form-group">
                 <label>Saldo</label>
                 <p class="font-weight-bold text-danger">{{new Intl.NumberFormat("de-DE").format(saldo)}}</p>
             </div>
-            
             <div class="form-group">
-                <label>Interes %</label>
-                <input type="number" class="form-control form-control-sm" v-model="interes" placeholder="Porcentaje ...">
+                <label>Cantidad Cuota</label>
+                <input type="Number" class="form-control form-control-sm" :disabled="!calcularcuota" v-model="cant_cuota" placeholder="Cant. Cuota ...">
+            </div>
+            
+            
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                <label>Entrega</label>
+                <input type="text" class="form-control number-separator form-control-sm" id="entrega" :disabled="primeracuota" placeholder="Monto ..."  style="text-align:right;" @keyup="getSaldo" >
             </div>
             <div class="form-group">
                 <label><input type="checkbox" v-model="redondear"> Redondear Monto Cuota</label>
@@ -37,8 +40,13 @@
 
     <hr> 
     <table class="table table-striped table-hover table-sm">
-        <tbody>
-            
+        <tr>
+            <th>#</th>
+            <th>Cuota</th>
+            <th>vencimiento</th>
+            <th>Tipo</th>
+        </tr>
+        <tbody>  
         <template v-for="c in cuotas">
             <tr>
             <td>{{c.nro}}</td>
@@ -53,22 +61,46 @@
     
 </template>
 <script>
+
 export default {
     name: 'generar_cuota',
-    props: ['total', 'fecha'],
+    props: ['total', 'fecha','datoscuota','calcularcuota'],
     data(){
         return{
             cant_cuota: 1,
             sentrega: '',
             entrega: 0,
-            primeracuota: 0,
+            primeracuota: false,
             saldo: 0,
             interes: 0,
             cuota: { nro: 0, interes: 0, vencimiento: 0, monto: 0, tipo: 0 },
+            oldDatos: {entrega: 0,saldo: 0},
             cuotas: [],
-            redondear: true,
+            redondear: false,
         }
        
+    },
+    watch: {
+        total: function(){
+            this.saldo = this.total;
+        },
+        calcularcuota: function(newVal, oldVal){
+            if(!newVal){
+                //Extraer cantidad de cuota Ej:(CR2)
+                this.cant_cuota= Number(this.datoscuota.iPrecio.substr(2));
+            }
+        },
+        primeracuota: function(newVal, oldVal){
+            if(newVal){
+                this.oldDatos.saldo= this.saldo;
+                this.oldDatos.entrega= this.entrega;
+                this.saldo= this.total;
+                this.entrega= 0;
+            }else{
+                this.saldo= this.oldDatos.saldo;
+                this.entrega= this.oldDatos.entrega;
+            }
+        }
     },
     methods: {
         generar: function () {
@@ -77,6 +109,7 @@ export default {
             let monto_cuota, Importe, cantidad, restoDivision;
             let Dia;
             let i_plus=0;
+            let indexcuota=0;
             
             Importe = this.saldo;
             cantidad = this.cant_cuota;
@@ -89,18 +122,28 @@ export default {
                 Swal.fire('Atención...','No se puede generar cuota Saldo es 0!','warning');
                 return;
             }
-            monto_cuota = Number.parseInt(Importe / cantidad);
+            if(this.calcularcuota){
+                monto_cuota = Number.parseInt(Importe / cantidad);
+            }else{
+                monto_cuota= this.datoscuota.monto_cuota;
+            }
+           
             restoDivision = Importe % cantidad;
-            console.log("Monto cuota:",monto_cuota);
 
             if (this.interes > 0) {
                 monto_cuota = monto_cuota + (monto_cuota * this.interes) / 100;
             }
 
         
-            let d = new Date();
-
-            this._setCuota(0,this._nextMonth(d,false),this.entrega,'Entrega');  //Entrega 
+            let d = new Date(this.fecha);
+            if(!this.primeracuota){
+                if(this.entrega > 0 ){
+                    this._setCuota(1,this._nextMonth(d,false),this.entrega,'Entrega');  //Entrega
+                    indexcuota= 1;
+                    i_plus++;
+                }
+            }
+            
 
             if (this.redondear && cantidad > 1 && restoDivision!=0) {
 
@@ -111,7 +154,7 @@ export default {
                     if(ultimos_tresdigitos==ultimo_digito.repeat(3)){
                         let primera_cuota= monto_cuota.toString().substr(0,monto_cuota.toString().length-4);
                         primera_cuota= (Number.parseInt(primera_cuota) + 1) * 10000 
-                        this._setCuota(1,this._nextMonth(d,true),primera_cuota,'Cuota');
+                        this._setCuota(i_plus+1,this._nextMonth(d,this.primeracuota ? false : true),primera_cuota,this.primeracuota ? 'Entrega':'Cuota');
                         cantidad--;
                         i_plus++;
                         monto_cuota= (Importe - primera_cuota)/cantidad;
@@ -120,7 +163,7 @@ export default {
             }
 
             for (var i = 1; i <= cantidad; i++) {
-                this._setCuota(i+i_plus,this._nextMonth(d,true),monto_cuota,'Cuota');
+                this._setCuota(i+i_plus,this._nextMonth(d,i==1 && this.primeracuota ? false : true),monto_cuota,i==1 && this.primeracuota ? 'Entrega': 'Cuota');
             }
             this.getCuotas();
         },
@@ -157,9 +200,6 @@ export default {
     },
     mounted(){
         this.saldo= this.total;
-    },
-    updated(){
-       // this.saldo= this.total;
     }
 
 };

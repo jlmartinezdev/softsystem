@@ -8,6 +8,7 @@ use App\Apertura;
 use App\Sucursal;
 use App\MovimientoCaja;
 use App\Empresa;
+use App\CtaCobrar;
 use DB;
 use Auth;
 use PDF;
@@ -79,12 +80,13 @@ class VentaController extends Controller
      */
     public function store(Request $request)
     {
+        
         $venta = new Venta();
         $venta->clientes_cod= $request->ventaCabecera['clienteId'];
         $venta->cod_usuarios= Auth::user()->cod_usuarios;
         $venta->suc_cod= $request->ventaCabecera['idSucursal'];
         $venta->venta_total= $request->ventaCabecera['total'];
-        $venta->venta_fecha = date('Y-m-d H:i');
+        $venta->venta_fecha = $request->ventaCabecera['fecha'].date(' H:i');
         $venta->tipo_factura = $request->ventaCabecera['condicionventa'];
         $venta->cant_cuotas =0;
         $venta->intervalo_venc='2030-01-01'; 
@@ -95,6 +97,10 @@ class VentaController extends Controller
         $venta->save();
         if($request->ventaCabecera['condicionventa']=='1'){
             $this->storeMovimiento($venta,$request->ventaCabecera['idSucursal'],$request->ventaCabecera['nro_operacion']);
+        }else{
+            foreach($request->cuotas as $cuota){
+                $this->storeCtaCobrar($venta->nro_fact_ventas,$cuota);
+            }
         }
         
         foreach ($request->detalle as $detalle) {
@@ -105,11 +111,28 @@ class VentaController extends Controller
         return $venta->nro_fact_ventas;
         
     }
-
-   
-  
-
-   private function storeMovimiento(Venta $venta,$idSucursal,$ope ){
+    
+    private function storeCtaCobrar($idventa, $cuota){
+        $CtaCobrar= new CtaCobrar();
+        $CtaCobrar->nro_cuotas = $cuota['nro'];
+        $CtaCobrar->nro_fact_ventas= $idventa;
+        $CtaCobrar->monto_cuota= $cuota['monto'];
+        $CtaCobrar->monto_cobrado= $cuota['tipo']=="Entrega" ? $cuota['monto'] : 0;
+        $CtaCobrar->monto_saldo = $cuota['tipo']== "Entrega" ? 0 : $cuota['monto'];
+        $CtaCobrar->fecha_venc= $this->formatFecha($cuota['vencimiento']);
+        $CtaCobrar->estado= $cuota['tipo']=="Entrega" ? '0' : '1';
+        $CtaCobrar->interes = $cuota['interes'] ;
+        $CtaCobrar->save();
+        
+    }
+    private function storeCobro(){
+        
+    }
+    private function formatFecha($fecha){
+        $array_fecha= explode("-",$fecha);
+        return $array_fecha[2]."-".$array_fecha[1]."-".$array_fecha[0];
+    }
+    private function storeMovimiento(Venta $venta,$idSucursal,$ope ){
         $movimiento= new MovimientoCaja();
         $movimiento->nro_operacion= $ope;
         $movimiento->mov_fecha= date('Y-m-d H:i');
