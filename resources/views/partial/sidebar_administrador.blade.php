@@ -104,12 +104,27 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('venta') }}" id="m_venta" class="nav-link">
+                    <a href="#" id="m_ventas" class="nav-link">
                         <i class="nav-icon fa fa-cog"></i>
                         <p>
-                            VENTA
+                            GESTIONAR VENTA
+                            <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('anularventa') }}" id="m_anularventa" class="nav-link">
+                                <i class="fa  fa fa-cog nav-icon"></i>
+                                <p>Anular Venta</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('venta') }}" id="m_venta" class="nav-link">
+                                <i class="fa  fa fa-cog nav-icon"></i>
+                                <p>Venta</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link" id="m_caja">

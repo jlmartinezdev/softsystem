@@ -30,6 +30,9 @@ class VentaController extends Controller
         ->where('apert_cierres_caja.apert_fecha','=',date('Y-m-d'))->get();
         return view('venta',compact('apertura'));
     }
+    public function indexanular(){
+        return view('anularventa');
+    }
     public function indexInf(){
         $sucursales= Sucursal::all();
         return view('informes.venta',compact('sucursales'));
@@ -60,6 +63,10 @@ class VentaController extends Controller
     }
     public function getDetalle($nro_venta){
         return DB::select('SELECT dv.*,a.producto_nombre,a.producto_c_barra,p.iva FROM detalle_venta dv INNER JOIN articulos a ON dv.ARTICULOS_cod=a.ARTICULOS_cod inner join presentacion p on a.present_cod=p.present_cod where dv.nro_fact_ventas=?',[$nro_venta]);
+    }
+    public function getCabecera($nro_venta){
+        $cabecera= DB::select('SELECT v.*, c.cliente_ci,c.cliente_nombre FROM ventas v INNER JOIN clientes c ON v.CLIENTES_cod= c.CLIENTES_cod WHERE v.nro_fact_ventas= ?',[$nro_venta]);
+        return ["venta"=> $cabecera, "detalle" => $this->getDetalle($nro_venta)];
     }
     public function getVentaChart(Request $request){
         
@@ -111,7 +118,15 @@ class VentaController extends Controller
         return $venta->nro_fact_ventas;
         
     }
-    
+    public function destroy($id){
+        
+        DB::table('cobranza_detalle')->where('nro_fact_ventas',$id)->delete();
+        DB::table('ctas_cobrar')->where('nro_fact_ventas',$id)->delete();
+        DB::table('detalle_venta')->where('nro_fact_ventas',$id)->delete();
+        DB::table('ventas')->where('nro_fact_ventas',$id)->delete();
+        return "OK";
+    }
+
     private function storeCtaCobrar($idventa, $cuota){
         $CtaCobrar= new CtaCobrar();
         $CtaCobrar->nro_cuotas = $cuota['nro'];
@@ -126,7 +141,7 @@ class VentaController extends Controller
         
     }
     private function storeCobro(){
-        
+
     }
     private function formatFecha($fecha){
         $array_fecha= explode("-",$fecha);

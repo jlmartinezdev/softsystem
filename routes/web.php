@@ -23,13 +23,16 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('infventa/cliente', 'VentaController@getVentaByCliente')->name('infventa.cliente');
     Route::post('infventa/chart', 'VentaController@getVentaChart')->name('infventa.chart');
     Route::get('infventa/detalle/{id}', 'VentaController@getDetalle');
+    Route::get('venta/cabecera/{id}','VentaController@getCabecera');
     Route::get('infventa/articulo', 'VentaController@getVentaArticulo');
     Route::get('venta', 'VentaController@index')->name('venta');
+    Route::get('anularventa','VentaController@indexanular')->name('anularventa');
     Route::post('venta', 'VentaController@store');
     Route::get('venta/imprimir', 'VentaController@imprimir');
     Route::get('venta/facturar/{id}', 'FacturarController@index');
     Route::post('venta/facturar', 'FacturarController@store');
     Route::delete('venta/facturar/{id}', 'FacturarController@destroy');
+    Route::delete('venta/{id}','VentaController@destroy');
     //COMPRA
     Route::get('infcompra', 'CompraController@indexInf')->name('infcompra');
     Route::get('infcompra/detalle/{id}', 'CompraController@getDetalle');
