@@ -1,0 +1,226 @@
+.sb-suggestions {
+    text-align: left;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    font-family: inherit;
+    position: absolute;
+    display: none;
+    z-index: 1005;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    min-width: 100%;
+}
+.ML .sb-suggestions,
+[data-site="ML"] .sb-suggestions {
+    font-family: "Proxima Nova", -apple-system, "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+}
+.sb-suggestions__wrapper {
+    overflow: hidden;
+    position: relative;
+}
+.sb-suggestions__list {
+    padding: 0;
+    margin: 12px 0;
+}
+.sb-suggestions__list--additional {
+    margin: 0 0 12px;
+    padding: 0;
+}
+.sb-suggestions__item {
+    position: relative;
+    padding: 16px 40px 20px 49px;
+    margin: 0;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    line-height: 0.88;
+    color: #333;
+}
+.sb-suggestions__item strong {
+    font-weight: 400;
+}
+.sb-suggestions__item:before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 1em;
+    top: 0.9em;
+    background: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024"><path d="M398.725 689.682c156.825 0 284.95-128.125 284.95-284.95 0-157.85-128.125-284.95-284.95-284.95s-284.95 127.1-284.95 284.95c0 156.825 128.125 284.95 284.95 284.95zm0 56.375c-188.6 0-341.325-152.725-341.325-341.325S210.125 63.407 398.725 63.407 740.05 216.132 740.05 404.732 587.325 746.057 398.725 746.057zm235.75-65.6l248.05 248.05 39.976-39.975-19.474-20.5-227.55-227.55-20.5-19.475L615 660.982l19.476 19.475z" fill="%23999999"/>%3C/svg>')
+        center center no-repeat;
+    background-size: cover;
+    width: 18px;
+    height: 18px;
+}
+.sb-suggestions__item:last-child {
+    margin-bottom: 0;
+}
+.sb-suggestions__item.selected {
+    background: #f5f5f5;
+}
+.sb-suggestions__item--visited {
+    font-weight: 400;
+}
+.sb-suggestions__item--visited:before {
+    background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M16 26.656c5.888 0 10.656-4.768 10.656-10.656S21.888 5.344 16 5.344C10.112 5.344 5.344 10.112 5.344 16S10.112 26.656 16 26.656zm0 1.792C9.12 28.448 3.552 22.88 3.552 16S9.12 3.552 16 3.552c6.88 0 12.448 5.568 12.448 12.448S22.88 28.448 16 28.448zm0-10.656h6.208V16h-7.104v1.792H16zm-.896-8.896v8h1.792V8h-1.792v.896z" fill="%23999999" />%3C/svg>');
+}
+.sb-suggestions__item--additional {
+    font-weight: 400;
+}
+.sb-suggestions__item--additional .store-name {
+    display: block;
+    color: #3483fa;
+    margin-top: 8px;
+}
+.sb-suggestions__item--additional .store-one ~ .store-name:before {
+    content: "Tienda oficial ";
+}
+[lang="pt-BR"] .sb-suggestions__item--additional .store-one ~ .store-name:before,
+[lang="pt-PT"] .sb-suggestions__item--additional .store-one ~ .store-name:before {
+    content: "Loja oficial ";
+}
+.sb-suggestions__fill {
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 40px;
+    height: 100%;
+}
+.sb-suggestions__fill-icon {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    background: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M6 15.667l9 9L16.333 23 10 16.667h16v-2H10l6.333-6.333L15 6.667z" fill="%23999999"/>%3C/svg>')
+        center center no-repeat;
+    background-size: cover;
+}
+.mobile-view#mlCategory {
+    height: 50px;
+    background: #f5f5f5;
+    position: absolute;
+    margin-top: 6px;
+    left: -10px;
+    right: -10px;
+    line-height: 50px;
+    box-shadow: 0px -1px 1px 0px rgba(0, 0, 0, 0.1);
+    padding: 0 20px 0 17px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block !important;
+    visibility: hidden;
+}
+.nav-header-has-search-active .mobile-view#mlCategory {
+    visibility: visible;
+    height: 50px;
+}
+.mobile-view#mlCategory input {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+.mobile-view#mlCategory label {
+    padding-left: 30px;
+    font-size: 16px;
+}
+@media (min-width: 1024px) {
+    .sb-suggestions {
+        border-top: solid 1px #e6e6e6;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        padding: 0;
+        z-index: 1005;
+        margin-top: 0;
+        min-width: 0;
+        border-bottom-right-radius: 2px;
+        border-bottom-left-radius: 2px;
+    }
+    .sb-suggestions__wrapper:before {
+        display: none;
+    }
+    .sb-suggestions__wrapper--additional:before {
+        content: "";
+        border-top: solid 1px #e6e6e6;
+        display: block;
+        margin: 0 16.5px;
+    }
+    .sb-suggestions__list {
+        margin: 8px 0;
+    }
+    .sb-suggestions__list--additional {
+        margin: 0;
+        padding: 16.5px 0;
+    }
+    .sb-suggestions__list--additional:before {
+        content: "Tiendas oficiales";
+        color: #666;
+        margin-left: 16.5px;
+        font-weight: 300;
+    }
+    [lang="pt-BR"] .sb-suggestions__list--additional:before,
+    [lang="pt-PT"] .sb-suggestions__list--additional:before {
+        content: "Lojas oficiais";
+    }
+    .sb-suggestions__item {
+        padding: 11px 0 11px 48px;
+        border-top: 0;
+        cursor: pointer;
+    }
+    .sb-suggestions__item strong {
+        font-weight: 300;
+    }
+    .sb-suggestions__item:before {
+        top: 0.7em;
+        background: url('data:image/svg+xml;charset=UTF-8,%3Csvg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">%3Cg fill="%23CCCCCC" fill-rule="evenodd">%3Cpath d="M10.915 10.167l4.955 4.955-.749.748-4.954-4.954z"/>%3Cpath d="M6.612 13.223A6.612 6.612 0 1 1 6.612 0a6.612 6.612 0 0 1 0 13.223zm0-1.058a5.554 5.554 0 1 0 0-11.107 5.554 5.554 0 0 0 0 11.107z"/>%3C/g>%3C/svg>')
+            center center no-repeat;
+        width: 16px;
+        height: 16px;
+    }
+    .sb-suggestions__item.selected {
+        background: #3483fa;
+        color: #fff;
+    }
+    .sb-suggestions__item.selected:before {
+        background: url('data:image/svg+xml;charset=UTF-8,%3Csvg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">%3Cg fill="%23FFFFFF" fill-rule="evenodd">%3Cpath d="M10.915 10.167l4.955 4.955-.749.748-4.954-4.954z"/>%3Cpath d="M6.612 13.223A6.612 6.612 0 1 1 6.612 0a6.612 6.612 0 0 1 0 13.223zm0-1.058a5.554 5.554 0 1 0 0-11.107 5.554 5.554 0 0 0 0 11.107z"/>%3C/g>%3C/svg>')
+            center center no-repeat;
+    }
+    .sb-suggestions__item--additional {
+        font-weight: 300;
+    }
+    .sb-suggestions__item--additional:first-child {
+        margin-top: 10px;
+    }
+    .sb-suggestions__item--additional .store-name {
+        display: inline;
+    }
+    .sb-suggestions__item--additional.selected .store-name {
+        color: #fff;
+    }
+    .sb-suggestions__item--visited {
+        font-weight: 600;
+    }
+    .sb-suggestions__item--visited:before {
+        background: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15">%3Cg fill="none" fill-rule="evenodd" stroke="%23CCCCCC">%3Cpath d="M.5 7.5a7 7 0 1 0 14 0 7 7 0 1 0-14 0"/>%3Cpath stroke-linecap="square" d="M7.5 3.5v4m0 0h4"/>%3C/g>%3C/svg>')
+            center center no-repeat;
+    }
+    .sb-suggestions__item--visited.selected:before {
+        background: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15">%3Cg fill="none" fill-rule="evenodd" stroke="%23FFFFFF">%3Cpath d="M.5 7.5a7 7 0 1 0 14 0 7 7 0 1 0-14 0"/>%3Cpath stroke-linecap="square" d="M7.5 3.5v4m0 0h4"/>%3C/g>%3C/svg>')
+            center center no-repeat;
+    }
+    .sb-suggestions__fill {
+        display: none;
+    }
+    .nav-header-has-search-active .nav-search:before,
+    .nav-header-has-search-active .nav-search .nav-search-close-btn,
+    .nav-header-has-search-active .nav-search .nav-search-clear-btn {
+        display: none;
+    }
+}

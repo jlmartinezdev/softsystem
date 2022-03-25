@@ -63,6 +63,8 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('ctas_cobrar/buscar', 'CtaCobrarController@getCtaCobrar')->name('ctas_cobrar@buscar');
     Route::post('infctacobrar', 'CtaCobrarController@infToPdf')->name('infctacobrar@pdf');
     Route::get('cobro','CtaCobrarController@index')->name('cobro');
+    Route::get('cuotas/{id}','CtaCobrarController@getCuotas');
+    Route::post('cobro','CtaCobrarController@store');
     //Usuario
     Route::get('usuario', 'UserController@index')->name('usuario');
     
@@ -90,6 +92,8 @@ Route::group(['middleware' => ['administrador']], function () {
     //PDF
     Route::get('pdf/boletaventa/{id}', 'VentaController@pdfboleta')->name('pfd.boletaventa');
     Route::get('pdf/boletacompra/{id}', 'CompraController@pdfboleta')->name('pdf.boletacompra');
+    // DOCUMENTO
+    Route::get('documento/recibocobro/{id}','CtaCobrarController@printRecibo');
 
     Route::get('/clear-cache', 'AperturaController@comando');
     //TICKET
