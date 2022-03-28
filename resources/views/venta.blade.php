@@ -156,7 +156,7 @@
 		<span class="ml-3">{{date('d-m-Y')}}</span>
 @endsection
 @section('script')
-<script src="{{ mix('js/venta.js')}}"></script>
+<script src="{{ asset(mix('js/venta.js'))}}"></script>
 <script src="{{ asset('js/separator.js')}}"></script>
 <script type="text/javascript">
 	var app= new Vue({
@@ -396,7 +396,7 @@
             	let idSucursal= $('#sucursal').attr('data-id');
             	this.ventaCabecera.idSucursal=idSucursal;
             	if(idSucursal != null){
-            		axios.get('/aperturacierre/'+idSucursal)
+            		axios.get('aperturacierre/'+idSucursal)
             		.then(response =>{
             			if(response.data){
             				this.nrooperacion= response.data.nro_operacion;

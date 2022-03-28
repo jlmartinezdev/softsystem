@@ -134,7 +134,7 @@
                 this.getDetalle();
             },
             getDetalle:function(){
-                axios.get('/infventa/detalle/'+this.venta.nro_fact_ventas)
+                axios.get('infventa/detalle/'+this.venta.nro_fact_ventas)
                 .then(response=>{
                     this.detalleVenta= response.data;
                 })
@@ -147,7 +147,7 @@
             },
             getVenta: function(){
                 this.requestSend= true;
-                    axios.get('/infventa/cliente', {
+                    axios.get('infventa/cliente', {
                         params: {
                             cliente: this.txtbuscar,
                             alls: this.idSucursal

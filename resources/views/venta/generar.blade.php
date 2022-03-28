@@ -68,7 +68,7 @@
 </div>
     
 </body>
-<script src="{{ mix('js/app.js') }}"></script>
+<script src="{{ asset(mix('js/app.js')) }}"></script>
 <script src="{{ asset('js/jquery.overlayScrollbars.min.js') }}"></script>
 <script src="{{ asset('js/adminlte.min.js') }}"></script>
 <script src="{{ asset('js/separator.js')}}"></script>

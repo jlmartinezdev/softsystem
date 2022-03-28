@@ -1,4 +1,4 @@
-<script src="{{ mix('js/app.js') }}"></script>
+<script src="{{ asset(mix('js/app.js')) }}"></script>
     <script type="text/javascript">
         function soloNumero(event)
         {

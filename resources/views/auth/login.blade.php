@@ -63,7 +63,7 @@
     
   </div>
 </body>
-<script src="{{ mix('js/app.js') }}"></script>
+<script src="{{ asset(mix('js/app.js')) }}"></script>
 <script>
     //const axios = require('axios').default;
     var app = new Vue({
@@ -86,7 +86,7 @@
       })
     },
     enviar: function () {
-        var url='/login';
+        var url='login';
         if(this.usuario.length>0 && this.password.length>0){
             axios.post(url,{
                 user_usuarios: this.usuario.trim(),

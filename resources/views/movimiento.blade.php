@@ -83,7 +83,7 @@
 				let idSucursal= $('#sucursal').attr('data-id');
             	this.movimiento.idSucursal=idSucursal;
             	if(idSucursal != null){
-            		axios.get('/aperturacierre/'+idSucursal)
+            		axios.get('aperturacierre/'+idSucursal)
             		.then(response =>{
             			if(response.data){
             				this.movimiento.nro_operacion= response.data.nro_operacion;

@@ -438,7 +438,7 @@
             	let idSucursal= $('#sucursal').attr('data-id');
             	this.cobro.idSucursal=idSucursal;
             	if(idSucursal != null){
-            		axios.get('/aperturacierre/'+idSucursal)
+            		axios.get('aperturacierre/'+idSucursal)
             		.then(response =>{
             			if(response.data){
             				this.caja.nrooperacion= response.data.nro_operacion;

@@ -129,8 +129,8 @@
 
 @endsection
 @section('script')
-<script src="{{ mix('js/busqueda.js')}}"></script>
-<script src="{{ mix('js/component/proveedor.js')}}"></script>
+<script src="{{ asset(mix('js/busqueda.js'))}}"></script>
+<script src="{{ asset(mix('js/component/proveedor.js'))}}"></script>
 <script type="text/javascript">
 	var app=new Vue({
 	el: '#app',
@@ -352,7 +352,7 @@
 			let idSucursal= $('#sucursal').attr('data-id');
 			this.compraCabecera.idSucursal=idSucursal;
 			if(idSucursal != null){
-				axios.get('/aperturacierre/'+idSucursal)
+				axios.get('aperturacierre/'+idSucursal)
 				.then(response =>{
 					if(response.data){
 						this.nrooperacion= response.data.nro_operacion;
