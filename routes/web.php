@@ -65,6 +65,9 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('cobro','CtaCobrarController@index')->name('cobro');
     Route::get('cuotas/{id}','CtaCobrarController@getCuotas');
     Route::post('cobro','CtaCobrarController@store');
+    Route::get('infcobro','CtaCobrarController@indexCobrado')->name('infcobro');
+    Route::get('infcobro/fecha','CtaCobrarController@getCobroFecha');
+    Route::get('infcobro/detalle/{id}','CtaCobrarController@getDetalleCobro');
     //Usuario
     Route::get('usuario', 'UserController@index')->name('usuario');
     

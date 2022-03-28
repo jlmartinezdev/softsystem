@@ -248,7 +248,7 @@
                 },
                 chart: {
                     mes: '1',
-                    anho: '2021',
+                    anho: '2022',
                     byYear: false
                 },
                 venta:{},

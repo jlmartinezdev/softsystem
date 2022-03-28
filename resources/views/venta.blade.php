@@ -477,6 +477,7 @@
             		})
             	}
             },
+			
             selectCliente: function(id,cliente){
             	this.ventaCabecera.clienteId=id;
             	this.ventaCabecera.clienteNombre= cliente;

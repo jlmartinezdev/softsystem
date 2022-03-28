@@ -185,6 +185,12 @@
                                 <p>Cuentas a cobrar</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('infcobro') }}" id="m_ictacobro" class="nav-link">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Cobros</p>
+                            </a>
+                        </li>
 
                     </ul>
                 </li>

@@ -7,6 +7,7 @@ use App\CtaCobrar;
 use App\Cobro;
 use App\MovimientoCaja;
 use App\Empresa;
+use App\Sucursal;
 
 use DB;
 use PDF;
@@ -21,6 +22,10 @@ class CtaCobrarController extends Controller
     }
     public function indexInf(){
         return view('informes.ctacobrar');
+    }
+    public function indexCobrado(){
+        $sucursales= Sucursal::all();
+        return view('informes.cobro',compact('sucursales'));
     }
     public function infToPdf(Request $request){
         if(!empty($request->buscar)){
@@ -44,9 +49,16 @@ class CtaCobrarController extends Controller
     ];
         
     }
-    public function getCtasPagadas(Request $request){
-
+    public function getCobroFecha(Request $request){
+        $cobro = Cobro::whereBetween('cobranzas.cob_fecha',[$request->alld,$request->allh])->get();
+        return $cobro;
     }
+    public function getDetalleCobro($id){
+        $detalle = Cobro::join('cobranza_detalle as cd','cobranzas.cc_numero','cd.cc_numero')
+                    ->where('cobranzas.cc_numero',$id)->get();
+        return $detalle;
+    }
+
     private function getCtas($request, $ci){
         return $ctas= CtaCobrar::join('ventas','ctas_cobrar.nro_fact_ventas','ventas.nro_fact_ventas')
         ->join('clientes as c','ventas.clientes_cod','c.CLIENTES_cod')
@@ -148,7 +160,12 @@ class CtaCobrarController extends Controller
                 ->where('cobranzas.cc_numero',$id)
                 ->first();
         $cuotas = Cobro::join('cobranza_detalle as cd','cobranzas.cc_numero','cd.cc_numero')
-                ->select('cd.nro_cuotas','cd.cobrado')
+                ->join('ctas_cobrar as cc', function($join)
+                {
+                    $join->on('cd.nro_cuotas','=','cc.nro_cuotas');
+                    $join->on('cd.nro_fact_ventas','=', 'cc.nro_fact_ventas');
+                })
+                ->select('cd.nro_cuotas','cd.cobrado','cc.interes')
                 ->where('cobranzas.cc_numero',$id)
                 ->get();
         $articulos = Cobro::join('cobranza_detalle as cd','cobranzas.cc_numero','cd.cc_numero')

@@ -54,11 +54,13 @@
                 <tr>
                     <th style="width: 100px" class="pl-2"> Nro. Cuota</th>
                     <th style="width: 150px" class="pl-2"> Importe</th>
+                    <th style="width: 150px" class="pl-2"> Interes por Mora</th>
                 </tr>
                 @foreach($cuotas as $cuota)
                 <tr>
                     <td>&nbsp;&nbsp;{{$cuota->nro_cuotas}} de {{$cobro->cantidad}}</td>
                     <td>&nbsp;&nbsp;{{number_format($cuota->cobrado,2,",",".")}}</td>
+                    <td>&nbsp;&nbsp;{{number_format($cuota->interes,2,",",".")}}</td>
                 </tr>
                 @endforeach
             </table>
@@ -77,9 +79,18 @@
                 </tr>
                 @endforeach
             </table>
-            <hr>
-            Interes por Mora: 0 Gs.
+
+        </div>
+        <div class="d-print-none">
+            <button class="btn btn-primary"  onclick="javascript:window.print()" > Imprimir</button>
+            <a href="{{route('cobro')}}" class="btn btn-secondary"> Atras</a>
         </div>
     </div>
+
 </body>
+<script>
+    function imprimir(){
+
+    }
+</script>
 </html>
