@@ -9,6 +9,7 @@ use App\Sucursal;
 use App\MovimientoCaja;
 use App\Empresa;
 use App\CtaCobrar;
+use App\Cobro;
 use DB;
 use Auth;
 use PDF;
@@ -51,7 +52,7 @@ class VentaController extends Controller
         return Venta::select('ventas.nro_fact_ventas','ventas.documento','ventas.venta_total',DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y %H:%i") AS fecha'),'c.cliente_nombre', 'c.cliente_direccion', 'c.cliente_ruc','s.suc_desc','ventas.tipo_factura')
         ->join('clientes as c','ventas.clientes_cod','=','c.clientes_cod')
         ->join('sucursales as s','ventas.suc_cod','=','s.suc_cod')
-        ->filtrocliente($request->cliente)
+        ->filtrocliente($request->cliente,$request->isNumber)
         ->filtrosuc($request->alls)
         ->orderBy('ventas.nro_fact_ventas','desc')
         ->limit(100)
@@ -106,7 +107,11 @@ class VentaController extends Controller
             $this->storeMovimiento($venta,$request->ventaCabecera['idSucursal'],$request->ventaCabecera['nro_operacion']);
         }else{
             foreach($request->cuotas as $cuota){
+                
                 $this->storeCtaCobrar($venta->nro_fact_ventas,$cuota);
+                if($cuota['tipo']=='Entrega'){
+                    $this->storeCobro($request->ventaCabecera,$venta->nro_fact_ventas, $cuota);
+                }
             }
         }
         
@@ -140,8 +145,45 @@ class VentaController extends Controller
         $CtaCobrar->save();
         
     }
-    private function storeCobro(){
+    private function storeCobro($ventaCabecera,$idventa,$cuota){
+        $ultimo= Cobro::orderBy('cc_numero','DESC')->first();
+        $recibo= $this->reciboUp([$ultimo->recibon1,$ultimo->recibon2,$ultimo->nro_recibo]);
+        $cobro = new Cobro();
+        $cobro->nro_operacion = $ventaCabecera['nro_operacion'];
+        $cobro->suc_cod = $ventaCabecera['idSucursal'];
+        $cobro->cob_fecha = $ventaCabecera['fecha'];
+        $cobro->recibon1 = $recibo[0];
+        $cobro->recibon2 = $recibo[1];
+        $cobro->nro_recibo = $recibo[2];
+        $cobro->cob_importe= $cuota['monto'];
+        $cobro->estado = "N";
+        $cobro->save();
 
+        DB::insert("INSERT INTO cobranza_detalle (cc_numero, nro_fact_ventas, nro_cuotas, importe, cobrado, tipo) VALUES (?,?,?,?,?,?)",[$cobro->cc_numero,$idventa,$cuota['nro'],$cuota['monto'],$cuota['monto'],'1']);
+
+    }
+    private function reciboUp($numeros){
+        
+        $n1 = $numeros[0];
+        $n2= str_pad($numeros[1],3,"0",STR_PAD_LEFT);
+        $recibo = str_pad($numeros[2],7,"0",STR_PAD_LEFT);
+        $nrofinal = ($n1.$n2.$recibo) + 1;
+        $strfinal = strval($nrofinal);
+        $l= strlen($nrofinal);
+        if($l < 7){
+            return ["001","001", str_pad($strfinal,7,"0",STR_PAD_LEFT)];
+        }else{
+            $recibo =substr($strfinal, -7,7);
+            if (($l-7)>3){
+                $n2= substr($strfinal,-10,3);
+                $n1= str_pad(substr($strfinal,0,$l-10),3,"0",STR_PAD_LEFT);
+            }else{
+                $n2= str_pad(substr($strfinal,0,$l-7),3,"0",STR_PAD_LEFT);
+                $n1="000";
+            }
+
+        }
+        return [$n1,$n2,$recibo];
     }
     private function formatFecha($fecha){
         $array_fecha= explode("-",$fecha);
@@ -175,4 +217,5 @@ class VentaController extends Controller
    public function imprimir(){
        return view('venta.imprimir');
    }
+   
 }

@@ -30,9 +30,14 @@ class Venta extends Model
             return $query->where('s.suc_cod','=',$suc);
         }
     }
-    public function scopeFiltrocliente($query, $cliente){
+    public function scopeFiltrocliente($query, $cliente, $isNumber){
         if(!empty($cliente)){
-            return $query->where('c.cliente_nombre','like',"%$cliente%");
+            if($isNumber=='1'){
+                return $query->where('c.cliente_ci',$cliente);
+            }else{
+                return $query->where('c.cliente_nombre','like',"%$cliente%");
+            }
+            
         }
     }
 }

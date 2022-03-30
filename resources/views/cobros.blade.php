@@ -236,6 +236,7 @@
         @include('cobro.cuotas')
         @include('venta.detalle')
         @include('cobro.finalizar')
+        @include('cobro.cliente') 
     </div>
 @endsection
 @section('script')
@@ -243,17 +244,19 @@
     var app= new Vue({
         el: "#app",
         data: {
-            request: {buscar: false, cuota : false},
+            request: {buscar: false, cuota : false, cliente: false},
             txtbuscar: '',
             caja: {estado: 'CERRADO',id: 0, nrooperacion : 0},
             filtro : {orden:'ASC',busquedapor : 'cliente',ordenarpor:'0',ci: false},
             cobro: {total: 0, saldo: 0, saldonuevo: 0, cobrado: 0, entrega: 0, fecha: '', idSucursal: 0, totalInteres: 0},
             cliente: {id : 0,documento: 0, nombre: '.-'},
             descontarCantidad: 0,
+            txtcliente : '',
             ctas: [],
             articulos: [],
             cuotas: [],
             cuotasAcobrar: [],
+            clientes : [],
             venta: {}
         },
         methods:{
@@ -261,20 +264,29 @@
                 if(this.txtbuscar.length<1)
                     return
 
-                this.request.buscar= true;
                 var t=parseFloat(this.txtbuscar);
                 if(isNaN(t)){
-                    this.filtro.ci= false;
+                    this.txtcliente= this.txtbuscar
+                    $('#busquedaCliente').modal('show');
+                    setTimeout(() => {
+                        document.getElementById('txtcliente').focus();
+                    }, 500);
+
                 }else{
+                    this.request.buscar= true;
                     this.filtro.ci= true;
+                    this.getCta(this.txtbuscar);
                 }
+                
+            },
+            getCta: function(abuscar){
                 axios.get('ctas_cobrar/buscar',{
-			        params:{buscar:this.txtbuscar,ci:this.filtro.ci,buscarpor:this.filtro.busquedapor,ordenarpor:this.filtro.ordenarpor,ord:this.filtro.orden}
+			        params:{buscar:abuscar,ci:this.filtro.ci,buscarpor:this.filtro.busquedapor,ordenarpor:this.filtro.ordenarpor,ord:this.filtro.orden}
                 })
                 .then(response=>{
                     this.request.buscar= false;
                     if(response.data=='NO'){
-                     Swal.fire('No se encontrado resultado!','Para:  '+this.txtbuscar, 'info' );
+                     Swal.fire('No se encontrado resultado!','Para:  '+abuscar, 'info' );
                     }else{
                         this.cobro.cobrado = 0;
                         this.cobro.saldo = 0;
@@ -300,6 +312,33 @@
                     this.request.buscar= false;
                     this.error= e.message;
                 });
+            },
+            buscarCliente: function(){
+                if(this.txtcliente.length > 0){
+            		var doc= '';
+            		var nom= '';
+            		if(isNaN(parseFloat(this.txtcliente))){
+            			nom= this.txtcliente;
+            		}else{
+            			doc= this.txtcliente;
+            		}
+                    this.request.cliente = true;
+            		axios.get('cliente/buscar',{params:{documento: doc,nombre: nom }})
+            		.then(response =>{
+            			this.clientes= response.data;
+                        this.request.cliente = false;
+            		})
+            		.catch(error =>{
+                        this.request.cliente = false;
+            			console.log(error.message);
+            		})
+            	}
+            },
+            selectCliente : function(ci){
+            
+                this.filtro.ci= true;
+                $('#busquedaCliente').modal('hide');
+                this.getCta(ci);
             },
             getCuotas: function(id){
                 this.request.cuota = true;

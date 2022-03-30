@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Login</title>
+    <title>Login Softsystem</title>
 
     <link href="{{ asset('css/adminlte.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/all.css') }}" rel="stylesheet">
@@ -55,8 +55,9 @@
           </div>
         </div>
         <div class="card-footer">
-            <center><button v-on:click="enviar()" class="btn btn-success" ><span class="glyphicon glyphicon-chevron-right"></span>&nbsp;Acceder al Sistema</button></center>
-            <span class="text-muted align-items-center">Sistema de Gestion de Stock, Compra, Venta &copy; 2020</span>   
+            <center><button v-on:click="enviar()" class="btn btn-success" ><span class="fa fa-sign-in-alt"></span>&nbsp;Acceder al Sistema</button></center>
+            <br>
+            <span class="text-muted align-items-center">Sistema de Gestion de Stock, Compra, Venta &copy; {{ date('Y')}}</span>   
         </div>
       </div>
     </div>

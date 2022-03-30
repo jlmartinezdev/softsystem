@@ -133,9 +133,9 @@ export default {
             if (this.interes > 0) {
                 monto_cuota = monto_cuota + (monto_cuota * this.interes) / 100;
             }
-
-        
-            let d = new Date(this.fecha);
+            const f = this.fecha.split("-");
+            
+            let d = new Date(f[0],f[1]-1,f[2]);
             if(!this.primeracuota){
                 if(this.entrega > 0 ){
                     this._setCuota(1,this._nextMonth(d,false),this.entrega,'Entrega');  //Entrega

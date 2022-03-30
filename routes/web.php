@@ -28,7 +28,7 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('venta', 'VentaController@index')->name('venta');
     Route::get('anularventa','VentaController@indexanular')->name('anularventa');
     Route::post('venta', 'VentaController@store');
-    Route::get('venta/imprimir', 'VentaController@imprimir');
+    Route::get('venta/imprimir', 'VentaController@imprimir')->name('infventa.imprimir');
     Route::get('venta/facturar/{id}', 'FacturarController@index');
     Route::post('venta/facturar', 'FacturarController@store');
     Route::delete('venta/facturar/{id}', 'FacturarController@destroy');
@@ -92,10 +92,10 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::post('ciudad/{id}', 'CiudadController@update');
     Route::delete('ciudad/{id}', 'CiudadController@destroy');
     
-    //PDF
+    //PDF A IMPRIMIR 
     Route::get('pdf/boletaventa/{id}', 'VentaController@pdfboleta')->name('pfd.boletaventa');
     Route::get('pdf/boletacompra/{id}', 'CompraController@pdfboleta')->name('pdf.boletacompra');
-    // DOCUMENTO
+    // DOCUMENTO A IMPRIMIR 
     Route::get('documento/recibocobro/{id}','CtaCobrarController@printRecibo');
 
     Route::get('/clear-cache', 'AperturaController@comando');
@@ -108,19 +108,19 @@ Route::post('seccion', 'SeccionController@store');
 Route::post('seccion/{id}', 'SeccionController@update');
 Route::delete('seccion/{id}', 'SeccionController@destroy');
 Route::get('v1/unidad/all', 'UnidadController@All');
-    Route::get('seccion/all', 'SeccionController@All');
+Route::get('seccion/all', 'SeccionController@All');
 
 
 Route::get('cliente/buscar', 'ClienteController@buscar');
-    Route::get('cliente', 'ClienteController@index')->name('cliente.index');
-    Route::delete('cliente/{id}', 'ClienteController@destroy');
-    Route::post('cliente', 'ClienteController@store');
-    Route::post('cliente/update', 'ClienteController@update');
+Route::get('cliente', 'ClienteController@index')->name('cliente.index');
+Route::delete('cliente/{id}', 'ClienteController@destroy');
+Route::post('cliente', 'ClienteController@store');
+Route::post('cliente/update', 'ClienteController@update');
 
-    Route::get('reffactura', 'ReffacturaController@index')->name('reffactura.index');
-    Route::get('reffactura/all', 'ReffacturaController@getAll');
-    Route::post('reffactura', 'ReffacturaController@store');
-    Route::post('reffactura', 'ReffacturaController@update');
+Route::get('reffactura', 'ReffacturaController@index')->name('reffactura.index');
+Route::get('reffactura/all', 'ReffacturaController@getAll');
+Route::post('reffactura', 'ReffacturaController@store');
+Route::post('reffactura', 'ReffacturaController@update');
 
 
 

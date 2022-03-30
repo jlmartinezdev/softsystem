@@ -139,7 +139,7 @@
                 })
             },
             anular: function(){
-                if(this.articulos.length > 0 ){
+                if(this.ventaCabecera.total > 0 ){
                     Swal.fire({
                         title: 'Desea anular?',
                         text: "Anular esta venta!",

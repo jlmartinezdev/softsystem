@@ -138,8 +138,8 @@
 						</button>
 						<button class="btn btn-secondary" @click="cancelar"> <span class="fa fa-times"></span> CANCELAR</button>
 						<hr>
-						<a href="venta/imprimir" class="btn btn-link"> <span class="fa fa-print"></span> Imprimir</a>
-						<button class="btn btn-link"><span class="fa fa-file-alt"></span> Informe</button>
+						<a href="venta/imprimir" class="btn btn-outline-success"> <span class="fa fa-print"></span> Imprimir</a>
+						<button class="btn btn-outline-success"><span class="fa fa-file-alt"></span> Informe</button>
 				</div>
 			</div>
 			</div>
@@ -385,8 +385,11 @@
 				
             	this.saveDatos(); 
             },
-            delArticulo: function(articulo){
-            	this.carro.pop(articulo);
+            delArticulo: function(a){
+				let validar = this.carro.findIndex(x=> x.codigo == a.codigo)
+				if(validar > -1 ) {
+                    this.carro.splice(validar,1);
+                   }
             	this.saveDatos();
             },
             format: function(numero){
