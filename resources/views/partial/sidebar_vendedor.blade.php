@@ -1,6 +1,6 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link">
+    <a href="/" class="brand-link">
         <img src="/img/logo-softsystem.PNG" alt="Softystem" class="brand-image img-circle elevation-3"
             style="opacity: .8">
         <span class="brand-text font-weight-light">SOFTSYSTEM</span>
@@ -18,7 +18,7 @@
             </div>
         </div>
 
-        <!-- SidebarSearch Form -->
+        <!-- SidebarSearch Form ->
         <div class="form-inline">
             <div class="input-group" data-widget="sidebar-search">
                 <input class="form-control form-control-sidebar" type="search" placeholder="Buscar" aria-label="Search">
@@ -29,7 +29,7 @@
                 </div>
             </div>
         </div>
-
+        -->
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
@@ -38,7 +38,7 @@
                     <a href="#" class="nav-link" id="m_mantenimiento">
                         <i class="nav-icon fa fa-cog"></i>
                         <p>
-                            Mantimiento
+                            MANTENIMIENTO
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -68,37 +68,47 @@
                                 <p>Proveedor</p>
                             </a>
                         </li>
+                       
+                        <li class="nav-item">
+                            <a href="{{ route('ciudad.index') }}" id="m_ciudad" class="nav-link">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Ciudad</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('articulo') }}" id="m_articulo" class="nav-link">
-                        <i class="nav-icon fa fa-clone"></i>
-                        <p>
-                            Articulos
-                        </p>
-                    </a>
-                </li>
+               
                 <li class="nav-item">
                     <a href="{{ route('compra') }}" id="m_compra" class="nav-link">
                         <i class="nav-icon fas fa-th"></i>
                         <p>
-                            Compra
+                            COMPRA
                         </p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('venta') }}" id="m_venta" class="nav-link">
+                    <a href="#" id="m_ventas" class="nav-link">
                         <i class="nav-icon fa fa-cog"></i>
                         <p>
-                            Venta
+                            GESTIONAR VENTA
+                            <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                    
+                        <li class="nav-item">
+                            <a href="{{ route('venta') }}" id="m_venta" class="nav-link">
+                                <i class="fa  fa fa-cog nav-icon"></i>
+                                <p>Venta</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link" id="m_caja">
                         <i class="nav-icon fa fa-cash-register"></i>
                         <p>
-                            Caja
+                            CAJA
                             <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
@@ -127,6 +137,42 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="#" class="nav-link" id="m_informe">
+                        <i class="nav-icon fa fa-sticky-note"></i>
+                        <p>
+                            INFORMES
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('infcompra') }}" class="nav-link" id="m_icompra">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Compras</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('infventa') }}" class="nav-link" id="m_iventa">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Ventas</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('infctacobrar') }}" id="m_ictacobrar" class="nav-link">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Cuentas a cobrar</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('infcobro') }}" id="m_ictacobro" class="nav-link">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Cobros</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+                <li class="nav-item">
                     <a href="{{ route('sucursal.set') }}" class="nav-link" id="m_sucursal">
                         <i class="fa fa-warehouse nav-icon"></i>
                         <p><span id="sucursal"></span></p>
@@ -137,7 +183,7 @@
                         onclick="event.preventDefault();document.getElementById('logout-form').submit();">
                         <i class="nav-icon fa fa-sign-out-alt"></i>
                         <p>
-                            Cerrar Sesion
+                            CERRAR SESION
                         </p>
                     </a>
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

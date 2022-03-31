@@ -6,8 +6,8 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-sm-4 col-md-2 p-2">
-                        <button class="btn btn-primary" @click="showMArticulo"><span class="fa fa-plus"></span>
+                    <div class="col-sm-4 col-md-2 pl-2">
+                        <button class="btn btn-primary btn-block" @click="showMArticulo"><span class="fa fa-plus"></span>
                             Nuevo</button>
                     </div>
                     <div class="col-sm-8 col-md-6">
@@ -35,7 +35,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-2">
-                        <label><strong>Seccion</strong></label>
+                        <label>Seccion</label>
                         <select class="form-control form-control-sm" v-model="filtro.seccion">
                             <option value="0">Todos</option>
                             @foreach ($secciones as $seccion)
@@ -45,36 +45,32 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <label><strong>Ordenar Por</strong></label>
+                        <label>Ordenar Por</label>
                         <select class="form-control form-control-sm" v-model="filtro.columna">
                             <option value="0">Descripcion</option>
                             <option value="1">Codigo</option>
                             <option value="2">Precio</option>
                         </select>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-8">
                         <div class="d-flex" style="margin-top:28pt;">
 
                             <div class="custom-control custom-radio">
                                 <input type="radio" id="asc" name="radio" value="ASC" class="custom-control-input"
                                     v-model="filtro.orden">
-                                <label class="custom-control-label" for="asc">Asc&nbsp;<span
+                                <label class="custom-control-label" for="asc"><span
                                         class="fa fa-sort-alpha-down"></span></label>
                             </div>
                             <div class="custom-control custom-radio ml-2">
                                 <input type="radio" id="desc" name="radio" value="DESC" class="custom-control-input"
                                     v-model="filtro.orden">
-                                <label class="custom-control-label" for="desc">Desc&nbsp;<span
+                                <label class="custom-control-label" for="desc"><span
                                         class="fa fa-sort-alpha-up"></span></label>
                             </div>
+                            <div class="pl-3" style="margin-top: -7pt;">
+                                <a href="excel/articulos" class="btn btn-success"><span class="fa fa-file-excel"></span> Exportar</a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <nav style="margin-top:25pt;">
-                            <v-pagination v-model="currentPage" :page-count="paginacion.ultima_pagina"
-                                :classes="bootstrapPaginationClasses" :labels="customLabels" @change="onChange">
-                            </v-pagination>
-                        </nav>
                     </div>
 
                 </div>
@@ -127,7 +123,9 @@
                     </tbody>
                 </table>
             </div>
-
+            <v-pagination v-model="currentPage" :page-count="paginacion.ultima_pagina"
+            :classes="bootstrapPaginationClasses" :labels="customLabels" @change="onChange">
+            </v-pagination>
 
             <!--div class="d-flex flex-column">
                       <span>{ a.producto_nombre }}</span>

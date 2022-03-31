@@ -17,8 +17,8 @@ class Venta extends Model
 			return $query->paginate("100");
 		}
     }
-    public function scopeFiltrochart($query,$mes,$anho,$byYear){
-    	if($byYear){
+    public function scopeFiltrochart($query,$mes,$anho){
+    	if($mes== 13){
     		return $query->where(DB::raw("YEAR(ventas.venta_fecha)"),"=",$anho);
     	}else{
     		return $query->where(DB::raw("YEAR(ventas.venta_fecha)"),"=",$anho)

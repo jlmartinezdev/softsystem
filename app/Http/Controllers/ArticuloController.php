@@ -7,6 +7,8 @@ use App\Articulo;
 use App\Seccion;
 use App\Unidad;
 use DB;
+use App\Exports\ArticulosExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ArticuloController extends Controller
 {
@@ -215,5 +217,8 @@ class ArticuloController extends Controller
     }
     public function informe(){
         return view('informes.articulo');
+    }
+    public function export(){
+        return Excel::download(new ArticulosExport, 'articulos.xlsx');
     }
 }

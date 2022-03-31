@@ -24,7 +24,7 @@
 				<div class="col-sm-3">
 					<ul class="list-inline">
 						<li><strong>Fecha apertura: </strong></li>
-						<li>{{ $apertura[0]['apert_fecha']}}</li>
+						<li>{{ date_format(new DateTime($apertura[0]['apert_fecha']),'d/m/Y')}}</li>
 						<li><strong>Hora apertura: </strong></li>
 						<li>{{$apertura[0]['apert_hora']}}</li>
 					</ul>

@@ -22,7 +22,6 @@
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         @guest
-
         @else
             @include('partial.sidebar_top')
             @if (Auth::user()->cod_rol == 4)

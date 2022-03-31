@@ -5,8 +5,9 @@
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="{{ route('home')}}" class="nav-link">Pagina Prinipal</a>
+        <a href="{{ route('home')}}" class="nav-link"><span class="fa fa-home"></span> INICIO</a>
       </li>
+      <li class="nav-item"></li>
       
     </ul>
 

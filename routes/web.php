@@ -95,6 +95,8 @@ Route::group(['middleware' => ['administrador']], function () {
     //PDF A IMPRIMIR 
     Route::get('pdf/boletaventa/{id}', 'VentaController@pdfboleta')->name('pfd.boletaventa');
     Route::get('pdf/boletacompra/{id}', 'CompraController@pdfboleta')->name('pdf.boletacompra');
+    //EXCEL 
+    Route::get('excel/articulos/','ArticuloController@export');
     // DOCUMENTO A IMPRIMIR 
     Route::get('documento/recibocobro/{id}','CtaCobrarController@printRecibo');
 

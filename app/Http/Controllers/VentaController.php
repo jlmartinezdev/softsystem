@@ -72,7 +72,7 @@ class VentaController extends Controller
     public function getVentaChart(Request $request){
         
        return Venta::select(DB::raw("SUM(ventas.venta_total) AS total"),DB::raw("DATE_FORMAT(ventas.venta_fecha,'%Y-%m-%d') AS fecha"))
-        ->filtrochart($request->chart['mes'],$request->chart['anho'],$request->chart['byYear'])
+        ->filtrochart($request->chart['mes'],$request->chart['anho'])
         ->groupBy(DB::raw("DATE(ventas.venta_fecha)"))
         ->get();
 
