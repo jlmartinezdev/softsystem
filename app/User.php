@@ -41,4 +41,7 @@ class User extends Authenticatable
     {
         return $this->clave_usuarios;
     }
+    public function roles(){
+        return $this->belongsTo(Roles::class, 'cod_rol');
+    }
 }

@@ -39,15 +39,15 @@
             </div>
         </div>
         <div class="m-2 border border-dark p-2 d-flex flex-column">
-           <span> Fecha: <strong>{{ date('d-M-Y')}}</strong></span>
-           <span>Recibi de : <strong>{{$cobro->cliente_nombre}}</strong> &nbsp;&nbsp; Documento Nro. / R.U.C.: <strong>{{$cobro->cliente_ruc}}</strong></span>
+           
+           <span>Recibimos del/la Sr./a <strong>{{$cobro->cliente_nombre}}</strong>  con documento y/o R.U.C. número  <strong>{{$cobro->cliente_ruc}}</strong> en la fecha <strong>{{ date('d-m-Y')}}</strong> </span>
            <span>La suma de: <strong>{{NumeroALetras::convertir($cobro->cob_importe,"Guaranies")}}</strong></span>
-           <span>En concepto: <strong>pago de cuenta</strong></span>
+           <span>En concepto: <strong>se detalla acontinuación </strong></span>
         </div>
 
         
         <div class="m-2 border border-dark pl-2 pr-2 pt-1 pb-1 d-flex flex-column">
-            Detalle
+            Detalles de Cobro
         </div>
         <div class="p-2">
             <table class="table-bordered">
@@ -69,7 +69,7 @@
                 <tr>
                     <th  style="width: 100px">&nbsp;&nbsp;Nro. Venta</th>
                     <th  style="width: 170px">&nbsp;&nbsp;Fecha Venta</th>
-                    <th  style="width: 200px">&nbsp;&nbsp;Articulo</th>
+                    <th  style="width: 350px">&nbsp;&nbsp;Articulo</th>
                 </tr>
                 @foreach($articulos as $articulo)
                 <tr>

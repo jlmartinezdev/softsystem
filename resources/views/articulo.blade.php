@@ -68,7 +68,19 @@
                                         class="fa fa-sort-alpha-up"></span></label>
                             </div>
                             <div class="pl-3" style="margin-top: -7pt;">
-                                <a href="excel/articulos" class="btn btn-success"><span class="fa fa-file-excel"></span> Exportar</a>
+                                <!-- Example single danger button -->
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
+                                        aria-expanded="false">
+                                        <span class="fa fa-file-excel"></span> Exportar
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="excel/articulos">Con Stock</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#">Precios Creditos</a>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -123,26 +135,26 @@
                     </tbody>
                 </table>
             </div>
-            <v-pagination v-model="currentPage" :page-count="paginacion.ultima_pagina"
-            :classes="bootstrapPaginationClasses" :labels="customLabels" @change="onChange">
+            <v-pagination v-model="currentPage" :page-count="paginacion.ultima_pagina" :classes="bootstrapPaginationClasses"
+                :labels="customLabels" @change="onChange">
             </v-pagination>
 
             <!--div class="d-flex flex-column">
-                      <span>{ a.producto_nombre }}</span>
-                      <span class="text-muted small">{ a.present_descripcion }}</span>
-                    </div -->
+                          <span>{ a.producto_nombre }}</span>
+                          <span class="text-muted small">{ a.present_descripcion }}</span>
+                        </div -->
         </template>
 
-        @include("articulo.create")
-        @include("articulo.edit")
-        @include("articulo.delete")
-        @include("articulo.detalle")
-        @include("articulo.precio")
+        @include('articulo.create')
+        @include('articulo.edit')
+        @include('articulo.delete')
+        @include('articulo.detalle')
+        @include('articulo.precio')
 
     </div>
 @endsection
 @section('script')
-    <script src="{{ asset('js/separator.js')}}"></script>
+    <script src="{{ asset('js/separator.js') }}"></script>
     <script>
         var app = new Vue({
             el: '#app',
@@ -170,7 +182,79 @@
                     'desde': 0,
                     'hasta': 0
                 },
-                precios: [{p: 50, m: 5, c:2},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0},{p: 0, m: 0, c:0}],
+                precios: [{
+                    p: 50,
+                    m: 5,
+                    c: 2
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }, {
+                    p: 0,
+                    m: 0,
+                    c: 0
+                }],
                 chcuota: false,
                 chprecio: false,
                 url: 'controller/ArticulosController.php',
@@ -185,13 +269,41 @@
                 sucursales: [],
                 unidades: [],
                 filtro: {
-                    seccion: 0, columna: 0, orden: 'ASC'
+                    seccion: 0,
+                    columna: 0,
+                    orden: 'ASC'
                 },
                 articulo: {
-                    codigo: '',c_barra: '',descripcion: '',indicaciones: '',modouso: '',seccion: 1,unidad: 1,factor: 1,ubicacion: '',costo: 0,p1: 0,p2: 0,p3: 0,p4: 0,p5: 0,m1: 0,m2: 0,m3: 0,m4: 0,m5: 0, svenc: '0', existePrecios: false
+                    codigo: '',
+                    c_barra: '',
+                    descripcion: '',
+                    indicaciones: '',
+                    modouso: '',
+                    seccion: 1,
+                    unidad: 1,
+                    factor: 1,
+                    ubicacion: '',
+                    costo: 0,
+                    p1: 0,
+                    p2: 0,
+                    p3: 0,
+                    p4: 0,
+                    p5: 0,
+                    m1: 0,
+                    m2: 0,
+                    m3: 0,
+                    m4: 0,
+                    m5: 0,
+                    svenc: '0',
+                    existePrecios: false
                 },
                 stock: {
-                    id: 0, cantidad: 0, loteold: '', lotenew: '', vencimiento: '', sucursal: 1
+                    id: 0,
+                    cantidad: 0,
+                    loteold: '',
+                    lotenew: '',
+                    vencimiento: '',
+                    sucursal: 1
                 },
                 stocks: [],
                 error: '',
@@ -203,80 +315,84 @@
                     cant: 0
                 }
             },
-            watch:{
-                chprecio: function(newVal, oldVal){
-                    for(i=0;i<this.precios.length;i++){
+            watch: {
+                chprecio: function(newVal, oldVal) {
+                    for (i = 0; i < this.precios.length; i++) {
                         this.setPrecio(i);
                     }
                 },
-                chcuota: function(newVal, oldVal){
-                    for(i=0;i<this.precios.length;i++){
+                chcuota: function(newVal, oldVal) {
+                    for (i = 0; i < this.precios.length; i++) {
                         this.setCuota(i);
                     }
                 }
 
             },
             methods: {
-                setMargen: function(index){
-                    if(typeof(this.articulo.costo==='string')){
-                        this.articulo.costo= this.articulo.costo * 1;
+                setMargen: function(index) {
+                    if (typeof(this.articulo.costo === 'string')) {
+                        this.articulo.costo = this.articulo.costo * 1;
                     }
-                    if(this.articulo.costo > 0 && this.precios[index].p > 0) {
-                        if(this.precios[index].p > this.articulo.costo){
-                            var res= this.precios[index].p - this.articulo.costo;
-                            this.precios[index].m=  Math.round(res * 100 / this.articulo.costo);
-                        }else{
-                            this.precios[index].m=0;
+                    if (this.articulo.costo > 0 && this.precios[index].p > 0) {
+                        if (this.precios[index].p > this.articulo.costo) {
+                            var res = this.precios[index].p - this.articulo.costo;
+                            this.precios[index].m = Math.round(res * 100 / this.articulo.costo);
+                        } else {
+                            this.precios[index].m = 0;
                         }
                         this.setCuota(index)
                     }
                 },
-                setPrecio: function(index){
-                    if(typeof(this.articulo.costo==='string')){
-                        this.articulo.costo= this.articulo.costo * 1;
+                setPrecio: function(index) {
+                    if (typeof(this.articulo.costo === 'string')) {
+                        this.articulo.costo = this.articulo.costo * 1;
                     }
-                    if(this.articulo.costo< 1){
-                        this.precios[index].p= 0;
+                    if (this.articulo.costo < 1) {
+                        this.precios[index].p = 0;
                         return;
                     }
-                    if(parseInt(this.precios[index].m) < 1 || this.precios[index].m.length==0){
-                        this.precios[index].p=0;
+                    if (parseInt(this.precios[index].m) < 1 || this.precios[index].m.length == 0) {
+                        this.precios[index].p = 0;
                         return;
                     }
-                        
-                    var retornar= (this.articulo.costo * parseInt(this.precios[index].m))/100+this.articulo.costo
-                    if(this.chprecio)
-                        this.precios[index].p= this.redondear(retornar);
+
+                    var retornar = (this.articulo.costo * parseInt(this.precios[index].m)) / 100 + this.articulo
+                        .costo
+                    if (this.chprecio)
+                        this.precios[index].p = this.redondear(retornar);
                     else
-                    this.precios[index].p= retornar;//parseInt(retornar) 
-             
+                        this.precios[index].p = retornar; //parseInt(retornar) 
+
                 },
-                setCuota: function(index){
-                    if(this.precios[index].p > 0){
-                        if(this.chcuota){ 
-                            this.precios[index].c= this.precios[index].p / (index+2);
-                            this.precios[index].c= this.redondear(parseInt(this.precios[index].c));
-                        }else{
-                            this.precios[index].c= parseInt(this.precios[index].p / (index+2));
-                        } 
-                    }else{
-                        this.precios[index].c= 0;
+                setCuota: function(index) {
+                    if (this.precios[index].p > 0) {
+                        if (this.chcuota) {
+                            this.precios[index].c = this.precios[index].p / (index + 2);
+                            this.precios[index].c = this.redondear(parseInt(this.precios[index].c));
+                        } else {
+                            this.precios[index].c = parseInt(this.precios[index].p / (index + 2));
+                        }
+                    } else {
+                        this.precios[index].c = 0;
                     }
                 },
-                redondear: function(monto){
-                    var longitud=0,x="",b="",PFinal=0;
-                    if (monto > 1000){
-                        longitud= monto.toString().length;
-                        x= monto.toString().substr(-3);
-                        if(parseInt(x)> 500){
-                            x="500"
-                        }else{
-                            x="000"
+                redondear: function(monto) {
+                    var longitud = 0,
+                        x = "",
+                        b = "",
+                        PFinal = 0;
+                    if (monto > 1000) {
+                        longitud = monto.toString().length;
+                        x = monto.toString().substr(-3);
+                        if (parseInt(x) > 500) {
+                            x = "500"
+                        } else {
+                            x = "000"
                         }
-                        b= monto.toString().substr(0,longitud-3); 
-                        PFinal = parseInt(b+x);
-                    }else{
-                        if (monto=> 500) {
+                        b = monto.toString().substr(0, longitud - 3);
+                        PFinal = parseInt(b + x);
+                    } else {
+                        if (monto => 500) {
                             PFinal = 500;
                         }
                     }
@@ -293,19 +409,19 @@
                     }
 
                 },
-                mostrarPrecios: function(){
-                    if(this.isnew){
+                mostrarPrecios: function() {
+                    if (this.isnew) {
                         $('#addArticulo').modal('hide');
-                    }else{
+                    } else {
                         $('#editArticulo').modal('hide');
                     }
-                   
+
                     $('#precioArticulo').modal('show');
                 },
-                cerrarPrecios: function(){
-                    if(this.isnew){
+                cerrarPrecios: function() {
+                    if (this.isnew) {
                         $('#addArticulo').modal('show');
-                    }else{
+                    } else {
                         $('#editArticulo').modal('show');
                     }
                     $('#precioArticulo').modal('hide');
@@ -340,13 +456,13 @@
                             this.requestSend = false;
                             if (response.data == 'NO') {
                                 Swal.fire('No se encontrado resultado!', 'Para:  ' + this.txtbuscar,
-                                'info');
+                                    'info');
                             } else {
                                 this.articulos = response.data.articulos.data;
                                 this.paginacion = response.data.paginacion;
                                 //this.paginacion.pagina_actual=1;
                                 this.currentPage = this.currentPage == 0 ? 1 : this.paginacion
-                                .pagina_actual;
+                                    .pagina_actual;
                             }
                             //this.error=response.data;
                         })
@@ -375,10 +491,10 @@
                     this.cleanAll();
                     $('#addArticulo').modal('show');
                     //this.getUltimo();
-                    setTimeout(function(){
+                    setTimeout(function() {
                         $('input[name="cbarraN"]').focus();
                     }, 1000);
-                    
+
                     //document.getElementById("cbarraN").focus()
                 },
                 showEArticulo: function(a) {
@@ -405,7 +521,7 @@
                         'm2': parseInt(a.pre_margen2, 10),
                         'm3': parseInt(a.pre_margen3, 10),
                         'm4': parseInt(a.pre_margen4, 10),
-                        'm5': parseInt(a.pre_margen5,10),
+                        'm5': parseInt(a.pre_margen5, 10),
                         'svenc': '0',
                         existePrecios: false
                     }
@@ -533,10 +649,10 @@
                 cleanAll: function() {
                     this.stocks = [];
                     this.limpiarCamposStock();
-                    for(i=0;i<17;i++){
-                        this.precios[i].p=0;
-                        this.precios[i].m=0;
-                        this.precios[i].c=0;
+                    for (i = 0; i < 17; i++) {
+                        this.precios[i].p = 0;
+                        this.precios[i].m = 0;
+                        this.precios[i].c = 0;
                     }
                     this.articulo = {
                         'codigo': '',
@@ -553,12 +669,12 @@
                         'p2': 0,
                         'p3': 0,
                         'p4': 0,
-                        'p5':0,
+                        'p5': 0,
                         'm1': 0,
                         'm2': 0,
                         'm3': 0,
                         'm4': 0,
-                        'm5':0,
+                        'm5': 0,
                         'svenc': '0',
                         existePrecios: false
                     };
@@ -655,7 +771,7 @@
                                         precios: this.precios
                                     })
                                     .then(r => {
-                                      this.cleanAll();
+                                        this.cleanAll();
                                         $('#addArticulo').modal('hide');
                                         this.buscar();
                                     })
@@ -702,24 +818,24 @@
                         this.error = e.message;
                     })
                 },
-                getPrecios: function(id){
-                    axios.get('articulo/precios/'+id).then(response =>{
-                        if(response.data.length> 0)
-                            for(i=0;i<response.data.length; i++){
-                                this.articulo.existePrecios= true;
-                                this.precios[i].p= response.data[i].p;
-                                this.precios[i].m= response.data[i].m;
-                                this.precios[i].c= response.data[i].c;
+                getPrecios: function(id) {
+                    axios.get('articulo/precios/' + id).then(response => {
+                        if (response.data.length > 0)
+                            for (i = 0; i < response.data.length; i++) {
+                                this.articulo.existePrecios = true;
+                                this.precios[i].p = response.data[i].p;
+                                this.precios[i].m = response.data[i].m;
+                                this.precios[i].c = response.data[i].c;
                             }
                         else
-                            for(i=0;i<17;i++){
-                                this.articulo.existePrecios= false;
-                                this.precios[i].p=0;
-                                this.precios[i].m=0;
-                                this.precios[i].c=0;
+                            for (i = 0; i < 17; i++) {
+                                this.articulo.existePrecios = false;
+                                this.precios[i].p = 0;
+                                this.precios[i].m = 0;
+                                this.precios[i].c = 0;
                             }
-                    }).catch( error => {
-                        this.error= error.message;
+                    }).catch(error => {
+                        this.error = error.message;
                     })
                 },
                 reservarCodigo: function() {
@@ -789,9 +905,9 @@
         /* $('#addArticulo').on('hidden.bs.modal',function(e){
         	app.delArticulo();
         }); */
-       /*  $('#editArticulo').on('hidden.bs.modal', function(e) {
-            app.cleanAll();
-        }); */
+        /*  $('#editArticulo').on('hidden.bs.modal', function(e) {
+             app.cleanAll();
+         }); */
         activarMenu('m_articulo', '');
     </script>
 

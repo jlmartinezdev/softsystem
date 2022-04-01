@@ -3,7 +3,15 @@ Auth::routes();
 
 Route::get('/', 'HomeController@index')->name('home');
 Route::group(['middleware' => ['administrador']], function () {
-
+    Route::post('articulo', 'ArticuloController@store');
+    Route::put('articulo/{id}', 'ArticuloController@update')->name('articulo.update');
+    Route::delete('articulo/res/{id}', 'ArticuloController@destroy')->name('articulo.destroy');
+    Route::get('anularventa','VentaController@indexanular')->name('anularventa');
+    Route::post('anular_venta','VentaController@destroy');
+    Route::post('usuario', 'UserController@store');
+    Route::delete('usuario/{id}', 'UserController@destroy');
+    Route::get('usuario', 'UserController@index')->name('usuario');
+});
     //Articulos
     Route::get('inf/articulo', 'ArticuloController@informe')->name('articulo@informe');
     Route::get('articulo', 'ArticuloController@index')->name('articulo');
@@ -11,9 +19,8 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('articulo/ultimo', 'ArticuloController@getUltimo')->name('articulo@ultimo');
     Route::get('articulo/precios/{id}','ArticuloController@getPrecios');
     Route::put('articulo', 'ArticuloController@getByCodigo');
-    Route::post('articulo', 'ArticuloController@store');
-    Route::put('articulo/{id}', 'ArticuloController@update')->name('articulo.update');
-    Route::delete('articulo/res/{id}', 'ArticuloController@destroy')->name('articulo.destroy');
+    
+    
     //STOCK
     Route::delete('stock/{id}', 'StockController@destroy');
     Route::post('stock/{id}', 'StockController@update');
@@ -26,13 +33,13 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('venta/cabecera/{id}','VentaController@getCabecera');
     Route::get('infventa/articulo', 'VentaController@getVentaArticulo');
     Route::get('venta', 'VentaController@index')->name('venta');
-    Route::get('anularventa','VentaController@indexanular')->name('anularventa');
+   
     Route::post('venta', 'VentaController@store');
     Route::get('venta/imprimir', 'VentaController@imprimir')->name('infventa.imprimir');
     Route::get('venta/facturar/{id}', 'FacturarController@index');
     Route::post('venta/facturar', 'FacturarController@store');
     Route::delete('venta/facturar/{id}', 'FacturarController@destroy');
-    Route::delete('venta/{id}','VentaController@destroy');
+    
     //COMPRA
     Route::get('infcompra', 'CompraController@indexInf')->name('infcompra');
     Route::get('infcompra/detalle/{id}', 'CompraController@getDetalle');
@@ -69,10 +76,9 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('infcobro/fecha','CtaCobrarController@getCobroFecha');
     Route::get('infcobro/detalle/{id}','CtaCobrarController@getDetalleCobro');
     //Usuario
-    Route::get('usuario', 'UserController@index')->name('usuario');
     
-    Route::post('usuario', 'UserController@store');
-    Route::delete('usuario/{id}', 'UserController@destroy');
+    
+   
 
     //REFERENCIAL
     
@@ -103,7 +109,7 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('/clear-cache', 'AperturaController@comando');
     //TICKET
     Route::get('ticket/factura/{id}', 'FacturarController@ticket');
-});
+
 Route::get('usuario/all', 'UserController@showAll')->name('showalluser');
 Route::get('seccion', 'SeccionController@index')->name('seccion.index');
 Route::post('seccion', 'SeccionController@store');

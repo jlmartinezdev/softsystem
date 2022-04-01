@@ -77,7 +77,14 @@
                         </li>
                     </ul>
                 </li>
-               
+                <li class="nav-item">
+                    <a href="{{ route('articulo') }}" id="m_articulo" class="nav-link">
+                        <i class="nav-icon fa fa-clone"></i>
+                        <p>
+                            ARTICULOS
+                        </p>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a href="{{ route('compra') }}" id="m_compra" class="nav-link">
                         <i class="nav-icon fas fa-th"></i>

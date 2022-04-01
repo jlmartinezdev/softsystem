@@ -140,6 +140,10 @@
             },
             anular: function(){
                 if(this.ventaCabecera.total > 0 ){
+                    let arts= [];
+                    for(i=0;i<this.articulos.length; i++){
+                        arts.push({id : this.articulos[i].ARTICULOS_cod, cantidad: parseInt(this.articulos[i].venta_cantidad)});
+                    }
                     Swal.fire({
                         title: 'Desea anular?',
                         text: "Anular esta venta!",
@@ -152,7 +156,10 @@
                         }).then((result) => {
                         if (result.value) {
                             console.log("Anular")
-                            axios.delete('venta/'+this.txtbuscar).then(response =>{
+                            axios.post('anular_venta', {
+                                id: this.txtbuscar,
+                                articulos: arts
+                            }).then(response =>{
                                 Swal.fire(
                                     'Anulado!',
                                     'Venta ha sido anulado.',

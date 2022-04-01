@@ -21,7 +21,6 @@ class AperturaController extends Controller
     	$aperturas= Apertura::join('sucursales','apert_cierres_caja.suc_cod','=','sucursales.suc_cod')
         ->join('caja','apert_cierres_caja.caja_cod','=','caja.caja_cod')
         ->orderBy('nro_operacion','DESC')
-        ->limit(10)
         ->get();
     	return view('apertura',compact('sucursales','cajas','aperturas'));
     }

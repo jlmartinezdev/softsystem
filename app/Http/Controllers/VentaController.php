@@ -10,6 +10,7 @@ use App\MovimientoCaja;
 use App\Empresa;
 use App\CtaCobrar;
 use App\Cobro;
+use App\Stock;
 use DB;
 use Auth;
 use PDF;
@@ -104,13 +105,14 @@ class VentaController extends Controller
         $venta->documento= $request->ventaCabecera['documento']; 
         $venta->save();
         if($request->ventaCabecera['condicionventa']=='1'){
-            $this->storeMovimiento($venta,$request->ventaCabecera['idSucursal'],$request->ventaCabecera['nro_operacion']);
+            $this->storeMovimiento($request->ventaCabecera['idSucursal'],$request->ventaCabecera['nro_operacion'],[$venta->nro_fact_ventas, $venta->venta_total]);
         }else{
             foreach($request->cuotas as $cuota){
                 
                 $this->storeCtaCobrar($venta->nro_fact_ventas,$cuota);
                 if($cuota['tipo']=='Entrega'){
                     $this->storeCobro($request->ventaCabecera,$venta->nro_fact_ventas, $cuota);
+                    $this->storeMovimiento($request->ventaCabecera['idSucursal'],$request->ventaCabecera['nro_operacion'],[$venta->nro_fact_ventas,$cuota['monto']]);
                 }
             }
         }
@@ -123,13 +125,17 @@ class VentaController extends Controller
         return $venta->nro_fact_ventas;
         
     }
-    public function destroy($id){
-        
-        DB::table('cobranza_detalle')->where('nro_fact_ventas',$id)->delete();
-        DB::table('ctas_cobrar')->where('nro_fact_ventas',$id)->delete();
-        DB::table('detalle_venta')->where('nro_fact_ventas',$id)->delete();
-        DB::table('ventas')->where('nro_fact_ventas',$id)->delete();
-        return "OK";
+    public function destroy(Request $request){
+        foreach ($request->articulos as $articulo) {
+            Stock::where('ARTICULOS_cod',$articulo['id'])
+            ->first()
+            ->increment('cantidad',$articulo['cantidad']);
+        }
+        DB::table('cobranza_detalle')->where('nro_fact_ventas',$request->id)->delete();
+        DB::table('ctas_cobrar')->where('nro_fact_ventas',$request->id)->delete();
+        DB::table('detalle_venta')->where('nro_fact_ventas',$request->id)->delete();
+        DB::table('ventas')->where('nro_fact_ventas',$request->id)->delete();
+        return "ok";
     }
 
     private function storeCtaCobrar($idventa, $cuota){
@@ -189,14 +195,14 @@ class VentaController extends Controller
         $array_fecha= explode("-",$fecha);
         return $array_fecha[2]."-".$array_fecha[1]."-".$array_fecha[0];
     }
-    private function storeMovimiento(Venta $venta,$idSucursal,$ope ){
+    private function storeMovimiento($idSucursal,$ope, $datos ){
         $movimiento= new MovimientoCaja();
         $movimiento->nro_operacion= $ope;
         $movimiento->mov_fecha= date('Y-m-d H:i');
-        $movimiento->mov_concepto= 'Venta Nº: '.$venta->nro_fact_ventas;
+        $movimiento->mov_concepto= 'Venta Nº: '.$datos[0];
         $movimiento->mov_tipo= 'Entrada';
-        $movimiento->mov_monto= $venta->venta_total;
-        $movimiento->nro_fact_ventas= $venta->nro_fact_ventas;
+        $movimiento->mov_monto= $datos[1];
+        $movimiento->nro_fact_ventas= $datos[0];
         $movimiento->suc_cod= $idSucursal;
         $movimiento->save();
         

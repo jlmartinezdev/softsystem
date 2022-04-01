@@ -15,7 +15,7 @@ class Administrador
      */
     public function handle($request, Closure $next)
     {
-        if(Auth::user()->cod_rol == 4)
+        if(Auth::user()->roles->nom_rol=="Administrador")
             return $next($request);
         else
             return redirect('/');

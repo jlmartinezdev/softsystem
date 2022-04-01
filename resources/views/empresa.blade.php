@@ -62,8 +62,7 @@
                 </div>
                 <div class="form-group">
                     <strong>Descripcion</strong>
-                    <input type="text" class="form-control form-control-sm" placeholder="Descripcion"
-                        v-model="empresa.descripcion">
+                    <textarea id="descripcion" cols="60" rows="3" class="form-control form-control-sm" placeholder="Descripcion">{{trim($empresa->emp_descripcion)}}</textarea>
                 </div>
             </div>
         </div>
@@ -80,11 +79,12 @@
         var app= new Vue({
             el: '#app',
             data: {
-                empresa: {nombre: '{{trim($empresa->emp_nombre)}}',sucursal: '{{$empresa->suc_cod}}', ciudad: '{{$empresa->CIUDAD_cod}}',direccion: '{{ trim($empresa->emp_direccion)}}', ruc: '{{$empresa->emp_ruc}}',celular: '{{$empresa->emp_celular}}', telefono: '{{ $empresa->emp_telefono}}', correo: '{{trim($empresa->emp_correo)}}',web: '{{trim($empresa->emp_web)}}', descripcion: '{{ trim($empresa->emp_descripcion)}}'}
+                empresa: {nombre: '{{trim($empresa->emp_nombre)}}',sucursal: '{{$empresa->suc_cod}}', ciudad: '{{$empresa->CIUDAD_cod}}',direccion: '{{ trim($empresa->emp_direccion)}}', ruc: '{{$empresa->emp_ruc}}',celular: '{{$empresa->emp_celular}}', telefono: '{{ $empresa->emp_telefono}}', correo: '{{trim($empresa->emp_correo)}}',web: '{{trim($empresa->emp_web)}}', descripcion: ''}
             },
             methods: {
                 update: function(){
                     if(this.empresa.nombre.length > 0){
+                        this.empresa.descripcion= document.getElementById("descripcion").value;
                        axios.post('empresa',this.empresa)
                     .then(response =>{
                         location.reload();
