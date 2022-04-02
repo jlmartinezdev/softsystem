@@ -1,57 +1,74 @@
 @extends('layouts.app')
 @section('title', 'SOFTSYSTEM')
+@section('style')
+<style>
+    @font-face {
+    font-family: "Cairo";
+    font-style: normal;
+    font-weight: 400;
+    font-display: auto;
+    src: url("../webfonts/Cairo-Bold.ttf") format("truetype");
+}
+.font-cairo {
+    font-family: Cairo;
+}
+</style>
+@endsection
 @section('main')
     <div class="container">
-        <div>
-
-            <div class=" d-flex flex-column align-items-center justify-content-center">
-                <article class="px-3 py-3">
-                    <div class="text-center">
-                        <img src="img/logo-softsystem.PNG">
-                    </div>
-                    
-                    <center>
-                        <h4>SOFTSYSTEM</h4>
-                    </center>
-                    <hr>
-                    <a class="btn btn-app">
-                        <span class="badge bg-success">300</span>
-                        <i class="fas fa-barcode"></i> Articulo
-                    </a>
-                    <a class="btn btn-app">
-                        <span class="badge bg-purple">3</span>
-                        <i class="fas fa-users"></i> Clientes
-                    </a>
-                    <a class="btn btn-app">
-                        <span class="badge bg-teal">30</span>
-                        <i class="fas fa-inbox"></i> Clientes
-                    </a>
-                    <a class="btn btn-app">
-                        <span class="badge bg-teal">30</span>
-                        <i class="fas fa-inbox"></i> Clientes
-                    </a>
-                </article>
-                <article class="px-3 py-3">
-                    <a class="btn btn-app">
-                        <span class="badge bg-success">300</span>
-                        <i class="fas fa-barcode"></i> Articulo
-                    </a>
-                    <a class="btn btn-app">
-                        <span class="badge bg-purple">3</span>
-                        <i class="fas fa-users"></i> Clientes
-                    </a>
-                    <a class="btn btn-app">
-                        <span class="badge bg-teal">30</span>
-                        <i class="fas fa-inbox"></i> Clientes
-                    </a>
-                    <a class="btn btn-app">
-                        <span class="badge bg-teal">30</span>
-                        <i class="fas fa-inbox"></i> Clientes
-                    </a>
-                </article>
-
-            </div>
-
-        </div>
+        <h3 class="text-uppercase text-center font-cairo text-primary">{{ $empresa->emp_nombre }}</h3>
     </div>
+    <hr>
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-teal">
+                <div class="inner">
+                    <h3>{{$n_articulos}}</h3>
+                    <p>Articulos</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-users"></i>
+                </div>
+                <a href="#" class="small-box-footer">Abrir <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-lightblue">
+                <div class="inner">
+                    <h3>{{$n_clientes}}</h3>
+                    <p>Clientes</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-users"></i>
+                </div>
+                <a href="#" class="small-box-footer">Abrir <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>{{$n_ventas}}</h3>
+                    <p>Ventas {{$mes}}</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-shopping-cart"></i>
+                </div>
+                <a href="#" class="small-box-footer">Abrir <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>{{$n_cobros}}</h3>
+                    <p>Cobro {{$mes}}</p>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-users"></i>
+                </div>
+                <a href="#" class="small-box-footer">Abrir <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+        
+    </div>
+    <hr>
 @endsection

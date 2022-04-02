@@ -2,22 +2,32 @@
 //@import url('https://fonts.googleapis.com/css?family=Nunito');
 
 // Variables
-@import 'variables';
+@import "variables";
 
 // Bootstrap
-@import '~bootstrap/scss/bootstrap';
+@import "~bootstrap/scss/bootstrap";
 
 .navbar-laravel {
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
-.nowrap{
+@font-face {
+    font-family: "Cairo";
+    font-style: normal;
+    font-weight: 400;
+    font-display: auto;
+    src: url("../webfonts/Cairo-Bold.ttf") format("truetype");
+}
+.font-cairo {
+    font-family: Cairo;
+}
+.nowrap {
     white-space: nowrap;
 }
- .h-screen{
- 	height: 100vh;
- }
- .navbar {
+.h-screen {
+    height: 100vh;
+}
+.navbar {
     font-size: 12pt;
 }
 
