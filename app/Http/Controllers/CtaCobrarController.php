@@ -20,6 +20,9 @@ class CtaCobrarController extends Controller
     public function index(){
         return view('cobros');
     }
+    public function indexanular(){
+        return view('anularcobro');
+    }
     public function indexInf(){
         return view('informes.ctacobrar');
     }
@@ -48,6 +51,16 @@ class CtaCobrarController extends Controller
         'articulos' => $this->getArticuloFromCta($request,$request->ci)
     ];
         
+    }
+    public function getCobroById($id){
+        $cobro=Cobro::join('cobranza_detalle as dc','cobranzas.cc_numero','dc.cc_numero')
+                ->join('ventas as v','dc.nro_fact_ventas','v.nro_fact_ventas')
+                ->join('clientes as c','v.clientes_cod','c.clientes_cod')
+                ->select('cobranzas.*','c.cliente_ci','c.cliente_nombre','c.cliente_direccion')
+                ->where('cobranzas.cc_numero',$id)
+                ->get();
+        $detalle= $this->getDetalleCobro($id);
+        return ["cobro" => $cobro,"detalle" =>$detalle];
     }
     public function getCobroFecha(Request $request){
         $cobro = Cobro::whereBetween('cobranzas.cob_fecha',[$request->alld,$request->allh])->get();
@@ -126,6 +139,31 @@ class CtaCobrarController extends Controller
         $movimiento->suc_cod= $cobro->suc_cod;
         $movimiento->save();
         
+    }
+    public function destroy(Request $request){
+        
+        DB::table('cobranza_detalle')->where('cc_numero',$request->id)->delete();
+        Cobro::find($request->id)->delete();
+        foreach ($request->cuotas as $cuota) {
+
+            Ctacobrar::where('nro_cuotas',$cuota['nro_cuotas'])
+            ->where('nro_fact_ventas',$cuota['nro_fact_ventas'])
+            ->update([
+                'monto_cobrado' => $cuota['importe']-$cuota['cobrado'], 
+                'monto_saldo'=> intval('monto_saldo') + $cuota['cobrado'],
+                'estado' => '1'
+            ]);
+        }
+        $movimiento= new MovimientoCaja();
+        $movimiento->nro_operacion= $request->nrooperacion;
+        $movimiento->mov_fecha= date('Y-m-d H:i');
+        $movimiento->mov_concepto= 'Anular Cobro Nº: '.$request->id;
+        $movimiento->mov_tipo= 'Salida';
+        $movimiento->mov_monto= $request->monto;
+        $movimiento->nro_fact_ventas= '-';
+        $movimiento->suc_cod= $request->idSucursal;
+        $movimiento->save();
+        return "OK";
     }
     private function reciboUp($numeros){
         

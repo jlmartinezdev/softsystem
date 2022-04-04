@@ -285,8 +285,8 @@
                 })
                 .then(response=>{
                     this.request.buscar= false;
-                    if(response.data=='NO'){
-                     Swal.fire('No se encontrado resultado!','Para:  '+abuscar, 'info' );
+                    if(response.data.ctas.length==0){
+                     Swal.fire('No posee cuenta a Cobrar!',this.filtro.ci ? 'Documento Nro: '+abuscar : 'Cliente: ' +abuscar, 'info' );
                     }else{
                         this.cobro.cobrado = 0;
                         this.cobro.saldo = 0;

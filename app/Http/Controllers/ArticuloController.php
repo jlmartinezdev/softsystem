@@ -129,9 +129,16 @@ class ArticuloController extends Controller
         for ($i=0; $i <count($request->stock) ; $i++) { 
             DB::select('call insert_stock(?,?,?,?,?,?)',[$articulo->ARTICULOS_cod,$request->stock[$i]['sucursal'],$request->stock[$i]['cantidad'],$this->setVencimiento($request->stock[$i]['vencimiento']),$request->stock[$i]['loteold'],$request->stock[$i]['lotenew']]);
         }
-        for($i=2;$i<=18;$i++){
-            DB::insert('INSERT INTO precios VALUES (?,?,?,?,?,?)',[$i,$articulo->ARTICULOS_cod,$request->precios[$i-2]["p"],$request->precios[$i-2]["m"],$i,$request->precios[$i-2]["c"]]);
+        $suma= 0;
+        for($i=0;$i<=10;$i++){
+            $suma += intval($request->precios[$i]["p"]);
         }
+        if($suma > 0 ){
+            for($i=2;$i<=18;$i++){
+                DB::insert('INSERT INTO precios VALUES (?,?,?,?,?,?)',[$i,$articulo->ARTICULOS_cod,$request->precios[$i-2]["p"],$request->precios[$i-2]["m"],$i,$request->precios[$i-2]["c"]]);
+            }
+        }
+        
     }
 
     private function rellenar($codigo){
@@ -149,6 +156,7 @@ class ArticuloController extends Controller
      */
     public function update(Request $request, $id)
     {
+        
         $ok= Articulo::where('articulos_cod',$id)->update([
             'uni_codigo'=>$request->articulo['unidad'], 
             'producto_c_barra'=>$request->articulo['c_barra'],
@@ -180,11 +188,17 @@ class ArticuloController extends Controller
         for ($i=0; $i < count($request->stock) ; $i++) { 
             DB::select('call insert_stock(?,?,?,?,?,?)',[$id,$request->stock[$i]['sucursal'],$request->stock[$i]['cantidad'],$this->setVencimiento($request->stock[$i]['vencimiento']),$request->stock[$i]['loteold'],$request->stock[$i]['lotenew']]);
         }
+        $suma = 0;
+        for($i=0;$i<=10;$i++){
+            $suma += intval($request->precios[$i]["p"]);
+        }
         for($i=0;$i< count($request->precios);$i++){
             if($request->articulo['existePrecios']){
                 DB::update('UPDATE precios SET precio= ?,margen=?, cant_cuota=?, monto_cuota=? WHERE id_precio=? AND articulos_cod=?',[$request->precios[$i]["p"],$request->precios[$i]["m"],$i+2,$request->precios[$i]["c"],$i+2,$id]);
             }else{
-                DB::insert('INSERT INTO precios VALUES (?,?,?,?,?,?)',[$i+2,$id,$request->precios[$i]["p"],$request->precios[$i]["m"],$i+2,$request->precios[$i]["c"]]);
+                if($suma > 0){
+                    DB::insert('INSERT INTO precios VALUES (?,?,?,?,?,?)',[$i+2,$id,$request->precios[$i]["p"],$request->precios[$i]["m"],$i+2,$request->precios[$i]["c"]]);
+                }
             }
             
         }

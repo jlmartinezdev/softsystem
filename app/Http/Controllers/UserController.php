@@ -74,7 +74,7 @@ class UserController extends Controller
         //
     }
     public function showAll(){
-       return  User::All();
+       return  User::select('cod_usuarios','cod_rol','cod_cargo',DB::raw('TRIM(user_usuarios) as user_usuarios'),DB::raw('trim(nom_usuarios) as nom_usuarios'))->get();
     }
     /**
      * Show the form for editing the specified resource.

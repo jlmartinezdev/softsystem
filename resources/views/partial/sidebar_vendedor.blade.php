@@ -94,22 +94,10 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" id="m_ventas" class="nav-link">
-                        <i class="nav-icon fa fa-cog"></i>
-                        <p>
-                            GESTIONAR VENTA
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
+                    <a href="{{ route('venta') }}" id="m_venta" class="nav-link">
+                        <i class="fa  fa fa-cog nav-icon"></i>
+                        <p>VENTA</p>
                     </a>
-                    <ul class="nav nav-treeview">
-                    
-                        <li class="nav-item">
-                            <a href="{{ route('venta') }}" id="m_venta" class="nav-link">
-                                <i class="fa  fa fa-cog nav-icon"></i>
-                                <p>Venta</p>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link" id="m_caja">
@@ -185,7 +173,14 @@
                         <p><span id="sucursal"></span></p>
                     </a>
                 </li>
-            
+                <li class="nav-item">
+                    <a href="{{ route('home') }}" id="m_home" class="nav-link">
+                        <i class="nav-icon fa fa-home"></i>
+                        <p>
+                            INICIO
+                        </p>
+                    </a>
+                </li>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

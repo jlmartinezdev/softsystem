@@ -7,7 +7,9 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::put('articulo/{id}', 'ArticuloController@update')->name('articulo.update');
     Route::delete('articulo/res/{id}', 'ArticuloController@destroy')->name('articulo.destroy');
     Route::get('anularventa','VentaController@indexanular')->name('anularventa');
+    Route::get('anularcobro','CtaCobrarController@indexanular')->name('anularcobro');
     Route::post('anular_venta','VentaController@destroy');
+    Route::post('anular_cobro','CtaCobrarController@destroy');
     Route::post('usuario', 'UserController@store');
     Route::delete('usuario/{id}', 'UserController@destroy');
     Route::get('usuario', 'UserController@index')->name('usuario');
@@ -70,6 +72,7 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('ctas_cobrar/buscar', 'CtaCobrarController@getCtaCobrar')->name('ctas_cobrar@buscar');
     Route::post('infctacobrar', 'CtaCobrarController@infToPdf')->name('infctacobrar@pdf');
     Route::get('cobro','CtaCobrarController@index')->name('cobro');
+    Route::get('cobro/{id}','CtaCobrarController@getCobroById')->name('cobro.id');
     Route::get('cuotas/{id}','CtaCobrarController@getCuotas');
     Route::post('cobro','CtaCobrarController@store');
     Route::get('infcobro','CtaCobrarController@indexCobrado')->name('infcobro');

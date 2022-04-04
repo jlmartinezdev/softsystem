@@ -35,7 +35,7 @@
         <hr class="bg-primary" style="height: 4px; margin-bottom: 0px">
         <div class="row">
             <div class="col-4">
-                <img src="/img/{{$empresa->emp_logo}}" alt="{{$empresa->emp_nombre}}">
+                <img src="{{asset('img/'.$empresa->emp_logo)}}" alt="{{$empresa->emp_nombre}}">
             </div>
             <div class="col-4">
                 <ul class="list-unstyled">

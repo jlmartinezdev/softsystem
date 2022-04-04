@@ -7,7 +7,7 @@
     font-style: normal;
     font-weight: 400;
     font-display: auto;
-    src: url("../webfonts/Cairo-Bold.ttf") format("truetype");
+    src: url({{ asset("webfonts/Cairo-Bold.ttf")}}) format("truetype");
 }
 .font-cairo {
     font-family: Cairo;
@@ -27,9 +27,9 @@
                     <p>Articulos</p>
                 </div>
                 <div class="icon">
-                    <i class="fa fa-users"></i>
+                    <i class="fa fa-box"></i>
                 </div>
-                <a href="#" class="small-box-footer">Abrir <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="articulo" class="small-box-footer">Abrir <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
         <div class="col-lg-3 col-6">
@@ -41,7 +41,7 @@
                 <div class="icon">
                     <i class="fa fa-users"></i>
                 </div>
-                <a href="#" class="small-box-footer">Abrir <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="cliente" class="small-box-footer">Abrir <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
         <div class="col-lg-3 col-6">
@@ -53,7 +53,7 @@
                 <div class="icon">
                     <i class="fa fa-shopping-cart"></i>
                 </div>
-                <a href="#" class="small-box-footer">Abrir <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="venta" class="small-box-footer">Abrir <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
         <div class="col-lg-3 col-6">
@@ -63,9 +63,9 @@
                     <p>Cobro {{$mes}}</p>
                 </div>
                 <div class="icon">
-                    <i class="fa fa-users"></i>
+                    <i class="fa fa-calendar-check"></i>
                 </div>
-                <a href="#" class="small-box-footer">Abrir <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="cobro" class="small-box-footer">Abrir <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
         

@@ -6,7 +6,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-sm-4 col-md-2 pl-2">
+                    <div class="col-sm-4 col-md-2 pl-2 pb-2">
                         <button class="btn btn-primary btn-block" @click="showMArticulo"><span class="fa fa-plus"></span>
                             Nuevo</button>
                     </div>
@@ -410,13 +410,18 @@
 
                 },
                 mostrarPrecios: function() {
-                    if (this.isnew) {
-                        $('#addArticulo').modal('hide');
-                    } else {
-                        $('#editArticulo').modal('hide');
-                    }
+                    if(this.articulo.costo > 0 ){
+                        if (this.isnew) {
+                            $('#addArticulo').modal('hide');
+                        } else {
+                            $('#editArticulo').modal('hide');
+                        }
 
-                    $('#precioArticulo').modal('show');
+                        $('#precioArticulo').modal('show');
+                    }else{
+                        Swal.fire('Atención...','Agregue precio de compra','info');
+                    }
+                    
                 },
                 cerrarPrecios: function() {
                     if (this.isnew) {

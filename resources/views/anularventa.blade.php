@@ -186,5 +186,6 @@
             }
         }
     })
+    activarMenu('m_anular', 'm_aventa');
 </script>
 @endsection

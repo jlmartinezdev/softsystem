@@ -150,7 +150,7 @@
                     this.getDetalle();
                 },
                 getDetalle: function() {
-                    axios.get('infventa/detalle/' + this.venta.nro_fact_ventas)
+                    axios.get('{{ env('APP_URL') }}'+'infventa/detalle/' + this.venta.nro_fact_ventas)
                         .then(response => {
                             this.detalleVenta = response.data;
                         })

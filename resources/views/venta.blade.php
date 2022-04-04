@@ -539,6 +539,6 @@
 			this.getSucursal();
 		}
 	});
-	activarMenu('m_ventas','m_venta');
+	activarMenu('m_venta','');
 </script>
 @endsection
