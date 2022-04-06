@@ -75,7 +75,7 @@
                                         <span class="fa fa-file-excel"></span> Exportar
                                     </button>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="excel/articulos">Con Stock</a>
+                                        <button class="dropdown-item" @click="exportar('stock')">Con Stock</button>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="#">Precios Creditos</a>
                                     </div>
@@ -891,6 +891,24 @@
                         .catch(e => {
                             this.error = e.message;
                         })
+                },
+                exportar: function(tipo){
+                    if(this.articulos.length < 1){
+                        return false;
+                    }
+                    if(tipo=="stock"){
+                       let params= {
+                                page: 0,
+                                buscar: this.txtbuscar,
+                                criterio: 0,
+                                seccion: this.filtro.seccion,
+                                col: this.filtro.columna,
+                                ord: this.filtro.orden,
+                                suc: ''
+                            }
+                        let u = new URLSearchParams(params).toString();
+                        window.open('excel/articulos?'+u);
+                    }
                 }
             },
             computed: {

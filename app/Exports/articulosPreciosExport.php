@@ -1,7 +1,5 @@
 <?php
 
-namespace App\Exports;
-
 use App\Articulo;
 use DB;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -16,7 +14,7 @@ use Maatwebsite\Excel\Concerns\WithProperties;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\Exportable;
 
-class ArticulosExport implements FromQuery,WithColumnFormatting, WithHeadings, WithStyles,WithProperties,WithColumnWidths
+class articulosPreciosExport implements FromQuery,WithColumnFormatting, WithHeadings, WithStyles,WithProperties,WithColumnWidths
 {
     use Exportable;
 

@@ -232,7 +232,9 @@ class ArticuloController extends Controller
     public function informe(){
         return view('informes.articulo');
     }
-    public function export(){
-        return Excel::download(new ArticulosExport, 'articulos.xlsx');
+    public function export(Request $request){
+        //return Excel::download(new ArticulosExport, 'articulos.xlsx');
+        //return (new InvoicesExport(2018))->download('invoices.xlsx');
+        return (new ArticulosExport)->filtro($request)->download('articulos.xlsx');
     }
 }
