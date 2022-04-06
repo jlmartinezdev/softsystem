@@ -268,6 +268,7 @@
                 if(isNaN(t)){
                     this.txtcliente= this.txtbuscar
                     $('#busquedaCliente').modal('show');
+                    this.buscarCliente();
                     setTimeout(() => {
                         document.getElementById('txtcliente').focus();
                     }, 500);
@@ -416,9 +417,14 @@
                 return f[2]+"/"+f[1]+"/"+f[0];
             },
             subFecha: function(startFecha){
+                
                 const fechaInicio = new Date(startFecha).getTime();
                 const fechaFin    = new Date().getTime();
+                if(fechaInicio < fechaFin){
+                    return 0;
+                }
                 const diff = fechaFin - fechaInicio;
+                
                 return parseInt(diff/(1000*60*60*24));
             },
             diferenciaFecha: function(fecha_vent, pagada){
@@ -467,6 +473,7 @@
             },
             showDetalle: function(i){
                 this.venta= this.ctas[i];
+                
                 $('#frmdetalle').modal('show');
             },
             showFinalizar: function(){
@@ -499,6 +506,7 @@
                 let montoInteres=0;
                 const interes_mora= 100;
                 const tmp_vencimiento= this.subFecha(vencimiento);
+                console.log(tmp_vencimiento);
 
                 if (interes_mora > 0 && tmp_vencimiento > 5){
                     montoInteres= (monto * interes_mora)/ 100;

@@ -113,7 +113,8 @@
                                         </select>
                                     </div>
                                     <div class="ml-2 pb-2">
-                                        <button class="btn btn-primary" onclick="javascript:window.print()"><span class="fa fa-print"></span>
+                                        <button class="btn btn-primary" onclick="javascript:window.print()"><span
+                                                class="fa fa-print"></span>
                                             Imprimir</button>
                                     </div>
 
@@ -165,10 +166,10 @@
                                                     <td>@{{ c.nro_fact_ventas }}</td>
                                                     <td>@{{ c.venta_fecha }}</td>
                                                     <td>@{{ format(c.total) }}</td>
-                                                    <td>@{{ (c.pagada - 1) + " de " + (c.cuotas - 1) }}</td>
+                                                    <td>@{{ (c.pagada) + " de " + (c.cuotas) }}</td>
                                                     <td>@{{ format(c.cobrado) }}</td>
                                                     <td class="text-danger font-weight-bold">@{{ format(c.saldo) }}</td>
-                                                    <td>@{{ diferenciaFecha(c.fecha_v, c.pagada - 1) + " dias" }}</td>
+                                                    <td>@{{ diferenciaFecha(c.fecha_v, c.pagada) + " dias" }}</td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="7" class="border-bottom"><strong>Detalle de Venta</strong>
@@ -274,8 +275,6 @@
             },
             methods: {
                 buscar: function(p1) {
-                    
-
                     this.requestSend = true;
                     if (this.filtro.busquedapor == 'cliente') {
                         var t = parseFloat(this.txtbuscar);
@@ -321,6 +320,19 @@
                         return venta.nro_fact_ventas == nroventa
                     })
                 },
+                getFecha: function(flag) {
+
+                    var f = new Date();
+                    var dia = flag == 1 ? 1 : f.getDate();
+                    var mes = (f.getMonth() + 1);
+                    if (flag == 2) {
+                        this.chart.mes = mes;
+                        return;
+                    }
+                    return f.getFullYear() + "-" + mes.toString().padStart(2, "0") + "-" + dia.toString()
+                        .padStart(2, "0");
+                    //this.filtrovalue= this.meses[mes];
+                },
                 showComunidades: function() {
                     $('#frmcompania').modal('show');
                 },
@@ -328,6 +340,9 @@
                     //2016-07-12
                     var fechaInicio = new Date(fecha_vent).getTime();
                     var fechaFin = new Date().getTime();
+                    if (fechaFin > fechaInicio) {
+                        return "-";
+                    }
                     var diff = fechaFin - fechaInicio;
                     var dia = parseInt(diff / (1000 * 60 * 60 * 24));
                     var diferenciaFecha = 0;
@@ -348,7 +363,36 @@
 
                         return dia > 30 ? dia : "-";
                     }
+                },
+                getCobroMes() {
+                    axios.get('ctas_cobrar/fecha', {
+                            params: {
+                                desde: this.getFecha(1),
+                                hasta: this.getFecha(0),
+                                buscarpor: this.filtro.busquedapor,
+                                ordenarpor: this.filtro.ordenarpor,
+                                ord: this.filtro.orden
+                            }
+                        })
+                        .then(response => {
+                            this.requestSend = false;
+
+                            this.ctas = response.data.ctas;
+                            this.articulos = response.data.articulos;
+                            // this.paginacion= response.data.paginacion;
+                            //this.paginacion.pagina_actual=1;
+
+                            this.requestSend = false;
+                            //this.error=response.data;
+                        })
+                        .catch(e => {
+                            this.requestSend = false;
+                            this.error = e.message;
+                        });
                 }
+            },
+            mounted() {
+                //this.getCobroMes();
             }
         })
         activarMenu('m_informe', 'm_ictacobrar');

@@ -41,7 +41,7 @@
                                 @{{ cuota.nro_cuotas}}
                             </td>
                             <td>@{{ formatFecha(cuota.fecha_venc)}}</td>
-                            <td>@{{ format(cuota.monto_cuota)}}</td>
+                            <td>@{{ format(cuota.monto_cuota- cuota.monto_cobrado)}}</td>
                             <td>@{{ diferenciaFecha(cuota.fecha_venc, cuota.monto_cobrado) }}</td>
                             <td>
                                 <template v-if="cuota.monto_cobrado == cuota.monto_cuota">

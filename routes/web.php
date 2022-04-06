@@ -70,6 +70,7 @@ Route::group(['middleware' => ['administrador']], function () {
     //COBROS
     Route::get('infctacobrar', 'CtaCobrarController@indexInf')->name('infctacobrar');
     Route::get('ctas_cobrar/buscar', 'CtaCobrarController@getCtaCobrar')->name('ctas_cobrar@buscar');
+    Route::get('ctas_cobrar/fecha','CtaCobrarController@getCtaCobrarFecha')->name('ctas_cobrar@fecha');
     Route::post('infctacobrar', 'CtaCobrarController@infToPdf')->name('infctacobrar@pdf');
     Route::get('cobro','CtaCobrarController@index')->name('cobro');
     Route::get('cobro/{id}','CtaCobrarController@getCobroById')->name('cobro.id');
