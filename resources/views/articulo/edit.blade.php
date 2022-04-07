@@ -13,7 +13,7 @@
 						<a class="nav-item nav-link active" data-toggle="tab" role="tab" href="#frmdescrip2" aria-controls="frmdescrip" aria-select="true">Descripcion</a>
 						<a class="nav-item nav-link" data-toggle="tab" role="tab" href="#frmstock2" aria-controls="frmstock" aria-select="false">Stock</a>
 						<a class="nav-item nav-link" data-toggle="tab" role="tab" href="#frmprecio2" aria-controls="frmprecio" aria-select="false">Precio</a>
-					</div>
+					</div> 
 				</nav>
 				<div class="tab-content">
 					<div class="tab-pane fade show active" id="frmdescrip2" role="tabpanel">
@@ -163,7 +163,7 @@
 	    					<div class="col">
 	    						<div class="form-group">
 							      <strong><label for="costo">Precio Compra *</label></strong>
-							      <input type="text" onkeypress="return soloNumero(event)" v-model="articulo.costo" v-on:keyup="setPrecioVenta()" onfocus="this.select()" class="form-control form-control-sm font-weight-bold" name="costo" placeholder="Precio Compra">
+								  <in-number  v-model="articulo.costo" placeholder="Precio Compra" @change="setPrecioVenta"></in-number>
 							    </div>
 								<button class="btn btn-primary" @click="mostrarPrecios"><span class="fa fa-plus"></span> Precios</button>
 							</div>
@@ -209,31 +209,31 @@
 								<div class="col">
 									<div class="form-group">
 								      <strong><label for="venta1">Precio Venta 1 *</label></strong>
-								      <input v-model="articulo.p1" onfocus="this.select()" v-on:keyup="setUtilPrecio('P',1)" type="number" class="form-control form-control-sm" name="venta1" placeholder="Precio Venta 1">
+								      <in-number  v-model="articulo.p1" placeholder="Precio venta 1" @change="setUtilPrecio('P',1)"></in-number>
 								    </div>
 								</div>
 								<div class="col">
 								    <div class="form-group">
 								      <strong><label for="venta2">Precio Venta 2</label></strong>
-								      <input type="number" onfocus="this.select()" v-model="articulo.p2" v-on:keyup="setUtilPrecio('P',2)" class="form-control form-control-sm" name="venta2" placeholder="Precio Venta 2">
+								      <in-number  v-model="articulo.p2" placeholder="Precio venta 2" @change="setUtilPrecio('P',2)"></in-number>
 								    </div>
 								</div>
 								<div class="col">
 								    <div class="form-group">
 								      <strong><label for="venta3">Precio Venta 3</label></strong>
-								      <input v-model="articulo.p3" onfocus="this.select()" v-on:keyup="setUtilPrecio('P',3)" type="number" class="form-control form-control-sm" name="venta3" placeholder="Precio Venta 3">
+								      <in-number  v-model="articulo.p3" placeholder="Precio venta 3" @change="setUtilPrecio('P',3)"></in-number>
 								    </div>
 								</div>
 								<div class="col">
 								    <div class="form-group">
 								      <strong><label for="venta4">Precio Venta 4</label></strong>
-								      <input v-model="articulo.p4" onfocus="this.select()" v-on:keyup="setUtilPrecio('P',4)" type="number" class="form-control form-control-sm" name="venta4" placeholder="Precio Venta 4">
+								      <in-number  v-model="articulo.p4" placeholder="Precio venta 4" @change="setUtilPrecio('P',4)"></in-number>
 								    </div>
 								</div>
 								<div class="col">
 								    <div class="form-group">
 								      <strong><label for="venta5">Precio Venta 5</label></strong>
-								      <input v-model="articulo.p5" onfocus="this.select()" v-on:keyup="setUtilPrecio('P',5)" type="number" class="form-control form-control-sm" name="venta5" placeholder="Precio Venta 5">
+								      <in-number  v-model="articulo.p5" placeholder="Precio venta 5" @change="setUtilPrecio('P',5)"></in-number>
 								    </div>
 								</div>
 							</div>
