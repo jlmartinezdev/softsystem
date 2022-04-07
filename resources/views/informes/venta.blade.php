@@ -14,7 +14,10 @@
             <div class="card-header">
                 <div class="nav nav-tabs card-header-tabs" role="tablist">
                     <a class="nav-item nav-link active" href="#frmlista" data-toggle="tab" role="tab"
-                        aria-select="true"><strong><span class="fa fa-list"></span> Lista</strong>
+                        aria-select="true"><strong><span class="fa fa-calendar"></span> Fecha</strong>
+                    </a>
+                    <a class="nav-item nav-link" href="#frmcliente" data-toggle="tab" role="tab"
+                        aria-select="true"><strong><span class="fa fa-users"></span> Cliente</strong>
                     </a>
                     <a class="nav-item nav-link" data-toggle="tab" role="tab" href="#frmchart"
                         aria-select="false"><strong><span class="fa fa-chart-line"></span> Grafica</strong>
@@ -26,7 +29,7 @@
             </div>
             <div class="card-body">
                 <div class="tab-content">
-                    <!-- *********** SECCION LISTA ************* -->
+                    <!-- *********** SECCION FECHA ************* -->
                     <div class="tab-pane fade show active" id="frmlista" role="tabpanel">
                         <div class="form-inline mb-3">
                             <strong><label for="desde">Desde: </label></strong>
@@ -104,6 +107,10 @@
                                 </tr>
                             </template>
                         </table>
+                    </div>
+                    <!--  ********** SECCION CLIENTE *********** -->
+                    <div class="tab-pane fade show active" id="frmcliente" role="tabpanel">
+
                     </div>
                     <!-- *********** SECCION CHART ************* -->
                     <div class="tab-pane fade" id="frmchart" role="tabpanel">

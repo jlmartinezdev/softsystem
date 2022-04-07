@@ -12,12 +12,12 @@ class CtaCobrar extends Model
     protected $fillable = [
 		'monto_cuota','monto_cobrado','monto_saldo','fecha_venc','estado','interes'
 	];
-    public function scopeCliente($query,$cliente,$buscarpor,$ci){
-        if(!empty($cliente) && $buscarpor=='cliente'){
+    public function scopeCliente($query,$cliente,$buscarpor){
+        if(!empty($cliente)){
             if(strtoupper($cliente)=='TODOS'){
                 return;
             }
-            if($ci=="true"){
+            if($buscarpor=='ci'){
                 return $query->where('c.cliente_ci','=',$cliente);
             }else {
                 return $query->where('c.cliente_nombre','LIKE',"%$cliente%");
@@ -26,8 +26,8 @@ class CtaCobrar extends Model
             
             
     }
-    public function scopeDireccion($query,$direccion,$buscarpor){
-        if($direccion && $buscarpor=='direccion'){
+    public function scopeDireccion($query,$direccion){
+        if($direccion){
             if(strtoupper($direccion)=='TODOS'){
                 return;
             }
@@ -57,6 +57,12 @@ class CtaCobrar extends Model
                 break;
             case '6':
                 $sql= $query->orderBy('total',$ascdesc);
+                break;
+            case '7':
+                $sql= $query->orderBy('saldo',$ascdesc);
+                break;
+            case '8':
+                $sql= $query->orderBy('c.cliente_direccion',$ascdesc);
                 break;
             default:
                 $sql=$query->orderBy('ctas_cobrar.nro_fact_ventas',$ascdesc);

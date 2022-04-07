@@ -77,7 +77,7 @@
                                     <td>@{{ c.nro_fact_ventas }}</td>
                                     <td>@{{ c.venta_fecha }}</td>
                                     <td>@{{ format(c.total)}}</td>
-                                    <td>@{{c.pagada +" de "+ c.cuotas  }}</td>
+                                    <td>@{{checkCantidad(c.pagada,c.nro_fact_ventas) +" de "+ checkCantidad(c.cuotas,c.nro_fact_ventas)  }}</td>
                                     <td>@{{ format(c.cobrado) }}</td>
                                     <td class="text-danger font-weight-bold">@{{ format(c.saldo)}}</td>
                                     <td>
@@ -139,7 +139,7 @@
                                     </tr>
                                     <template v-for="(c,index) in cuotasAcobrar">
                                         <tr>
-                                            <td>@{{ c.nro_cuotas }}</td>
+                                            <td>@{{ checkCantidad(c.nro_cuotas,c.nro_fact_ventas) }}</td>
                                             <td>@{{ c.nro_fact_ventas }}</td>
                                             <td>@{{ formatFecha(c.fecha_venc) }}</td>
                                             <td>@{{ diferenciaFecha(c.fecha_venc,c.monto_cobrado)}}</td>
@@ -247,7 +247,7 @@
             request: {buscar: false, cuota : false, cliente: false},
             txtbuscar: '',
             caja: {estado: 'CERRADO',id: 0, nrooperacion : 0},
-            filtro : {orden:'ASC',busquedapor : 'cliente',ordenarpor:'0',ci: false},
+            filtro : {orden:'ASC',busquedapor : 'cliente',ordenarpor:'0',tipo:''},
             cobro: {total: 0, saldo: 0, saldonuevo: 0, cobrado: 0, entrega: 0, fecha: '', idSucursal: 0, totalInteres: 0},
             cliente: {id : 0,documento: 0, nombre: '.-'},
             descontarCantidad: 0,
@@ -257,6 +257,7 @@
             cuotas: [],
             cuotasAcobrar: [],
             clientes : [],
+            allCuota: [],
             venta: {}
         },
         methods:{
@@ -275,14 +276,22 @@
 
                 }else{
                     this.request.buscar= true;
-                    this.filtro.ci= true;
+                    this.filtro.busquedapor= "ci";
                     this.getCta(this.txtbuscar);
                 }
                 
             },
+            checkCantidad: function(cantidad,nroventa){
+                let primeracuota= this.allCuota.find( cuota => cuota.nro_fact_ventas== nroventa && cuota.nro_cuotas==1);
+                if(primeracuota.monto_cuota==0 && primeracuota.monto_saldo==0){
+                    return cantidad -1;
+                }else{
+                    return cantidad;
+                }
+            },
             getCta: function(abuscar){
                 axios.get('ctas_cobrar/buscar',{
-			        params:{buscar:abuscar,ci:this.filtro.ci,buscarpor:this.filtro.busquedapor,ordenarpor:this.filtro.ordenarpor,ord:this.filtro.orden}
+			        params:{buscar:abuscar,buscarpor:this.filtro.busquedapor,ordenarpor:this.filtro.ordenarpor,ord:this.filtro.orden,tipo:"cliente",from:"cobro"}
                 })
                 .then(response=>{
                     this.request.buscar= false;
@@ -293,6 +302,7 @@
                         this.cobro.saldo = 0;
                         this.ctas= response.data.ctas;
                         this.articulos = response.data.articulos;
+                        this.allCuota= response.data.cuotas;
                         if(this.ctas.length > 0){
                             this.cliente.id= this.ctas[0].cliente_ruc;
                             this.cliente.nombre= this.ctas[0].cliente_nombre;
@@ -337,25 +347,13 @@
             },
             selectCliente : function(ci){
             
-                this.filtro.ci= true;
+                this.filtro.busquedapor= "ci";
                 $('#busquedaCliente').modal('hide');
                 this.getCta(ci);
             },
-            getCuotas: function(id){
-                this.request.cuota = true;
-                axios.get('cuotas/'+id).then(response =>{
-                    this.request.cuota= false;
-                    
-                    this.cuotas= response.data;
-                    for(i=0; i< this.cuotas.length; i++){
-                        let check = this.cuotasAcobrar.findIndex(x=> x.nro_cuotas == this.cuotas[i].nro_cuotas && x.nro_fact_ventas == this.cuotas[i].nro_fact_ventas);
-                        this.cuotas[i].check= check== -1 ? false : true;
-                        this.cuotas[i].acobrar = this.cuotas[i].monto_cuota;
-                       
-                    }
-                }).catch( error => {
-                    this.request.cuota= false;
-                    console.log(error.message);
+            getCuotas: function(nroventa){
+                this.cuotas= this.allCuota.filter(function(cuota){
+                    return cuota.nro_fact_ventas==nroventa
                 })
             },
             cancelar: function(){
