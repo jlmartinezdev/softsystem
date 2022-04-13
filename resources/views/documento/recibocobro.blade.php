@@ -17,7 +17,7 @@
         <div class="row">
             <div class="col-3">
                 <div class="m-2  cabecera">
-                    <img src="{{asset("/img".$empresa->emp_logo)}}" alt="{{$empresa->emp_nombre}}">
+                    <img src="{{asset("/img/".$empresa->emp_logo)}}" alt="{{$empresa->emp_nombre}}">
                 </div>
             </div>
             <div class="col-5">
