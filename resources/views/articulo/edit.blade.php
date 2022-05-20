@@ -1,8 +1,8 @@
 <div class="modal fade" id="editArticulo">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
-			<div class="modal-header bg-primary text-white">
-		        <h5 class="modal-title">Actualizar Articulo</h5>
+			<div class="modal-header">
+		        <strong class="modal-title">Actualizar Articulo</strong>
 		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 		          <span aria-hidden="true">&times;</span>
 		        </button>
@@ -38,21 +38,9 @@
 							      <input type="text" v-model="articulo.descripcion" class="form-control form-control-sm" name="descripcion" placeholder="Descripcion de Articulo">
 							    </div>
 							</div>
-	    					<div class="col">
-	    						<div class="form-group">
-							      <strong><label for="indicaciones">Indicaciones</label></strong>
-							      <input type="text" v-model="articulo.indicaciones" class="form-control form-control-sm" name="indicaciones" placeholder="Indicaciones">
-							    </div>
-	    					</div>
+	    				
 						</div>
-						<div class="form-row">
-	    					<div class="col">
-	    						<div class="form-group">
-							      <strong><label for="modouso">Modo de Uso</label></strong>
-							      <input type="text" v-model="articulo.modouso" class="form-control form-control-sm" name="modouso" placeholder="Modo de Uso">
-							    </div>
-							</div>
-						</div>
+						
 						<div class="form-row">
 	    					<div class="col">
 	    						<div class="form-group">
@@ -126,6 +114,8 @@
 								</template>
 								
 							</div>
+						</div>
+						<div class="row">
 							<div class="col">
 								<strong><label>Ubicacion</label></strong>								
 							    <input type="text" v-model="articulo.ubicacion" class="form-control form-control-sm" name="ubicacion" placeholder="Ubicacion">

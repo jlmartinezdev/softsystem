@@ -341,6 +341,7 @@
 				}
             },
 			showModalPrecio: function(index,articulo){
+				console.log(articulo);
 				this.articulo= articulo;
 				this.tmpIndexPrecio.iArticulo= index;
 				for(i=1;i<6;i++){
@@ -440,7 +441,6 @@
             	.catch(error =>{
             		Swal.fire('Error',error.message,'error');
             	})
-            	
             },
             numeroaletra: function(n){
             	return NumeroALetras.NumeroALetras(n);
@@ -526,10 +526,8 @@
 				if(this.ventaCabecera.descuento > 0 && this.ventaCabecera.total > 0){
 					this.ventaCabecera.total -=  this.ventaCabecera.descuento;
 				}
-				return this.format(this.ventaCabecera.total);
-				
+				return this.format(this.ventaCabecera.total);	
 			}
-
 		},
 		mounted(){
 			this.getFecha();

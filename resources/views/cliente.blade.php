@@ -77,6 +77,7 @@
                     id: '',
                     doc: '',
                     nombre: '',
+                    sexo: 'f',
                     direccion: '',
                     celular: '',
                     correo: '',

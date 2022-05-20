@@ -1,8 +1,8 @@
-<div class="modal fade" id="addArticulo">
+<div class="modal fade" id="editArticulo">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
-			<div class="modal-header">
-		        <strong class="modal-title">Nuevo Articulo</strong>
+			<div class="modal-header bg-primary text-white">
+		        <h5 class="modal-title">Actualizar Articulo</h5>
 		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 		          <span aria-hidden="true">&times;</span>
 		        </button>
@@ -10,13 +10,13 @@
 			<div class="modal-body">
 				<nav>
 					<div class="nav nav-tabs" role="tablist">
-						<a class="nav-item nav-link active" data-toggle="tab" role="tab" href="#frmdescrip" aria-controls="frmdescrip" aria-select="true"><strong>Descripcion</strong></a>
-						<a class="nav-item nav-link" data-toggle="tab" role="tab" href="#frmstock" aria-controls="frmstock" aria-select="false">Stock</a>
-						<a class="nav-item nav-link" data-toggle="tab" role="tab" href="#frmprecio" aria-controls="frmprecio" aria-select="false">Precio</a>
-					</div>
-				</nav> 
+						<a class="nav-item nav-link active" data-toggle="tab" role="tab" href="#frmdescrip2" aria-controls="frmdescrip" aria-select="true">Descripcion</a>
+						<a class="nav-item nav-link" data-toggle="tab" role="tab" href="#frmstock2" aria-controls="frmstock" aria-select="false">Stock</a>
+						<a class="nav-item nav-link" data-toggle="tab" role="tab" href="#frmprecio2" aria-controls="frmprecio" aria-select="false">Precio</a>
+					</div> 
+				</nav>
 				<div class="tab-content">
-					<div class="tab-pane fade show active" id="frmdescrip" role="tabpanel">
+					<div class="tab-pane fade show active" id="frmdescrip2" role="tabpanel">
 						<div class="form-row">
 	    					<div class="col">
 	    						<div class="form-group">
@@ -27,8 +27,8 @@
 							<div class="col">
 								<div class="form-group">
 							      <strong><label for="cbarra">Codigo de Barra</label></strong>
-							      <input type="text" v-model="articulo.c_barra" class="form-control form-control-sm" name="cbarraN" id="cbarraN" placeholder="Codigo de Barra">
-							    </div> 
+							      <input type="text" v-model="articulo.c_barra" class="form-control form-control-sm" name="cbarra" placeholder="Codigo de Barra">
+							    </div>
 							</div>
 						</div>
 						<div class="form-row">
@@ -38,15 +38,28 @@
 							      <input type="text" v-model="articulo.descripcion" class="form-control form-control-sm" name="descripcion" placeholder="Descripcion de Articulo">
 							    </div>
 							</div>
+	    					<div class="col">
+	    						<div class="form-group">
+							      <strong><label for="indicaciones">Indicaciones</label></strong>
+							      <input type="text" v-model="articulo.indicaciones" class="form-control form-control-sm" name="indicaciones" placeholder="Indicaciones">
+							    </div>
+	    					</div>
 						</div>
-						
+						<div class="form-row">
+	    					<div class="col">
+	    						<div class="form-group">
+							      <strong><label for="modouso">Modo de Uso</label></strong>
+							      <input type="text" v-model="articulo.modouso" class="form-control form-control-sm" name="modouso" placeholder="Modo de Uso">
+							    </div>
+							</div>
+						</div>
 						<div class="form-row">
 	    					<div class="col">
 	    						<div class="form-group">
 							      <strong><label for="seccion">Seccion *</label></strong>
 							      <select name="seccion" v-model="articulo.seccion" class="form-control form-control-sm">
 							      	<option value="0">Seleccionar</option>
-							      	@foreach($secciones as $seccion)
+							      		@foreach($secciones as $seccion)
 							      		<option value="{{$seccion['present_cod']}}"> {{ $seccion['present_descripcion'] }}</option>
 							      	@endforeach
 							      </select>
@@ -71,27 +84,27 @@
 							</div>
 						</div>
 					</div>
-					<div class="tab-pane fade" id="frmstock" role="tabpanel">
-						<div class="row">
-	    					<div class="col-sm-6 col-md-3 ">
+					<div class="tab-pane fade" id="frmstock2" role="tabpanel">
+						<div class="form-row">
+	    					<div class="col">
 	    						<div class="form-group">
 							      <strong><label for="stock">Stock *</label></strong>
-							      <input type="number" onfocus="this.select()" v-model.number="stock.cantidad" class="form-control form-control-sm" name="stock" placeholder="Stock">
+							      <input type="number" onfocus="this.select()" v-model="stock.cantidad" class="form-control form-control-sm" name="stock" placeholder="Stock">
 							    </div>
 							</div>
-							<div class="col-sm-6 col-md-3">
+							<div class="col">
 								<div class="form-group">
 							      <strong><label for="lote">Lote</label></strong>
 							      <input type="text" v-model="stock.lotenew" class="form-control form-control-sm" name="lote" placeholder="Lote">
 							    </div>
 							</div>
-							<div class="col-sm-6 col-md-3">
+							<div class="col">
 								<div class="form-group">
 							      <strong><label for="vencimiento">Vencimiento</label></strong>
 							      <input type="date" v-model="stock.vencimiento" class="form-control form-control-sm" name="vencimiento" placeholder="Vencimiento">
 							    </div>
 							</div>
-							<div class="col-sm-6 col-md-3">
+							<div class="col">
 								<div class="form-group">
 							      <strong><label for="sucursal">Sucursal</label></strong>
 							      <select v-model="stock.sucursal" class="form-control form-control-sm">
@@ -102,9 +115,8 @@
 							      </select>
 							    </div>
 							</div>
-							
 						</div>
-						<div class="row">
+						<div class="form-row">
 							<div class="col">
 								<template v-if="bandstock==0">
 									<button class="btn btn-outline-info" v-on:click="addStock()"><span class="fa fa-plus"></span> Agregar</button>
@@ -114,9 +126,6 @@
 								</template>
 								
 							</div>
-						</div>
-						<hr>
-						<div class="row">
 							<div class="col">
 								<strong><label>Ubicacion</label></strong>								
 							    <input type="text" v-model="articulo.ubicacion" class="form-control form-control-sm" name="ubicacion" placeholder="Ubicacion">
@@ -139,19 +148,16 @@
 											<td>@{{stock.lotenew}}</td>
 											<td>@{{stock.vencimiento}}</td>
 											<td>
-												<button v-on:click="editStockA(stock)" class="btn btn-outline-info btn-sm"><span class="fa fa-edit"></span> Modificar</button>
-										<button v-on:Click="delStockA(stock.id)" class="btn btn-outline-info btn-sm"><span class="fa fa-trash"></span> Eliminar</button>
+												<button v-on:click="editStockA(stock)" class="btn btn-outline-warning btn-sm"><span class="fa fa-edit"></span> Modificar</button>
+										<button v-on:Click="delStockA(stock.id)" class="btn btn-outline-danger btn-sm"><span class="fa fa-trash"></span> Quitar</button>
 											</td>
 										</tr>
 									</template>
 								</template>
-								<tr>
-									<td colspan="5">Total Stock: @{{ totalStock }}</td>
-								</tr>
 							</table>
 						</div>
 					</div>
-					<div class="tab-pane fade" id="frmprecio" role="tabpanel">
+					<div class="tab-pane fade" id="frmprecio2" role="tabpanel">
 						<div class="form-row">
 
 	    					<div class="col">
@@ -162,7 +168,7 @@
 								<button class="btn btn-primary" @click="mostrarPrecios"><span class="fa fa-plus"></span> Precios</button>
 							</div>
 						</div>
-						<div class="card border-warning py-2 px-2 mt-2">
+						<div class="card border-warning py-2 px-2 m-1">
 							<strong>Margen de Utilidad %</strong>
 							<div class="form-row">
 								<div class="col">
@@ -192,37 +198,36 @@
 								<div class="col">
 								    <div class="form-group">
 								      <strong><label for="margen5">Precio 5</label></strong>
-								      <input v-model="articulo.m5" onfocus="this.select()" type="number" v-on:keyup="setUtilPrecio('M',5)" class="form-control form-control-sm" name="margen5" placeholder="Margen Precio 5">
+								      <input v-model="articulo.m5" onfocus="this.select()" type="number" v-on:keyup="setUtilPrecio('M',5)" class="form-control form-control-sm" name="margen4" placeholder="Margen Precio 5">
 								    </div>
 								</div>
 							</div>
 						</div>
-						<div class="card border-warning py-2 px-2 mt-1">
+						<div class="card border-warning py-2 px-2 m-1">
 							<strong>Precio de Venta</strong>
 							<div class="form-row">
 								<div class="col">
 									<div class="form-group">
 								      <strong><label for="venta1">Precio Venta 1 *</label></strong>
-									  <in-number  v-model="articulo.p1" placeholder="Precio venta 1" @change="setUtilPrecio('P',1)"></in-number>
-						
+								      <in-number  v-model="articulo.p1" placeholder="Precio venta 1" @change="setUtilPrecio('P',1)"></in-number>
 								    </div>
 								</div>
 								<div class="col">
 								    <div class="form-group">
 								      <strong><label for="venta2">Precio Venta 2</label></strong>
-								      <in-number  v-model="articulo.p2" placeholder="Precio venta 1" @change="setUtilPrecio('P',2)"></in-number>
+								      <in-number  v-model="articulo.p2" placeholder="Precio venta 2" @change="setUtilPrecio('P',2)"></in-number>
 								    </div>
 								</div>
 								<div class="col">
 								    <div class="form-group">
 								      <strong><label for="venta3">Precio Venta 3</label></strong>
-								      <in-number  v-model="articulo.p1" placeholder="Precio venta 3" @change="setUtilPrecio('P',3)"></in-number>
+								      <in-number  v-model="articulo.p3" placeholder="Precio venta 3" @change="setUtilPrecio('P',3)"></in-number>
 								    </div>
 								</div>
 								<div class="col">
 								    <div class="form-group">
 								      <strong><label for="venta4">Precio Venta 4</label></strong>
-									  <in-number  v-model="articulo.p1" placeholder="Precio venta 4" @change="setUtilPrecio('P',4)"></in-number>
+								      <in-number  v-model="articulo.p4" placeholder="Precio venta 4" @change="setUtilPrecio('P',4)"></in-number>
 								    </div>
 								</div>
 								<div class="col">
@@ -244,9 +249,8 @@
 			        @{{ error }}
 			      </div>
 			    </template>
-				
 				<button type="button" class="btn btn-secondary" data-dismiss="modal"><span class="fa fa-times"></span> Cerrar</button>
-				<button type="button" class="btn btn-primary" @click="saveArticulo"><span class="fa fa-save"></span> Guardar</button>
+				<button type="button" class="btn btn-success" @click="saveArticulo"><span class="fa fa-save"></span> Guardar Cambios</button>
 			</div>
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->

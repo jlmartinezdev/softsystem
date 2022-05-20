@@ -36,8 +36,9 @@ class articulosPreciosExport implements FromQuery,WithColumnFormatting, WithHead
         $idsucursal= isset($this->request->suc) ? $this->request->suc : null;
         
             $articulos = Articulo::query()->join('stock', 'articulos.articulos_cod', '=', 'stock.articulos_cod')
+            ->join('precios','articulos.ARTICULOS_cod','=', 'precios.ARTICULOS_cod')
             ->join('presentacion','articulos.present_cod','=','presentacion.present_cod')
-            ->select( 'articulos.producto_c_barra',DB::raw('TRIM(articulos.producto_nombre)'),DB::raw('TRIM(presentacion.present_descripcion)'),'articulos.pre_venta1',DB::raw('SUM(stock.cantidad) AS cantidad'))
+            ->select( 'articulos.producto_c_barra',DB::raw('TRIM(articulos.producto_nombre)'),DB::raw('TRIM(presentacion.present_descripcion)'),'articulos.pre_venta1',DB::raw('SUM(stock.cantidad) AS cantidad'),'precios.*')
             ->descripcion($buscar)
             ->seccion($seccion)
             ->bysucursal($idsucursal)
@@ -52,8 +53,18 @@ class articulosPreciosExport implements FromQuery,WithColumnFormatting, WithHead
             'Cod. Barra',
             'Articulo',
             'Seccion',
-            'Precio Venta',
-            'Stock'
+            'Precio Contado',
+            '2 Cuotas',
+            '3 Cuotas',
+            '4 Cuotas',
+            '5 Cuotas',
+            '6 Cuotas',
+            '7 Cuotas',
+            '8 Cuotas',
+            '9 Cuotas',
+            '10 Cuotas',
+            '11 Cuotas',
+            '12 Cuotas',
         ];
     }
     public function columnWidths(): array
@@ -63,7 +74,17 @@ class articulosPreciosExport implements FromQuery,WithColumnFormatting, WithHead
             'B' => 55, 
             'C' => 30,
             'D' => 14,
-            'E' => 6           
+            'E' => 14,
+            'F' => 14, 
+            'G' => 14,
+            'H' => 14, 
+            'I' => 14,
+            'J' => 14, 
+            'K' => 14,  
+            'L' => 14, 
+            'M' => 14, 
+            'N' => 14,
+            'O' => 14                       
         ];
     }
     public function columnFormats(): array

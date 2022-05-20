@@ -1,8 +1,8 @@
 <div class="modal fade" id="addArticulo">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
-			<div class="modal-header">
-		        <strong class="modal-title">Nuevo Articulo</strong>
+			<div class="modal-header bg-warning">
+		        <h5 class="modal-title">Nuevo Articulo</h5>
 		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 		          <span aria-hidden="true">&times;</span>
 		        </button>
@@ -38,8 +38,21 @@
 							      <input type="text" v-model="articulo.descripcion" class="form-control form-control-sm" name="descripcion" placeholder="Descripcion de Articulo">
 							    </div>
 							</div>
+	    					<div class="col">
+	    						<div class="form-group">
+							      <strong><label for="indicaciones">Indicaciones</label></strong>
+							      <input type="text" v-model="articulo.indicaciones" class="form-control form-control-sm" name="indicaciones" placeholder="Indicaciones">
+							    </div>
+	    					</div>
 						</div>
-						
+						<div class="form-row">
+	    					<div class="col">
+	    						<div class="form-group">
+							      <strong><label for="modouso">Modo de Uso</label></strong>
+							      <input type="text" v-model="articulo.modouso" class="form-control form-control-sm" name="modouso" placeholder="Modo de Uso">
+							    </div>
+							</div>
+						</div>
 						<div class="form-row">
 	    					<div class="col">
 	    						<div class="form-group">
@@ -72,26 +85,26 @@
 						</div>
 					</div>
 					<div class="tab-pane fade" id="frmstock" role="tabpanel">
-						<div class="row">
-	    					<div class="col-sm-6 col-md-3 ">
+						<div class="form-row">
+	    					<div class="col">
 	    						<div class="form-group">
 							      <strong><label for="stock">Stock *</label></strong>
 							      <input type="number" onfocus="this.select()" v-model.number="stock.cantidad" class="form-control form-control-sm" name="stock" placeholder="Stock">
 							    </div>
 							</div>
-							<div class="col-sm-6 col-md-3">
+							<div class="col">
 								<div class="form-group">
 							      <strong><label for="lote">Lote</label></strong>
 							      <input type="text" v-model="stock.lotenew" class="form-control form-control-sm" name="lote" placeholder="Lote">
 							    </div>
 							</div>
-							<div class="col-sm-6 col-md-3">
+							<div class="col">
 								<div class="form-group">
 							      <strong><label for="vencimiento">Vencimiento</label></strong>
 							      <input type="date" v-model="stock.vencimiento" class="form-control form-control-sm" name="vencimiento" placeholder="Vencimiento">
 							    </div>
 							</div>
-							<div class="col-sm-6 col-md-3">
+							<div class="col">
 								<div class="form-group">
 							      <strong><label for="sucursal">Sucursal</label></strong>
 							      <select v-model="stock.sucursal" class="form-control form-control-sm">
@@ -102,9 +115,8 @@
 							      </select>
 							    </div>
 							</div>
-							
 						</div>
-						<div class="row">
+						<div class="form-row">
 							<div class="col">
 								<template v-if="bandstock==0">
 									<button class="btn btn-outline-info" v-on:click="addStock()"><span class="fa fa-plus"></span> Agregar</button>
@@ -114,9 +126,6 @@
 								</template>
 								
 							</div>
-						</div>
-						<hr>
-						<div class="row">
 							<div class="col">
 								<strong><label>Ubicacion</label></strong>								
 							    <input type="text" v-model="articulo.ubicacion" class="form-control form-control-sm" name="ubicacion" placeholder="Ubicacion">
