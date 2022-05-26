@@ -176,7 +176,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'busqueda',
-  props: ['txt_buscar'],
+  props: ['txt_buscar', 'url'],
   data: function data() {
     var _ref;
 
@@ -258,7 +258,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         });
       } else {
         //{{env("APP_APIDB")}}
-        axios.get('http://localhost/api/', {
+        axios.get(this.url, {
           params: {
             buscar: this.txtbuscar,
             bus_suc: this.idSuc

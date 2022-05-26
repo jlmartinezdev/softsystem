@@ -58,7 +58,7 @@
                 </tr>
                 @foreach($cuotas as $cuota)
                 <tr>
-                    <td>&nbsp;&nbsp;{{$cuota->nro_cuotas}} de {{$cobro->cantidad}}</td>
+                    <td>&nbsp;&nbsp;{{$cuota->nro_cuotas}} de {{  $cantidad_cuotas[array_search($cuota->nro_fact_ventas, array_column(json_decode($cantidad_cuotas), 'nro_fact_ventas'))]->cantidad}}</td>
                     <td>&nbsp;&nbsp;{{number_format($cuota->cobrado,2,",",".")}}</td>
                     <td>&nbsp;&nbsp;{{number_format($cuota->interes,2,",",".")}}</td>
                 </tr>

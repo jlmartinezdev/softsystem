@@ -77,7 +77,7 @@
     import vPagination from './vue-plain-pagination'
     export default {
         name : 'busqueda',
-        props:['txt_buscar'],
+        props:['txt_buscar','url'],
         data() {
             return {
                 requestSend: false,
@@ -131,7 +131,7 @@
                     });
                 }else{
                     //{{env("APP_APIDB")}}
-                    axios.get('http://localhost/api/',{
+                    axios.get(this.url,{
                         params: {buscar: this.txtbuscar,bus_suc:this.idSuc}
                     })
                     .then( response => {

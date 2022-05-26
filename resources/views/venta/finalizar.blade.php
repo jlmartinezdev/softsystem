@@ -48,7 +48,6 @@
 					<div class="tab-pane fade" id="generar" role="tabpanel">
 					
 						<generar_cuota :total="ventaCabecera.total" :fecha="ventaCabecera.fecha" :calcularcuota="ventaCabecera.generarcuota" :datoscuota="tmpIndexPrecio" ref="generarcuota" @cuotas="setCuotas"/>
-
 					</div>
 				</div>
 

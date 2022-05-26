@@ -121,8 +121,8 @@
 			
 		</div>
 	</div>
-	<busqueda @articulo_sel="validarArticulo" :txt_buscar="txtbuscar" ref="busqueda"></busqueda>
-	<busquedaproveedor @set_proveedor="setProveedor"></busquedaproveedor>
+	<busqueda @articulo_sel="validarArticulo" url="{{env('APP_APIDB')}}" :txt_buscar="txtbuscar" ref="busqueda"></busqueda>
+	<busquedaproveedor @set_proveedor="setProveedor" ></busquedaproveedor>
 	@include('compra.finalizar')
 	@include('compra.precio')
 </div>
@@ -173,7 +173,7 @@
 		validarArticulo: function(a){
 		  		this.requestLote= true;
 				if(this.compraCabecera.idSucursal=== undefined){
-					Swal.fire('Por seleccione una sucursal!','warning');
+					Swal.fire('Por favor seleccione una sucursal!','warning');
 				}
 		  		//Traer lotes
 		  		axios.get('{{env("APP_APIDB")}}',{params:{ lotecompra : a.ARTICULOS_cod, bus_suc : this.compraCabecera.idSucursal}})

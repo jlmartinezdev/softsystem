@@ -341,7 +341,7 @@
 				}
             },
 			showModalPrecio: function(index,articulo){
-				console.log(articulo);
+
 				this.articulo= articulo;
 				this.tmpIndexPrecio.iArticulo= index;
 				for(i=1;i<6;i++){
@@ -382,7 +382,7 @@
 						this.tmpIndexPrecio.monto_cuota= this.preciosCredito[x].c;
 					}
 						
-				}
+				} 
 				
             	this.saveDatos(); 
             },
@@ -458,6 +458,9 @@
             	if(cab != null){
             		this.ventaCabecera= JSON.parse(cab);
             	}
+				this.ventaCabecera.condicionventa= 1;
+				this.ventaCabecera.generarcuota= true;
+
             },
             showBuscarCliente: function(){
             	$('#busquedaCliente').modal('show');

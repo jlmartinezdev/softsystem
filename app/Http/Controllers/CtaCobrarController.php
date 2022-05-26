@@ -83,7 +83,7 @@ class CtaCobrarController extends Controller
     }
     public function getCobroFecha(Request $request)
     {
-        $cobro = Cobro::whereBetween('cobranzas.cob_fecha', [$request->alld,$request->allh])->get();
+        $cobro = Cobro::whereBetween('cobranzas.cob_fecha', [$request->alld,$request->allh])->orderBy('cobranzas.cc_numero','DESC')->get();
         return $cobro;
     }
     public function getDetalleCobro($id)
@@ -196,14 +196,14 @@ class CtaCobrarController extends Controller
         $cobro->save();
 
         foreach ($request->cuotas as $cuota) {
-            $detalle = DB::insert("INSERT INTO cobranza_detalle (cc_numero, nro_fact_ventas, nro_cuotas, importe, cobrado, tipo) VALUES (?,?,?,?,?,?)", [$cobro->cc_numero,$cuota['nro_fact_ventas'],$cuota['nro_cuotas'],$cuota['monto_cuota'],$cuota['monto_cuota'],'1']);
+            $detalle = DB::insert("INSERT INTO cobranza_detalle (cc_numero, nro_fact_ventas, nro_cuotas, importe, cobrado, tipo) VALUES (?,?,?,?,?,?)", [$cobro->cc_numero,$cuota['nro_fact_ventas'],$cuota['nro_cuotas'],$cuota['monto_saldo'],$cuota['acobrar'],'1']);
 
             Ctacobrar::where('nro_cuotas', $cuota['nro_cuotas'])
             ->where('nro_fact_ventas', $cuota['nro_fact_ventas'])
             ->update([
-                'monto_cobrado' => $cuota['acobrar'],
+                'monto_cobrado' => $cuota['monto_cobrado'] + $cuota['acobrar'],
                 'monto_saldo'=> $cuota['monto_saldo'] - $cuota['acobrar'],
-                'estado' => $cuota['acobrar']== $cuota['acobrar'] ? '0' : '1',
+                'estado' => $cuota['monto_saldo']== $cuota['acobrar'] ? '0' : '1',
                 'interes'=> $cuota['interes']
             ]);
         }
@@ -228,13 +228,21 @@ class CtaCobrarController extends Controller
         DB::table('cobranza_detalle')->where('cc_numero', $request->id)->delete();
         Cobro::find($request->id)->delete();
         foreach ($request->cuotas as $cuota) {
-            Ctacobrar::where('nro_cuotas', $cuota['nro_cuotas'])
-            ->where('nro_fact_ventas', $cuota['nro_fact_ventas'])
-            ->update([
-                'monto_cobrado' => $cuota['importe']-$cuota['cobrado'],
-                'monto_saldo'=> intval('monto_saldo') + $cuota['cobrado'],
+            $cuenta = Ctacobrar::where('nro_cuotas', $cuota['nro_cuotas'])
+            ->where('nro_fact_ventas', $cuota['nro_fact_ventas']);
+            $cuentafila= $cuenta->first();
+
+            $cuenta->decrement('monto_cobrado',$cuota['cobrado']);
+            $newVal= intval($cuentafila->monto_saldo) + $cuota['cobrado'];
+            $cuenta->update([
+                'monto_saldo' => $newVal,
                 'estado' => '1'
             ]);
+           /*  ->update([
+                'monto_cobrado' => intval('monto_cobrado') -$cuota['cobrado'],
+                'monto_saldo'=> intval('monto_saldo') + $cuota['cobrado'],
+                'estado' => '1'
+            ]); */
         }
         $movimiento= new MovimientoCaja();
         $movimiento->nro_operacion= $request->nrooperacion;
@@ -284,8 +292,14 @@ class CtaCobrarController extends Controller
                     $join->on('cd.nro_cuotas', '=', 'cc.nro_cuotas');
                     $join->on('cd.nro_fact_ventas', '=', 'cc.nro_fact_ventas');
                 })
-                ->select('cd.nro_cuotas', 'cd.cobrado', 'cc.interes')
+                ->select('cd.nro_cuotas', 'cd.cobrado', 'cc.interes','cc.nro_fact_ventas')
                 ->where('cobranzas.cc_numero', $id)
+                ->get();
+        $cantidad_cuotas = DB::table('cobranza_detalle as cd')
+                ->join('ctas_cobrar as cc', 'cd.nro_fact_ventas', '=', 'cc.nro_fact_ventas')
+                ->select('cc.nro_fact_ventas',DB::raw('COUNT(cc.nro_fact_ventas) AS cantidad'))
+                ->where('cd.cc_numero', $id)
+                ->groupBy('cc.nro_fact_ventas')
                 ->get();
         $articulos = Cobro::join('cobranza_detalle as cd', 'cobranzas.cc_numero', 'cd.cc_numero')
                     ->join('ventas as v', 'cd.nro_fact_ventas', 'v.nro_fact_ventas')
@@ -293,7 +307,9 @@ class CtaCobrarController extends Controller
                     ->join('articulos as a', 'dv.articulos_cod', 'a.articulos_cod')
                     ->select('a.producto_nombre', 'v.nro_fact_ventas', 'v.venta_fecha')
                     ->where('cobranzas.cc_numero', $id)
+                    ->groupBy('a.articulos_cod')
                     ->get();
-        return view('documento.recibocobro', compact('empresa', 'cobro', 'cuotas', 'articulos'));
+       
+        return view('documento.recibocobro', compact('empresa', 'cobro', 'cuotas', 'articulos','cantidad_cuotas'));
     }
 }

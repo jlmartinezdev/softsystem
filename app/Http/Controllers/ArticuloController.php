@@ -8,6 +8,7 @@ use App\Seccion;
 use App\Unidad;
 use DB;
 use App\Exports\ArticulosExport;
+use App\Exports\articulosPreciosExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ArticuloController extends Controller
@@ -61,10 +62,10 @@ class ArticuloController extends Controller
         return Articulo::join('stock', 'articulos.articulos_cod', '=', 'stock.articulos_cod')
             ->join('presentacion','articulos.present_cod','=','presentacion.present_cod')
             ->join('unidad','articulos.uni_codigo','=','unidad.uni_codigo')
-                ->select(  'articulos.*','presentacion.present_descripcion',DB::raw('SUM(stock.cantidad) AS cantidad'),'unidad.uni_nombre','unidad.uni_abreviatura')
-                ->where('articulos.producto_c_barra','=',$request->codigo)
-                ->groupBy('articulos.articulos_cod')
-                ->first();
+            ->select(  'articulos.*','presentacion.present_descripcion',DB::raw('SUM(stock.cantidad) AS cantidad'),'unidad.uni_nombre','unidad.uni_abreviatura')
+            ->where('articulos.producto_c_barra','=',$request->codigo)
+            ->groupBy('articulos.articulos_cod')
+            ->first();
     }
     public function getUltimo(){
         return Articulo::max('articulos_cod');
@@ -236,5 +237,8 @@ class ArticuloController extends Controller
         //return Excel::download(new ArticulosExport, 'articulos.xlsx');
         //return (new InvoicesExport(2018))->download('invoices.xlsx');
         return (new ArticulosExport)->filtro($request)->download('articulos.xlsx');
+    }
+    public function exportPrecio(Request $request){
+        return (new articulosPreciosExport)->filtro($request)->download('precioscreditos.xlsx');
     }
 }

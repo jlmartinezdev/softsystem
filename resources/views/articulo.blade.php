@@ -77,7 +77,7 @@
                                     <div class="dropdown-menu">
                                         <button class="dropdown-item" @click="exportar('stock')">Con Stock</button>
                                         <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="#">Precios Creditos</a>
+                                        <button class="dropdown-item" @click="exportar('precios')">Precios Creditos</button>
                                     </div>
                                 </div>
 
@@ -908,6 +908,19 @@
                             }
                         let u = new URLSearchParams(params).toString();
                         window.open('excel/articulos?'+u);
+                    }
+                    if(tipo=="precios"){
+                        let params= {
+                                page: 0,
+                                buscar: this.txtbuscar,
+                                criterio: 0,
+                                seccion: this.filtro.seccion,
+                                col: this.filtro.columna,
+                                ord: this.filtro.orden,
+                                suc: ''
+                            }
+                        let u = new URLSearchParams(params).toString();
+                        window.open('excel/articulosprecios?'+u);
                     }
                 }
             },

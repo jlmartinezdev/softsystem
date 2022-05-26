@@ -83,11 +83,21 @@ export default {
     watch: {
         total: function(){
             this.saldo = this.total;
+            this.cuotas= [];
+            if(!this.datoscuota.calcularcuota && this.datoscuota.iPrecio.includes('CR')){
+                this.cant_cuota= Number(this.datoscuota.iPrecio.substr(2)) +2;
+            }else{
+                this.cant_cuota=0;
+            }
         },
         calcularcuota: function(newVal, oldVal){
-            if(!newVal){
+            
+            if(!newVal && this.datoscuota.iPrecio.includes('CR')){
                 //Extraer cantidad de cuota Ej:(CR2)
-                this.cant_cuota= Number(this.datoscuota.iPrecio.substr(2));
+                this.cant_cuota= Number(this.datoscuota.iPrecio.substr(2)) +2;
+            }
+            else{
+                this.cant_cuota= 0;
             }
         },
         primeracuota: function(newVal, oldVal){

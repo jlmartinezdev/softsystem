@@ -1,13 +1,20 @@
 <template>
-    <input @keyup="keyup" @keypress="isNumber($event)" v-model="text" onfocus="this.select()" :placeholder="placeholder" class="form-control form-control-sm" type="text" />
+    <input :id="id" @keyup="keyup" @keypress="isNumber($event)" v-model="text" onfocus="this.select()" :placeholder="placeholder" :class="Classes.input" type="text" />
 </template>
 <script lang="ts">
+const defaultClasses ={
+    input: "form-control form-control-sm"
+}
 export default {
     name: "inNumber",
-    props: ["value","placeholder"],
+    props: ["value","placeholder","clases","id"],
     data() {
         return {
-            text: ""
+            text: "",
+            Classes: {
+            ...defaultClasses,
+            ...this.clases
+            }
         }
     },
     watch: {

@@ -44,7 +44,7 @@
                                     </template>
                                 </td>
                                 <td>
-                                    @{{ checkCantidad(cuota.nro_cuotas,cuota.nro_fact_ventas) }}
+                                    @{{ checkPrimeraCuota(cuota.nro_cuotas,cuota.nro_fact_ventas) }}
                                 </td>
                                 <td>@{{ formatFecha(cuota.fecha_venc) }}</td>
                                 <td>@{{ format(cuota.monto_cuota) }}</td>
