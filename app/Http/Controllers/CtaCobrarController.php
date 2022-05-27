@@ -284,7 +284,7 @@ class CtaCobrarController extends Controller
                 ->join('ctas_cobrar as cc', 'cd.nro_fact_ventas', 'cc.nro_fact_ventas')
                 ->join('ventas as v', 'cd.nro_fact_ventas', 'v.nro_fact_ventas')
                 ->join('clientes as c', 'v.clientes_cod', 'c.clientes_cod')
-                ->select('cobranzas.*', 'c.cliente_nombre', 'c.cliente_ruc', DB::raw('COUNT(cd.cc_numero) AS cantidad'))
+                ->select('cobranzas.*', 'c.cliente_nombre', 'c.cliente_ruc')
                 ->where('cobranzas.cc_numero', $id)
                 ->first();
         $cuotas = Cobro::join('cobranza_detalle as cd', 'cobranzas.cc_numero', 'cd.cc_numero')
@@ -295,12 +295,22 @@ class CtaCobrarController extends Controller
                 ->select('cd.nro_cuotas', 'cd.cobrado', 'cc.interes','cc.nro_fact_ventas')
                 ->where('cobranzas.cc_numero', $id)
                 ->get();
-        $cantidad_cuotas = DB::table('cobranza_detalle as cd')
+        $nro_ventas= DB::table('cobranza_detalle as cd')
                 ->join('ctas_cobrar as cc', 'cd.nro_fact_ventas', '=', 'cc.nro_fact_ventas')
-                ->select('cc.nro_fact_ventas',DB::raw('COUNT(cc.nro_fact_ventas) AS cantidad'))
+                ->select('cc.nro_fact_ventas')
                 ->where('cd.cc_numero', $id)
                 ->groupBy('cc.nro_fact_ventas')
                 ->get();
+        $cantidad_cuotas =  array();    
+        for ($i=0; $i < count($nro_ventas); $i++) { 
+            $tmpFila= DB::table('ctas_cobrar as cc')
+                ->select('cc.nro_fact_ventas',DB::raw('COUNT(cc.nro_fact_ventas) AS cantidad'))
+                ->where('cc.nro_fact_ventas', $nro_ventas[$i]->nro_fact_ventas)
+                ->first();
+            array_push($cantidad_cuotas,array('nro_fact_ventas' => $tmpFila->nro_fact_ventas,'cantidad' => $tmpFila->cantidad ));
+        }
+        
+        
         $articulos = Cobro::join('cobranza_detalle as cd', 'cobranzas.cc_numero', 'cd.cc_numero')
                     ->join('ventas as v', 'cd.nro_fact_ventas', 'v.nro_fact_ventas')
                     ->join('detalle_venta as dv', 'v.nro_fact_ventas', 'dv.nro_fact_ventas')
@@ -309,7 +319,7 @@ class CtaCobrarController extends Controller
                     ->where('cobranzas.cc_numero', $id)
                     ->groupBy('a.articulos_cod')
                     ->get();
-       
+                    
         return view('documento.recibocobro', compact('empresa', 'cobro', 'cuotas', 'articulos','cantidad_cuotas'));
     }
 }
