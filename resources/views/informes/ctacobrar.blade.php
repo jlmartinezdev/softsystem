@@ -684,6 +684,7 @@
                             } else {
                                 this.ctas = response.data.ctas;
                                 this.articulos = response.data.articulos;
+                                
                                 // this.paginacion= response.data.paginacion;
                                 //this.paginacion.pagina_actual=1;
                             }

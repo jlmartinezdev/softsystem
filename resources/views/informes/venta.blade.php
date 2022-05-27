@@ -110,6 +110,98 @@
                     </div>
                     <!--  ********** SECCION CLIENTE *********** -->
                     <div class="tab-pane fade show active" id="frmcliente" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group mt-1">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><span class="fa fa-user"></span> </span>
+                                    </div>
+                                    <input type="text" v-model="txtbuscar" name="buscar"
+                                        @keydown.enter="$event.preventDefault();" @keyup.enter="buscar('cliente')"
+                                        class="form-control" placeholder="Buscar por Nombre o CI..." tabindex="1" />
+                                </div>
+
+
+
+                            </div>
+                            <div class="col-md-6 form-inline">
+                                <div>
+                                    <select class="form-control" name="ordenarpor" v-model="filtro.ordenarpor">
+                                        <option value="1">Nro. Venta</option>
+                                        <option value="2">Documento</option>
+                                        <option value="3">Cliente</option>
+                                        <option value="4">Fecha</option>
+                                        <option value="5">Total</option>
+                                    </select>
+                                </div>
+
+
+                                <div class="ml-2 pl-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" value="ASC" name="ord2"
+                                            v-model="filtro.orden" id="defaultCheck3">
+                                        <label class="form-check-label" for="defaultCheck3">
+                                            ASC
+                                        </label>
+                                    </div>
+                                    <div class="form-check ml-md-2">
+                                        <input class="form-check-input" type="radio" value="DESC" v-model="filtro.orden"
+                                            name="ord2" id="defaultCheck4">
+                                        <label class="form-check-label" for="defaultCheck4">
+                                            DESC
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="ml-2">
+                                    <button @click="buscar('cliente')" class="btn btn-primary">
+                                        <template v-if="requestSend">
+                                            <span class="spinner-border" role="status"></span><span
+                                                class="sr-only">Cargando...</span> Cargando...
+                                        </template>
+                                        <template v-else>
+                                            <span class="fa fa-search"></span> Buscar
+                                        </template>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm table-hover table-striped table-responsive-sm ">
+                            <tr>
+                                <th>Nro Venta</th>
+                                <th>Fecha Hora</th>
+                                <th>Cliente</th>
+                                <th>Tipo</th>
+                                <th>Documento</th>
+                                <th class="text-right">Total</th>
+                                <th>Sucursal</th>
+                                <th><span class="fa fa-list"></span> Detalles</th>
+                            </tr>
+                            <template v-if="clientes.length==0">
+                                <tr>
+                                    <td colspan="8">No hay resultado para cliente...</td>
+                                </tr>
+                            </template>
+                            <template v-for="venta in clientes">
+                                <tr style="font-family: Arial,Helvetica,sans-serif;">
+                                    <td>@{{ venta.nro_fact_ventas }}</td>
+                                    <td>@{{ venta.fecha }}</td>
+                                    <td>@{{ venta.cliente_nombre }}</td>
+                                    <td>@{{ venta.tipo_factura == '1' ? "Contado" : "Credito" }}</td>
+                                    <td>@{{ venta.documento }}</td>
+                                    <td class="text-right font-weight-bold">@{{ new Intl.NumberFormat("de-DE").format(venta.venta_total) }}</td>
+                                    <td>@{{ venta.suc_desc }}</td>
+                                    <td class="text-nowrap">
+                                        <button class="btn btn-link" @click="showDetalle(venta)"><span
+                                                class="fa fa-file-alt"></span> Detalle</button>
+                                        <a :href="'pdf/boletaventa/'+venta.nro_fact_ventas+'/'" class="btn btn-link"><span
+                                                class="fa fa-file-pdf"></span> Imprimir</button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </table>
+
 
                     </div>
                     <!-- *********** SECCION CHART ************* -->
@@ -281,6 +373,7 @@
                     desde: '2020-01-01',
                     hasta: '2020-01-01'
                 },
+                filtro: { ordenarpor: 1, orden: 'ASC'},
                 articulo: {
                     desde: '2020-01-01',
                     hasta: '2020-01-01'
@@ -290,10 +383,12 @@
                     anho: '2022',
                     byYear: false
                 },
+                txtbuscar: '',
                 venta: {},
                 detalleVenta: {},
                 isDataChart: false,
                 ventas: [],
+                clientes: [],
                 articulos: [],
                 cantidadVenta: 0,
                 montoVenta: 0,
@@ -306,6 +401,26 @@
                 idSucursal: 0
             },
             methods: {
+                buscar: function(tipo){
+                    this.requestSend = true;
+                    const isNumber = isNaN(parseFloat(this.txtbuscar)) ? 0 : 1;
+            			
+                    axios.get('{{ Route('infventa.cliente') }}', {
+                            params: {
+                                cliente: this.txtbuscar,
+                                alls: this.idSucursal,
+                                isNumber: isNumber
+                            }
+                        })
+                        .then(response => {
+                            this.requestSend = false;
+                            this.clientes = response.data;
+                        })
+                        .catch(e => {
+                            this.requestSend = false;
+                            this.error = e.message;
+                        })
+                },
                 showChart: function() {
                     if (this.isVisibleChart) {
                         return
