@@ -95,6 +95,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?);',[$detalle['codigo'],$compra->compra_cod,$detalle[
         ->join('sucursales as s','compra.suc_cod','=','s.suc_cod')
         ->filtrofecha($request->alld,$request->allh)
         ->filtrosuc($request->alls)
+        ->filtroproveedor($request->proveedor)
         ->orderBy('compra.compra_cod','desc')
         ->groupBy('compra.compra_cod')
         ->get();
@@ -102,13 +103,13 @@ VALUES (?, ?, ?, ?, ?, ?, ?);',[$detalle['codigo'],$compra->compra_cod,$detalle[
     }
     public function pdfboleta($id){
         $compra =  Compra::select('compra.compra_cod','compra_fecha',DB::raw('SUM(dc.compra_precio*dc.compra_cantidad) AS total'),'proveedor.proveedor_nombre','proveedor_ruc')
+        ->join('detalle_compra as dc','compra.compra_cod','=','dc.compra_cod')
         ->join('proveedor','proveedor.PROVEEDOR_cod','=','compra.PROVEEDOR_cod')
         ->where('compra.compra_cod',$id)
         ->groupBy('compra.compra_cod')
         ->first();
         $detalle= $this->getDetalle($id);
         $empresa= Empresa::first();
-        return $compra;
         //$pdf= PDF::loadView('pdf.compra',compact('compra','detalle','empresa'));
         // return $pdf->stream();
         return view('pdf.compra',compact('compra','detalle','empresa'));

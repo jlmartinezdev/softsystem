@@ -109,7 +109,7 @@
                         </table>
                     </div>
                     <!--  ********** SECCION CLIENTE *********** -->
-                    <div class="tab-pane fade show active" id="frmcliente" role="tabpanel">
+                    <div class="tab-pane fade show" id="frmcliente" role="tabpanel">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="input-group mt-1">

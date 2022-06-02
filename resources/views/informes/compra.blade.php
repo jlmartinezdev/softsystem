@@ -6,75 +6,91 @@
         <div class="card">
 
             <div class="card-body">
-                <div class="form-inline mb-3">    
-                    <strong><label for="desde">Desde: </label></strong>
-                    <input type="date" class="form-control form-control-sm mx-2" v-model="fecha.desde" name="desde" placeholder="Desde Fecha">
-
-                    <strong><label for="hasta">Hasta: </label></strong>
-                    <input type="date" class="form-control form-control-sm  mx-2" v-model="fecha.hasta"name="hasta" placeholder="Hasta Fecha">
-
-                    <strong><label for="hasta">Sucursal: </label></strong>
-                    <select class="form-control form-control-sm mx-2" v-model="idSucursal">
-                        <option value="0">Todas</option>
-                        @foreach($sucursales as $s)
-                            <option value="{{$s['suc_cod']}}">{{ $s['suc_desc']}}</option>
-                        @endforeach
-                    </select>
-                    
-
-                    <strong><label for="hasta">&nbsp;</label></strong>
-                    <button @click="getCompra" class="btn btn-primary btn-sm">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-inline mt-1">    
+                            <strong><label for="desde">Desde: </label></strong>
+                            <input type="date" class="form-control form-control-sm mx-2" v-model="fecha.desde" name="desde" placeholder="Desde Fecha">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-inline mt-1">    
+                            <strong><label for="hasta">Hasta: </label></strong>
+                            <input type="date" class="form-control form-control-sm  mx-2" v-model="fecha.hasta"name="hasta" placeholder="Hasta Fecha">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-inline mt-1">
+                            <strong><label for="hasta">Sucursal: </label></strong>
+                            <select class="form-control form-control-sm mx-2" v-model="idSucursal">
+                                <option value="0">Todas</option>
+                                @foreach($sucursales as $s)
+                                    <option value="{{$s['suc_cod']}}">{{ $s['suc_desc']}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+ 
+                <div class="row mt-2">
+                    <div class="col-9">
+                           <input type="text" tabindex="1" v-model="txtproveedor" placeholder="Buscar Proveedor" class="form-control">
+                    </div>
+                    <div class="col-3">
+                        <button @click="getCompra" class="btn btn-primary btn-block">
                         <template v-if="requestSend">
                             <span class="spinner-border spinner-border-sm" role="status"></span><span class="sr-only">Cargando...</span> Cargando...
                         </template>
                         <template v-else>
                             <span class="fa fa-search"></span> Buscar
                         </template>
-                    </button>&nbsp;
-                    
+                    </button>
+                    </div>
                     
                 </div>
+                <hr>
+                <template>
+                    <div class="form-inline mt-2">
+                    <h6 class="text-muted"><span class="fa fa-calendar-minus"></span> Total de Compras <span class="badge badge-pill badge-info" >@{{ totalCompra }}</span></h6>
+                    <h6 class="ml-4 text-muted"><span class="fa fa-money-bill"></span> Monto de Gs <span class="badge badge-pill badge-info">@{{ new Intl.NumberFormat("de-DE").format(totalGuaranies) }}</span></h6>
+                    </div>
+                </template>
                 
-                    <template>
-                        <div class="form-inline">
-                        <h6 class="text-muted"><span class="fa fa-calendar-minus"></span> Total de Compras <span class="badge badge-pill badge-info" >@{{ totalCompra }}</span></h6>
-                        <h6 class="ml-4 text-muted"><span class="fa fa-money-bill"></span> Monto de Gs <span class="badge badge-pill badge-info">@{{ new Intl.NumberFormat("de-DE").format(totalGuaranies) }}</span></h6>
-                        </div>
-                    </template>
-                
-                
-                <table class="table table-sm table-hover table-striped table-responsive-sm ">
-                    <tr>
-                        <th>Nro Compra</th>
-                        <th>Fecha Hora</th>
-                        <th>Proveedor</th>
-                        <th>Tipo</th>
-                        <th class="text-right">Total</th>
-                        <th>Sucursal</th>
-                        <th><span class="fa fa-list"></span> Detalles</th>
-                    </tr>
-                    <template v-if="compras.length==0">
-                        <tr>
-                            <td colspan="7">No hay resultado para fecha!👆📆</td>
-                        </tr>
-                    </template>
-                    <template v-for="compra in compras">
-                        <tr style="font-family: Arial,Helvetica,sans-serif;">
-                            <td>@{{compra.compra_cod}}</td>
-                            <td>@{{compra.compra_fecha}}</td>
-                            <td>@{{compra.proveedor_nombre}}</td>
-                            <td>@{{compra.compra_tipo_factura=='1' ? "Contado" : "Credito"}}</td>
-                            <td class="text-right font-weight-bold">@{{new Intl.NumberFormat("de-DE").format(compra.total)}}</td>
-                            <td>@{{compra.suc_desc}}</td>
-                            <td>
-                                <button class="btn btn-link" @click="showDetalle(compra)"><span class="fa fa-file-alt"></span> Detalle</button>
-                                <a :href="'pdf/boletacompra/'+compra.compra_cod+'/'" class="btn btn-link"><span class="fa fa-file-pdf"></span> Imprimir</button>
-                            </td>
-                        </tr>
-                    </template>
-                </table>
+               
                          
-                </div>
+            </div>
+        </div>
+        <div class="card table-responsive-md">
+            <table class="table table-sm table-hover table-striped">
+                <tr>
+                    <th>Nro Compra</th>
+                    <th>Fecha Hora</th>
+                    <th>Proveedor</th>
+                    <th>Tipo</th>
+                    <th class="text-right">Total</th>
+                    <th>Sucursal</th>
+                    <th><span class="fa fa-list"></span> Detalles</th>
+                </tr>
+                <template v-if="compras.length==0">
+                    <tr>
+                        <td colspan="7">No hay resultado para fecha!👆📆</td>
+                    </tr>
+                </template>
+                <template v-for="compra in compras">
+                    <tr style="font-family: Arial,Helvetica,sans-serif;">
+                        <td>@{{compra.compra_cod}}</td>
+                        <td>@{{compra.compra_fecha}}</td>
+                        <td>@{{compra.proveedor_nombre}}</td>
+                        <td>@{{compra.compra_tipo_factura=='1' ? "Contado" : "Credito"}}</td>
+                        <td class="text-right font-weight-bold">@{{new Intl.NumberFormat("de-DE").format(compra.total)}}</td>
+                        <td>@{{compra.suc_desc}}</td>
+                        <td>
+                            <button class="btn btn-link" @click="showDetalle(compra)"><span class="fa fa-file-alt"></span> Detalle</button>
+                            <a :href="'pdf/boletacompra/'+compra.compra_cod+'/'" class="btn btn-link"><span class="fa fa-file-pdf"></span> Imprimir</button>
+                        </td>
+                    </tr>
+                </template>
+            </table>
         </div>
 
 
@@ -144,6 +160,7 @@
                     anho: '2022',
                     byYear: false
                 },
+                txtproveedor: '',
                 compra:{},
                 detalleCompra:{},
                 isDataChart: false,
@@ -201,7 +218,8 @@
                             params: {
                                 alld: this.fecha.desde,
                                 allh: this.fecha.hasta,
-                                alls: this.idSucursal
+                                alls: this.idSucursal,
+                                proveedor: this.txtproveedor
                             }
                         })
                         .then(response => {
