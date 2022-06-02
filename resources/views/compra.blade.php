@@ -39,18 +39,25 @@
 								<td>@{{item.codigo}}</td>
 								<td>@{{ item.descripcion }}</td>
 								<td>@{{item.cantidad}}</td>
-								<td>@{{new Intl.NumberFormat("de-DE").format(item.p1)}}</td>
-								<td>@{{new Intl.NumberFormat("de-DE").format(item.p1 * item.cantidad)}}</td>
+								<td>@{{new Intl.NumberFormat("de-DE").format(item.costo)}}</td>
+								<td>@{{new Intl.NumberFormat("de-DE").format(item.costo * item.cantidad)}}</td>
 								<td>
-									<button class="btn btn-primary btn-sm" @click="setCantidad(index,item.cantidad,item.stock)" title="Modificar cantidad">
-										<span class="fa fa-cubes"></span>	
-									</button>
-									<button class="btn btn-info btn-sm" @click="setPrecio(index,item)" title="Seleccionar precio">
-										<span class="fa fa-dollar-sign"></span>	
-									</button>
-									<button class="btn btn-danger btn-sm" @click="delArticulo(item)" title="Quitar articulo">
-										<span class="fa fa-times-circle"></span>	
-									</button>
+									<div class="btn-group">
+										<button class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+											<span class="fa fa-bars"></span>
+										</button>
+										<div class="dropdown-menu dropdown-menu-right">
+										<button class="dropdown-item" @click="setCantidad(index,item.cantidad,item.stock)">
+											<span class="fa fa-cubes text-primary" style="width: 13pt"></span> Cantidad	
+										</button>
+										<button class="dropdown-item" @click="showSetPrecio(index,item)">
+											<span class="fa fa-dollar-sign  text-info" style="width: 13pt"></span> Precio
+										</button>
+										<button class="dropdown-item" @click="delArticulo(item)">
+											<span class="fa fa-times-circle text-danger" style="width: 13pt"></span> Quitar
+										</button>
+										</div>
+									</div>
 								</td>
 								</tr>
 							</template>
@@ -125,6 +132,8 @@
 	<busquedaproveedor @set_proveedor="setProveedor" ></busquedaproveedor>
 	@include('compra.finalizar')
 	@include('compra.precio')
+	@include('articulo.precio')
+
 </div>
 
 @endsection
@@ -132,14 +141,26 @@
 <script src="{{ asset(mix('js/busqueda.js'))}}"></script>
 <script src="{{ asset(mix('js/component/proveedor.js'))}}"></script>
 <script type="text/javascript">
+	const defaulPrecio = [{p: 50,m: 5,c: 2}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,
+c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {
+p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,
+c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
 	var app=new Vue({
 	el: '#app',
 	data: {
 		txtbuscar: '',
+		inNumberClass: {
+            input: 'form-control form-control-sm'
+        },
 		requestSend: false,
 		requestLote: false,
 		carro: [],
 		articulos: [],
+		preciosCreditos: [],
+		precioCredito : [],
+		chcuota: false,
+        chprecio: false,
+		precios: defaulPrecio,
 		articulo: {},
 		pos_edit: 0,
 		stocks: [],
@@ -149,8 +170,80 @@
 		nrooperacion: '...',
 		articulo_selecionado: {}
 	},
-	methods:{
+	watch: {
+		chprecio: function(newVal, oldVal) {
+			for (i = 0; i < this.precios.length; i++) {
+				this.setPrecio(i);
+			}
+		},
+		chcuota: function(newVal, oldVal) {
+			for (i = 0; i < this.precios.length; i++) {
+				this.setCuota(i);
+			}
+		}
 
+	},
+	methods:{
+		setMargen: function(index) {
+			if (typeof(this.articulo.costo === 'string')) {
+				this.articulo.costo = this.articulo.costo * 1;
+			}
+			if (this.articulo.costo > 0 && this.precios[index].p > 0) {
+				if (this.precios[index].p > this.articulo.costo) {
+					var res = this.precios[index].p - this.articulo.costo;
+					this.precios[index].m = Math.round(res * 100 / this.articulo.costo);
+				} else {
+					this.precios[index].m = 0;
+				}
+				this.setCuota(index)
+			}
+		},
+		setPrecio: function(index) {
+			if (typeof(this.articulo.costo === 'string')) {
+				this.articulo.costo = this.articulo.costo * 1;
+			}
+			if (this.articulo.costo < 1) {
+				this.precios[index].p = 0;
+				return;
+			}
+			if (parseInt(this.precios[index].m) < 1 || this.precios[index].m.length == 0) {
+				this.precios[index].p = 0;
+				return;
+			}
+
+			var retornar = (this.articulo.costo * parseInt(this.precios[index].m)) / 100 + this.articulo
+				.costo
+			if (this.chprecio)
+				this.precios[index].p = this.redondear(retornar);
+			else
+				this.precios[index].p = retornar; //parseInt(retornar) 
+
+		},
+		setCuota: function(index) {
+			if (this.precios[index].p > 0) {
+				if (this.chcuota) {
+					this.precios[index].c = this.precios[index].p / (index + 2);
+					this.precios[index].c = this.redondear(parseInt(this.precios[index].c));
+				} else {
+					this.precios[index].c = parseInt(this.precios[index].p / (index + 2));
+				}
+			} else {
+				this.precios[index].c = 0;
+			}
+		},
+		mostrarPrecios: function() {
+			if(this.articulo.costo > 0 ){
+				$('#preciocompra').modal('hide');
+				$('#precioArticulo').modal('show');
+			}else{
+				Swal.fire('Atención...','Agregue precio de compra','info');
+			}
+			
+		},
+		cerrarPrecios: function() {
+			$('#preciocompra').modal('show');
+			$('#precioArticulo').modal('hide');
+		},
 		format: function(numero){
 			return new Intl.NumberFormat("de-DE").format(numero);
 		},
@@ -231,10 +324,11 @@
 					m4: parseInt(a.pre_margen4,10),
 					m5: parseInt(a.pre_margen5,10)}
 				this.carro.push(art);
+				this.getPreciosCredito(a.ARTICULOS_cod);
 			}else{
 				this.carro[i].cantidad= parseInt(this.carro[i].cantidad) + 1;//Actualizar cantidad
 			}
-			this.saveDatos();
+			//this.saveDatos(); // Llamar despues del request
 		},
 		setCantidad: async function(index,cantidad,stock){
 			const swalBootstrap = Swal.mixin({
@@ -258,20 +352,47 @@
 				this.saveDatos();
 			}
 		},
-		setPrecio:function(index,a){
+		
+		showSetPrecio:function(index,a){
 			//this.articulo= {'codigo':a.ARTICULOS_cod,'c_barra': a.producto_c_barra,'descripcion':a.producto_nombre,'indicaciones':a.producto_indicaciones==null? a.producto_indicaciones: a.producto_indicaciones/*.trim()*/,'modouso':a.producto_dosis==null? a.producto_dosis : a.producto_dosis/*.trim()*/,'seccion':a.present_cod,'unidad':a.uni_codigo,'factor':a.producto_factor,'ubicacion':a.producto_ubicacion,'costo':a.producto_costo_compra,'p1':a.pre_venta1,'p2':a.pre_venta2,'p3':a.pre_venta3,'p4':a.pre_venta4,'m1':parseInt(a.pre_margen1,10),'m2':parseInt(a.pre_margen2,10),'m3':parseInt(a.pre_margen3,10),'m4':parseInt(a.pre_margen4,10),'svenc':'0'}
+			
 			this.pos_edit= index;
 			this.articulo= this.carro[index];
+			let indexPrecio = this.preciosCreditos.findIndex( x => x.id== this.articulo.codigo);
+			if(index != -1){
+				this.precios = this.preciosCreditos[indexPrecio].precios;
+			}else{
+				this.precios = defaulPrecio;
+			}
+			
 			$('#preciocompra').modal('show');
 			this.get_historial();
+			
         },
 		update_precio: function(){
 			this.carro[this.pos_edit]= this.articulo;
+			this.preciosCreditos[this.preciosCreditos.findIndex( x => x.id== this.articulo.codigo)].precios= this.precios;
 			$('#preciocompra').modal('hide');
 			this.saveDatos();
 		},
-		getHistorialPrecio: function(){
-
+		getPreciosCredito: function(id){
+			axios.get('articulo/precios/'+id).then(response =>{
+				if(response.data.length> 0){
+					//this.preciosCreditos=[];
+					let tmpPrecios= [];
+					for(i=0;i<response.data.length; i++){
+						let precios={p:response.data[i].p,c: response.data[i].c, m:response.data[i].m}
+						tmpPrecios.push(precios);
+					}
+					this.preciosCreditos.push({'id':id,'precios':tmpPrecios});
+					this.saveDatos();
+				}else{
+					this.preciosCreditos.push({'id':id,'precios':defaulPrecio});
+					this.saveDatos();
+				}	
+			}).catch( error => {
+				this.error= error.message;
+			})
 		},
 		setUtilPrecio: function(tipo,i){
 			if(tipo=='M'){
@@ -287,9 +408,13 @@
   		}
 
 		},
-		delArticulo: function(articulo){
-            this.carro.pop(articulo);
-            this.saveDatos();
+		delArticulo: function(a){
+			let validar = this.carro.findIndex(x=> x.codigo == a.codigo)
+			if(validar > -1 ) {
+				this.carro.splice(validar,1);
+				this.preciosCreditos.splice(this.preciosCreditos.findIndex(x => x.id == a.codigo));
+			}
+			this.saveDatos();
         },
 		showFinalizar: function(){
 			if(this.caja=='ABIERTA'){
@@ -303,12 +428,14 @@
 			}
 		},
 		finalizar: function(){
-			axios.post('compra',{compraCabecera: this.compraCabecera, detalle: this.carro})
+			axios.post('compra',{compraCabecera: this.compraCabecera, detalle: this.carro, precios: this.preciosCreditos})
 			.then(response =>{
-				console.log(response.data);
 				this.carro= [];
+				this.precios= defaulPrecio;
+				this.preciosCreditos= [];
 				localStorage.removeItem('carro_compra');
 				localStorage.removeItem('compraCabecera');
+				localStorage.removeItem('compraPreciosCredito');
 				$('#finalizarcompra').modal('hide');
 				this.compraCabecera.factura_n1="";
 				this.compraCabecera.factura_n2="";
@@ -328,9 +455,9 @@
         		})
 		},
 		saveDatos: function(){
-			console.log(JSON.stringify(this.compraCabecera))
 			localStorage.setItem('carro_compra',JSON.stringify(this.carro));
             localStorage.setItem('compraCabecera',JSON.stringify(this.compraCabecera));
+			localStorage.setItem('compraPreciosCredito',JSON.stringify(this.preciosCreditos));
             
 		},
 		recuperarDatos: function(){
@@ -341,6 +468,10 @@
 			var cab = localStorage.getItem('compraCabecera');
 			if(cab != null){
 				this.compraCabecera= JSON.parse(cab);
+			}
+			let prec = localStorage.getItem('compraPreciosCredito');
+			if(prec != null){
+				this.preciosCreditos= JSON.parse(prec);
 			}
 		},
 		getSucursal: function(){
@@ -401,7 +532,7 @@
 		totalCompra: function(){
 			this.compraCabecera.total=0;
 			for (var i = 0; i < this.carro.length; i++) {
-				this.compraCabecera.total += (this.carro[i].p1 * this.carro[i].cantidad);
+				this.compraCabecera.total += (this.carro[i].costo * this.carro[i].cantidad);
 			}
 			if(this.compraCabecera.descuento > 0 && this.compraCabecera.total > 0){
 				this.compraCabecera.total -=  this.compraCabecera.descuento;

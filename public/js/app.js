@@ -41266,7 +41266,7 @@ const defaultClasses ={
 }
 /* harmony default export */ __webpack_exports__["default"] = ({
     name: "inNumber",
-    props: ["value","placeholder","clases","id"],
+    props: ["value","placeholder","clases","id","tabindex"],
     data() {
         return {
             text: "",
@@ -41349,6 +41349,7 @@ var render = function() {
     class: _vm.Classes.input,
     attrs: {
       id: _vm.id,
+      tabindex: _vm.tabindex,
       onfocus: "this.select()",
       placeholder: _vm.placeholder,
       type: "text"

@@ -24,7 +24,7 @@
                         <div class="card border-info p-3 m-1">
                             <fieldset class="form-group">
                                 <label for="factura">Costo</label>
-                                    <input type="text" placeholder="Precio" id="costo" v-model="articulo.costo" class="form-control form-control-sm">
+                                    <in-number id="costo"  v-model="articulo.costo" placeholder="Precio Costo" :clases="inNumberClass"></in-number>
                             </fieldset>
                             <div class="row">
                                 
@@ -34,7 +34,8 @@
                                             <label for="factura">Precio 1</label>
                                             <div class="input-group input-group-sm">
                                                 <input type="text" class="form-control" onfocus="this.select()"  v-on:keyup="setUtilPrecio('M',1)" v-model="articulo.m1" placeholder="%">
-                                                <input type="text" placeholder="Precio" onfocus="this.select()"  v-on:keyup="setUtilPrecio('P',1)" v-model="articulo.p1" class="form-control">
+                                                <!--input type="text" placeholder="Precio" onfocus="this.select()"  v-on: keyup="setUtilPrecio('P',1)" v-model="articulo.p1" class="form-control" -->
+                                                <in-number  v-model="articulo.p1"  :clases="inNumberClass" placeholder="Precio" @change="setUtilPrecio('P',1)"></in-number>
                                             </div>
                                         </fieldset>
                                     
@@ -79,7 +80,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label>&nbsp;</label>
-                                            <button class="btn btn-success btn-block btn-sm">Mas Precios</button>
+                                            <button @click="mostrarPrecios" class="btn btn-success btn-block btn-sm">Mas Precios</button>
                                         </div>
                                         
                                         

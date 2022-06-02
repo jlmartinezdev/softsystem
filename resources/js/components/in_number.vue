@@ -1,5 +1,5 @@
 <template>
-    <input :id="id" @keyup="keyup" @keypress="isNumber($event)" v-model="text" onfocus="this.select()" :placeholder="placeholder" :class="Classes.input" type="text" />
+    <input :id="id" :tabindex="tabindex" @keyup="keyup" @keypress="isNumber($event)" v-model="text" onfocus="this.select()" :placeholder="placeholder" :class="Classes.input" type="text" />
 </template>
 <script lang="ts">
 const defaultClasses ={
@@ -7,7 +7,7 @@ const defaultClasses ={
 }
 export default {
     name: "inNumber",
-    props: ["value","placeholder","clases","id"],
+    props: ["value","placeholder","clases","id","tabindex"],
     data() {
         return {
             text: "",

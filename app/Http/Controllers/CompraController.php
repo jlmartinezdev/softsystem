@@ -21,6 +21,7 @@ class CompraController extends Controller
     }
     public function store(Request $request)
     {
+        
         $compra = new Compra();
         $compra->PROVEEDOR_cod = $request->compraCabecera['idproveedor'];
         $compra->cod_usuarios = Auth::user()->cod_usuarios;
@@ -45,8 +46,25 @@ class CompraController extends Controller
             DB::insert('INSERT INTO detalle_compra (ARTICULOS_cod, compra_cod, compra_precio, compra_cantidad, exentas, grabadas5, grabadas10)
 VALUES (?, ?, ?, ?, ?, ?, ?);',[$detalle['codigo'],$compra->compra_cod,$detalle['precio'],$detalle['cantidad'],$detalle['precio'],$detalle['precio'],$detalle['precio']]);
            DB::update('update stock set cantidad = (cantidad + ?) where id_stock=?',[$detalle['cantidad'],$detalle['idstock']]);
+        } 
+        for($i=0;$i< count($request->precios);$i++){
+            $suma = 0;
+            for($y=0;$y<=10;$y++){
+                $suma += intval($request->precios[$i]['precios'][$y]["p"]);
+            }
+            if($suma > 0) {
+                DB::table('precios')->where('ARTICULOS_cod',$request->precios[$i]['id'])->delete();
+            }
+           
+            for($x=0;$x< count($request->precios[$i]['precios']);$x++){
+                if($suma > 0){
+                    DB::insert('INSERT INTO precios VALUES (?,?,?,?,?,?)',[$x+2,$request->precios[$i]['id'],$request->precios[$i]['precios'][$x]["p"],$request->precios[$i]['precios'][$x]["m"],$x+2,$request->precios[$i]['precios'][$x]["c"]]);
+                }
+                
+            }
         }
-        return $compra->compra_cod;
+        return 1;
+        //return $compra->compra_cod;
         
     }
 
