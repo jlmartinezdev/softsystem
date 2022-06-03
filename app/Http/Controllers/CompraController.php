@@ -44,7 +44,7 @@ class CompraController extends Controller
         foreach ($request->detalle as $detalle) {
            // $lote = empty($detalle['aux_lote']) ? " AND lote_nro is null": " AND lote_nro='".trim($detalle['aux_lote'])."'");
             DB::insert('INSERT INTO detalle_compra (ARTICULOS_cod, compra_cod, compra_precio, compra_cantidad, exentas, grabadas5, grabadas10)
-VALUES (?, ?, ?, ?, ?, ?, ?);',[$detalle['codigo'],$compra->compra_cod,$detalle['precio'],$detalle['cantidad'],$detalle['precio'],$detalle['precio'],$detalle['precio']]);
+VALUES (?, ?, ?, ?, ?, ?, ?);',[$detalle['codigo'],$compra->compra_cod,$detalle['costo'],$detalle['cantidad'],0,0,0]);
            DB::update('update stock set cantidad = (cantidad + ?) where id_stock=?',[$detalle['cantidad'],$detalle['idstock']]);
         } 
         for($i=0;$i< count($request->precios);$i++){
