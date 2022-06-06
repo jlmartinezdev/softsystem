@@ -68,21 +68,26 @@
 @endsection
 @section('script')
     <script type="text/javascript">
-        var app = new Vue({
-            el: '#app',
-            data: {
-                clientes: [],
-                requestSend: false,
-                cliente: {
+        const defaulCliente =  {
                     id: '',
                     doc: '',
                     nombre: '',
                     sexo: 'f',
                     direccion: '',
                     celular: '',
+                    telefono: '',
                     correo: '',
-                    idciudad: '1'
-                },
+                    idciudad: '1',
+                    celfamiliar: '',
+                    ocupacion: '',
+                    reflaboral: ''
+                };
+        var app = new Vue({
+            el: '#app',
+            data: {
+                clientes: [],
+                requestSend: false,
+                cliente: defaulCliente,
                 txtbuscar: ''
             },
             methods: {
@@ -121,7 +126,13 @@
                         direccion: c.cliente_direccion,
                         celular: c.cliente_cel,
                         correo: c.cliente_correo,
-                        idciudad: c.ciudad_cod
+                        idciudad: c.ciudad_cod,
+                        telefono: '',
+                    correo: '',
+                    idciudad: '1',
+                    celfamiliar: '',
+                    ocupacion: '',
+                    reflaboral: ''
                     };
                     $('#editarCliente').modal('show');
                 },

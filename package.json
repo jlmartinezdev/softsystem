@@ -1,7 +1,7 @@
 {
     "private": true,
     "scripts": {
-        "venta" :"",
+        "venta": "",
         "dev": "npm run development",
         "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
         "watch": "npm run development -- --watch",
@@ -33,6 +33,7 @@
         "morris.js": "^0.5.0",
         "raphael": "^2.3.0",
         "sweetalert2": "^9.10.12",
+        "vue-good-table": "^2.21.11",
         "vuex": "^3.6.2"
     }
 }

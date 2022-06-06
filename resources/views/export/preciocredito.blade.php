@@ -18,28 +18,26 @@
             <th><strong>11 Cuotas</strong></th>
             <th><strong>12 Cuotas</strong></th>
             <th><strong>13 Cuotas</strong></th>
+            <th><strong>14 Cuotas</strong></th>
+            <th><strong>15 Cuotas</strong></th>
+            <th><strong>16 Cuotas</strong></th>
+            <th><strong>17 Cuotas</strong></th>
+            <th><strong>18 Cuotas</strong></th>
         </tr>
         
     </thead>
     <tbody>
-        @foreach($articulos as $articulo)
+        @foreach($articulos->where('cantidad','>',0)->all() as $articulo)
         <tr>
             <td>{{ $articulo->producto_c_barra }}</td>
             <td>{{ $articulo->producto_nombre }}</td>
             <td>{{ $articulo->present_descripcion }}</td>
             <td>{{ $articulo->cantidad }}</td>
+            
             <td>{{ $articulo->pre_venta1 }}</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            @foreach ($precios->where('ARTICULOS_cod',$articulo->ARTICULOS_cod)->all() as $precio)
+                <td> {{$precio->monto_cuota}}</td>
+            @endforeach
         </tr>
         @endforeach
     </tbody>

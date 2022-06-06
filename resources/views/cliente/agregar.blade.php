@@ -42,7 +42,7 @@
 						</div>
 						<div class="form-group">
 							<label class="font-weight-bold">Telefono</label>
-							<input type="text" class="form-control form-control-sm" v-model="cliente.direccion" placeholder="Direccion...">
+							<input type="text" class="form-control form-control-sm" v-model="cliente.telefono" placeholder="Telefono...">
 						</div>
 						<div class="form-group">
 							<label class="font-weight-bold">Cuidad</label>
@@ -56,15 +56,15 @@
 					<div class="col-sm-6 col-md-4 col-lg-3">
 						<div class="form-group">
 							<label class="font-weight-bold">Cel. Familiar</label>
-							<input type="text" class="form-control form-control-sm" v-model="cliente.direccion" placeholder="Direccion...">
+							<input type="text" class="form-control form-control-sm" v-model="cliente.celfamiliar" placeholder="Celular...">
 						</div>
 						<div class="form-group">
 							<label class="font-weight-bold">Profesion/ Ocupacion</label>
-							<input type="text" class="form-control form-control-sm" v-model="cliente.direccion" placeholder="Direccion...">
+							<input type="text" class="form-control form-control-sm" v-model="cliente.ocupacion" placeholder="Profesion...">
 						</div>
 						<div class="form-group">
 							<label class="font-weight-bold">Ref. Laboral</label>
-							<input type="text" class="form-control form-control-sm" v-model="cliente.direccion" placeholder="Direccion...">
+							<input type="text" class="form-control form-control-sm" v-model="cliente.reflaboral" placeholder="Celular...">
 						</div>
 					</div>
 					<div class="col-sm-6 col-md-4 col-lg-3">

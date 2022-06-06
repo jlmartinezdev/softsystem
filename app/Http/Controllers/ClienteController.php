@@ -46,16 +46,21 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-
+        $ultimo= Cliente::max('CLIENTES_cod');
+        
         $cliente = new Cliente();
+        $cliente->CLIENTES_cod= $ultimo +1;
         $cliente->CIUDAD_cod =$request->cliente['idciudad'];
         $cliente->cliente_ci =$request->cliente['doc'];
         $cliente->cliente_nombre =$request->cliente['nombre'];
         $cliente->cliente_ruc =$request->cliente['doc'];
         $cliente->cliente_direccion =$request->cliente['direccion'];
-        $cliente->cliente_telef =$request->cliente['celular'];
+        $cliente->cliente_telef =$request->cliente['telefono'];
         $cliente->cliente_cel =$request->cliente['celular'];
         $cliente->cliente_correo =$request->cliente['correo'];
+        $cliente->cliente_referente_nombre = $request->cliente['celfamiliar'];
+        $cliente->cliente_profesion = $request->cliente['ocupacion'];
+        $cliente->cliente_referencia_laboral = $request->cliente['reflaboral'];
         $cliente->save();
         return 'OK';
     }

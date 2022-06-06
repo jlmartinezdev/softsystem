@@ -60,8 +60,8 @@
                          
             </div>
         </div>
-        <div class="card table-responsive-md">
-            <table class="table table-sm table-hover table-striped">
+        <div class="card">
+            <table id="tabla" class="table table-sm table-hover table-striped">
                 <tr>
                     <th>Nro Compra</th>
                     <th>Fecha Hora</th>
@@ -92,6 +92,14 @@
                 </template>
             </table>
         </div>
+        <template>
+            <div>
+              <vue-good-table
+                :columns="columns"
+                :rows="rows"
+                styleClass="vgt-table striped"/>
+            </div>
+          </template>
 
 
     <div class="modal fade" id="frmdetalle">
@@ -141,6 +149,7 @@
     <script type="text/javascript" src="chart/raphael.min.js"></script>
     <script type="text/javascript" src="chart/morris.min.js"></script>
     <script type="text/javascript">
+
         var app = new Vue({
             el: '#app',
             data: {
@@ -174,9 +183,46 @@
                 requestSend: false,
                 alturaChart: 'alturaChart',
                 alturaSinDatos: 'alturaSinDatos',
-                idSucursal: 0
+                idSucursal: 0,
+                columns: [
+                    {
+                    label: 'Nro Compra',
+                    field: 'codigo',
+                    type: 'number'
+                    },
+                    {
+                    label: 'Fecha Hora',
+                    field: 'fecha',
+                    },
+                    {
+                    label: 'Proveedor',
+                    field: 'proveedor',
+                    },
+                    {
+                    label: 'Tipo',
+                    field: 'tipo',
+                    },
+                    {
+                    label: 'Total',
+                    field: 'total',
+                    type: 'number',
+                    tdClass: 'font-weight-bold',
+                    },
+                    {
+                    label: 'Sucursal',
+                    field: 'sucursal',
+                    },
+                    {
+                    label: 'Detalle',
+                    field: 'detalle',
+                    html: true
+                    },
+                
+                ],
+                rows: []
             },
             methods: {
+                
                 showChart: function() {
                     if (this.isVisibleChart) {
                         return
@@ -224,7 +270,23 @@
                         })
                         .then(response => {
                             this.requestSend= false;
+                            this.rows= [];
                             this.compras = response.data;
+                            for (let i = 0; i < this.compras.length; i++) {
+                                const item = {
+                                    codigo: this.compras[i].compra_cod,
+                                    fecha: this.compras[i].compra_fecha,
+                                    proveedor : this.compras[i].proveedor_nombre,
+                                    tipo : this.compras[i].compra_tipo_factura =='1' ? "Contado" : "Credito",
+                                    total : new Intl.NumberFormat("de-DE").format(this.compras[i].total),
+                                    sucursal: this.compras[i].suc_desc,
+                                    detalle : "  <button class='btn btn-link' @click='showDetalle("+this.compras[i]+")'><span class='fa fa-file-alt'></span> Detalle</button><a href='pdf/boletacompra/"+this.compras[i].compra_cod+"/' class='btn btn-link'><span class='fa fa-file-pdf'></span> Imprimir</button>"
+
+                                    }
+                                this.rows.push(item);
+                                
+                            }
+                            
                         })
                         .catch(e => {
                             this.requestSend=false;

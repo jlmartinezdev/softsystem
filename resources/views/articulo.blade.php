@@ -36,7 +36,7 @@
                 <div class="row">
                     <div class="col-md-2">
                         <label>Seccion</label>
-                        <select class="form-control form-control-sm" v-model="filtro.seccion">
+                        <select class="form-control form-control-sm" @click="buscar(false)" v-model="filtro.seccion">
                             <option value="0">Todos</option>
                             @foreach ($secciones as $seccion)
                                 <option value="{{ $seccion['present_cod'] }}">{{ $seccion['present_descripcion'] }}
@@ -82,6 +82,9 @@
                                 </div>
 
                             </div>
+                            <!--div class="pl-3">
+                                <input type="checkbox" id="stockcero"><label for="stockcero"> Exportar solo stock mayor a 0</label>
+                            </div -->
                         </div>
                     </div>
 
@@ -119,13 +122,15 @@
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
                                             <button class='dropdown-item' @click="showEArticulo(a)"><span
-                                                    class="fa fa-edit"></span> Editar</button>
+                                                    class="fa fa-edit text-primary"></span> Editar</button>
+                                            <button class='dropdown-item' @click="verPreciosCredito( a.ARTICULOS_cod, a.producto_costo_compra)"><span
+                                                class="fa fa-edit text-primary"></span> Ver Precios Credito</button>
                                             <button class='dropdown-item'
-                                                @click="modalDelete(a.ARTICULOS_cod,a.producto_nombre)"><span
-                                                    class="fa fa-trash"></span> Eliminar</button>
+                                                @click="modalDelete( a.ARTICULOS_cod, a.producto_nombre)"><span
+                                                    class="fa fa-trash text-primary"></span> Eliminar</button>
                                             <button class='dropdown-item'
-                                                @click="showDetalle(a.ARTICULOS_cod,a.producto_nombre)"><span
-                                                    class="fa fa-retweet"></span> Transferir</button>
+                                                @click="showDetalle( a.ARTICULOS_cod,a.producto_nombre )"><span
+                                                    class="fa fa-retweet text-primary"></span> Transferir</button>
                                         </div>
                                     </div>
 
@@ -156,6 +161,41 @@
 @section('script')
     <script src="{{ asset('js/separator.js') }}"></script>
     <script>
+        const defaultStock= {
+                        'id': 0,
+                        'cantidad': 0,
+                        'loteold': '',
+                        'lotenew': '',
+                        'vencimiento': '',
+                        'sucursal': 1
+                    };
+        const defaultPrecio= [{p: 50,m: 5,c: 2}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,
+c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {
+p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,
+c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
+        const defaultArticulo= { 'codigo': '',
+                        'c_barra': '',
+                        'descripcion': '',
+                        'indicaciones': '',
+                        'modouso': '',
+                        'seccion': 1,
+                        'unidad': 1,
+                        'factor': 1,
+                        'ubicacion': '',
+                        'costo': 0,
+                        'p1': 0,
+                        'p2': 0,
+                        'p3': 0,
+                        'p4': 0,
+                        'p5': 0,
+                        'm1': 0,
+                        'm2': 0,
+                        'm3': 0,
+                        'm4': 0,
+                        'm5': 0,
+                        'svenc': '0',
+                        existePrecios: false
+                    }
         var app = new Vue({
             el: '#app',
             data: {
@@ -182,16 +222,14 @@
                     'desde': 0,
                     'hasta': 0
                 },
-                precios: [{p: 50,m: 5,c: 2}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,
-c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {
-p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,
-c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}],
+                precios: defaultPrecio,
                 chcuota: false,
                 chprecio: false,
                 url: 'controller/ArticulosController.php',
                 reservarC: false,
                 bandstock: 0,
                 isnew: true,
+                viewPrecio: false,
                 txtbuscar: '',
                 datos: 'F',
                 idstock: 1,
@@ -204,38 +242,8 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}],
                     columna: 0,
                     orden: 'ASC'
                 },
-                articulo: {
-                    codigo: '',
-                    c_barra: '',
-                    descripcion: '',
-                    indicaciones: '',
-                    modouso: '',
-                    seccion: 1,
-                    unidad: 1,
-                    factor: 1,
-                    ubicacion: '',
-                    costo: 0,
-                    p1: 0,
-                    p2: 0,
-                    p3: 0,
-                    p4: 0,
-                    p5: 0,
-                    m1: 0,
-                    m2: 0,
-                    m3: 0,
-                    m4: 0,
-                    m5: 0,
-                    svenc: '0',
-                    existePrecios: false
-                },
-                stock: {
-                    id: 0,
-                    cantidad: 0,
-                    loteold: '',
-                    lotenew: '',
-                    vencimiento: '',
-                    sucursal: 1
-                },
+                articulo: defaultArticulo,
+                stock: defaultStock,
                 stocks: [],
                 error: '',
                 cantidadStock: 0,
@@ -261,6 +269,9 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}],
             },
             methods: {
                 setMargen: function(index) {
+                    if(this.viewPrecio){
+                        return false;
+                    }
                     if (typeof(this.articulo.costo === 'string')) {
                         this.articulo.costo = this.articulo.costo * 1;
                     }
@@ -275,6 +286,9 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}],
                     }
                 },
                 setPrecio: function(index) {
+                    if(this.viewPrecio){
+                        return false;
+                    }
                     if (typeof(this.articulo.costo === 'string')) {
                         this.articulo.costo = this.articulo.costo * 1;
                     }
@@ -296,6 +310,9 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}],
 
                 },
                 setCuota: function(index) {
+                    if(this.viewPrecio){
+                        return false;
+                    }
                     if (this.precios[index].p > 0) {
                         if (this.chcuota) {
                             this.precios[index].c = this.precios[index].p / (index + 2);
@@ -340,12 +357,21 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}],
                     }
 
                 },
+                verPreciosCredito: function(cod,costo){
+                    this.viewPrecio= true;
+                    this.articulo.costo= costo;
+                    this.getPrecios(cod);
+                    this.mostrarPrecios();
+
+                },
                 mostrarPrecios: function() {
                     if(this.articulo.costo > 0 ){
-                        if (this.isnew) {
-                            $('#addArticulo').modal('hide');
-                        } else {
-                            $('#editArticulo').modal('hide');
+                        if(!this.viewPrecio){
+                            if (this.isnew) {
+                                $('#addArticulo').modal('hide');
+                            } else {
+                                $('#editArticulo').modal('hide');
+                            }
                         }
 
                         $('#precioArticulo').modal('show');
@@ -355,10 +381,12 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}],
                     
                 },
                 cerrarPrecios: function() {
-                    if (this.isnew) {
-                        $('#addArticulo').modal('show');
-                    } else {
-                        $('#editArticulo').modal('show');
+                    if(!this.viewPrecio){
+                        if (this.isnew) {
+                            $('#addArticulo').modal('show');
+                        } else {
+                            $('#editArticulo').modal('show');
+                        }
                     }
                     $('#precioArticulo').modal('hide');
                 },
@@ -424,6 +452,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}],
                 },
                 showMArticulo: function() {
                     this.isnew = true;
+                    this.viewPrecio= false;
                     this.cleanAll();
                     $('#addArticulo').modal('show');
                     //this.getUltimo();
@@ -465,6 +494,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}],
                     this.getPrecios(a.ARTICULOS_cod);
                     this.reservarC = false;
                     this.isnew = false;
+                    this.viewPrecio= false;
                 },
                 setPrecioVenta: function() {
                     if (this.articulo.costo > 0) {
@@ -573,14 +603,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}],
                 },
                 limpiarCamposStock: function() {
                     this.bandstock = 0;
-                    this.stock = {
-                        'id': 0,
-                        'cantidad': 0,
-                        'loteold': '',
-                        'lotenew': '',
-                        'vencimiento': '',
-                        'sucursal': 1
-                    };
+                    this.stock = defaultStock;
                 },
                 cleanAll: function() {
                     this.stocks = [];
@@ -590,30 +613,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}],
                         this.precios[i].m = 0;
                         this.precios[i].c = 0;
                     }
-                    this.articulo = {
-                        'codigo': '',
-                        'c_barra': '',
-                        'descripcion': '',
-                        'indicaciones': '',
-                        'modouso': '',
-                        'seccion': 1,
-                        'unidad': 1,
-                        'factor': 1,
-                        'ubicacion': '',
-                        'costo': 0,
-                        'p1': 0,
-                        'p2': 0,
-                        'p3': 0,
-                        'p4': 0,
-                        'p5': 0,
-                        'm1': 0,
-                        'm2': 0,
-                        'm3': 0,
-                        'm4': 0,
-                        'm5': 0,
-                        'svenc': '0',
-                        existePrecios: false
-                    };
+                    this.articulo = defaultArticulo;
                 },
                 delStockA: function(id) {
                     const s = this.stocks.find(stock => stock.id == id);
@@ -698,41 +698,40 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}],
                 saveArticulo: function() {
                     if (this.articulo.descripcion && this.articulo.costo && this.articulo.p1) {
                         // this.validar_Cbarra();
-                        this.error = "";
-                        if (this.stocks.length > 0) {
-                            if (this.isnew) {
-                                axios.post('articulo', {
-                                        articulo: this.articulo,
-                                        stock: this.stocks,
-                                        precios: this.precios
-                                    })
-                                    .then(r => {
-                                        this.cleanAll();
-                                        $('#addArticulo').modal('hide');
-                                        this.buscar();
-                                    })
-                                    .catch(e => {
-                                        this.error = e.message;
-                                    })
-                            } else {
-                                axios.put('articulo/' + this.articulo.codigo, {
-                                        articulo: this.articulo,
-                                        stock: this.stocks,
-                                        precios: this.precios
-                                    })
-                                    .then(r => {
-                                        this.cleanAll();
-                                        $('#editArticulo').modal('hide');
-                                        this.buscar();
-                                    })
-                                    .catch(e => {
-                                        this.error = e.message;
-                                    })
-                            }
-
-                        } else {
-                            Swal.fire('Atencion', 'Falta agregar Stock!', 'warning');
+                        if(this.stocks.length < 1){
+                            this.stocks.push(defaultStock);
                         }
+                        this.error = "";
+                        if (this.isnew) {
+                            axios.post('articulo', {
+                                articulo: this.articulo,
+                                stock: this.stocks,
+                                precios: this.precios
+                            })
+                            .then(r => {
+                                this.cleanAll();
+                                $('#addArticulo').modal('hide');
+                                this.buscar();
+                            })
+                            .catch(e => {
+                                this.error = e.message;
+                            })
+                        } else {
+                            axios.put('articulo/' + this.articulo.codigo, {
+                                articulo: this.articulo,
+                                stock: this.stocks,
+                                precios: this.precios
+                            })
+                            .then(r => {
+                                this.cleanAll();
+                                $('#editArticulo').modal('hide');
+                                this.buscar();
+                            })
+                            .catch(e => {
+                                this.error = e.message;
+                            })
+                        }
+                        
                     } else {
                         Swal.fire('Atencion', 'Hay campos obligatorios (*) vacios!', 'warning');
                     }

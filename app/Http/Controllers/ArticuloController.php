@@ -13,6 +13,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ArticuloController extends Controller
 {
+    public $request= '';
     public function __construct()
     {
         $this->middleware('auth');
@@ -90,6 +91,7 @@ class ArticuloController extends Controller
      */
     public function store(Request $request)
     {
+        
         $articulo= new Articulo();
         $articulo->uni_codigo=$request->articulo['unidad']; 
         $articulo->present_cod =  $request->articulo['seccion'];
@@ -127,9 +129,11 @@ class ArticuloController extends Controller
         Articulo::where('articulos_cod',$articulo->ARTICULOS_cod)->update([
             'producto_c_barra'=>$cbarra
         ]);
+        
         for ($i=0; $i <count($request->stock) ; $i++) { 
             DB::select('call insert_stock(?,?,?,?,?,?)',[$articulo->ARTICULOS_cod,$request->stock[$i]['sucursal'],$request->stock[$i]['cantidad'],$this->setVencimiento($request->stock[$i]['vencimiento']),$request->stock[$i]['loteold'],$request->stock[$i]['lotenew']]);
         }
+       
         $suma= 0;
         for($i=0;$i<=10;$i++){
             $suma += intval($request->precios[$i]["p"]);
@@ -239,6 +243,9 @@ class ArticuloController extends Controller
         return (new ArticulosExport)->filtro($request)->download('articulos.xlsx');
     }
     public function exportPrecio(Request $request){
-        return (new articulosPreciosExport)->filtro($request)->download('precioscreditos.xlsx');
+      
+        $date = date('d_m_Y');
+       return (new articulosPreciosExport)->filtro($request)->download($date.'_precioscreditos.xlsx');
     }
+   
 }
