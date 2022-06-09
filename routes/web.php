@@ -3,9 +3,6 @@ Auth::routes();
 
 Route::get('/', 'HomeController@index')->name('home');
 Route::group(['middleware' => ['administrador']], function () {
-    Route::post('articulo', 'ArticuloController@store');
-    Route::put('articulo/{id}', 'ArticuloController@update')->name('articulo.update');
-    Route::delete('articulo/res/{id}', 'ArticuloController@destroy')->name('articulo.destroy');
     Route::get('anularventa','VentaController@indexanular')->name('anularventa');
     Route::get('anularcobro','CtaCobrarController@indexanular')->name('anularcobro');
     Route::post('anular_venta','VentaController@destroy');
@@ -21,6 +18,9 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('articulo/ultimo', 'ArticuloController@getUltimo')->name('articulo@ultimo');
     Route::get('articulo/precios/{id}','ArticuloController@getPrecios');
     Route::put('articulo', 'ArticuloController@getByCodigo');
+    Route::post('articulo', 'ArticuloController@store');
+    Route::put('articulo/{id}', 'ArticuloController@update')->name('articulo.update');
+    Route::delete('articulo/res/{id}', 'ArticuloController@destroy')->name('articulo.destroy');
     
     
     //STOCK

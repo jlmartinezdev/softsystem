@@ -226,7 +226,7 @@ class CtaCobrarController extends Controller
     public function destroy(Request $request)
     {
         DB::table('cobranza_detalle')->where('cc_numero', $request->id)->delete();
-        Cobro::find($request->id)->delete();
+        Cobro::where('cc_numero',$request->id)->delete();
         foreach ($request->cuotas as $cuota) {
             $cuenta = Ctacobrar::where('nro_cuotas', $cuota['nro_cuotas'])
             ->where('nro_fact_ventas', $cuota['nro_fact_ventas']);
@@ -253,7 +253,9 @@ class CtaCobrarController extends Controller
         $movimiento->nro_fact_ventas= '-';
         $movimiento->suc_cod= $request->idSucursal;
         $movimiento->save();
+        //Cobro::where('cc_numero',$request->id)->delete();
         return "OK";
+
     }
     private function reciboUp($numeros)
     {

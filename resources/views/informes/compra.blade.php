@@ -60,45 +60,14 @@
                          
             </div>
         </div>
-        <div class="card">
-            <table id="tabla" class="table table-sm table-hover table-striped">
-                <tr>
-                    <th>Nro Compra</th>
-                    <th>Fecha Hora</th>
-                    <th>Proveedor</th>
-                    <th>Tipo</th>
-                    <th class="text-right">Total</th>
-                    <th>Sucursal</th>
-                    <th><span class="fa fa-list"></span> Detalles</th>
-                </tr>
-                <template v-if="compras.length==0">
-                    <tr>
-                        <td colspan="7">No hay resultado para fecha!👆📆</td>
-                    </tr>
-                </template>
-                <template v-for="compra in compras">
-                    <tr style="font-family: Arial,Helvetica,sans-serif;">
-                        <td>@{{compra.compra_cod}}</td>
-                        <td>@{{compra.compra_fecha}}</td>
-                        <td>@{{compra.proveedor_nombre}}</td>
-                        <td>@{{compra.compra_tipo_factura=='1' ? "Contado" : "Credito"}}</td>
-                        <td class="text-right font-weight-bold">@{{new Intl.NumberFormat("de-DE").format(compra.total)}}</td>
-                        <td>@{{compra.suc_desc}}</td>
-                        <td>
-                            <button class="btn btn-link" @click="showDetalle(compra)"><span class="fa fa-file-alt"></span> Detalle</button>
-                            <a :href="'pdf/boletacompra/'+compra.compra_cod+'/'" class="btn btn-link"><span class="fa fa-file-pdf"></span> Imprimir</button>
-                        </td>
-                    </tr>
-                </template>
-            </table>
-        </div>
         <template>
             <div>
               <vue-good-table
                 :columns="columns"
                 :rows="rows"
-                styleClass="vgt-table striped"/>
+                style-class="vgt-table striped"/>
             </div>
+
           </template>
 
 
@@ -144,6 +113,9 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 </div>
+
+
+
 @endsection
 @section('script')
     <script type="text/javascript" src="chart/raphael.min.js"></script>
@@ -280,7 +252,7 @@
                                     tipo : this.compras[i].compra_tipo_factura =='1' ? "Contado" : "Credito",
                                     total : new Intl.NumberFormat("de-DE").format(this.compras[i].total),
                                     sucursal: this.compras[i].suc_desc,
-                                    detalle : "  <button class='btn btn-link' @click='showDetalle("+this.compras[i]+")'><span class='fa fa-file-alt'></span> Detalle</button><a href='pdf/boletacompra/"+this.compras[i].compra_cod+"/' class='btn btn-link'><span class='fa fa-file-pdf'></span> Imprimir</button>"
+                                    detalle : '<div class="btn-group"><button class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-bars"></span></button><div class="dropdown-menu dropdown-menu-right"><button class="dropdown-item" onclick="app.showDetalle('+this.compras[i].compra_cod+');"><span class="fa fa-file-alt"></span> Detalle</button><div class="dropdown-divider"></div><a href="pdf/boletacompra/'+this.compras[i].compra_cod+'/" class="dropdown-item"><span class="fa fa-file-pdf"></span> Imprimir</a></div></div>'
 
                                     }
                                 this.rows.push(item);
@@ -318,8 +290,9 @@
                 Procesar: function() {
                     alert("Prueba ");
                 },
-                showDetalle: function(compra){
-                    this.compra= compra;
+                showDetalle: function(id){
+                    console.log(id);
+                    this.compra= this.compras[this.compras.findIndex(x=> x.compra_cod== id)];
                     $('#frmdetalle').modal('show');
                     this.getDetalle();
                 },
