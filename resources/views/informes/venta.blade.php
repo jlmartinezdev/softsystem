@@ -6,7 +6,14 @@
             min-height: 250px;
         }
 
-    </style>
+	.modal-dialog{
+		overflow-y: initial !important
+	}
+	.modal-body{
+		height: 350px;
+		overflow-y: auto;
+	}
+</style>
 @endsection
 @section('main')
     <div class="container" id="app">
@@ -73,40 +80,14 @@
                         </template>
 
 
-                        <table class="table table-sm table-hover table-striped table-responsive-sm ">
-                            <tr>
-                                <th>Nro Venta</th>
-                                <th>Fecha Hora</th>
-                                <th>Cliente</th>
-                                <th>Tipo</th>
-                                <th>Documento</th>
-                                <th class="text-right">Total</th>
-                                <th>Sucursal</th>
-                                <th><span class="fa fa-list"></span> Detalles</th>
-                            </tr>
-                            <template v-if="ventas.length==0">
-                                <tr>
-                                    <td colspan="8">No hay resultado para fecha!👆📆</td>
-                                </tr>
-                            </template>
-                            <template v-for="venta in ventas">
-                                <tr style="font-family: Arial,Helvetica,sans-serif;">
-                                    <td>@{{ venta.nro_fact_ventas }}</td>
-                                    <td>@{{ venta.fecha }}</td>
-                                    <td>@{{ venta.cliente_nombre }}</td>
-                                    <td>@{{ venta.tipo_factura == '1' ? "Contado" : "Credito" }}</td>
-                                    <td>@{{ venta.documento }}</td>
-                                    <td class="text-right font-weight-bold">@{{ new Intl.NumberFormat("de-DE").format(venta.venta_total) }}</td>
-                                    <td>@{{ venta.suc_desc }}</td>
-                                    <td class="text-nowrap">
-                                        <button class="btn btn-link" @click="showDetalle(venta)"><span
-                                                class="fa fa-file-alt"></span> Detalle</button>
-                                        <a :href="'pdf/boletaventa/'+venta.nro_fact_ventas+'/'" class="btn btn-link"><span
-                                                class="fa fa-file-pdf"></span> Imprimir</button>
-                                    </td>
-                                </tr>
-                            </template>
-                        </table>
+                        <template>
+                            <div>
+                              <vue-good-table
+                                :columns="columns"
+                                :rows="rows"
+                                style-class="vgt-table striped"/>
+                            </div>
+                        </template>
                     </div>
                     <!--  ********** SECCION CLIENTE *********** -->
                     <div class="tab-pane fade show" id="frmcliente" role="tabpanel">
@@ -193,7 +174,7 @@
                                     <td class="text-right font-weight-bold">@{{ new Intl.NumberFormat("de-DE").format(venta.venta_total) }}</td>
                                     <td>@{{ venta.suc_desc }}</td>
                                     <td class="text-nowrap">
-                                        <button class="btn btn-link" @click="showDetalle(venta)"><span
+                                        <button class="btn btn-link" @click="showDetalle(venta.nro_fact_ventas,'clientes')"><span
                                                 class="fa fa-file-alt"></span> Detalle</button>
                                         <a :href="'pdf/boletaventa/'+venta.nro_fact_ventas+'/'" class="btn btn-link"><span
                                                 class="fa fa-file-pdf"></span> Imprimir</button>
@@ -321,14 +302,48 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <span class="pr-3"><span class="fa fa-grip-horizontal text-primary"></span><strong> Nro de
-                                Venta: @{{ venta.nro_fact_ventas }} |</strong></span>
-                        <span class="pr-3"><span class="fa fa-calendar text-warning"></span><strong>
-                                Fecha:@{{ venta.fecha }} | </strong></span>
-                        <span><span class="fa fa-user-circle text-info"></span><strong> Cliente:
-                                @{{ venta.cliente_nombre }}</strong></span>
-                        <br><br>
-                        <table class="table table-sm">
+                        <div class="row">
+                        <div class="col-sm-3 border-right">
+                            <div class="text-center">
+                                <span class="fa fa-grip-horizontal text-primary"></span>
+                                <strong> Nro de Venta</strong>
+                                <span class="d-block"> @{{ venta.nro_fact_ventas }}</span>
+                            </div>
+                            
+                        </div>
+                        <div class="col-sm-3 border-right">
+                            <div class="text-center">
+                                <span class="fa fa-calendar text-warning"></span><strong> Fecha</strong>
+                                <span class="d-block"> @{{ venta.fecha }}</span>
+                            </div>
+                            
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-center">
+                                <span class="fa fa-user-circle text-info"></span><strong> Cliente</strong>
+                                <span class="d-block">@{{ venta.cliente_nombre }}</span>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-4">
+                                 Condicion de Venta:<strong> @{{ venta.tipo_factura== 1 ? "Contado" : "Credito" }}</strong>
+                            </div>
+                            <div class="col-4">
+                                
+                                Descuento: <strong>@{{new Intl.NumberFormat("de-DE").format(venta.venta_descuento) }} Gs.</strong>
+                            </div>
+                            <div class="col-4">
+                                 Total: <strong>
+                                @{{new Intl.NumberFormat("de-DE").format(venta.venta_total) }} Gs.</strong>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="mt-3">
+                            <span class="badge bg-info">Detalle Venta</span>
+                    
+                           <table class="table table-sm">
                             <tr>
                                 <th>Codigo</th>
                                 <th>Descripcion</th>
@@ -345,10 +360,41 @@
                                     <td>@{{ new Intl.NumberFormat("de-DE").format(d.venta_cantidad * d.venta_precio) }}</td>
                                 </tr>
                             </template>
-                        </table>
+                            </table> 
+                        </div>
+                        <template v-if="venta.tipo_factura==2">
+                            <span class="badge bg-success">Detalle Cuotas</span>
+                            <table class="table table-sm table-striped">
+                                <tr>
+                                    <th>Nro Cuota</th>
+                                    <th>Vencimiento</th>
+                                    <th>Monto Cuota</th>
+                                    <th>Monto Cobrado</th>
+                                    <th>Saldo</th>
+                                </tr>
+                                <template v-for="c in cuotas">
+                                    <tr>
+                                        <td>@{{c.nro_cuotas}}</td>
+                                        <td>@{{formatFecha(c.fecha_venc)}}</td>
+                                        <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_cuota)}}</td>
+                                        <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_cobrado)}}</td>
+                                        <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_saldo)}}</td>
+                                    </tr>
+                                </template>
+                            </table>
+                            <div class="row">
+                                <div class="col-4">
+                                    Monto Cobrado: <strong>@{{ new Intl.NumberFormat("de-DE").format(venta.venta_total- Cuenta.saldo)}}</strong> 
+                                </div>
+                                <div class="col-4">
+                                    Saldo: <strong>@{{ new Intl.NumberFormat("de-DE").format(Cuenta.saldo)}}</strong> 
+                                </div>
+                            </div>
+                        </template>
+                        
                     </div>
                     <div class="modal-footer">
-                        <strong>Total @{{ new Intl.NumberFormat("de-DE").format(venta.venta_total) }}</strong>
+                        
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"><span
                                 class="fa fa-times"></span> Cerrar</button>
                     </div>
@@ -390,6 +436,8 @@
                 ventas: [],
                 clientes: [],
                 articulos: [],
+                cuotas: [],
+                Cuenta: {cantitad: 0, montoCuota: 0, saldo: 0, cobrado : 0},
                 cantidadVenta: 0,
                 montoVenta: 0,
                 error: '',
@@ -398,7 +446,48 @@
                 requestSend: false,
                 alturaChart: 'alturaChart',
                 alturaSinDatos: 'alturaSinDatos',
-                idSucursal: 0
+                idSucursal: 0,
+                columns: [
+                    {
+                    label: 'Nro Venta',
+                    field: 'codigo',
+                    type: 'number'
+                    },
+                    {
+                    label: 'Fecha Hora',
+                    field: 'fecha',
+                    },
+                    {
+                    label: 'Cliente',
+                    field: 'cliente',
+                    },
+                    {
+                    label: 'Tipo',
+                    field: 'tipo',
+                    },
+                    {
+                        label: 'Documento',
+                        field: 'documento'
+                    },
+                    {
+                    label: 'Total',
+                    field: 'total',
+                    type: 'number',
+                    tdClass: 'font-weight-bold',
+                    },
+                    {
+                    label: 'Sucursal',
+                    field: 'sucursal',
+                    },
+                    {
+                    label: 'Detalle',
+                    field: 'detalle',
+                    html: true
+                    },
+                
+                ],
+                rows: []
+
             },
             methods: {
                 buscar: function(tipo){
@@ -415,6 +504,7 @@
                         .then(response => {
                             this.requestSend = false;
                             this.clientes = response.data;
+                            
                         })
                         .catch(e => {
                             this.requestSend = false;
@@ -467,8 +557,27 @@
                             }
                         })
                         .then(response => {
+                            this.rows= [];
+
                             this.requestSend = false;
                             this.ventas = response.data;
+                            for (let i = 0; i < this.ventas.length; i++) {
+                                const item = {
+                                    codigo: this.ventas[i].nro_fact_ventas,
+                                    fecha: this.ventas[i].fecha,
+                                    cliente : this.ventas[i].cliente_nombre,
+                                    tipo : this.ventas[i].tipo_factura =='1' ? "Contado" : "Credito",
+                                    documento: this.ventas[i].documento,
+                                    total : new Intl.NumberFormat("de-DE").format(this.ventas[i].venta_total),
+                                    sucursal: this.ventas[i].suc_desc,
+                                    detalle : '<div class="btn-group"><button class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-bars"></span></button><div class="dropdown-menu dropdown-menu-right"><button class="dropdown-item" onclick="app.showDetalle('+this.ventas[i].nro_fact_ventas+',\'ventas\');"><span class="fa fa-file-alt"></span> Detalle</button><div class="dropdown-divider"></div><a href="pdf/boletaventa/'+this.ventas[i].nro_fact_ventas+'/" class="dropdown-item"><span class="fa fa-file-pdf"></span> Imprimir</a></div></div>'
+
+                                    }
+                                this.rows.push(item);
+                                
+                            }
+                            
+
                         })
                         .catch(e => {
                             this.requestSend = false;
@@ -502,19 +611,44 @@
                 Procesar: function() {
                     alert("Prueba ");
                 },
-                showDetalle: function(venta) {
-                    this.venta = venta;
+                showDetalle: function(id,tab) {
+                    if(tab=='ventas'){
+                        this.venta = this.ventas[this.ventas.findIndex(x => x.nro_fact_ventas== id)] ;
+                    }else{
+                        this.venta = this.clientes[this.clientes.findIndex(x => x.nro_fact_ventas== id)] ;
+                    }
+                    
                     $('#frmdetalle').modal('show');
                     this.getDetalle();
                 },
                 getDetalle: function() {
                     axios.get('infventa/detalle/' + this.venta.nro_fact_ventas)
-                        .then(response => {
-                            this.detalleVenta = response.data;
-                        })
-                        .catch(error => {
-
-                        })
+                    .then(response => {
+                        this.detalleVenta = response.data;
+                    })
+                    .catch(error => {
+                        console.log(error.message);
+                    })
+                    if(this.venta.tipo_factura=='2'){
+                        this.getCta();
+                    }
+                    
+                },
+                getCta: function(){
+                    axios.get('cuotas/' + this.venta.nro_fact_ventas)
+                    .then(response => {
+                        const c= response.data;
+                        this.cuotas= c;
+                        let saldo= 0;
+                        
+                        for (let i = 0; i < c.length; i++) {
+                            saldo += parseInt(c[i].monto_saldo);
+                        }
+                        this.Cuenta.saldo= saldo;
+                    })
+                    .catch(error => {
+                        console.log(error.message);
+                    })
                 },
                 getArticulo: function() {
                     this.requestSend = true;
@@ -533,6 +667,10 @@
                             this.requestSend = false;
                             this.error = e.message;
                         })
+                },
+                formatFecha: function(fecha) {
+                    const f = fecha.split("-");
+                    return f[2] + "/" + f[1] + "/" + f[0];
                 }
             },
             computed: {

@@ -81,7 +81,7 @@
                                 <div class="m-2">
                                     <in-number tabindex="5" v-model="precios[3].p" placeholder="Precio" @change="setMargen(3)"></in-number>
                                 </div>
-                                <div class="m-2">
+                                <div class="m-2"> 
                                     <in-number  v-model="precios[3].c" placeholder="Cuota"></in-number>
                                 </div>  
                             </div>

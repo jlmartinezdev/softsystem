@@ -237,7 +237,11 @@ __webpack_require__.r(__webpack_exports__);
       if (this.calcularcuota) {
         monto_cuota = Number.parseInt(Importe / cantidad);
       } else {
-        monto_cuota = this.datoscuota.monto_cuota;
+        if (this.entrega > 0) {
+          monto_cuota = Number.parseInt(Importe / cantidad);
+        } else {
+          monto_cuota = this.datoscuota.monto_cuota;
+        }
       }
 
       restoDivision = Importe % cantidad;

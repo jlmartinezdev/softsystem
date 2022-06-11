@@ -35,7 +35,7 @@
             <td>{{ $articulo->cantidad }}</td>
             
             <td>{{ $articulo->pre_venta1 }}</td>
-            @foreach ($precios->where('ARTICULOS_cod',$articulo->ARTICULOS_cod)->all() as $precio)
+            @foreach ($precios->where('ARTICULOS_cod',$articulo->ARTICULOS_cod)->sortBy('cant_cuota')->all() as $precio)
                 <td> {{$precio->monto_cuota}}</td>
             @endforeach
         </tr>

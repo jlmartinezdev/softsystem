@@ -54,7 +54,8 @@
 				
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-success" @click="finalizar"><span class="fa fa-check"></span> CONFIRMAR VENTA</button>
+				<button class="btn btn-success" @click="finalizar(true)"><span class="fa fa-print"></span> FINALIZAR E IMPRIMIR</button>
+				<button class="btn btn-primary" @click="finalizar(false)"><span class="fa fa-check"></span> FINALIZAR VENTA</button>
 				<button class="btn btn-secondary" data-dismiss="modal"><span class="fa fa-reply"></span> CANCELAR</button>
 			</div>
 		</div>

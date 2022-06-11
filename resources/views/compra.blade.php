@@ -186,7 +186,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
 	methods:{
 		setMargen: function(index) {
 			if (typeof(this.articulo.costo === 'string')) {
-				this.articulo.costo = this.articulo.costo * 1;
+				this.articulo.costo = parseInt(this.articulo.costo);
 			}
 			if (this.articulo.costo > 0 && this.precios[index].p > 0) {
 				if (this.precios[index].p > this.articulo.costo) {
@@ -200,7 +200,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
 		},
 		setPrecio: function(index) {
 			if (typeof(this.articulo.costo === 'string')) {
-				this.articulo.costo = this.articulo.costo * 1;
+				this.articulo.costo = parseInt(this.articulo.costo);
 			}
 			if (this.articulo.costo < 1) {
 				this.precios[index].p = 0;
@@ -211,8 +211,8 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
 				return;
 			}
 
-			var retornar = (this.articulo.costo * parseInt(this.precios[index].m)) / 100 + this.articulo
-				.costo
+			var retornar = parseInt((this.articulo.costo * parseInt(this.precios[index].m)) / 100 + this.articulo
+				.costo)
 			if (this.chprecio)
 				this.precios[index].p = this.redondear(retornar);
 			else

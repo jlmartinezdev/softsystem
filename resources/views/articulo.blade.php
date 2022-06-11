@@ -290,7 +290,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                         return false;
                     }
                     if (typeof(this.articulo.costo === 'string')) {
-                        this.articulo.costo = this.articulo.costo * 1;
+                        this.articulo.costo = parseInt(this.articulo.costo)
                     }
                     if (this.articulo.costo < 1) {
                         this.precios[index].p = 0;
@@ -301,8 +301,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                         return;
                     }
 
-                    var retornar = (this.articulo.costo * parseInt(this.precios[index].m)) / 100 + this.articulo
-                        .costo
+                    var retornar = parseInt((this.articulo.costo * parseInt(this.precios[index].m)) / 100 + this.articulo.costo)
                     if (this.chprecio)
                         this.precios[index].p = this.redondear(retornar);
                     else
@@ -758,8 +757,8 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                         if (response.data.length > 0)
                             for (i = 0; i < response.data.length; i++) {
                                 this.articulo.existePrecios = true;
-                                this.precios[i].p = response.data[i].p;
-                                this.precios[i].m = response.data[i].m;
+                                this.precios[i].p = parseInt(response.data[i].p);
+                                this.precios[i].m = parseInt(response.data[i].m);
                                 this.precios[i].c = response.data[i].c;
                             }
                         else

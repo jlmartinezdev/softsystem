@@ -588,15 +588,12 @@
                 return f[2] + "/" + f[1] + "/" + f[0];
             },
             subFecha: function(startFecha) {
-
                 const fechaInicio = new Date(startFecha).getTime();
-                const fechaFin = new Date().getTime();
-                
+                const fechaFin = new Date().getTime(); 
                 if (fechaInicio > fechaFin) {
                     return 0;
                 }
                 const diff = fechaFin - fechaInicio;
-
                 return parseInt(diff / (1000 * 60 * 60 * 24));
             },
             diferenciaFecha: function(fecha_vent, pagada) {

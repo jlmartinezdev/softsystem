@@ -425,7 +425,7 @@
             	}
             	
             },
-            finalizar: function(){
+            finalizar: function(print){
             	if(this.ventaCabecera.condicionventa==2 && this.cuotas.length < 1){
 					Swal.fire('Error','Por favor genere las cuotas','error');
 					return false;
@@ -435,8 +435,13 @@
             		this.carro= [];
             		localStorage.removeItem('carro_venta');
             		localStorage.removeItem('ventaCabecera');
-            		$('#finalizarventa').modal('hide');
-					window.location.reload();
+					if(print){
+						window.location.assign('/pdf/boletaventa/' + response.data);
+					}else{
+						$('#finalizarventa').modal('hide');
+						window.location.reload();
+					}
+            		
             	})
             	.catch(error =>{
             		Swal.fire('Error',error.message,'error');

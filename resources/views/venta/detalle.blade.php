@@ -9,12 +9,22 @@
                 </button>
             </div>
             <div class="modal-body">
-                <span class="pr-3"><span class="fa fa-grip-horizontal text-primary"></span><strong> Nro de
-                        Venta: @{{ venta.nro_fact_ventas }} |</strong></span>
-                <span class="pr-3"><span class="fa fa-calendar text-warning"></span><strong>
-                        Fecha:@{{ venta.venta_fecha }} | </strong></span>
-                <span><span class="fa fa-user-circle text-info"></span><strong> Cliente:
-                        @{{ venta.cliente_nombre }}</strong></span>
+                <div class="row">
+                    <div class="col-4">
+                        <span class="fa fa-grip-horizontal text-primary"></span><strong> Nro de
+                            Venta: @{{ venta.nro_fact_ventas }} |</strong>
+                    </div>
+                    <div class="col-4">
+                        <span class="fa fa-calendar text-warning"></span><strong>
+                        Fecha:@{{ venta.venta_fecha }}</strong>
+                    </div>
+                    <div class="col-4">
+                        <span class="fa fa-user-circle text-info"></span><strong> Cliente:
+                        @{{ venta.cliente_nombre }}</strong>
+                    </div>
+                </div>
+    
+                
                 <br><br>
                 <table class="table table-sm">
                     <tr>
