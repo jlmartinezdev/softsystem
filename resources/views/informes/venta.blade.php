@@ -10,7 +10,7 @@
 		overflow-y: initial !important
 	}
 	.modal-body{
-		height: 350px;
+		height: 390px;
 		overflow-y: auto;
 	}
 </style>
@@ -384,7 +384,7 @@
                             </table>
                             <div class="row">
                                 <div class="col-4">
-                                    Monto Cobrado: <strong>@{{ new Intl.NumberFormat("de-DE").format(venta.venta_total- Cuenta.saldo)}}</strong> 
+                                    Monto Cobrado: <strong>@{{ new Intl.NumberFormat("de-DE").format(Cuenta.montoCobrado)}}</strong> 
                                 </div>
                                 <div class="col-4">
                                     Saldo: <strong>@{{ new Intl.NumberFormat("de-DE").format(Cuenta.saldo)}}</strong> 
@@ -437,7 +437,7 @@
                 clientes: [],
                 articulos: [],
                 cuotas: [],
-                Cuenta: {cantitad: 0, montoCuota: 0, saldo: 0, cobrado : 0},
+                Cuenta: {cantitad: 0, montoCuota: 0, saldo: 0, cobrado : 0, montoCobrado: 0},
                 cantidadVenta: 0,
                 montoVenta: 0,
                 error: '',
@@ -640,11 +640,15 @@
                         const c= response.data;
                         this.cuotas= c;
                         let saldo= 0;
+                        let cobrado= 0;
                         
                         for (let i = 0; i < c.length; i++) {
                             saldo += parseInt(c[i].monto_saldo);
+                            cobrado += parseInt(c[i].monto_cobrado);
+
                         }
                         this.Cuenta.saldo= saldo;
+                        this.Cuenta.montoCobrado= cobrado;
                     })
                     .catch(error => {
                         console.log(error.message);

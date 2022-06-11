@@ -10,6 +10,7 @@
 			<div class="modal-body">
                 <span class="text-muted d-block">Articulo</span>
                 <span class="d-block"><strong>@{{preciosContado.articulo}}</strong></span>
+                <hr>
                 <nav>
 					<div class="nav nav-tabs" role="tablist">
 						<a class="nav-item nav-link active" data-toggle="tab" role="tab" href="#precio1" aria-controls="frmdescrip" aria-select="true"><strong>Precio Contado</strong></a>

@@ -100,7 +100,7 @@ class VentaController extends Controller
         $venta->cant_cuotas =0;
         $venta->intervalo_venc='2030-01-01'; 
         $venta->venta_estado='2'; 
-        $venta->venta_descuento='0'; 
+        $venta->venta_descuento=$request->ventaCabecera['descuento'] ; 
         $venta->forma_cobro= $request->ventaCabecera['formacobro']; 
         $venta->documento= $request->ventaCabecera['documento']; 
         $venta->save();
