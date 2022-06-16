@@ -1,5 +1,17 @@
 @extends('layouts.app')
 @section('title','Informe de Cobros')
+@section('style')
+<style type="text/css">
+	
+	.modal-dialog{
+		overflow-y: initial !important
+	}
+	.modal-body{
+		height: 390px;
+		overflow-y: auto;
+	}
+</style>
+@endsection
 @section('main')
  <div class="container" id="app">
         <h4>Informe de Cobros</h4>
@@ -48,6 +60,7 @@
                         <th>Nro Cobro</th>
                         <th>Fecha</th>
                         <th>Nro Recibo</th>
+                        <th>Cliente</th>
                         <th class="text-right">Importe</th>
                         <th><span class="fa fa-list"></span> Detalles</th>
                         <th><span class="fa fa-print"></span> Imprimir</th>
@@ -62,6 +75,7 @@
                             <td>@{{ cobro.cc_numero }}</td>
                             <td>@{{ formatFecha(cobro.cob_fecha) }}</td>
                             <td>@{{ numeroRecibo(cobro.recibon1,cobro.recibon2,cobro.nro_recibo) }}</td>
+                            <td>@{{ cobro.cliente_nombre }}</td>
                             <td>@{{ format(cobro.cob_importe) }}</td>
                             <td><button class="btn btn-link" @click="showDetalle(cobro)"> Detalle </button></td>
                             <td><a class="btn btn-link" :href="'documento/recibocobro/'+cobro.cc_numero"> Imprimir</a></td>
@@ -74,7 +88,7 @@
 
 
     <div class="modal fade" id="frmdetalle">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header bg-dark text-white">
                 <h6 class="modal-title">Detalle Cobro</h6>
@@ -84,11 +98,26 @@
                 </button>
             </div>
             <div class="modal-body">
-                <span class="pr-3"><span class="fa fa-grip-horizontal text-primary"></span><strong> Nro de Cobro: @{{cobro.cc_numero}} |</strong></span>
-                <span class="pr-3"><span class="fa fa-calendar text-warning"></span><strong> Fecha:@{{cobro.cob_fecha}} | </strong></span>
-                <span><span class="fa fa-user-circle text-info"></span><strong> Recibo: @{{numeroRecibo(cobro.recibon1,cobro.recibon2,cobro.nro_recibo)}}</strong></span>
-                <br><br>
-                <table class="table table-sm">
+                <div class="row text-center">
+                    <div class="col-3 border-right">
+                        <span><span class="fa fa-grip-horizontal text-primary"></span><strong> Nro de Cobro </strong></span>
+                        <span class="d-block">@{{cobro.cc_numero}}</span>
+                    </div>
+                    <div class="col-3 border-right">
+                        <span><span class="fa fa-calendar text-warning"></span><strong> Fecha </strong></span>
+                        <span class="d-block">@{{formatFecha(cobro.cob_fecha)}}</span>
+                    </div>
+                    <div class="col-4">
+                        <span><span class="fa fa-file text-info"></span><strong> Recibo </strong></span>
+                        <span class="d-block">@{{numeroRecibo(cobro.recibon1,cobro.recibon2,cobro.nro_recibo)}}</span>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <span>Cliente: <strong>@{{ cobro.cliente_nombre }}</strong></span>
+                </div>
+                <span class="badge bg-primary">Cuotas cobrados</span>
+                <div class="border border-primary">
+                    <table class="table table-sm table-striped">
                     <tr>
                         <th>Nro Venta</th>
                         <th>Nro Cuota</th>
@@ -101,9 +130,42 @@
                             <td>@{{d.nro_cuotas}}</td>
                             <td>@{{new Intl.NumberFormat("de-DE").format(d.importe)}}</td>
                             <td>@{{new Intl.NumberFormat("de-DE").format(d.cobrado)}}</td>
-                        </tr -->
+                        </tr>
                     </template> 
-                </table>
+                </table> 
+                </div>
+               
+
+                <span class="badge bg-success">Detalle Cuotas</span>
+                <div class="border border-success">
+                    <table class="table table-sm table-striped">
+                        <tr>
+                            <th>Nro Cuota</th>
+                            <th>Vencimiento</th>
+                            <th>Monto Cuota</th>
+                            <th>Monto Cobrado</th>
+                            <th>Saldo</th>
+                        </tr>
+                        <template v-for="c in cuotas">
+                            <tr>
+                                <td>@{{c.nro_cuotas}}</td>
+                                <td>@{{formatFecha(c.fecha_venc)}}</td>
+                                <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_cuota)}}</td>
+                                <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_cobrado)}}</td>
+                                <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_saldo)}}</td>
+                            </tr>
+                        </template>
+                    </table>
+                </div>
+                
+                <div class="row">
+                    <div class="col-4">
+                        Monto Cobrado: <strong>@{{ new Intl.NumberFormat("de-DE").format(Cuenta.montoCobrado)}}</strong> 
+                    </div>
+                    <div class="col-4">
+                        Saldo: <strong>@{{ new Intl.NumberFormat("de-DE").format(Cuenta.saldo)}}</strong> 
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <strong>Total @{{new Intl.NumberFormat("de-DE").format(cobro.cob_importe)}}</strong>
@@ -136,6 +198,8 @@
                 montoCobro:0,
                 error: '',
                 requestSend: false,
+                cuotas: [],
+                Cuenta: {cantitad: 0, montoCuota: 0, saldo: 0, cobrado : 0, montoCobrado: 0},
                 idSucursal: 0
             },
             methods: {
@@ -185,15 +249,39 @@
                         this.detalleCobro= response.data;
                     })
                     .catch(error =>{
+                        console.log(error.message);
+                    })
+                    this.getCuotas();
+                },
+                getCuotas: function(){
+                    axios.get('cuotas/' + this.cobro.nro_fact_ventas)
+                    .then(response => {
+                        const c= response.data;
+                        this.cuotas= c;
+                        let saldo= 0;
+                        let cobrado= 0;
+                        
+                        for (let i = 0; i < c.length; i++) {
+                            saldo += parseInt(c[i].monto_saldo);
+                            cobrado += parseInt(c[i].monto_cobrado);
 
+                        }
+                        this.Cuenta.saldo= saldo;
+                        this.Cuenta.montoCobrado= cobrado;
+                    })
+                    .catch(error => {
+                        console.log(error.message);
                     })
                 },
                 format: function(numero){
             	    return new Intl.NumberFormat("de-DE").format(numero);
                 },
                 formatFecha: function(fecha){
+                   if (typeof fecha !== 'undefined'){
                     const f = fecha.split("-");
                     return f[2]+"/"+f[1]+"/"+f[0];
+                   }
+                    
                 },
             },
             computed:{

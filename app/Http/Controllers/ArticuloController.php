@@ -143,6 +143,7 @@ class ArticuloController extends Controller
                 DB::insert('INSERT INTO precios VALUES (?,?,?,?,?,?)',[$i,$articulo->ARTICULOS_cod,$request->precios[$i-2]["p"],$request->precios[$i-2]["m"],$i,$request->precios[$i-2]["c"]]);
             }
         }
+        return $articulo->ARTICULOS_cod;
         
     }
 

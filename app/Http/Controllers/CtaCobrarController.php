@@ -83,9 +83,16 @@ class CtaCobrarController extends Controller
     }
     public function getCobroFecha(Request $request)
     {
-        $cobro = Cobro::whereBetween('cobranzas.cob_fecha', [$request->alld,$request->allh])->orderBy('cobranzas.cc_numero','DESC')->get();
+        $cobro = Cobro::join('cobranza_detalle as dc', 'cobranzas.cc_numero', 'dc.cc_numero')
+        ->join('ventas as v', 'dc.nro_fact_ventas', 'v.nro_fact_ventas')
+        ->join('clientes as c', 'v.clientes_cod', 'c.clientes_cod')
+        ->select('cobranzas.*','c.cliente_nombre','dc.nro_fact_ventas')
+        ->whereBetween('cobranzas.cob_fecha', [$request->alld,$request->allh])
+        ->orderBy('cobranzas.cc_numero','DESC')
+        ->get();
         return $cobro;
     }
+    
     public function getDetalleCobro($id)
     {
         $detalle = Cobro::join('cobranza_detalle as cd', 'cobranzas.cc_numero', 'cd.cc_numero')

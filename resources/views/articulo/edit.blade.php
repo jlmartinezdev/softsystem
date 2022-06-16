@@ -9,7 +9,7 @@
 		      </div>
 			<div class="modal-body">
 				<nav>
-					<div class="nav nav-tabs" role="tablist">
+					<div class="nav nav-tabs" id="tabedit" role="tablist">
 						<a class="nav-item nav-link active" data-toggle="tab" role="tab" href="#frmdescrip2" aria-controls="frmdescrip" aria-select="true">Descripcion</a>
 						<a class="nav-item nav-link" data-toggle="tab" role="tab" href="#frmstock2" aria-controls="frmstock" aria-select="false">Stock</a>
 						<a class="nav-item nav-link" data-toggle="tab" role="tab" href="#frmprecio2" aria-controls="frmprecio" aria-select="false">Precio</a>
@@ -35,7 +35,7 @@
 	    					<div class="col">
 	    						<div class="form-group">
 							      <strong><label for="descripcion">Descripcion *</label></strong>
-							      <input type="text" v-model="articulo.descripcion" class="form-control form-control-sm" name="descripcion" placeholder="Descripcion de Articulo">
+							      <input type="text" v-model="articulo.descripcion" class="form-control form-control-sm" name="descripcionE" placeholder="Descripcion de Articulo">
 							    </div>
 							</div>
 	    				

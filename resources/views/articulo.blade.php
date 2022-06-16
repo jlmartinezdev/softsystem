@@ -222,7 +222,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                     'desde': 0,
                     'hasta': 0
                 },
-                precios: defaultPrecio,
+                precios: {...defaultPrecio},
                 chcuota: false,
                 chprecio: false,
                 url: 'controller/ArticulosController.php',
@@ -242,8 +242,8 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                     columna: 0,
                     orden: 'ASC'
                 },
-                articulo: defaultArticulo,
-                stock: defaultStock,
+                articulo: {...defaultArticulo},
+                stock: {...defaultStock},
                 stocks: [],
                 error: '',
                 cantidadStock: 0,
@@ -454,10 +454,12 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                     this.viewPrecio= false;
                     this.cleanAll();
                     $('#addArticulo').modal('show');
+                    $('#tabadd a:first-child').tab('show')
                     //this.getUltimo();
                     setTimeout(function() {
                         $('input[name="cbarraN"]').focus();
-                    }, 1000);
+                        
+                    }, 500);
 
                     //document.getElementById("cbarraN").focus()
                 },
@@ -494,6 +496,12 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                     this.reservarC = false;
                     this.isnew = false;
                     this.viewPrecio= false;
+                    $('#tabedit a:first-child').tab('show')
+                    //this.getUltimo();
+                    setTimeout(function() {
+                        $('input[name="descripcionE"]').focus();
+                        
+                    }, 500);
                 },
                 setPrecioVenta: function() {
                     if (this.articulo.costo > 0) {
@@ -602,7 +610,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                 },
                 limpiarCamposStock: function() {
                     this.bandstock = 0;
-                    this.stock = defaultStock;
+                    this.stock = {...defaultStock};
                 },
                 cleanAll: function() {
                     this.stocks = [];
@@ -612,7 +620,8 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                         this.precios[i].m = 0;
                         this.precios[i].c = 0;
                     }
-                    this.articulo = defaultArticulo;
+                    this.articulo = {...defaultArticulo};
+
                 },
                 delStockA: function(id) {
                     const s = this.stocks.find(stock => stock.id == id);
