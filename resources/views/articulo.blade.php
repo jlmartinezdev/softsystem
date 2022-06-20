@@ -222,7 +222,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                     'desde': 0,
                     'hasta': 0
                 },
-                precios: {...defaultPrecio},
+                precios: [...defaultPrecio],
                 chcuota: false,
                 chprecio: false,
                 url: 'controller/ArticulosController.php',

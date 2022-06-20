@@ -486,7 +486,7 @@
                     })
                     .then(response => {
                         if (response.data > 0) {
-                            window.location.assign('/documento/recibocobro/' + response.data);
+                            window.location.assign('{{ env('APP_URL') }}'+'documento/recibocobro/' + response.data);
 
                         }
                     })

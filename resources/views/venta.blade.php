@@ -163,6 +163,7 @@
 		el: '#app',
 		data: {
 			requestSend:false,
+			requestFinalizar: false,
 			currentPage: 1,
 		    bootstrapPaginationClasses: { ul: 'pagination',li: 'page-item',liActive: 'active',liDisable: 'disabled', button: 'page-link'},
 		    customLabels: { first: 'Primer', prev: 'Ant',next: 'Sig', last: 'Ultimo' },
@@ -426,17 +427,22 @@
             	
             },
             finalizar: function(print){
+				if(this.requestFinalizar){
+					return false;
+				}
             	if(this.ventaCabecera.condicionventa==2 && this.cuotas.length < 1){
 					Swal.fire('Error','Por favor genere las cuotas','error');
 					return false;
 				}
+				this.requestFinalizar= true;
             	axios.post('venta',{ventaCabecera: this.ventaCabecera, detalle: this.carro, cuotas: this.cuotas})
             	.then(response =>{
+					this.requestFinalizar= false;
             		this.carro= [];
             		localStorage.removeItem('carro_venta');
             		localStorage.removeItem('ventaCabecera');
 					if(print){
-						window.location.assign('/pdf/boletaventa/' + response.data);
+						window.location.assign('{{ env('APP_URL') }}'+'pdf/boletaventa/' + response.data);
 					}else{
 						$('#finalizarventa').modal('hide');
 						window.location.reload();
@@ -444,6 +450,7 @@
             		
             	})
             	.catch(error =>{
+					this.requestFinalizar= false;
             		Swal.fire('Error',error.message,'error');
             	})
             },

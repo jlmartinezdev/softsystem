@@ -112,7 +112,9 @@ class VentaController extends Controller
                 $this->storeCtaCobrar($venta->nro_fact_ventas,$cuota);
                 if($cuota['tipo']=='Entrega'){
                     $this->storeCobro($request->ventaCabecera,$venta->nro_fact_ventas, $cuota);
-                    $this->storeMovimiento($request->ventaCabecera['idSucursal'],$request->ventaCabecera['nro_operacion'],[$venta->nro_fact_ventas,$cuota['monto']]);
+                    if(Auth::user()->cod_usuarios!= 1){
+                        $this->storeMovimiento($request->ventaCabecera['idSucursal'],$request->ventaCabecera['nro_operacion'],[$venta->nro_fact_ventas,$cuota['monto']]);
+                    }
                 }
             }
         }
@@ -132,6 +134,8 @@ class VentaController extends Controller
             ->increment('cantidad',$articulo['cantidad']);
         }
         DB::table('cobranza_detalle')->where('nro_fact_ventas',$request->id)->delete();
+        DB::table('cobranzas as c')->join('cobranza_detalle as cd','c.cc_numero','=','cd.cc_numero')
+        ->where('cd.nro_fact_ventas',$request->id)->delete();
         DB::table('ctas_cobrar')->where('nro_fact_ventas',$request->id)->delete();
         DB::table('detalle_venta')->where('nro_fact_ventas',$request->id)->delete();
         DB::table('ventas')->where('nro_fact_ventas',$request->id)->delete();

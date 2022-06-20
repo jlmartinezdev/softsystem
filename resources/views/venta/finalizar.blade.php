@@ -54,7 +54,12 @@
 				
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-success" @click="finalizar(true)"><span class="fa fa-print"></span> FINALIZAR E IMPRIMIR</button>
+				<template v-if="requestFinalizar">
+					<span class="spinner-border spinner-border-sm" role="status"></span><span class="sr-only">Finalizando...</span> Finalizando...
+				</template>
+				<button class="btn btn-success" @click="finalizar(true)">
+					<span class="fa fa-print"></span> FINALIZAR E IMPRIMIR
+				</button>
 				<button class="btn btn-primary" @click="finalizar(false)"><span class="fa fa-check"></span> FINALIZAR VENTA</button>
 				<button class="btn btn-secondary" data-dismiss="modal"><span class="fa fa-reply"></span> CANCELAR</button>
 			</div>

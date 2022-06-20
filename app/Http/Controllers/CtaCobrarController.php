@@ -11,6 +11,7 @@ use App\Sucursal;
 
 use DB;
 use PDF;
+use Auth;
 
 class CtaCobrarController extends Controller
 {
@@ -89,10 +90,11 @@ class CtaCobrarController extends Controller
         ->select('cobranzas.*','c.cliente_nombre','dc.nro_fact_ventas')
         ->whereBetween('cobranzas.cob_fecha', [$request->alld,$request->allh])
         ->orderBy('cobranzas.cc_numero','DESC')
+        ->groupBy('cobranzas.cc_numero')
         ->get();
         return $cobro;
     }
-    
+     
     public function getDetalleCobro($id)
     {
         $detalle = Cobro::join('cobranza_detalle as cd', 'cobranzas.cc_numero', 'cd.cc_numero')
@@ -214,7 +216,10 @@ class CtaCobrarController extends Controller
                 'interes'=> $cuota['interes']
             ]);
         }
-        $this->storeMovimiento($cobro);
+        if(Auth::user()->cod_usuarios!= 1){
+            $this->storeMovimiento($cobro);
+        }
+        
         return $cobro->cc_numero;
     }
     private function storeMovimiento($cobro)
@@ -251,16 +256,18 @@ class CtaCobrarController extends Controller
                 'estado' => '1'
             ]); */
         }
-        $movimiento= new MovimientoCaja();
-        $movimiento->nro_operacion= $request->nrooperacion;
-        $movimiento->mov_fecha= date('Y-m-d H:i');
-        $movimiento->mov_concepto= 'Anular Cobro Nº: '.$request->id;
-        $movimiento->mov_tipo= 'Salida';
-        $movimiento->mov_monto= $request->monto;
-        $movimiento->nro_fact_ventas= '-';
-        $movimiento->suc_cod= $request->idSucursal;
-        $movimiento->save();
-        //Cobro::where('cc_numero',$request->id)->delete();
+        if(Auth::user()->cod_usuarios!= 1){
+            $movimiento= new MovimientoCaja();
+            $movimiento->nro_operacion= $request->nrooperacion;
+            $movimiento->mov_fecha= date('Y-m-d H:i');
+            $movimiento->mov_concepto= 'Anular Cobro Nº: '.$request->id;
+            $movimiento->mov_tipo= 'Salida';
+            $movimiento->mov_monto= $request->monto;
+            $movimiento->nro_fact_ventas= '-';
+            $movimiento->suc_cod= $request->idSucursal;
+            $movimiento->save();
+            //Cobro::where('cc_numero',$request->id)->delete();
+        }
         return "OK";
 
     }
