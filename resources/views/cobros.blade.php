@@ -285,7 +285,7 @@
     var app = new Vue({
         el: "#app",
         data: {
-            request: { buscar: false,cuota: false,cliente: false },
+            request: { buscar: false,cuota: false,cliente: false, finalizar: false },
             txtbuscar: '',
             inNumberClass: {
                 input: 'form-control input-millares'
@@ -480,6 +480,10 @@
                 this.getApertura();
             },
             finalizar: function() {
+                if(this.request.finalizar){
+                    return false;
+                }
+                this.request.finalizar= true;
                 axios.post('cobro', {
                         cuotas: this.cuotasAcobrar,
                         cobro: this.cobro
@@ -491,6 +495,7 @@
                         }
                     })
                     .catch(error => {
+                        this.request.finalizar= false;
                         console.log(error.message);
                     })
 

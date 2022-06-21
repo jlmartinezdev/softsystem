@@ -18,6 +18,13 @@
                 
             </div>
             <div class="modal-footer">
+                <template v-if="request.finalizar">
+                    <div class="text-secondary">
+                        <span class="spinner-border spinner-border-sm" role="status"></span><span
+                        class="sr-only">Guardando espere...</span> Guardando espere...
+                    </div>
+                    
+                </template>
                 <button class="btn btn-success" @click="finalizar"> <span class="fa fa-save"></span> Finalizar</button>
                 <button class="btn btn-secondary"  data-dismiss="modal"><span class="fa fa-reply"></span> Cancelar</button>
             </div>

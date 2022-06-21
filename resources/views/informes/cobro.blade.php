@@ -18,41 +18,47 @@
         <div class="card">
 
             <div class="card-body">
-                <div class="form-inline mb-3">    
-                    <strong><label for="desde">Desde: </label></strong>
-                    <input type="date" class="form-control form-control-sm mx-2" v-model="fecha.desde" name="desde" placeholder="Desde Fecha">
+                <div class="form-inline">    
+                    <strong><label class="mr-sm-2" for="desde">Desde: </label></strong>
+                    <input type="date" class="form-control form-control-sm my-1 mr-sm-2" v-model="fecha.desde" name="desde" placeholder="Desde Fecha">
 
-                    <strong><label for="hasta">Hasta: </label></strong>
-                    <input type="date" class="form-control form-control-sm  mx-2" v-model="fecha.hasta"name="hasta" placeholder="Hasta Fecha">
+                    <strong><label class=" mr-sm-2" for="hasta">Hasta: </label></strong>
+                    <input type="date" class="form-control form-control-sm  my-1 mr-sm-2" v-model="fecha.hasta" name="hasta" placeholder="Hasta Fecha">
 
-                    <strong><label for="hasta">Sucursal: </label></strong>
-                    <select class="form-control form-control-sm mx-2" v-model="idSucursal">
+                    <strong><label class="mr-sm-2" for="sucursal">Sucursal: </label></strong>
+                    <select class="form-control form-control-sm my-1 mr-sm-2" id="sucursal" v-model="idSucursal">
                         <option value="0">Todas</option>
                         @foreach($sucursales as $s)
                             <option value="{{$s['suc_cod']}}">{{ $s['suc_desc']}}</option>
                         @endforeach
-                    </select>
-                    
-
-                    <strong><label for="hasta">&nbsp;</label></strong>
-                    <button @click="getCobro" class="btn btn-primary btn-sm">
-                        <template v-if="requestSend">
-                            <span class="spinner-border spinner-border-sm" role="status"></span><span class="sr-only">Cargando...</span> Cargando...
-                        </template>
-                        <template v-else>
-                            <span class="fa fa-search"></span> Buscar
-                        </template>
-                    </button>&nbsp;
-                    
-                    
+                    </select>      
                 </div>
-                
+                <div class="row">
+                    <div class="col-md-9 my-1">
+                        <input type="text" v-model="txtbuscar" class="form-control form-control" placeholder="Buscar cliente...">
+                    </div>
+                    <div class="col-md-3 my-1">
+                        <button @click="getCobro" class="btn btn-primary btn-block">
+                            <template v-if="requestSend">
+                                <span class="spinner-border spinner-border-sm" role="status"></span><span class="sr-only">Cargando...</span> Cargando...
+                            </template>
+                            <template v-else>
+                                <span class="fa fa-search"></span> Buscar
+                            </template>
+                        </button>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mt-2">
+                    
                     <template>
-                        <div class="form-inline">
-                        <h6 class="text-muted"><span class="fa fa-calendar-minus"></span> Total de Cobros <span class="badge badge-pill badge-info" >@{{ totalCobro }}</span></h6>
-                        <h6 class="ml-4 text-muted"><span class="fa fa-money-bill"></span> Monto de Gs <span class="badge badge-pill badge-info">@{{ new Intl.NumberFormat("de-DE").format(totalGuaranies) }}</span></h6>
+                        <div class="d-flex ml-2">
+                            <h6 class="text-muted"><span class="fa fa-calendar-minus"></span> Total de Cobros <span class="badge badge-pill badge-info" >@{{ totalCobro }}</span></h6>
+                            <h6 class="ml-4 text-muted"><span class="fa fa-money-bill"></span> Monto de Gs <span class="badge badge-pill badge-info">@{{ new Intl.NumberFormat("de-DE").format(totalGuaranies) }}</span></h6>
                         </div>
                     </template>
+                </div>
+                    
                 
                 
                 <table class="table table-sm table-hover table-striped table-responsive-sm ">
@@ -200,7 +206,8 @@
                 requestSend: false,
                 cuotas: [],
                 Cuenta: {cantitad: 0, montoCuota: 0, saldo: 0, cobrado : 0, montoCobrado: 0},
-                idSucursal: 0
+                idSucursal: 0,
+                txtbuscar: ''
             },
             methods: {
                
@@ -222,7 +229,8 @@
                             params: {
                                 alld: this.fecha.desde,
                                 allh: this.fecha.hasta,
-                                alls: this.idSucursal
+                                alls: this.idSucursal,
+                                search: this.txtbuscar
                             }
                         })
                         .then(response => {

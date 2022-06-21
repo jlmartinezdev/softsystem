@@ -22,10 +22,9 @@ class CtaCobrar extends Model
             }else {
                 return $query->where('c.cliente_nombre','LIKE',"%$cliente%");
             }
-        }
-            
-            
+        }        
     }
+   
     public function scopeDireccion($query,$direccion){
         if($direccion){
             if(strtoupper($direccion)=='TODOS'){

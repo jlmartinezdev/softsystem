@@ -121,7 +121,7 @@ class ArticuloController extends Controller
         $articulo->save();
         $articulo= Articulo::latest('ARTICULOS_cod', 'desc')->first();
         $cbarra= null;
-        if (!is_null($request->c_barra)){
+        if (!is_null($request->articulo['c_barra'])){
             $cbarra=$request->articulo['c_barra'];
         }else{
             $cbarra= $this->rellenar($articulo->ARTICULOS_cod);

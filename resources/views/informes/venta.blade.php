@@ -352,7 +352,7 @@
                                 <th>Importe</th>
                             </tr>
                             <template v-for="d in detalleVenta">
-                                <tr>
+                                <tr> 
                                     <td>@{{ d.producto_c_barra }}</td>
                                     <td>@{{ d.producto_nombre }}</td>
                                     <td>@{{ parseInt(d.venta_cantidad) }}</td>
@@ -371,6 +371,8 @@
                                     <th>Monto Cuota</th>
                                     <th>Monto Cobrado</th>
                                     <th>Saldo</th>
+                                    <td>Mora</td>
+                                    <td>Estado</td>
                                 </tr>
                                 <template v-for="c in cuotas">
                                     <tr>
@@ -379,6 +381,15 @@
                                         <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_cuota)}}</td>
                                         <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_cobrado)}}</td>
                                         <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_saldo)}}</td>
+                                        <td>@{{ diferenciaFecha(c.fecha_venc, c.monto_cobrado) }}</td>
+                                        <td>
+                                            <template v-if="c.monto_cobrado == c.monto_cuota">
+                                                <span class="badge badge-success">Cobrado</span>
+                                            </template>
+                                            <template v-else>
+                                                <span class="badge badge-danger">Pendiente</span>
+                                            </template>
+                                        </td>
                                     </tr>
                                 </template>
                             </table>
@@ -675,7 +686,24 @@
                 formatFecha: function(fecha) {
                     const f = fecha.split("-");
                     return f[2] + "/" + f[1] + "/" + f[0];
-                }
+                },
+                subFecha: function(startFecha) {
+                    const fechaInicio = new Date(startFecha).getTime();
+                    const fechaFin = new Date().getTime(); 
+                    if (fechaInicio > fechaFin) {
+                        return 0;
+                    }
+                    const diff = fechaFin - fechaInicio;
+                    return parseInt(diff / (1000 * 60 * 60 * 24));
+                },
+                diferenciaFecha: function(fecha_vent, pagada) {
+                    const dia = this.subFecha(fecha_vent)
+                    if (pagada == 0) {
+                        return dia
+                    } else {
+                        return "-"
+                    }
+                },
             },
             computed: {
                 totalVenta() {

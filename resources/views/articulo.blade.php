@@ -131,6 +131,9 @@
                                             <button class='dropdown-item'
                                                 @click="showDetalle( a.ARTICULOS_cod,a.producto_nombre )"><span
                                                     class="fa fa-retweet text-primary"></span> Transferir</button>
+                                            <button class="dropdown-item" @click="duplicar(a)">
+                                                <span class="fa fa-copy text-primary"></span> Duplicar
+                                            </button>
                                         </div>
                                     </div>
 
@@ -465,6 +468,20 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                 },
                 showEArticulo: function(a) {
                     $('#editArticulo').modal('show');
+                    this.setArticulo(a);
+                    this.getStock(a.ARTICULOS_cod);
+                    this.getPrecios(a.ARTICULOS_cod);
+                    this.reservarC = false;
+                    this.isnew = false;
+                    this.viewPrecio= false;
+                    $('#tabedit a:first-child').tab('show')
+                    //this.getUltimo();
+                    setTimeout(function() {
+                        $('input[name="descripcionE"]').focus();
+                        
+                    }, 500);
+                },
+                setArticulo: function(a){
                     this.articulo = {
                         'codigo': a.ARTICULOS_cod,
                         'c_barra': a.producto_c_barra,
@@ -491,17 +508,21 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                         'svenc': '0',
                         existePrecios: false
                     }
-                    this.getStock(a.ARTICULOS_cod);
-                    this.getPrecios(a.ARTICULOS_cod);
-                    this.reservarC = false;
-                    this.isnew = false;
+                },
+                duplicar: function(articulo){
+                    this.isnew = true;
                     this.viewPrecio= false;
-                    $('#tabedit a:first-child').tab('show')
+                    this.setArticulo(articulo);
+                    this.articulo.codigo = '';
+                    this.articulo.c_barra = '';
+                    $('#addArticulo').modal('show');
+                    $('#tabadd a:first-child').tab('show')
                     //this.getUltimo();
                     setTimeout(function() {
-                        $('input[name="descripcionE"]').focus();
+                        $('input[name="cbarraN"]').focus();
                         
                     }, 500);
+
                 },
                 setPrecioVenta: function() {
                     if (this.articulo.costo > 0) {

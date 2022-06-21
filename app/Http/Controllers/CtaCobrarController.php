@@ -88,7 +88,7 @@ class CtaCobrarController extends Controller
         ->join('ventas as v', 'dc.nro_fact_ventas', 'v.nro_fact_ventas')
         ->join('clientes as c', 'v.clientes_cod', 'c.clientes_cod')
         ->select('cobranzas.*','c.cliente_nombre','dc.nro_fact_ventas')
-        ->whereBetween('cobranzas.cob_fecha', [$request->alld,$request->allh])
+        ->clientes($request)
         ->orderBy('cobranzas.cc_numero','DESC')
         ->groupBy('cobranzas.cc_numero')
         ->get();

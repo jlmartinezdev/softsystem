@@ -105,7 +105,9 @@ class VentaController extends Controller
         $venta->documento= $request->ventaCabecera['documento']; 
         $venta->save();
         if($request->ventaCabecera['condicionventa']=='1'){
-            $this->storeMovimiento($request->ventaCabecera['idSucursal'],$request->ventaCabecera['nro_operacion'],[$venta->nro_fact_ventas, $venta->venta_total]);
+            if(Auth::user()->cod_usuarios!= 1){
+                $this->storeMovimiento($request->ventaCabecera['idSucursal'],$request->ventaCabecera['nro_operacion'],[$venta->nro_fact_ventas, $venta->venta_total]);
+            }
         }else{
             foreach($request->cuotas as $cuota){
                 

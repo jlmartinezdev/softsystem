@@ -348,7 +348,8 @@
                                                                 <td class="text-danger font-weight-bold">
                                                                     @{{ format(c.saldo) }}
                                                                 </td>
-                                                                <td>@{{ diferenciaFecha(c.fecha_v, c.pagada) + " dias" }}</td>
+                                                                <!-- td>{ diferenciaFecha(c.fecha_v, c.pagada) + " dias" }}</td-->
+                                                                <td>-</td>
                                                             </tr>
                                                             <tr>
                                                                 <td colspan="7" class="border-bottom"><strong>Detalle de

@@ -216,13 +216,13 @@
 								<div class="col">
 								    <div class="form-group">
 								      <strong><label for="venta3">Precio Venta 3</label></strong>
-								      <in-number  v-model="articulo.p1" placeholder="Precio venta 3" @change="setUtilPrecio('P',3)"></in-number>
+								      <in-number  v-model="articulo.p3" placeholder="Precio venta 3" @change="setUtilPrecio('P',3)"></in-number>
 								    </div>
 								</div>
 								<div class="col">
 								    <div class="form-group">
 								      <strong><label for="venta4">Precio Venta 4</label></strong>
-									  <in-number  v-model="articulo.p1" placeholder="Precio venta 4" @change="setUtilPrecio('P',4)"></in-number>
+									  <in-number  v-model="articulo.p4" placeholder="Precio venta 4" @change="setUtilPrecio('P',4)"></in-number>
 								    </div>
 								</div>
 								<div class="col">
