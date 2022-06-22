@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Stock;
+use App\Seccion;
+use App\Unidad;
 use DB;
 
 class StockController extends Controller
@@ -17,7 +19,11 @@ class StockController extends Controller
     {
         //
     }
-
+    public function infstock(){
+        $secciones= Seccion::All();
+        $unidades = Unidad::All();
+        return view('informes.stock',compact('secciones','unidades'));
+    }
     /**
      * Show the form for creating a new resource.
      *

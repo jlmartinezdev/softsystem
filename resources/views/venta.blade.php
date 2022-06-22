@@ -236,6 +236,13 @@
 			        
 		  	},
 		  	showBuscar: function(){
+				var Toast = Swal.mixin({
+					toast: true,
+					position: 'top-end',
+					showConfirmButton: false,
+					timer: 3000
+				});
+	
 		  		var t=parseFloat(this.txtbuscar);
 		  		if(isNaN(t)){
 		  			$('#busquedaArticulo').modal('show');
@@ -250,8 +257,12 @@
 		  					else
 		  						this.addCarrito(articulo[0],articulo[0].id_stock);
 		  				}
-		  				else
-		  					Swal.fire('Atención..','Codigo ingresado no existe en la Base de Datos...','warning')
+		  				else{
+							Toast.fire({
+								icon: 'error',
+								title: 'Codigo ingresado no existe en la Base de Datos...'
+							})
+						}
 		  			})
 		  			.catch(error =>{
 		  				console.log(error.message)

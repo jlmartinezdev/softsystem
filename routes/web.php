@@ -10,6 +10,10 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::post('usuario', 'UserController@store');
     Route::delete('usuario/{id}', 'UserController@destroy');
     Route::get('usuario', 'UserController@index')->name('usuario');
+
+
+    //Stock
+    Route::get('excel/articulos_costo/','ArticuloController@export_costo');
 });
     //Articulos
     Route::get('inf/articulo', 'ArticuloController@informe')->name('articulo@informe');
@@ -23,9 +27,11 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::delete('articulo/res/{id}', 'ArticuloController@destroy')->name('articulo.destroy');
     
     
+    
     //STOCK
     Route::delete('stock/{id}', 'StockController@destroy');
     Route::post('stock/{id}', 'StockController@update');
+    Route::get('stock/informe','StockController@infstock')->name('infstock');
     //VENTA
     Route::get('infventa', 'VentaController@indexInf')->name('infventa');
     Route::get('infventa/fecha', 'VentaController@getVentaByFecha')->name('infventa.fecha');

@@ -243,6 +243,11 @@ class ArticuloController extends Controller
         //return (new InvoicesExport(2018))->download('invoices.xlsx');
         return (new ArticulosExport)->filtro($request)->download('articulos.xlsx');
     }
+    public function export_costo(Request $request){
+        //return Excel::download(new ArticulosExport, 'articulos.xlsx');
+        //return (new InvoicesExport(2018))->download('invoices.xlsx');
+        return (new ArticulosExportCosto)->filtro($request)->download('articulos.xlsx');
+    }
     public function exportPrecio(Request $request){
       
         $date = date('d_m_Y');

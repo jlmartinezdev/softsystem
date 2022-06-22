@@ -190,6 +190,12 @@
                                 <p>Cobros</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('infstock') }}" id="m_istock" class="nav-link">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Stock</p>
+                            </a>
+                        </li>
 
                     </ul>
                 </li>

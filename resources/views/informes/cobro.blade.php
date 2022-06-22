@@ -35,7 +35,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-9 my-1">
-                        <input type="text" v-model="txtbuscar" class="form-control form-control" placeholder="Buscar cliente...">
+                        <input type="text" v-model="txtbuscar" @keyup.enter="getCobro" class="form-control form-control" placeholder="Buscar cliente...">
                     </div>
                     <div class="col-md-3 my-1">
                         <button @click="getCobro" class="btn btn-primary btn-block">

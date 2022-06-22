@@ -34,8 +34,9 @@ class ProveedorController extends Controller
     }
     public function store(Request $request){
         $ultimo= $this->ultimo();
+        $ultimo = is_null($ultimo) ? 0 : $ultimo->PROVEEDOR_cod;
         $p= new Proveedor();
-        $p->PROVEEDOR_cod= $ultimo->PROVEEDOR_cod + 1;
+        $p->PROVEEDOR_cod= $ultimo + 1;
         $p->nacio_cod= $request->idnacionalidad; 
         $p->CIUDAD_cod= $request->idciudad; 
         $p->proveedor_nombre= $request->nombre;
