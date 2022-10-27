@@ -113,6 +113,10 @@
                                                 <button class='dropdown-item text-primary'
                                                     @click="showCuotas(c.nro_fact_ventas)"><span
                                                         class="fa fa-list"></span> Seleccionar Cuota</button>
+                                                <div class="dropdown-divider"></div>
+                                                <a :href="'documento/extractocuenta/'+c.nro_fact_ventas" class="dropdown-item text-primary">
+                                                    <span class="fa fa-print"> </span> Estado de Cuenta
+                                                </a>
 
                                             </div>
                                         </div>
@@ -574,6 +578,7 @@
                 }
             },
             modalCobroParcial: function() {
+                
                 if (this.cobro.saldo > 0 && this.cuotasAcobrar.length==0) {
                     $('#cobroParcial').modal('show');
                     $('#txtparcial').focus();

@@ -10,6 +10,7 @@ use DB;
 use App\Exports\ArticulosExport;
 use App\Exports\articulosPreciosExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Auth;
 
 class ArticuloController extends Controller
 {
@@ -20,6 +21,7 @@ class ArticuloController extends Controller
     }
     public function index()
     {
+        
         $secciones= Seccion::All();
         $unidades = Unidad::All();
         return view('articulo',compact('secciones','unidades'));
@@ -36,25 +38,15 @@ class ArticuloController extends Controller
             $articulos = Articulo::join('stock', 'articulos.articulos_cod', '=', 'stock.articulos_cod')
             ->join('presentacion','articulos.present_cod','=','presentacion.present_cod')
             ->join('unidad','articulos.uni_codigo','=','unidad.uni_codigo')
-                ->select(  'articulos.*','presentacion.present_descripcion',DB::raw('SUM(stock.cantidad) AS cantidad'),'unidad.uni_nombre','unidad.uni_abreviatura')
-                ->descripcion($buscar)
-                ->seccion($seccion)
-                ->bysucursal($idsucursal)
-                ->groupBy('articulos.articulos_cod')
-                ->orderBy($columna, $request->ord)
-                ->paginate(100);
+            ->select(  'articulos.*','presentacion.present_descripcion',DB::raw('SUM(stock.cantidad) AS cantidad'),'unidad.uni_nombre','unidad.uni_abreviatura')
+            ->descripcion($buscar)
+            ->seccion($seccion)
+            ->bysucursal($idsucursal)
+            ->groupBy('articulos.articulos_cod')
+            ->orderBy($columna, $request->ord)
+            ->get();
         
-        return [
-            'paginacion' => [
-                'total' => $articulos->total(),
-                'pagina_actual' => $articulos->currentPage(),
-                'por_pagina' => $articulos->perPage(),
-                'ultima_pagina' => $articulos->lastPage(),
-                'desde' => $articulos->firstItem(),
-                'hasta' => $articulos->lastItem()
-            ],
-            'articulos' => $articulos
-        ];
+        return $articulos;
     }
     public function getPrecios($id){
         return DB::select("SELECT truncate(precio,0) as p, truncate(margen,0) as m, truncate(monto_cuota,0) as c FROM precios where ARTICULOS_cod=".$id);
@@ -129,9 +121,28 @@ class ArticuloController extends Controller
         Articulo::where('articulos_cod',$articulo->ARTICULOS_cod)->update([
             'producto_c_barra'=>$cbarra
         ]);
-        
-        for ($i=0; $i <count($request->stock) ; $i++) { 
-            DB::select('call insert_stock(?,?,?,?,?,?)',[$articulo->ARTICULOS_cod,$request->stock[$i]['sucursal'],$request->stock[$i]['cantidad'],$this->setVencimiento($request->stock[$i]['vencimiento']),$request->stock[$i]['loteold'],$request->stock[$i]['lotenew']]);
+        $stock= array();
+        if( Auth::user()->roles()->first()->nom_rol!='Administrador'){
+            for ($i=0; $i <count($request->stock); $i++){
+                $temp= array('sucursal' => $request->stock[$i]['sucursal'], 
+                    'cantidad' => 0,
+                    'vencimiento' => $request->stock[$i]['vencimiento'],
+                    'loteold' => $request->stock[$i]['loteold'],
+                    'lotenew' => $request->stock[$i]['lotenew']);
+                array_push($stock,$temp);
+            }
+        }else{
+            for ($i=0; $i <count($request->stock); $i++){
+                $temp= array('sucursal' => $request->stock[$i]['sucursal'], 
+                    'cantidad' => $request->stock[$i]['cantidad'],
+                    'vencimiento' => $request->stock[$i]['vencimiento'],
+                    'loteold' => $request->stock[$i]['loteold'],
+                    'lotenew' => $request->stock[$i]['lotenew']);
+                array_push($stock,$temp);
+            }
+        }
+        for ($i=0; $i <count($stock) ; $i++) { 
+            DB::select('call insert_stock(?,?,?,?,?,?)',[$articulo->ARTICULOS_cod,$stock[$i]['sucursal'],$stock[$i]['cantidad'],$this->setVencimiento($stock[$i]['vencimiento']),$stock[$i]['loteold'],$stock[$i]['lotenew']]);
         }
        
         $suma= 0;
@@ -191,8 +202,10 @@ class ArticuloController extends Controller
             'producto_formula'=> '',
             'producto_dimagen'=> ''
         ]);
-        for ($i=0; $i < count($request->stock) ; $i++) { 
-            DB::select('call insert_stock(?,?,?,?,?,?)',[$id,$request->stock[$i]['sucursal'],$request->stock[$i]['cantidad'],$this->setVencimiento($request->stock[$i]['vencimiento']),$request->stock[$i]['loteold'],$request->stock[$i]['lotenew']]);
+        if( Auth::user()->roles()->first()->nom_rol=='Administrador'){
+            for ($i=0; $i < count($request->stock) ; $i++) { 
+                DB::select('call insert_stock(?,?,?,?,?,?)',[$id,$request->stock[$i]['sucursal'],$request->stock[$i]['cantidad'],$this->setVencimiento($request->stock[$i]['vencimiento']),$request->stock[$i]['loteold'],$request->stock[$i]['lotenew']]);
+            }
         }
         $suma = 0;
         for($i=0;$i<=10;$i++){

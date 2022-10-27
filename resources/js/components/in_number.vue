@@ -7,7 +7,7 @@ const defaultClasses ={
 }
 export default {
     name: "inNumber",
-    props: ["value","placeholder","clases","id","tabindex"],
+    props: ["value","placeholder","clases","id","tabindex","enabled"],
     data() {
         return {
             text: "",

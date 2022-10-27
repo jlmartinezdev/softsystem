@@ -49,10 +49,10 @@
         <tbody>  
         <template v-for="c in cuotas">
             <tr>
-            <td>{{c.nro}}</td>
-            <td>{{new Intl.NumberFormat("de-DE").format(c.monto)}}</td>
-            <td>{{c.vencimiento}}</td>
-            <td>{{c.tipo}}</td>
+                <td>{{c.nro}}</td>
+                <td>{{new Intl.NumberFormat("de-DE").format(c.monto)}}</td>
+                <td>{{c.vencimiento}}</td>
+                <td>{{c.tipo}}</td>
             </tr>
         </template>
         </tbody>

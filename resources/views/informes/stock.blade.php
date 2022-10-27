@@ -65,17 +65,13 @@
                             </div>
                             <div class="pl-3" style="margin-top: -7pt;">
                                 <!-- Example single danger button -->
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
-                                        aria-expanded="false">
-                                        <span class="fa fa-file-excel"></span> Exportar
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        <button class="dropdown-item" @click="exportar('stock')">Con Stock</button>
-                                        <div class="dropdown-divider"></div>
-                                        <button class="dropdown-item" @click="exportar('precios')">Precios Creditos</button>
-                                    </div>
-                                </div>
+                              
+                                <button type="button" class="btn btn-success"  @click="exportar('stock')">
+                                    <span class="fa fa-file-excel"></span> Exportar
+                                </button>
+                                    
+                                    
+                                
 
                             </div>
                             <!--div class="pl-3">
@@ -104,9 +100,9 @@
                             <th>Codigo</th>
                             <th>Descripcion</th>
                             <th>Seccion</th>
-                            <th class="text-right">Precio</th>
+                            <th class="text-right">Precio Costo</th>
                             <th>Stock</th>
-                            <th>Opciones</th>
+                            
                         </tr>
                     </thead>
                     <tbody style="font-family: Arial,Helvetica,sans-serif;">
@@ -117,21 +113,6 @@
                                 <td>@{{ a.present_descripcion }}</td>
                                 <td class="font-weight-bold text-right">@{{ separador(a.producto_costo_compra) }}</td>
                                 <td class="text-center font-weight-bold">@{{ a.cantidad }}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        <button class="btn btn-link dropdown-toggle" data-toggle="dropdown"
-                                            aria-haspopup="true" aria-expanded="false">
-                                            <span class="fa fa-bars"></span>
-                                        </button>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                           
-                                            <button class='dropdown-item' @click="verPreciosCredito( a.ARTICULOS_cod, a.producto_costo_compra)"><span
-                                                class="fa fa-edit text-primary"></span> Ver Precios Credito</button>
-                                            
-                                        </div>
-                                    </div>
-
-                                </td>
                             </tr>
                         </template>
                     </tbody>

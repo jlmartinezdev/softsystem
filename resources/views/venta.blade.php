@@ -303,7 +303,7 @@
 	  					cantidad: 1,
 	  					stock: a.cantidad,
 	  					precio: a.pre_venta1,
-	  					p1: a.pre_venta1,
+	  					p1: parseInt(a.pre_venta1),
 	  					p2: a.pre_venta2,
 	  					p3: a.pre_venta3,
 	  					p4: a.pre_venta4,
@@ -466,7 +466,7 @@
             	})
             },
             numeroaletra: function(n){
-            	return NumeroALetras.NumeroALetras(n);
+            	return NumeroALetras.NumeroALetras(parseInt(n));
             },
             saveDatos: function(){
             	localStorage.setItem('carro_venta',JSON.stringify(this.carro));

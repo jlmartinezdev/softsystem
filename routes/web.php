@@ -5,8 +5,10 @@ Route::get('/', 'HomeController@index')->name('home');
 Route::group(['middleware' => ['administrador']], function () {
     Route::get('anularventa','VentaController@indexanular')->name('anularventa');
     Route::get('anularcobro','CtaCobrarController@indexanular')->name('anularcobro');
+    Route::get('anularcompra','CompraController@indexanular')->name('anularcompra');
     Route::post('anular_venta','VentaController@destroy');
     Route::post('anular_cobro','CtaCobrarController@destroy');
+    Route::post('anular_compra','CompraController@destroy');
     Route::post('usuario', 'UserController@store');
     Route::delete('usuario/{id}', 'UserController@destroy');
     Route::get('usuario', 'UserController@index')->name('usuario');
@@ -53,6 +55,7 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('infcompra/detalle/{id}', 'CompraController@getDetalle');
     Route::get('compra', 'CompraController@index')->name('compra');
     Route::post('compra', 'CompraController@store');
+    Route::get('compra/cabecera/{id}','CompraController@getCabecera');
     Route::get('compra/historial', 'CompraController@getHistorialPrecio');
     Route::get('infcompra/fecha', 'CompraController@getCompraByFecha');
     //PROVEEDOR
@@ -115,6 +118,7 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('excel/articulosprecios/','ArticuloController@exportPrecio');
     // DOCUMENTO A IMPRIMIR 
     Route::get('documento/recibocobro/{id}','CtaCobrarController@printRecibo');
+    Route::get('documento/extractocuenta/{id}','CtaCobrarController@printExtracto');
 
     Route::get('/clear-cache', 'AperturaController@comando');
     //TICKET

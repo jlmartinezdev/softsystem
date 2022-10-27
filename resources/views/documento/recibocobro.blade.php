@@ -55,12 +55,14 @@
                     <th style="width: 100px" class="pl-2"> Nro. Cuota</th>
                     <th style="width: 150px" class="pl-2"> Importe</th>
                     <th style="width: 150px" class="pl-2"> Interes por Mora</th>
+                    <th style="width: 150px" class="pl-2"> Dias de atraso</th>
                 </tr>
                 @foreach($cuotas as $cuota)
                 <tr>
                     <td>&nbsp;&nbsp;{{$cuota->nro_cuotas}} de {{  $cantidad_cuotas[array_search($cuota->nro_fact_ventas, array_column($cantidad_cuotas, 'nro_fact_ventas'))]['cantidad']}}</td>
                     <td>&nbsp;&nbsp;{{number_format($cuota->cobrado,2,",",".")}}</td>
                     <td>&nbsp;&nbsp;{{number_format($cuota->interes,2,",",".")}}</td>
+                    <td>&nbsp;&nbsp;{{ $cuota->interes> 0 ? diferenciaFecha($cuota->fecha_venc) : "-"}}</td>
                 </tr>
                 @endforeach
             </table>
@@ -89,8 +91,35 @@
 
 </body>
 <script>
-    function imprimir(){
 
+    formatFecha= function(fecha) {
+        const f = fecha.split("-");
+        return f[2] + "/" + f[1] + "/" + f[0];
+    } 
+    subFecha= function(startFecha) {
+        const fechaInicio = new Date(startFecha).getTime();
+        const fechaFin = new Date().getTime(); 
+        if (fechaInicio > fechaFin) {
+            return 0;
+        }
+        const diff = fechaFin - fechaInicio;
+        return parseInt(diff / (1000 * 60 * 60 * 24));
+    }
+    diferenciaFecha= function(fecha_vent, pagada) {
+        //2016-07-12
+        const dia = subFecha(fecha_vent)
+        
+        //let diferenciaFecha = 0;
+        if (pagada == 0) {
+            /* if ((dia - 30) > 0) {
+                return dia - 30;
+            } else {
+                return "-";
+            } */
+            return dia
+        } else {
+            return "-"
+        }
     }
 </script>
 </html>

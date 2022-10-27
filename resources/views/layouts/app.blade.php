@@ -17,6 +17,7 @@
     <link href="{{ asset('css/adminlte.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/all.css') }}" rel="stylesheet">
     <link href="{{ asset('css/OverlayScrollbars.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/vue-good-table.min.css') }}" rel="stylesheet">
     @yield("style")
 </head>
 
@@ -46,6 +47,8 @@
     <script src="{{ asset('js/jquery.overlayScrollbars.min.js') }}"></script>
     <script src="{{ asset('js/adminlte.min.js') }}"></script>
     <script src="{{ asset('js/date.format.js') }}"></script>
+    <script src="{{ asset('js/vue-good-table.min.js') }}"></script>
+    
     <script type="text/javascript">
         function activarMenu(nivel1, subnivel) {
             let menu_nivel1 = document.getElementById(nivel1);

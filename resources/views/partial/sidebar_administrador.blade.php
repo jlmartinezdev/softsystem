@@ -144,6 +144,12 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
+                            <a href="{{ route('anularcompra') }}" class="nav-link" id="m_acompra">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Compra</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('anularcobro') }}" class="nav-link" id="m_acobro">
                                 <i class="fa fa-chevron-right nav-icon"></i>
                                 <p>Cobro</p>

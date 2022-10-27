@@ -43,6 +43,7 @@ class ArticulosExport implements FromQuery,WithColumnFormatting, WithHeadings, W
             ->descripcion($buscar)
             ->seccion($seccion)
             ->bysucursal($idsucursal)
+            ->having('cantidad','>',0)
             ->groupBy('articulos.articulos_cod')
             ->orderBy($columna, $this->request->ord); 
                 

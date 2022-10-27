@@ -405,7 +405,9 @@
                         
                     </div>
                     <div class="modal-footer">
-                        
+                        <a :href="'documento/extractocuenta/'+venta.nro_fact_ventas" class="btn btn-success">
+                            <span class="fa fa-print"> </span> Imprimir
+                        </a>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"><span
                                 class="fa fa-times"></span> Cerrar</button>
                     </div>
@@ -467,6 +469,9 @@
                     {
                     label: 'Fecha Hora',
                     field: 'fecha',
+                    type: 'date',
+                    dateInputFormat: 'dd/MM/yyyy HH:mm', // expects 2018-03-16
+                    dateOutputFormat: 'dd/MM/yyyy HH:mm', // outputs Mar 16th 2018
                     },
                     {
                     label: 'Cliente',

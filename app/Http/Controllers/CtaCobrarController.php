@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\CtaCobrar;
 use App\Cobro;
+use App\Venta;
 use App\MovimientoCaja;
 use App\Empresa;
 use App\Sucursal;
@@ -308,7 +309,7 @@ class CtaCobrarController extends Controller
                     $join->on('cd.nro_cuotas', '=', 'cc.nro_cuotas');
                     $join->on('cd.nro_fact_ventas', '=', 'cc.nro_fact_ventas');
                 })
-                ->select('cd.nro_cuotas', 'cd.cobrado', 'cc.interes','cc.nro_fact_ventas')
+                ->select('cd.nro_cuotas', 'cd.cobrado', 'cc.interes','cc.nro_fact_ventas','cc.fecha_venc')
                 ->where('cobranzas.cc_numero', $id)
                 ->get();
         $nro_ventas= DB::table('cobranza_detalle as cd')
@@ -337,5 +338,23 @@ class CtaCobrarController extends Controller
                     ->get();
                     
         return view('documento.recibocobro', compact('empresa', 'cobro', 'cuotas', 'articulos','cantidad_cuotas'));
+    }
+    
+    public function printExtracto($id){
+        $empresa= Empresa::first();
+        $articulos = Venta::join('detalle_venta as dv', 'ventas.nro_fact_ventas', 'dv.nro_fact_ventas')
+                    ->join('articulos as a', 'dv.articulos_cod', 'a.articulos_cod')
+                    ->join('clientes as c','ventas.clientes_cod','c.clientes_cod')
+                    ->select('a.articulos_cod','dv.venta_cantidad','dv.venta_precio','a.producto_nombre', 'ventas.nro_fact_ventas', 'ventas.venta_fecha','c.cliente_ruc','c.cliente_nombre')
+                    ->where('ventas.nro_fact_ventas', $id)
+                    ->get();
+        $cuotas = Venta::join('ctas_cobrar as cc', 'ventas.nro_fact_ventas', 'cc.nro_fact_ventas')
+        ->select('cc.nro_cuotas', 'cc.monto_saldo','cc.monto_cuota','cc.monto_cobrado', 'cc.interes','cc.nro_fact_ventas','cc.fecha_venc')
+        ->where('ventas.nro_fact_ventas', $id)
+        ->get();
+        if(count($articulos)<1){
+            return back();
+        }
+        return view('documento.extractocuenta',compact('empresa','articulos','cuotas'));
     }
 }

@@ -1,5 +1,15 @@
 @extends('layouts.app')
 @section('title', 'Articulo')
+@section('style')
+<style>
+    .vgt-table tr{
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    .vgt-table td{
+        color: rgb(8, 8, 8);
+    }
+</style>
+@endsection
 @section('main')
     <div class="container" id="app">
         <div class="font-weight-bold" style="font-size: 14pt;">Mantimiento de Articulos</div>
@@ -10,6 +20,7 @@
                         <button class="btn btn-primary btn-block" @click="showMArticulo"><span class="fa fa-plus"></span>
                             Nuevo</button>
                     </div>
+                   
                     <div class="col-sm-8 col-md-6">
                         <div class="input-group">
                             <input type="text" v-model="txtbuscar" @keyup.enter="buscar(false)" class="form-control"
@@ -18,25 +29,17 @@
                                 <button class="btn btn-secondary" @click="buscar(false)">
                                     <template v-if="requestSend">
                                         <span class="spinner-border spinner-border-sm" role="status"></span><span
-                                            class="sr-only">Buscando...</span> Cargando...
+                                            class="sr-only">Cargando...</span> Cargando...
                                     </template>
                                     <template v-else>
-                                        <span class="fa fa-search"></span> Buscar
+                                        <span class="fa fa-sync"></span> Recargar
                                     </template>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <registro_mostrado :pagina_actual="paginacion.pagina_actual" :desde="paginacion.desde"
-                            :hasta="paginacion.hasta" :total="paginacion.total">
-                        </registro_mostrado>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="col-md-2">
-                        <label>Seccion</label>
-                        <select class="form-control form-control-sm" @click="buscar(false)" v-model="filtro.seccion">
+                        <select class="form-control" @click="buscar(false)" v-model="filtro.seccion">
                             <option value="0">Todos</option>
                             @foreach ($secciones as $seccion)
                                 <option value="{{ $seccion['present_cod'] }}">{{ $seccion['present_descripcion'] }}
@@ -44,114 +47,59 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label>Ordenar Por</label>
-                        <select class="form-control form-control-sm" v-model="filtro.columna">
-                            <option value="0">Descripcion</option>
-                            <option value="1">Codigo</option>
-                            <option value="2">Precio</option>
-                        </select>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="d-flex" style="margin-top:28pt;">
-
-                            <div class="custom-control custom-radio">
-                                <input type="radio" id="asc" name="radio" value="ASC" class="custom-control-input"
-                                    v-model="filtro.orden">
-                                <label class="custom-control-label" for="asc"><span
-                                        class="fa fa-sort-alpha-down"></span></label>
+                    <div class="pl-3" >
+                        <!-- Example single danger button -->
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
+                                aria-expanded="false">
+                                <span class="fa fa-file-excel"></span> Exportar
+                            </button>
+                            <div class="dropdown-menu">
+                                <button class="dropdown-item" @click="exportar('stock')">Con Stock</button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" @click="exportar('precios')">Precios Creditos</button>
                             </div>
-                            <div class="custom-control custom-radio ml-2">
-                                <input type="radio" id="desc" name="radio" value="DESC" class="custom-control-input"
-                                    v-model="filtro.orden">
-                                <label class="custom-control-label" for="desc"><span
-                                        class="fa fa-sort-alpha-up"></span></label>
-                            </div>
-                            <div class="pl-3" style="margin-top: -7pt;">
-                                <!-- Example single danger button -->
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
-                                        aria-expanded="false">
-                                        <span class="fa fa-file-excel"></span> Exportar
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        <button class="dropdown-item" @click="exportar('stock')">Con Stock</button>
-                                        <div class="dropdown-divider"></div>
-                                        <button class="dropdown-item" @click="exportar('precios')">Precios Creditos</button>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <!--div class="pl-3">
-                                <input type="checkbox" id="stockcero"><label for="stockcero"> Exportar solo stock mayor a 0</label>
-                            </div -->
                         </div>
-                    </div>
 
+                    </div>
+                    
                 </div>
             </div>
 
         </div><!--  END CARD -->
-
         <template>
-            <div class="table-responsive-sm">
-                <table id="tabla" class="table table-striped table-hover table-sm">
-                    <thead>
-                        <tr class="text-uppercase">
-                            <th>Codigo</th>
-                            <th>Descripcion</th>
-                            <th>Seccion</th>
-                            <th class="text-right">Precio</th>
-                            <th>Stock</th>
-                            <th>Opciones</th>
-                        </tr>
-                    </thead>
-                    <tbody style="font-family: Arial,Helvetica,sans-serif;">
-                        <template v-for="a in articulos">
-                            <tr :class="{'text-danger': a.cantidad==0}">
-                                <td>@{{ a.producto_c_barra }}</td>
-                                <td>@{{ a.producto_nombre }}</td>
-                                <td>@{{ a.present_descripcion }}</td>
-                                <td class="font-weight-bold text-right">@{{ separador(a.pre_venta1) }}</td>
-                                <td class="text-center font-weight-bold">@{{ a.cantidad }}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        <button class="btn btn-link dropdown-toggle" data-toggle="dropdown"
-                                            aria-haspopup="true" aria-expanded="false">
-                                            <span class="fa fa-bars"></span>
-                                        </button>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                            <button class='dropdown-item' @click="showEArticulo(a)"><span
-                                                    class="fa fa-edit text-primary"></span> Editar</button>
-                                            <button class='dropdown-item' @click="verPreciosCredito( a.ARTICULOS_cod, a.producto_costo_compra)"><span
-                                                class="fa fa-edit text-primary"></span> Ver Precios Credito</button>
-                                            <button class='dropdown-item'
-                                                @click="modalDelete( a.ARTICULOS_cod, a.producto_nombre)"><span
-                                                    class="fa fa-trash text-primary"></span> Eliminar</button>
-                                            <button class='dropdown-item'
-                                                @click="showDetalle( a.ARTICULOS_cod,a.producto_nombre )"><span
-                                                    class="fa fa-retweet text-primary"></span> Transferir</button>
-                                            <button class="dropdown-item" @click="duplicar(a)">
-                                                <span class="fa fa-copy text-primary"></span> Duplicar
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                </td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-            </div>
-            <v-pagination v-model="currentPage" :page-count="paginacion.ultima_pagina" :classes="bootstrapPaginationClasses"
-                :labels="customLabels" @change="onChange">
-            </v-pagination>
-
-            <!--div class="d-flex flex-column">
-                          <span>{ a.producto_nombre }}</span>
-                          <span class="text-muted small">{ a.present_descripcion }}</span>
-                        </div -->
+            <div>
+                <vue-good-table
+                  :columns="columns"
+                  :rows="rows"
+                  style-class="vgt-table striped"
+                  :pagination-options="{
+                    enabled: true
+                  }"
+                  :search-options="{
+                    enabled: true,
+                    externalQuery: txtbuscar,
+                    searchFn: busqueda_tabla
+                  }"
+                  >
+                  <template slot="table-row" slot-scope="props">
+                    <span v-if="props.row.stock=='0'">
+                      <span style="color: rgb(226, 0, 0);">
+                        <span v-if="!props.column.html">
+                            @{{props.formattedRow[props.column.field]}}
+                        </span>
+                        <span v-else v-html="props.row[props.column.field]">
+                        </span>
+                       
+                    </span> 
+                    </span>
+                    
+                  </template>
+                </vue-good-table>
+                  
+              </div>
         </template>
+        
 
         @include('articulo.create')
         @include('articulo.edit')
@@ -203,28 +151,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
             el: '#app',
             data: {
                 requestSend: false,
-                currentPage: 0,
-                bootstrapPaginationClasses: {
-                    ul: 'pagination',
-                    li: 'page-item',
-                    liActive: 'active',
-                    liDisable: 'disabled',
-                    button: 'page-link'
-                },
-                customLabels: {
-                    first: 'Primer',
-                    prev: 'Ant',
-                    next: 'Sig',
-                    last: 'Ultimo'
-                },
-                paginacion: {
-                    'total': 0,
-                    'pagina_actual': 1,
-                    'por_pagina': 0,
-                    'ultima_pagina': 0,
-                    'desde': 0,
-                    'hasta': 0
-                },
+                
                 precios: [...defaultPrecio],
                 chcuota: false,
                 chprecio: false,
@@ -255,7 +182,38 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                     t: false,
                     suc: 0,
                     cant: 0
-                }
+                },
+                columns: [
+                    {
+                    label: 'Codigo',
+                    field: 'codigo',
+                    },
+                    {
+                    label: 'Descripcion',
+                    field: 'descripcion',
+                    },
+                    {
+                    label: 'Seccion',
+                    field: 'seccion',
+                    },
+                    {
+                    label: 'Precio',
+                    field: 'precio',
+                    type: 'number'
+                    },
+                    {
+                    label: 'Stock',
+                    field: 'stock',
+                    type: 'number',
+                    },
+                    {
+                    label: 'Opciones',
+                    field: 'opciones',
+                    html: true
+                    },
+                
+                ],
+                rows: []
             },
             watch: {
                 chprecio: function(newVal, oldVal) {
@@ -271,6 +229,11 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
 
             },
             methods: {
+                busqueda_tabla: function(row, col, cellValue, searchTerm){
+                    if(row.descripcion.toUpperCase().includes(searchTerm.toUpperCase())){
+                        return cellValue;
+                    }
+                },
                 setMargen: function(index) {
                     if(this.viewPrecio){
                         return false;
@@ -424,11 +387,41 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                                 Swal.fire('No se encontrado resultado!', 'Para:  ' + this.txtbuscar,
                                     'info');
                             } else {
-                                this.articulos = response.data.articulos.data;
-                                this.paginacion = response.data.paginacion;
-                                //this.paginacion.pagina_actual=1;
-                                this.currentPage = this.currentPage == 0 ? 1 : this.paginacion
-                                    .pagina_actual;
+                                this.rows= [];
+                                this.articulos = response.data;
+                                for (let i = 0; i < response.data.length; i++) {
+                                    const item = {
+                                        codigo : this.articulos[i].producto_c_barra,
+                                        descripcion: this.articulos[i].producto_nombre,
+                                        seccion: this.articulos[i].present_descripcion,
+                                        precio : this.separador(this.articulos[i].pre_venta1),
+                                        stock : this.articulos[i].cantidad,
+                                        opciones : `<div class="btn-group">
+                                        <button class="btn btn-link dropdown-toggle" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">
+                                            <span class="fa fa-bars"></span>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            <button class='dropdown-item' onclick="app.showEArticulo('${this.articulos[i].ARTICULOS_cod}')"><span
+                                                    class="fa fa-edit text-primary"></span> Editar</button>
+                                            <button class='dropdown-item' onclick="app.verPreciosCredito( '${this.articulos[i].ARTICULOS_cod}','${this.articulos[i].producto_costo_compra}')"><span
+                                                class="fa fa-edit text-primary"></span> Ver Precios Credito</button>
+                                            <button class='dropdown-item'
+                                                onclick="app.modalDelete( '${this.articulos[i].ARTICULOS_cod}', '${this.articulos[i].producto_nombre}')"><span
+                                                    class="fa fa-trash text-primary"></span> Eliminar</button>
+                                            <button class='dropdown-item'
+                                                onclick="app.showDetalle( '${this.articulos[i].ARTICULOS_cod}','${this.articulos[i].producto_nombre}' )"><span
+                                                    class="fa fa-retweet text-primary"></span> Transferir</button>
+                                            <button class="dropdown-item" onclick="app.duplicar('${this.articulos[i].ARTICULOS_cod}')">
+                                                <span class="fa fa-copy text-primary"></span> Duplicar
+                                            </button>
+                                        </div>
+                                    </div>`
+                                    }
+                                    this.rows.push(item);
+                                    
+                                }
+                               
                             }
                             //this.error=response.data;
                         })
@@ -462,11 +455,12 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                     setTimeout(function() {
                         $('input[name="cbarraN"]').focus();
                         
-                    }, 500);
+                    }, 500); 
 
                     //document.getElementById("cbarraN").focus()
                 },
-                showEArticulo: function(a) {
+                showEArticulo: function(id) {
+                    const a = this.articulos[this.articulos.findIndex(e => e.ARTICULOS_cod== id)];
                     $('#editArticulo').modal('show');
                     this.setArticulo(a);
                     this.getStock(a.ARTICULOS_cod);
@@ -509,7 +503,8 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                         existePrecios: false
                     }
                 },
-                duplicar: function(articulo){
+                duplicar: function(id){
+                    const articulo = this.articulos[this.articulos.findIndex(e => e.ARTICULOS_cod== id)];
                     this.isnew = true;
                     this.viewPrecio= false;
                     this.setArticulo(articulo);

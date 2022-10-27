@@ -165,6 +165,9 @@
                     {
                     label: 'Fecha Hora',
                     field: 'fecha',
+                    type: 'date',
+                    dateInputFormat: 'dd/MM/yyyy HH:mm', 
+                    dateOutputFormat: 'dd/MM/yyyy HH:mm',
                     },
                     {
                     label: 'Proveedor',
@@ -291,7 +294,6 @@
                     alert("Prueba ");
                 },
                 showDetalle: function(id){
-                    console.log(id);
                     this.compra= this.compras[this.compras.findIndex(x=> x.compra_cod== id)];
                     $('#frmdetalle').modal('show');
                     this.getDetalle();

@@ -7,6 +7,7 @@ use App\Compra;
 use App\MovimientoCaja;
 use App\Sucursal;
 use App\Empresa;
+use App\Stock;
 use DB;
 use Auth;
 
@@ -18,6 +19,9 @@ class CompraController extends Controller
     }
     public function index(){
         return view('compra');
+    }
+    public function indexanular(){
+        return view('anularcompra');
     }
     public function store(Request $request)
     {
@@ -116,6 +120,20 @@ VALUES (?, ?, ?, ?, ?, ?, ?);',[$detalle['codigo'],$compra->compra_cod,$detalle[
     }
     public function getDetalle($nro_compra){
         return DB::select('SELECT dc.*,a.producto_nombre,a.producto_c_barra,p.iva FROM detalle_compra dc INNER JOIN articulos a ON dc.ARTICULOS_cod=a.ARTICULOS_cod inner join presentacion p on a.present_cod=p.present_cod where dc.compra_cod=?',[$nro_compra]);
+    }
+    public function getCabecera($nro_compra){
+        $cabecera= DB::select('SELECT c.*, p.proveedor_ruc,p.proveedor_nombre FROM compra c INNER JOIN proveedor p ON c.proveedor_cod= p.proveedor_cod WHERE c.compra_cod= ?',[$nro_compra]);
+        return ["compra"=> $cabecera, "detalle" => $this->getDetalle($nro_compra)];
+    }
+    public function destroy(Request $request){
+        foreach ($request->articulos as $articulo) {
+            Stock::where('ARTICULOS_cod',$articulo['id'])
+            ->first()
+            ->decrement('cantidad',$articulo['cantidad']);
+        }
+        DB::table('detalle_compra')->where('compra_cod',$request->id)->delete();
+        DB::table('compra')->where('compra_cod',$request->id)->delete();
+        return "ok";
     }
 
 }

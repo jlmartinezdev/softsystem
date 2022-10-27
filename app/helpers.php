@@ -10,6 +10,23 @@ function filtrarCtas($a1,$nroventa){
         return $e->nro_fact_ventas==$nroventa;
     }); */
 }
+function diferenciaFecha($fecha){
+    $date1 = new DateTime($fecha);
+    $date2 = new DateTime("now");
+    $diff = $date1->diff($date2);
+    // will output 2 days
+    return $diff->days;
+}
+function isFechaMayor($fecha){
+    $fecha_inicio = new DateTime("now");
+    $fecha_fin    = new DateTime($fecha);
+    if($fecha_fin > $fecha_inicio){
+        return true;
+    }else{
+        return false;
+    }
+        
+}
 class NumeroALetras
 {
     private static $UNIDADES = [
@@ -148,4 +165,5 @@ class NumeroALetras
         return $output;
     }
 }
+
 ?>
