@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Articulo;
 use App\Seccion;
 use App\Unidad;
+use App\Stock;
 use DB;
 use App\Exports\ArticulosExport;
 use App\Exports\articulosPreciosExport;
@@ -142,7 +143,14 @@ class ArticuloController extends Controller
             }
         }
         for ($i=0; $i <count($stock) ; $i++) { 
-            DB::select('call insert_stock(?,?,?,?,?,?)',[$articulo->ARTICULOS_cod,$stock[$i]['sucursal'],$stock[$i]['cantidad'],$this->setVencimiento($stock[$i]['vencimiento']),$stock[$i]['loteold'],$stock[$i]['lotenew']]);
+            $s = new Stock();
+            $s->articulos_cod= $articulo->ARTICULOS_cod;
+            $s->suc_cod=$request->stock[$i]['sucursal'];
+            $s->cantidad= $request->stock[$i]['cantidad'];
+            $s->stock_fech_venc= $this->setVencimiento($request->stock[$i]['vencimiento']);
+            $s->lote_nro= $request->stock[$i]['lotenew'];
+            $s->save();
+            
         }
        
         $suma= 0;
@@ -204,7 +212,21 @@ class ArticuloController extends Controller
         ]);
         if( Auth::user()->roles()->first()->nom_rol=='Administrador'){
             for ($i=0; $i < count($request->stock) ; $i++) { 
-                DB::select('call insert_stock(?,?,?,?,?,?)',[$id,$request->stock[$i]['sucursal'],$request->stock[$i]['cantidad'],$this->setVencimiento($request->stock[$i]['vencimiento']),$request->stock[$i]['loteold'],$request->stock[$i]['lotenew']]);
+                if($request->stock[$i]['id'] > 5){
+                    Stock::where('id_stock',$request->stock[$i]['id'])->update([
+                        'cantidad' =>$request->stock[$i]['cantidad'], 
+                        'stock_fech_venc' => $this->setVencimiento($request->stock[$i]['vencimiento']),
+                        'lote_nro' => $request->stock[$i]['lotenew']
+                    ]);
+                }else{
+                    $stock = new Stock();
+                    $stock->articulos_cod= $id;
+                    $stock->suc_cod=$request->stock[$i]['sucursal'];
+                    $stock->cantidad= $request->stock[$i]['cantidad'];
+                    $stock->stock_fech_venc= $this->setVencimiento($request->stock[$i]['vencimiento']);
+                    $stock->lote_nro= $request->stock[$i]['lotenew'];
+                    $stock->save();
+                }
             }
         }
         $suma = 0;

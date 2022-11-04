@@ -8,4 +8,4 @@ Atrasos, calificacion , porcetanje de cobro
 
 Recibo 
 Agregar dias de mora ✔
-Opcion para imprimir cuenta
+Opcion para imprimir cuenta ✔

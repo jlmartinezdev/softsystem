@@ -85,7 +85,22 @@ class StockController extends Controller
     public function update(Request $request, $id)
     {
          for ($i=0; $i <count($request->stock) ; $i++) { 
-            DB::select('call insert_stock(?,?,?,?,?,?)',[$id,$request->stock[$i]['sucursal'],$request->stock[$i]['cantidad'],$this->setVencimiento($request->stock[$i]['vencimiento']),$request->stock[$i]['loteold'],$request->stock[$i]['lotenew']]);
+            if($request->stock[$i]['id'] > 5){
+                Stock::where('id_stock',$request->stock[$i]['id'])->update([
+                    'cantidad' =>$request->stock[$i]['cantidad'], 
+                    'stock_fech_venc' => $this->setVencimiento($request->stock[$i]['vencimiento']),
+                    'lote_nro' => $request->stock[$i]['lotenew']
+                ]);
+            }else{
+                $stock = new Stock();
+                $stock->articulos_cod= $id;
+                $stock->suc_cod=$request->stock[$i]['sucursal'];
+                $stock->cantidad= $request->stock[$i]['cantidad'];
+                $stock->stock_fech_venc= $this->setVencimiento($request->stock[$i]['vencimiento']);
+                $stock->lote_nro= $request->stock[$i]['lotenew'];
+                $stock->save();
+            }
+            //DB::select('call insert_stock(?,?,?,?,?,?)',[$id,$request->stock[$i]['sucursal'],$request->stock[$i]['cantidad'],$this->setVencimiento($request->stock[$i]['vencimiento']),$request->stock[$i]['loteold'],$request->stock[$i]['lotenew']]);
         }
     }
 
