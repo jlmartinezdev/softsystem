@@ -261,14 +261,17 @@ class ArticuloController extends Controller
      */
     public function destroy($id)
     {
-        DB::select("delete from stock where articulos_cod=?",[$id]);
-        DB::select("delete from precios where articulos_cod=?",[$id]);
-        $articulo= Articulo::where('ARTICULOS_cod',$id)->delete();
-        if($articulo){
-            return "OK";
-        }else{
-            return "Error";
+        if( Auth::user()->roles()->first()->nom_rol=='Administrador'){
+            DB::select("delete from stock where articulos_cod=?",[$id]);
+            DB::select("delete from precios where articulos_cod=?",[$id]);
+            $articulo= Articulo::where('ARTICULOS_cod',$id)->delete();
+            if($articulo){
+                return "OK";
+            }else{
+                return "Error";
+            }
         }
+        return "Sin Privilegio...";
     }
     public function informe(){
         return view('informes.articulo');

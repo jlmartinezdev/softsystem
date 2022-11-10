@@ -40671,7 +40671,7 @@ const defaultClasses ={
 }
 /* harmony default export */ __webpack_exports__["default"] = ({
     name: "inNumber",
-    props: ["value","placeholder","clases","id","tabindex"],
+    props: ["value","placeholder","clases","id","tabindex","enabled"],
     data() {
         return {
             text: "",
