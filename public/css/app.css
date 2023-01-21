@@ -11549,8 +11549,20 @@ a.text-dark:focus {
   src: url(/fonts/Cairo-Bold.ttf?ef55322bc2031017175022b779940cb0) format("truetype");
 }
 
+@font-face {
+  font-family: "Sofia";
+  font-style: normal;
+  font-weight: 400;
+  font-display: auto;
+  src: url(/fonts/SofiaSans-Regular.ttf?7cb8b2127317d4f7a8ea953a3d3b91da) format("truetype");
+}
+
 .font-cairo {
   font-family: Cairo;
+}
+
+.font-sofia {
+  font-family: Sofia;
 }
 
 .nowrap {

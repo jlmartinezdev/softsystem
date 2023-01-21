@@ -3,6 +3,16 @@
 @section('style')
     <link href="{{ asset('css/icheck-bootstrap.min.css') }}" rel="stylesheet">
     <style type="text/css">
+        @font-face {
+            font-family: "Sofia";
+            font-style: normal;
+            font-weight: 400;
+            font-display: auto;
+            src: url("../webfonts/SofiaSans-Regular.ttf") format("truetype");
+        }
+        #main {
+            font-family: 'Sofia';
+        }
         .form-group {
             margin-bottom: 0rem;
         }
@@ -45,7 +55,7 @@
     <div id="app">
         <div class="row">
             <!-- PANEL IZQUIERDO -->
-            <div class="col-md-9">
+            <div class="col-md-12">
                 <div class="card">
                     <div class="p-2 mb-3">
                         <!-- Buscador -->
@@ -164,25 +174,27 @@
                             <div class="table-responsive-sm">
                                 <table class="table table-sm table-bordered table-hover">
                                     <tr>
-                                        <th>N de Cuota</th>
-                                        <th>N de Venta</th>
+                                        <th># Cuota</th>
+                                        <th># Venta</th>
                                         <th>Vencimiento</th>
+                                        <th>Monto Cuota</th>
                                         <th>Mora</th>
                                         <th>Interes</th>
-                                        <th>Monto Cuota</th>
                                         <th>Cobrado</th>
-                                        <th>Monto a Cobrar</th>
+                                        <th>Saldo</th>
+                                        <th>Cuota + Interes</th>
                                     </tr>
                                     <template v-for="(c,index) in cuotasAcobrar">
                                         <tr>
                                             <td>@{{ checkCantidad(c.nro_cuotas, c.nro_fact_ventas) }}</td>
                                             <td>@{{ c.nro_fact_ventas }}</td>
                                             <td>@{{ formatFecha(c.fecha_venc) }}</td>
-                                            <td>@{{ diferenciaFecha(c.fecha_venc, c.monto_cobrado) }}</td>
+                                            <td>@{{ format(c.monto_cuota) }}</td>
+                                            <td>@{{ diferenciaFecha(c.fecha_venc, c.monto_saldo) }}</td>
                                             <td>@{{ format(c.interes) }}</td>
-                                            <td>@{{ format(c.monto_saldo) }}</td>
                                             <td>@{{ format(c.monto_cobrado) }}</td>
-                                            <td>@{{ format(c.acobrar) }}</td>
+                                            <td>@{{ format(c.monto_saldo) }}</td>
+                                            <td>@{{ format(parseInt(c.acobrar) + c.interes) }}</td>
                                         </tr>
 
 
@@ -194,86 +206,166 @@
                 </template>
 
             </div>
-            <!-- PANEL DERECHO -->
-            <div class="col-md-3">
-                <div class="card p-2">
-
-                    <div class="text-secondary text-center">
-                        <span class="badge badge-default">
-                            <span class="fa fa-cash-register"></span> CAJA
-                        </span>
-                        <span class="badge badge-pill "
-                            :class="[caja.estado == 'ABIERTA' ? 'badge-success pr-2 pl-2' : 'badge-danger']">
-                            @{{ caja.estado }} </span>
-                        |<span class="badge badge-default">
-                            <span class="fa fa-info-circle"></span> #
-                        </span>
-                        <span class="badge badge-pill "
-                            :class="[caja.estado == 'ABIERTA' ? 'badge-success' : 'badge-danger']"> @{{ caja.nrooperacion }}
-                        </span>
+        </div>
+        <!-- PANEL DETALLE -->
+        <div class="row">
+            
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-teal">
+                        <spam class="header-title">Detalle Cobro</spam>
                     </div>
-                    <hr>
-                     <label for="interes" @click="setCheckInteres"><input v-model="cobro.cobrarInteres" type="checkbox" id="interes"> Cobrar Interes por Mora</label>
-                    <hr>
-                    <div class="form-group">
-                        <label for="fecha">Fecha</label>
-                        <input type="date" id="fecha" class="form-control form-control-sm" v-model="cobro.fecha"
-                            placeholder="Fecha">
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mt-2 ">
-                        <p class="text-muted">
-                            <i class="fa fa-id-card"></i> Doc:
-                        </p>
-                        <p class=" text-right">
-                            <template>@{{ cliente.documento }}</template>
-                        </p>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center ">
-                        <p class="text-muted">
-                            <i class="fa fa-user"></i> Cliente:
-                        </p>
-                        <p class=" text-right">
-                            <template>@{{ cliente.nombre }}</template>
-                        </p>
-                    </div>
+                    <div class="card-body p-3">
+                        
+                        
 
-                    <hr>
-                    <div class="d-flex justify-content-between align-items-center ">
-                        <p class="text-warning text-xl">
-                            <i class="fa fa-money-check-alt"></i>
-                        </p>
-                        <p class="d-flex flex-column text-right">
-                            <span class="font-weight-bold">
-                                <template>@{{ format(cobro.saldonuevo) }}</template>
+                        <div class="row">
+                            <div class="col-sm-3 col-6">
+                                <div class="description-block border-right">
+                                    <div class="descripcion-percentage text-secondary">
+                                        <i class="fa fa-cash-register"></i>
+                                    </div>
+                                    <div class="description-header">
+                                        <span class="badge badge-pill "
+                                        :class="[caja.estado == 'ABIERTA' ? 'badge-success pr-2 pl-2' : 'badge-danger']">
+                                        @{{ caja.estado }} </span>
+                                    </div>
+                                    <div class="description-text">
+                                        Estado Caja
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-6">
+                                <div class="description-block">
+                                    <div class="descripcion-percentage text-secondary">
+                                        <i class="fa fa-info-circle"></i>
+                                    </div>
+                                    <div class="description-header">
+                                        <span class="badge badge-pill "
+                                        :class="[caja.estado == 'ABIERTA' ? 'badge-success' : 'badge-danger']"> @{{ caja.nrooperacion }}
+                                    </div>
+                                    <div class="description-text">
+                                        # Operacion
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3 col-6">
+                                <div class="description-block border-right">
+                                    <div class="descripcion-percentage text-info">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <div class="description-header mr-2">
+                                        <input type="date" id="fecha" class="form-control form-control-sm" v-model="cobro.fecha"
+                                        placeholder="Fecha">
+                                    </div>
+                                    <div class="description-text">
+                                        Fecha
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-6">
+                                <div class="description-block border-right">
+                                    <div class="descripcion-percentage text-info">
+                                        <i class="fa fa-id-card"></i>
+                                    </div>
+                                    <div class="description-header">
+                                        <template>@{{ cliente.documento }}</template>
+                                    </div>
+                                    <div class="description-text">
+                                        Nro. Documento
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-6">
+                                <div class="description-block">
+                                    <div class="descripcion-percentage text-info">
+                                        <i class="fa fa-user"></i>
+                                    </div>
+                                    <div class="description-header">
+                                        <template>@{{ cliente.nombre }}</template>
+                                    </div>
+                                    <div class="description-text">
+                                        Nombre Cliente
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <hr>
+                        <label for="interes" @change="changeMontoInteres"><input v-model="cobro.cobrarInteres" type="checkbox" id="interes"> Cobrar Interes por Mora</label>
 
-                            </span>
-                            <span class="text-muted">Saldo</span>
-                        </p>
+                        <div class="row">
+                            <div class="col-sm-3 col-6">
+                                <div class="description-block border-right">
+                                    <div class="descripcion-percentage text-success">
+                                        <i class="fa fa-dollar-sign"></i>
+                                    </div>
+                                    <div class="description-header">
+                                        <template>@{{ totalCuota }}</template>
+                                    </div>
+                                    <div class="description-text">
+                                        Total Cuota
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-6">
+                                <div class="description-block border-right">
+                                    <div class="descripcion-percentage">
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" title="Ingresar Monto Interes" @click="setInteres"><span class="fa fa-edit"></span></button> 
+                                        <button class="btn btn-outline-warning" title="Usar monto genterado por sistema" @click="cobro.isInteresFija= false"><span class="fa fa-retweet"></span></button>
+                                        </div>
+                                    </div>
+                                    <div class="description-header">
+                                        <template>@{{ format(cobro.totalInteres) }} 
+                                            
+                                        </template>
+                                    </div>
+                                    <div class="description-text">
+                                        Interes
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-6">
+                                
+                                <div class="description-block border-right">
+                                    <div class="descripcion-percentage text-success">
+                                        <i class="fa fa-dollar-sign"></i>
+                                    </div>
+                                    <div class="description-header">
+                                        <template>@{{ format(cobro.saldonuevo) }}</template>
+                                    </div>
+                                    <div class="description-text">
+                                        Saldo
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 col-6">
+                                
+                                <div class="description-block border-right">
+                                    <div class="descripcion-percentage text-success">
+                                        <i class="fa fa-dollar-sign"></i>
+                                    </div>
+                                    <div class="description-header">
+                                        <strong><template>@{{ totalCobrar}}</template></strong>
+                                    </div>
+                                    <div class="description-text">
+                                        Total
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="d-flex justify-content-between align-items-center ">
-                        <p class="text-success text-xl">
-                            <i class="fa fa-dollar-sign"></i>
-                        </p>
-                        <p class="d-flex flex-column text-right">
-                            <span class="font-weight-bold">
-                                <template>@{{ totalCobrar }}</template>
-
-                            </span>
-                            <span class="text-muted">Total a Cobrar</span>
-                        </p>
-                    </div>
-
-                    <hr>
-                    <div class="d-flex justify-content-center">
-                        <button class="btn btn-app bg-success" @click="showFinalizar">
-                            <span class="fa fa-check"></span> FINALIZAR
+                    <div class="card-footer">
+                        <button class="btn btn-flat bg-success" @click="showFinalizar">
+                            <span class="fas fa-check mr-2"></span> FINALIZAR
                         </button>&nbsp;
-                        <button class="btn btn-app bg-secondary " @click="cancelar"> <span class="fa fa-times"></span>
+                        <button class="btn btn-flat bg-secondary " @click="cancelar"> <span class="fas fa-times mr-2"></span>
                             CANCELAR</button>
                     </div>
-
-
                 </div>
             </div>
         </div>
@@ -315,7 +407,9 @@
                 fecha: '',
                 idSucursal: 0,
                 totalInteres: 0,
-                cobrarInteres: true
+                cobrarInteres: true,
+                isInteresFija: false,
+                interesFija: 0
             },
             cliente: {
                 id: 0,
@@ -473,7 +567,9 @@
                     fecha: '',
                     idSucursal: 0,
                     totalInteres: 0,
-                    cobrarInteres: true
+                    cobrarInteres: true,
+                    isInteresFija: false,
+                    interesFija: 0
                 };
                 this.descontarCantidad = 0;
                 this.articulos = [];
@@ -564,9 +660,10 @@
                         }
                     } 
 
-                    for (i = 0; i < this.cuotasAcobrar.length; i++) {
+                    /* for (i = 0; i < this.cuotasAcobrar.length; i++) {
                         sumatoria += this.cuotasAcobrar[i].interes;
-                    }
+                    } */
+
                     if(sumatoria >= this.montoParcial){
                         let lastIndex= this.cuotasAcobrar.length -1;
                         let lastAcobrar= this.cuotasAcobrar[lastIndex].acobrar;
@@ -606,17 +703,12 @@
                 const diff = fechaFin - fechaInicio;
                 return parseInt(diff / (1000 * 60 * 60 * 24));
             },
-            diferenciaFecha: function(fecha_vent, pagada) {
+            diferenciaFecha: function(fecha_vent, monto_saldo) {
                 //2016-07-12
                 const dia = this.subFecha(fecha_vent)
                 
                 //let diferenciaFecha = 0;
-                if (pagada == 0) {
-                    /* if ((dia - 30) > 0) {
-                        return dia - 30;
-                    } else {
-                        return "-";
-                    } */
+                if (monto_saldo > 0) {
                     return dia
                 } else {
                     return "-"
@@ -697,26 +789,70 @@
                 }
                 return parseInt(montoInteres);
             },
-            setCheckInteres: function(){
-                for (let i = 0; i < this.cuotasAcobrar.length; i++) {
-                    this.cuotasAcobrar[i].interes=  !this.cobro.cobrarInteres ?  this.setMontoInteres(this.cuotasAcobrar[i].fecha_venc, this.cuotasAcobrar[i].monto_cuota) : 0 ;
+            setInteres : async function(){
+                if(this.cobro.total == 0){
+                    return false;
+                }
+                const { value: interes } = await Swal.fire({
+                title: 'Ingrese el monto del interes',
+                input: 'number',
+                //inputLabel: 'Interes Fijo',
+                inputPlaceholder: 'Interes'
+                })
+               
+                if(parseInt(interes) > 0){
+                    this.cobro.isInteresFija= true;
+                    this.cobro.interesFija= parseInt(interes);
+                    this.changeMontoInteres();
+                }
+            },
+            changeMontoInteres: function(){
+                if(this.cobro.isInteresFija){
+                    let l= this.cuotasAcobrar.length;
+                    for (let i = 0; i < l; i++) {
+                        this.cuotasAcobrar[i].interes=  this.cobro.cobrarInteres ?  this.cobro.interesFija/l : 0 ;
+                    }
+                }else{
+                    for (let i = 0; i < this.cuotasAcobrar.length; i++) {
+                        this.cuotasAcobrar[i].interes=  this.cobro.cobrarInteres ?  this.setMontoInteres(this.cuotasAcobrar[i].fecha_venc, this.cuotasAcobrar[i].monto_cuota) : 0 ;
+                    }
                 }
             }
         },
         computed: {
             totalCobrar: function() {
-                this.cobro.total = 0;
-                this.cobro.totalInteres = 0;
-                this.cobro.saldonuevo = 0;
+                let total=0;
+                let interes= 0;
+                let saldo=0; 
+
                 if (this.cuotasAcobrar.length > 0) {
                     for (i = 0; i < this.cuotasAcobrar.length; i++) {
-                        this.cobro.total += parseInt(this.cuotasAcobrar[i].acobrar) + parseInt(this.cuotasAcobrar[i].interes);
-                        this.cobro.totalInteres += this.cuotasAcobrar[i].interes;
+                        total += parseInt(this.cuotasAcobrar[i].acobrar) + parseInt(this.cuotasAcobrar[i].interes);
+                        interes += this.cuotasAcobrar[i].interes;
                     }
-                    this.cobro.saldonuevo = this.cobro.saldo - (this.cobro.total - this.cobro.totalInteres);
+                    saldo = this.cobro.saldo - (total - interes); 
+                }
+                if(this.cobro.isInteresFija && this.cobro.cobrarInteres){ //Si interes es fija
+                    total-= interes;
+                    interes= this.cobro.interesFija;
+                    total += interes;
+                    //saldo += this.montoParcial > 0 ? 0 : interes;
                 }
 
-                return this.format(this.cobro.total);
+                this.cobro.total = total;
+                this.cobro.totalInteres = interes;
+                this.cobro.saldonuevo = saldo;
+                //this.changeMontoInteres();
+                return this.format(total);
+            },
+            totalCuota: function(){
+                let total= 0;
+                if(this.montoParcial> 0 && this.cobro.isInteresFija){
+                    total= this.cobro.total - this.cobro.interesFija;
+                }else{
+                    total= this.cobro.total - this.cobro.totalInteres;
+                }
+                return this.format(total);
             }
         },
         mounted() {

@@ -18,8 +18,18 @@
     font-display: auto;
     src: url("../webfonts/Cairo-Bold.ttf") format("truetype");
 }
+@font-face {
+    font-family: "Sofia";
+    font-style: normal;
+    font-weight: 400;
+    font-display: auto;
+    src: url("../webfonts/SofiaSans-Regular.ttf") format("truetype");
+}
 .font-cairo {
     font-family: Cairo;
+}
+.font-sofia {
+    font-family: Sofia;
 }
 .nowrap {
     white-space: nowrap;

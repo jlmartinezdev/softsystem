@@ -34,7 +34,7 @@
         @endguest
         <div class="content-wrapper">
             <section class="content">
-                <div class="container-fluid">
+                <div id="main" class="container-fluid">
                     @yield('main')
                 </div>
             </section>

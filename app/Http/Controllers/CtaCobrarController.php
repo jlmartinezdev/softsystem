@@ -249,6 +249,7 @@ class CtaCobrarController extends Controller
             $newVal= intval($cuentafila->monto_saldo) + $cuota['cobrado'];
             $cuenta->update([
                 'monto_saldo' => $newVal,
+                'interes' => '0',
                 'estado' => '1'
             ]);
            /*  ->update([
