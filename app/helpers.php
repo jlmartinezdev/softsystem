@@ -14,8 +14,31 @@ function diferenciaFecha($fecha){
     $date1 = new DateTime($fecha);
     $date2 = new DateTime("now");
     $diff = $date1->diff($date2);
-    // will output 2 days
-    return $diff->days;
+    return $date2 > $date1 ? $diff->days :"-".$diff->days;
+}
+function diferenciaFechaCompleta($fecha){
+    $firstDate  = new DateTime($fecha);
+    $secondDate = new DateTime("now");
+    $intvl = $firstDate->diff($secondDate);
+    $anho= '';
+    $mes= '';
+    $dia= '';
+    $dias= $intvl->days;
+    if($intvl->y >0 ){
+        $anho= $intvl->y > 1 ? $intvl->y." años,": $intvl->y." año,";
+    }
+    if($intvl->m > 0){
+        $mes= $intvl->m > 1 ? $intvl->m." meses": $intvl->m." mes";
+    }
+    $d= $intvl->d > 1 ? $intvl->d." dias": $intvl->d." dia";
+    $dia = strlen($mes)>0 ? " y ".$d : $d;
+    if($secondDate>$firstDate ){
+        return ['dias' =>$dias, 'detalle' =>" (".$anho.$mes.$dia.")"]; 
+    }else{
+        return ['dias' => 0,'detalle'=> "Falta: ".$dias." dias"];
+    }
+    
+
 }
 function isFechaMayor($fecha){
     $fecha_inicio = new DateTime("now");

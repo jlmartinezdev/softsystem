@@ -116,6 +116,7 @@ Route::group(['middleware' => ['administrador']], function () {
     //EXCEL 
     Route::get('excel/articulos/','ArticuloController@export');
     Route::get('excel/articulosprecios/','ArticuloController@exportPrecio');
+    Route::get('excel/ctascobrar','CtaCobrarController@exportCtasAll');
     // DOCUMENTO A IMPRIMIR 
     Route::get('documento/recibocobro/{id}','CtaCobrarController@printRecibo');
     Route::get('documento/extractocuenta/{id}','CtaCobrarController@printExtracto');

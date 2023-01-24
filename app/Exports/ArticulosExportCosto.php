@@ -93,7 +93,7 @@ class ArticulosExportCosto implements FromQuery,WithColumnFormatting, WithHeadin
             'keywords'       => 'articulos,export,spreadsheet',
             'category'       => 'Sistema Informatico',
             'manager'        => 'JL Martinez',
-            'company'        => 'controlhig.com',
+            'company'        => 'controlhigh.com',
         ];
     }
 }

@@ -53,6 +53,9 @@
                         <a class="nav-item nav-link" data-toggle="tab" role="tab" href="#frmzona"
                             aria-select="false"><strong><span class="fa fa-map-marked"></span> Zona</strong>
                         </a>
+                        <a class="nav-item nav-link" data-toggle="tab" role="tab" href="#frmexportar"
+                            aria-select="false"><strong><span class="fa fa-file-export"></span> Exportar</strong>
+                        </a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -592,6 +595,13 @@
                             </div>
 
                         </div>
+
+                        <!-- *********** EXPORTAR ************* -->
+                        <div class="tab-pane fade" id="frmexportar" role="tabpanel">
+                            <div class="p-4">
+                                <button class="btn btn-info" @click="exportar"><span class="fa fa-file-excel"></span> Exportar</button>
+                            </div>
+                        </div>
                     </div>
 
 
@@ -756,6 +766,10 @@
                     const f = fecha.split("-");
                     return f[2] + "/" + f[1] + "/" + f[0];
                 },
+                exportar: function(){
+                    //let u = new URLSearchParams(params).toString();
+                    window.open('excel/ctascobrar');
+                }
             },
             mounted() {
                 this.filtro.desde = this.getFecha(1);

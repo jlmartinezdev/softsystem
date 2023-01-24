@@ -14,6 +14,9 @@ use DB;
 use PDF;
 use Auth;
 
+use App\Exports\CtasCobrarExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 class CtaCobrarController extends Controller
 {
     public function __construct()
@@ -357,5 +360,11 @@ class CtaCobrarController extends Controller
             return back();
         }
         return view('documento.extractocuenta',compact('empresa','articulos','cuotas'));
+    }
+    public function exportCtasAll(Request $request){
+        //return Excel::download(new ArticulosExport, 'articulos.xlsx');
+        //return (new InvoicesExport(2018))->download('invoices.xlsx');
+        $date=date('d_m_Y');
+        return (new CtasCobrarExport)->download('Ctas_a_Cobrar_'.$date.'.xlsx');
     }
 }
