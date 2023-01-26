@@ -54402,6 +54402,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 window.Vuex = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 window.Swal = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
 window.NumeroALetras = __webpack_require__(/*! ./numeroaletra */ "./resources/js/numeroaletra.js");
+window.Funciones = __webpack_require__(/*! ./funciones */ "./resources/js/funciones.js");
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -54681,6 +54682,66 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_vue_plain_pagination_vue_vue_type_template_id_7f64c8a2___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
+
+/***/ }),
+
+/***/ "./resources/js/funciones.js":
+/*!***********************************!*\
+  !*** ./resources/js/funciones.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var subFecha = function subFecha(startFecha) {
+  var fechaInicio = new Date(startFecha).getTime();
+  var fechaFin = new Date().getTime();
+
+  if (fechaInicio > fechaFin) {
+    return 0;
+  }
+
+  var diff = fechaFin - fechaInicio;
+  return parseInt(diff / (1000 * 60 * 60 * 24));
+};
+
+var setMontointeres = function setMontointeres(vencimiento, monto, isSaldo) {
+  if (isSaldo == 0) return 0; //Informe de venta misma funcion
+
+  var montoInteres = 0;
+  var interes_mora = 100;
+  var tmp_vencimiento = subFecha(vencimiento);
+
+  if (interes_mora > 0 && tmp_vencimiento > 5) {
+    montoInteres = monto * interes_mora / 100;
+    montoInteres = montoInteres / 360;
+    montoInteres = montoInteres * tmp_vencimiento;
+  }
+
+  return parseInt(montoInteres);
+};
+
+var formatFecha = function formatFecha(fecha) {
+  var f = fecha.split("-");
+  return f[2] + "/" + f[1] + "/" + f[0];
+};
+
+var diferenciaFecha = function diferenciaFecha(fecha_vent, monto_saldo) {
+  //2016-07-12
+  var dia = subFecha(fecha_vent); //let diferenciaFecha = 0;
+
+  if (monto_saldo > 0) {
+    return dia;
+  } else {
+    return "-";
+  }
+};
+
+module.exports = {
+  setMontointeres: setMontointeres,
+  subFecha: subFecha,
+  formatFecha: formatFecha,
+  diferenciaFecha: diferenciaFecha
+};
 
 /***/ }),
 

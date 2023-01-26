@@ -90,6 +90,7 @@
                     <td>Cobrado</td>
                     <td>Saldo</td>
                     <td>Mora</td>
+                    <td>Interes</td>
                     <td>Estado</td>
                 </tr>
                 @foreach($cuotas as $cuota)
@@ -100,6 +101,7 @@
                         <td>{{number_format($cuota->monto_cobrado,2,",",".")}}</td>
                         <td>{{number_format($cuota->monto_saldo,2,",",".")}}</td>
                         <td>{{$cuota->monto_saldo > 0 && !isFechaMayor($cuota->fecha_venc) ? diferenciaFecha($cuota->fecha_venc) : "-"}}</td>
+                        <td>{{number_format(setMontointeres($cuota->fecha_venc, $cuota->monto_cuota, $cuota->monto_saldo),2,",",".")}}</td>
                         <td>{{ $cuota->monto_cobrado == $cuota->monto_cuota ? "Pagado" : "Pendiente"}}</td>
                     </tr>
                 @endforeach

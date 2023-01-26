@@ -20,6 +20,7 @@ mix.js('resources/js/app.js', 'public/js')
     .js('resources/js/proveedor.js','public/js/component')
     .js('resources/js/venta.js','public/js')
     .js('resources/js/articulo.js','public/js/component')
+    .js('resources/js/funciones.js','public/js')
     .sass('resources/sass/app.scss', 'public/css')
     .version();
 if(mix.inProduction())

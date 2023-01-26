@@ -10,7 +10,7 @@ window.Vue = require('vue');
 window.Vuex =require('vuex')
 window.Swal = require('sweetalert2')
 window.NumeroALetras = require('./numeroaletra');
-
+window.Funciones = require('./funciones');
 
 /**
  * The following block of code may be used to automatically register your

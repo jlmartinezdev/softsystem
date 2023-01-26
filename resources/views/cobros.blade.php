@@ -353,7 +353,7 @@
                                         <strong><template>@{{ totalCobrar}}</template></strong>
                                     </div>
                                     <div class="description-text">
-                                        Total
+                                        Total a Cobrar
                                     </div>
                                 </div>
                             </div>
@@ -778,6 +778,7 @@
                 return NumeroALetras.NumeroALetras(n);
             },
             setMontoInteres: function(vencimiento, monto) {
+                //Informe de venta misma funcion
                 let montoInteres = 0;
                 const interes_mora = 100;
                 const tmp_vencimiento = this.subFecha(vencimiento);

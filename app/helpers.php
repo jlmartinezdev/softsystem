@@ -16,6 +16,27 @@ function diferenciaFecha($fecha){
     $diff = $date1->diff($date2);
     return $date2 > $date1 ? $diff->days :"-".$diff->days;
 }
+function subFecha($fecha) {
+    $date1 = new DateTime($fecha);
+    $date2 = new DateTime("now");
+    $diff = $date1->diff($date2);
+    return $diff->days;
+}
+function setMontointeres($vencimiento, $monto, $isSaldo){
+    if ($isSaldo==0)
+        return 0;
+    
+    $montoInteres = 0;
+    $interes_mora = 100;
+    $tmp_vencimiento = subFecha($vencimiento);
+
+    if ($interes_mora > 0 && $tmp_vencimiento > 5) {
+        $montoInteres = ($monto * $interes_mora) / 100;
+        $montoInteres = $montoInteres / 360;
+        $montoInteres = $montoInteres * $tmp_vencimiento;
+    }
+    return intval($montoInteres);
+}
 function diferenciaFechaCompleta($fecha){
     $firstDate  = new DateTime($fecha);
     $secondDate = new DateTime("now");

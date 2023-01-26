@@ -372,16 +372,18 @@
                                     <th>Monto Cobrado</th>
                                     <th>Saldo</th>
                                     <td>Mora</td>
+                                    <td>Interes</td>
                                     <td>Estado</td>
                                 </tr>
                                 <template v-for="c in cuotas">
                                     <tr>
                                         <td>@{{c.nro_cuotas}}</td>
-                                        <td>@{{formatFecha(c.fecha_venc)}}</td>
-                                        <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_cuota)}}</td>
-                                        <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_cobrado)}}</td>
-                                        <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_saldo)}}</td>
-                                        <td>@{{ diferenciaFecha(c.fecha_venc, c.monto_cobrado) }}</td>
+                                        <td>@{{Funciones.formatFecha(c.fecha_venc)}}</td>
+                                        <td>@{{c.monto_cuota.toLocaleString('es-ES')}}</td>
+                                        <td>@{{c.monto_cobrado.toLocaleString('es-ES')}}</td>
+                                        <td>@{{ parseInt(c.monto_saldo).toLocaleString('es-ES')}}</td>
+                                        <td>@{{ Funciones.diferenciaFecha(c.fecha_venc, c.monto_saldo) }}</td>
+                                        <td>@{{ Funciones.setMontointeres(c.fecha_venc, c.monto_cuota, c.monto_saldo).toLocaleString('es-ES')}}</td>
                                         <td>
                                             <template v-if="c.monto_cobrado == c.monto_cuota">
                                                 <span class="badge badge-success">Cobrado</span>
@@ -395,10 +397,10 @@
                             </table>
                             <div class="row">
                                 <div class="col-4">
-                                    Monto Cobrado: <strong>@{{ new Intl.NumberFormat("de-DE").format(Cuenta.montoCobrado)}}</strong> 
+                                    Monto Cobrado: <strong>@{{ Cuenta.montoCobrado.toLocaleString('es-ES')}}</strong> 
                                 </div>
                                 <div class="col-4">
-                                    Saldo: <strong>@{{ new Intl.NumberFormat("de-DE").format(Cuenta.saldo)}}</strong> 
+                                    Saldo: <strong>@{{ Cuenta.saldo.toLocaleString('es-ES')}}</strong> 
                                 </div>
                             </div>
                         </template>
@@ -420,6 +422,7 @@
     <script type="text/javascript" src="chart/raphael.min.js"></script>
     <script type="text/javascript" src="chart/morris.min.js"></script>
     <script type="text/javascript">
+    Vue.prototype.Funciones= window.Funciones;
         var app = new Vue({
             el: '#app',
             data: {
@@ -688,27 +691,7 @@
                             this.error = e.message;
                         })
                 },
-                formatFecha: function(fecha) {
-                    const f = fecha.split("-");
-                    return f[2] + "/" + f[1] + "/" + f[0];
-                },
-                subFecha: function(startFecha) {
-                    const fechaInicio = new Date(startFecha).getTime();
-                    const fechaFin = new Date().getTime(); 
-                    if (fechaInicio > fechaFin) {
-                        return 0;
-                    }
-                    const diff = fechaFin - fechaInicio;
-                    return parseInt(diff / (1000 * 60 * 60 * 24));
-                },
-                diferenciaFecha: function(fecha_vent, pagada) {
-                    const dia = this.subFecha(fecha_vent)
-                    if (pagada == 0) {
-                        return dia
-                    } else {
-                        return "-"
-                    }
-                },
+               
             },
             computed: {
                 totalVenta() {
