@@ -50,7 +50,7 @@
                                 <td>@{{ format(cuota.monto_cuota) }}</td>
                                 <td>@{{ format(cuota.monto_cobrado) }}</td>
                                 <td>@{{ format(cuota.monto_cuota - cuota.monto_cobrado) }}</td>
-                                <td>@{{ diferenciaFecha(cuota.fecha_venc, cuota.monto_saldo) }}</td>
+                                <td>@{{ diferenciaFecha(cuota.fecha_venc, cuota.monto_saldo, cuota.estado_interes) }}</td>
                                 <td>
                                     <template v-if="cuota.monto_cobrado == cuota.monto_cuota">
                                         <span class="badge badge-success">Cobrado</span>

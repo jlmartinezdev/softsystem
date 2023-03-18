@@ -62,7 +62,7 @@
                     <td>&nbsp;&nbsp;{{$cuota->nro_cuotas}} de {{  $cantidad_cuotas[array_search($cuota->nro_fact_ventas, array_column($cantidad_cuotas, 'nro_fact_ventas'))]['cantidad']}}</td>
                     <td>&nbsp;&nbsp;{{number_format($cuota->cobrado,2,",",".")}}</td>
                     <td>&nbsp;&nbsp;{{number_format($cuota->interes,2,",",".")}}</td>
-                    <td>&nbsp;&nbsp;{{ $cuota->interes> 0 ? diferenciaFecha($cuota->fecha_venc) : "-"}}</td>
+                    <td>&nbsp;&nbsp;{{ $cuota->interes> 0 ? diferenciaFecha($cuota->fecha_venc, $cobro->cob_fecha) : "-"}}</td>
                 </tr>
                 @endforeach
             </table>
@@ -98,7 +98,7 @@
     } 
     subFecha= function(startFecha) {
         const fechaInicio = new Date(startFecha).getTime();
-        const fechaFin = new Date().getTime(); 
+        const fechaFin = new Date(endFecha).getTime(); 
         if (fechaInicio > fechaFin) {
             return 0;
         }

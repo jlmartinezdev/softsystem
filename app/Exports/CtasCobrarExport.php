@@ -1,8 +1,8 @@
 <?php
 namespace App\Exports;
-use DB;
-use App\Ctacobrar;
 
+//use App\Ctacobrar;
+use DB;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -30,7 +30,7 @@ class CtasCobrarExport implements FromView
         ];
     } */
     private function getDiaMora(){
-        return CtaCobrar::query()
+        return \App\CtaCobrar::query()
         ->select('ctas_cobrar.nro_cuotas', DB::raw('DATE_FORMAT(ctas_cobrar.fecha_venc,"%Y-%m-%d") as fecha_v'),'ctas_cobrar.nro_fact_ventas')
         ->where('ctas_cobrar.estado', '1')
         ->groupBy('ctas_cobrar.nro_fact_ventas')
@@ -39,7 +39,7 @@ class CtasCobrarExport implements FromView
     }
     public function view(): View
     {
-        $ctas= CtaCobrar::query()->join('ventas', 'ctas_cobrar.nro_fact_ventas', 'ventas.nro_fact_ventas')
+        $ctas= \App\CtaCobrar::query()->join('ventas', 'ctas_cobrar.nro_fact_ventas', 'ventas.nro_fact_ventas')
             ->join('clientes as c', 'ventas.clientes_cod', 'c.CLIENTES_cod')
             ->select( 'ctas_cobrar.nro_fact_ventas',DB::raw('SUM(ctas_cobrar.monto_saldo) as "saldo"'),DB::raw('COUNT(ctas_cobrar.nro_cuotas) as "cuotas"'), DB::raw('SUM(ctas_cobrar.monto_cobrado) as "cobrado"'), DB::raw('COUNT(IF(ctas_cobrar.estado=1,1,NULL)) AS "nopagada"'), DB::raw('COUNT(IF(ctas_cobrar.estado=0,1,NULL)) AS "pagada"'), DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y") as venta_fecha'), DB::raw('DATE_FORMAT(ctas_cobrar.fecha_venc,"%Y-%m-%d") as fecha_v'), 'ventas.venta_descuento', 'c.cliente_ruc', 'c.cliente_nombre', 'c.cliente_direccion', 'c.cliente_cel','ctas_cobrar.monto_cuota')
             ->groupBy('ctas_cobrar.nro_fact_ventas')

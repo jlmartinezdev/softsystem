@@ -1,7 +1,7 @@
 <template>
     <input :id="id" :tabindex="tabindex" @keyup="keyup" @keypress="isNumber($event)" v-model="text" onfocus="this.select()" :placeholder="placeholder" :class="Classes.input" type="text" />
 </template>
-<script lang="ts">
+<script>
 const defaultClasses ={
     input: "form-control form-control-sm"
 }

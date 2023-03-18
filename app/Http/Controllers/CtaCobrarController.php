@@ -195,6 +195,35 @@ class CtaCobrarController extends Controller
     }
     public function store(Request $request)
     {
+        if($request->onlyInteres){
+            $ultimo= Cobro::orderBy('cc_numero', 'DESC')->first();
+            $recibo= $this->reciboUp([$ultimo->recibon1,$ultimo->recibon2,$ultimo->nro_recibo]);
+            $cobro = new Cobro();
+            $cobro->nro_operacion = $request->cobro['nro_operacion'];
+            $cobro->suc_cod = $request->cobro['idSucursal'];
+            $cobro->cob_fecha = $request->cobro['fecha'];
+            $cobro->recibon1 = $recibo[0];
+            $cobro->recibon2 = $recibo[1];
+            $cobro->nro_recibo = $recibo[2];
+            $cobro->cob_importe= $request->cobro['totalInteres'];
+            $cobro->estado = "N";
+            $cobro->save();
+
+            foreach ($request->cuotas as $cuota) {
+                $detalle = DB::insert("INSERT INTO cobranza_detalle (cc_numero, nro_fact_ventas, nro_cuotas, importe, cobrado, tipo) VALUES (?,?,?,?,?,?)", [$cobro->cc_numero,$cuota['nro_fact_ventas'],$cuota['nro_cuotas'],$cuota['interes'],$cuota['interes'],'2']);
+
+                Ctacobrar::where('nro_cuotas', $cuota['nro_cuotas'])
+                ->where('nro_fact_ventas', $cuota['nro_fact_ventas'])
+                ->update([
+                    'interes' => $cuota['interes'],
+                    'estado_interes' => '1'
+                ]);
+            }
+            if(Auth::user()->cod_usuarios!= 1){
+                $this->storeMovimiento($cobro);
+            }
+            return $cobro->cc_numero;
+        }
         $ultimo= Cobro::orderBy('cc_numero', 'DESC')->first();
         $recibo= $this->reciboUp([$ultimo->recibon1,$ultimo->recibon2,$ultimo->nro_recibo]);
         $cobro = new Cobro();

@@ -10,12 +10,13 @@ function filtrarCtas($a1,$nroventa){
         return $e->nro_fact_ventas==$nroventa;
     }); */
 }
-function diferenciaFecha($fecha){
+function diferenciaFecha($fecha, $fechaCobro="now"){
     $date1 = new DateTime($fecha);
-    $date2 = new DateTime("now");
+    $date2 = new DateTime($fechaCobro);
     $diff = $date1->diff($date2);
     return $date2 > $date1 ? $diff->days :"-".$diff->days;
 }
+
 function subFecha($fecha) {
     $date1 = new DateTime($fecha);
     $date2 = new DateTime("now");
