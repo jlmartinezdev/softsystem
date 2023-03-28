@@ -81,6 +81,7 @@
                     externalQuery: txtbuscar,
                     searchFn: busqueda_tabla
                   }"
+                  
                   >
                   <template slot="table-row" slot-scope="props">
                     <span v-if="props.row.stock=='0'">

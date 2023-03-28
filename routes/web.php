@@ -94,7 +94,8 @@ Route::group(['middleware' => ['administrador']], function () {
 
     //REFERENCIAL
     
-    
+    //CONFIGURACION
+    Route::get('ajustes','AjusteController@index')->name('ajuste.index');
     
     //SUCURSAL
     Route::get('sucursal/all', 'SucursalController@All');

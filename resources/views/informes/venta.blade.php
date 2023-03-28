@@ -14,6 +14,7 @@
 		overflow-y: auto;
 	}
 </style>
+
 @endsection
 @section('main')
     <div class="container" id="app">
@@ -421,6 +422,7 @@
 @section('script')
     <script type="text/javascript" src="chart/raphael.min.js"></script>
     <script type="text/javascript" src="chart/morris.min.js"></script>
+  
     <script type="text/javascript">
     Vue.prototype.Funciones= window.Funciones;
         var app = new Vue({

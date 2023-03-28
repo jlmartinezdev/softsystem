@@ -1,4 +1,4 @@
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside class="main-sidebar sidebar-dark-info elevation-2">
     <!-- Brand Logo -->
     <a href="/" class="brand-link">
         <img src="/img/logo-softsystem.PNG" alt="Softystem" class="brand-image img-circle elevation-3"
@@ -216,6 +216,14 @@
                         <i class="nav-icon fa fa-home"></i>
                         <p>
                             INICIO
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('ajuste.index') }}" id="m_ajuste" class="nav-link">
+                        <i class="nav-icon fa fa-cog"></i>
+                        <p>
+                            AJUSTES
                         </p>
                     </a>
                 </li>

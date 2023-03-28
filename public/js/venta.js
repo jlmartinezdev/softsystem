@@ -86,6 +86,17 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Autocomplete.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Autocomplete.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: C:\\laragon\\www\\softsystem\\resources\\js\\components\\Autocomplete.vue: Support for the experimental syntax 'optionalChaining' isn't currently enabled (162:19):\n\n\u001b[0m \u001b[90m 160 | \u001b[39m        \u001b[36mclass\u001b[39m\u001b[33m:\u001b[39m \u001b[32m`${this.baseClass}-result-list`\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 161 | \u001b[39m        role\u001b[33m:\u001b[39m \u001b[32m'listbox'\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 162 | \u001b[39m        [ariaLabel\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mattribute]\u001b[33m:\u001b[39m ariaLabel\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mcontent\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m     | \u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 163 | \u001b[39m        style\u001b[33m:\u001b[39m {\u001b[0m\n\u001b[0m \u001b[90m 164 | \u001b[39m          position\u001b[33m:\u001b[39m \u001b[32m'absolute'\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 165 | \u001b[39m          zIndex\u001b[33m:\u001b[39m \u001b[35m1\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\n\nAdd @babel/plugin-proposal-optional-chaining (https://git.io/vb4Sk) to the 'plugins' section of your Babel config to enable transformation.\n    at Parser.raise (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:6322:17)\n    at Parser.expectPlugin (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:7643:18)\n    at Parser.parseSubscript (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8420:12)\n    at Parser.parseSubscripts (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8406:19)\n    at Parser.parseExprSubscripts (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8395:17)\n    at Parser.parseMaybeUnary (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8365:21)\n    at Parser.parseExprOps (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8252:23)\n    at Parser.parseMaybeConditional (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8225:23)\n    at Parser.parseMaybeAssign (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8172:21)\n    at Parser.parsePropertyName (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9272:23)\n    at Parser.parseObjectMember (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9178:10)\n    at Parser.parseObj (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9112:25)\n    at Parser.parseExprAtom (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8745:21)\n    at Parser.parseExprSubscripts (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8385:23)\n    at Parser.parseMaybeUnary (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8365:21)\n    at Parser.parseExprOps (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8252:23)\n    at Parser.parseMaybeConditional (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8225:23)\n    at Parser.parseMaybeAssign (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8172:21)\n    at Parser.parseExpression (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8120:23)\n    at Parser.parseReturnStatement (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:10132:28)\n    at Parser.parseStatementContent (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9811:21)\n    at Parser.parseStatement (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9763:17)\n    at Parser.parseBlockOrModuleBlockBody (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:10340:25)\n    at Parser.parseBlockBody (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:10327:10)\n    at Parser.parseBlock (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:10311:10)\n    at Parser.parseFunctionBody (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9382:24)\n    at Parser.parseFunctionBodyAndFinish (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9352:10)\n    at Parser.parseMethod (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9306:10)\n    at Parser.parseObjectMethod (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9222:19)\n    at Parser.parseObjPropValue (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9264:23)\n    at Parser.parseObjectMember (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9188:10)\n    at Parser.parseObj (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9112:25)\n    at Parser.parseExprAtom (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8745:21)\n    at Parser.parseExprSubscripts (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8385:23)\n    at Parser.parseMaybeUnary (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8365:21)\n    at Parser.parseExprOps (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8252:23)");
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/generar_cuota.vue?vue&type=script&lang=js&":
 /*!************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/generar_cuota.vue?vue&type=script&lang=js& ***!
@@ -323,6 +334,109 @@ __webpack_require__.r(__webpack_exports__);
     this.saldo = this.total;
   }
 });
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Autocomplete.vue?vue&type=template&id=c191a05a&":
+/*!***************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Autocomplete.vue?vue&type=template&id=c191a05a& ***!
+  \***************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { ref: "root" },
+    [
+      _vm._t(
+        "default",
+        [
+          _c("div", _vm._b({}, "div", _vm.rootProps, false), [
+            _c(
+              "input",
+              _vm._g(
+                _vm._b(
+                  {
+                    ref: "input",
+                    on: {
+                      input: _vm.handleInput,
+                      keydown: _vm.core.handleKeyDown,
+                      focus: _vm.core.handleFocus,
+                      blur: _vm.core.handleBlur
+                    }
+                  },
+                  "input",
+                  _vm.inputProps,
+                  false
+                ),
+                _vm.$listeners
+              )
+            ),
+            _vm._v(" "),
+            _c(
+              "ul",
+              _vm._g(
+                _vm._b({ ref: "resultList" }, "ul", _vm.resultListProps, false),
+                _vm.resultListListeners
+              ),
+              [
+                _vm._l(_vm.results, function(result, index) {
+                  return [
+                    _vm._t(
+                      "result",
+                      [
+                        _c(
+                          "li",
+                          _vm._b(
+                            { key: _vm.resultProps[index].id },
+                            "li",
+                            _vm.resultProps[index],
+                            false
+                          ),
+                          [
+                            _vm._v(
+                              "\n              " +
+                                _vm._s(_vm.getResultValue(result)) +
+                                "\n            "
+                            )
+                          ]
+                        )
+                      ],
+                      { result: result, props: _vm.resultProps[index] }
+                    )
+                  ]
+                })
+              ],
+              2
+            )
+          ])
+        ],
+        {
+          rootProps: _vm.rootProps,
+          inputProps: _vm.inputProps,
+          inputListeners: _vm.inputListeners,
+          resultListProps: _vm.resultListProps,
+          resultListListeners: _vm.resultListListeners,
+          results: _vm.results,
+          resultProps: _vm.resultProps
+        }
+      )
+    ],
+    2
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
 
 /***/ }),
 
@@ -689,6 +803,78 @@ function normalizeComponent (
 
 /***/ }),
 
+/***/ "./resources/js/components/Autocomplete.vue":
+/*!**************************************************!*\
+  !*** ./resources/js/components/Autocomplete.vue ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Autocomplete_vue_vue_type_template_id_c191a05a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Autocomplete.vue?vue&type=template&id=c191a05a& */ "./resources/js/components/Autocomplete.vue?vue&type=template&id=c191a05a&");
+/* harmony import */ var _Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Autocomplete.vue?vue&type=script&lang=js& */ "./resources/js/components/Autocomplete.vue?vue&type=script&lang=js&");
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Autocomplete_vue_vue_type_template_id_c191a05a___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Autocomplete_vue_vue_type_template_id_c191a05a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/Autocomplete.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/Autocomplete.vue?vue&type=script&lang=js&":
+/*!***************************************************************************!*\
+  !*** ./resources/js/components/Autocomplete.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./Autocomplete.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Autocomplete.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./resources/js/components/Autocomplete.vue?vue&type=template&id=c191a05a&":
+/*!*********************************************************************************!*\
+  !*** ./resources/js/components/Autocomplete.vue?vue&type=template&id=c191a05a& ***!
+  \*********************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_template_id_c191a05a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./Autocomplete.vue?vue&type=template&id=c191a05a& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Autocomplete.vue?vue&type=template&id=c191a05a&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_template_id_c191a05a___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_template_id_c191a05a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/components/generar_cuota.vue":
 /*!***************************************************!*\
   !*** ./resources/js/components/generar_cuota.vue ***!
@@ -766,6 +952,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 Vue.component('generar_cuota', __webpack_require__(/*! ./components/generar_cuota.vue */ "./resources/js/components/generar_cuota.vue")["default"]);
+Vue.component('Autocomplete', __webpack_require__(/*! ./components/Autocomplete.vue */ "./resources/js/components/Autocomplete.vue")["default"]);
 
 /***/ }),
 

@@ -25,6 +25,9 @@
         "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
+        "@trevoreyre/autocomplete": "^2.4.1",
+        "@trevoreyre/autocomplete-js": "^2.4.1",
+        "@trevoreyre/autocomplete-vue": "^2.4.1",
         "bootstrap": "^4.6.0",
         "inputmask": "^5.0.5",
         "jquery": "^3.6.0",
