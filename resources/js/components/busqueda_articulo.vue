@@ -34,8 +34,8 @@
                 		<th>Stock</th>
                 		<th>Acciones</th>
                 	</tr>
-                	<template v-for="articulo in articulos">
-                		<tr :class="{'text-danger': articulo.cantidad==0}">
+                	<template>
+                		<tr v-for="(articulo,index) in articulos" :key="index" :class="{'text-danger': articulo.cantidad==0}">
                 			<td>{{articulo.producto_c_barra}}</td>
                 			<td>{{articulo.producto_nombre}}</td>
                 			<td><strong>{{new Intl.NumberFormat("de-DE").format(articulo.pre_venta1)}}</strong></td>

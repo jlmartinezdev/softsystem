@@ -86,14 +86,382 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./node_modules/@trevoreyre/autocomplete/AutocompleteCore.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/@trevoreyre/autocomplete/AutocompleteCore.js ***!
+  \*******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+throw new Error("Module parse failed: Unexpected token (5:8)\nYou may need an appropriate loader to handle this file type.\n| \n| class AutocompleteCore {\n>   value = ''\n|   searchCounter = 0\n|   results = []");
+
+/***/ }),
+
+/***/ "./node_modules/@trevoreyre/autocomplete/util/debounce.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/@trevoreyre/autocomplete/util/debounce.js ***!
+  \****************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// Credit David Walsh (https://davidwalsh.name/javascript-debounce-function)
+
+// Returns a function, that, as long as it continues to be invoked, will not
+// be triggered. The function will be called after it stops being called for
+// N milliseconds. If `immediate` is passed, trigger the function on the
+// leading edge, instead of the trailing.
+const debounce = (func, wait, immediate) => {
+  let timeout
+
+  return function executedFunction() {
+    const context = this
+    const args = arguments
+
+    const later = function() {
+      timeout = null
+      if (!immediate) func.apply(context, args)
+    }
+
+    const callNow = immediate && !timeout
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+
+    if (callNow) func.apply(context, args)
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (debounce);
+
+
+/***/ }),
+
+/***/ "./node_modules/@trevoreyre/autocomplete/util/getAriaLabel.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@trevoreyre/autocomplete/util/getAriaLabel.js ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+throw new Error("Module parse failed: Unexpected token (12:15)\nYou may need an appropriate loader to handle this file type.\n|  */\n| const getAriaLabel = labelStr => {\n>   if (labelStr?.length) {\n|     const isLabelId = labelStr.startsWith('#')\n| ");
+
+/***/ }),
+
+/***/ "./node_modules/@trevoreyre/autocomplete/util/getRelativePosition.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/@trevoreyre/autocomplete/util/getRelativePosition.js ***!
+  \***************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// Calculates whether element2 should be above or below element1. Always
+// places element2 below unless all of the following:
+// 1. There isn't enough visible viewport below to fit element2
+// 2. There is more room above element1 than there is below
+// 3. Placing elemen2 above 1 won't overflow window
+const getRelativePosition = (element1, element2) => {
+  const position1 = element1.getBoundingClientRect()
+  const position2 = element2.getBoundingClientRect()
+
+  const positionAbove =
+    /* 1 */ position1.bottom + position2.height > window.innerHeight &&
+    /* 2 */ window.innerHeight - position1.bottom < position1.top &&
+    /* 3 */ window.pageYOffset + position1.top - position2.height > 0
+
+  return positionAbove ? 'above' : 'below'
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (getRelativePosition);
+
+
+/***/ }),
+
+/***/ "./node_modules/@trevoreyre/autocomplete/util/uniqueId.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/@trevoreyre/autocomplete/util/uniqueId.js ***!
+  \****************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// Generates a unique ID, with optional prefix. Adapted from
+// https://github.com/lodash/lodash/blob/61acdd0c295e4447c9c10da04e287b1ebffe452c/uniqueId.js
+let idCounter = 0
+const uniqueId = (prefix = '') => `${prefix}${++idCounter}`
+
+/* harmony default export */ __webpack_exports__["default"] = (uniqueId);
+
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Autocomplete.vue?vue&type=script&lang=js&":
 /*!***********************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Autocomplete.vue?vue&type=script&lang=js& ***!
   \***********************************************************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: C:\\laragon\\www\\softsystem\\resources\\js\\components\\Autocomplete.vue: Support for the experimental syntax 'optionalChaining' isn't currently enabled (162:19):\n\n\u001b[0m \u001b[90m 160 | \u001b[39m        \u001b[36mclass\u001b[39m\u001b[33m:\u001b[39m \u001b[32m`${this.baseClass}-result-list`\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 161 | \u001b[39m        role\u001b[33m:\u001b[39m \u001b[32m'listbox'\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 162 | \u001b[39m        [ariaLabel\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mattribute]\u001b[33m:\u001b[39m ariaLabel\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mcontent\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m     | \u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 163 | \u001b[39m        style\u001b[33m:\u001b[39m {\u001b[0m\n\u001b[0m \u001b[90m 164 | \u001b[39m          position\u001b[33m:\u001b[39m \u001b[32m'absolute'\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 165 | \u001b[39m          zIndex\u001b[33m:\u001b[39m \u001b[35m1\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\n\nAdd @babel/plugin-proposal-optional-chaining (https://git.io/vb4Sk) to the 'plugins' section of your Babel config to enable transformation.\n    at Parser.raise (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:6322:17)\n    at Parser.expectPlugin (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:7643:18)\n    at Parser.parseSubscript (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8420:12)\n    at Parser.parseSubscripts (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8406:19)\n    at Parser.parseExprSubscripts (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8395:17)\n    at Parser.parseMaybeUnary (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8365:21)\n    at Parser.parseExprOps (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8252:23)\n    at Parser.parseMaybeConditional (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8225:23)\n    at Parser.parseMaybeAssign (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8172:21)\n    at Parser.parsePropertyName (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9272:23)\n    at Parser.parseObjectMember (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9178:10)\n    at Parser.parseObj (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9112:25)\n    at Parser.parseExprAtom (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8745:21)\n    at Parser.parseExprSubscripts (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8385:23)\n    at Parser.parseMaybeUnary (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8365:21)\n    at Parser.parseExprOps (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8252:23)\n    at Parser.parseMaybeConditional (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8225:23)\n    at Parser.parseMaybeAssign (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8172:21)\n    at Parser.parseExpression (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8120:23)\n    at Parser.parseReturnStatement (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:10132:28)\n    at Parser.parseStatementContent (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9811:21)\n    at Parser.parseStatement (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9763:17)\n    at Parser.parseBlockOrModuleBlockBody (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:10340:25)\n    at Parser.parseBlockBody (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:10327:10)\n    at Parser.parseBlock (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:10311:10)\n    at Parser.parseFunctionBody (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9382:24)\n    at Parser.parseFunctionBodyAndFinish (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9352:10)\n    at Parser.parseMethod (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9306:10)\n    at Parser.parseObjectMethod (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9222:19)\n    at Parser.parseObjPropValue (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9264:23)\n    at Parser.parseObjectMember (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9188:10)\n    at Parser.parseObj (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:9112:25)\n    at Parser.parseExprAtom (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8745:21)\n    at Parser.parseExprSubscripts (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8385:23)\n    at Parser.parseMaybeUnary (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8365:21)\n    at Parser.parseExprOps (C:\\laragon\\www\\softsystem\\node_modules\\@babel\\parser\\lib\\index.js:8252:23)");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _trevoreyre_autocomplete_AutocompleteCore_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @trevoreyre/autocomplete/AutocompleteCore.js */ "./node_modules/@trevoreyre/autocomplete/AutocompleteCore.js");
+/* harmony import */ var _trevoreyre_autocomplete_AutocompleteCore_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_trevoreyre_autocomplete_AutocompleteCore_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _trevoreyre_autocomplete_util_uniqueId_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @trevoreyre/autocomplete/util/uniqueId.js */ "./node_modules/@trevoreyre/autocomplete/util/uniqueId.js");
+/* harmony import */ var _trevoreyre_autocomplete_util_getRelativePosition_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @trevoreyre/autocomplete/util/getRelativePosition.js */ "./node_modules/@trevoreyre/autocomplete/util/getRelativePosition.js");
+/* harmony import */ var _trevoreyre_autocomplete_util_debounce_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @trevoreyre/autocomplete/util/debounce.js */ "./node_modules/@trevoreyre/autocomplete/util/debounce.js");
+/* harmony import */ var _trevoreyre_autocomplete_util_getAriaLabel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @trevoreyre/autocomplete/util/getAriaLabel */ "./node_modules/@trevoreyre/autocomplete/util/getAriaLabel.js");
+/* harmony import */ var _trevoreyre_autocomplete_util_getAriaLabel__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_trevoreyre_autocomplete_util_getAriaLabel__WEBPACK_IMPORTED_MODULE_4__);
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: 'Autocomplete',
+  inheritAttrs: false,
+  props: {
+    search: {
+      type: Function,
+      required: true
+    },
+    baseClass: {
+      type: String,
+      "default": 'autocomplete'
+    },
+    autoSelect: {
+      type: Boolean,
+      "default": false
+    },
+    getResultValue: {
+      type: Function,
+      "default": function _default(result) {
+        return result;
+      }
+    },
+    defaultValue: {
+      type: String,
+      "default": ''
+    },
+    debounceTime: {
+      type: Number,
+      "default": 0
+    },
+    resultListLabel: {
+      type: String,
+      "default": undefined
+    },
+    submitOnEnter: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  data: function data() {
+    var core = new _trevoreyre_autocomplete_AutocompleteCore_js__WEBPACK_IMPORTED_MODULE_0___default.a({
+      search: this.search,
+      autoSelect: this.autoSelect,
+      setValue: this.setValue,
+      onUpdate: this.handleUpdate,
+      onSubmit: this.handleSubmit,
+      onShow: this.handleShow,
+      onHide: this.handleHide,
+      onLoading: this.handleLoading,
+      onLoaded: this.handleLoaded,
+      submitOnEnter: this.submitOnEnter
+    });
+
+    if (this.debounceTime > 0) {
+      core.handleInput = Object(_trevoreyre_autocomplete_util_debounce_js__WEBPACK_IMPORTED_MODULE_3__["default"])(core.handleInput, this.debounceTime);
+    }
+
+    return {
+      core: core,
+      value: this.defaultValue,
+      resultListId: Object(_trevoreyre_autocomplete_util_uniqueId_js__WEBPACK_IMPORTED_MODULE_1__["default"])("".concat(this.baseClass, "-result-list-")),
+      results: [],
+      selectedIndex: -1,
+      expanded: false,
+      loading: false,
+      position: 'below',
+      resetPosition: true
+    };
+  },
+  computed: {
+    rootProps: function rootProps() {
+      return {
+        "class": this.baseClass,
+        style: {
+          position: 'relative'
+        },
+        'data-expanded': this.expanded,
+        'data-loading': this.loading,
+        'data-position': this.position
+      };
+    },
+    inputProps: function inputProps() {
+      return _objectSpread({
+        "class": "".concat(this.baseClass, "-input"),
+        value: this.value,
+        role: 'combobox',
+        autocomplete: 'off',
+        autocapitalize: 'off',
+        autocorrect: 'off',
+        spellcheck: 'false',
+        'aria-autocomplete': 'list',
+        'aria-haspopup': 'listbox',
+        'aria-owns': this.resultListId,
+        'aria-expanded': this.expanded ? 'true' : 'false',
+        'aria-activedescendant': this.selectedIndex > -1 ? this.resultProps[this.selectedIndex].id : ''
+      }, this.$attrs);
+    },
+    inputListeners: function inputListeners() {
+      return {
+        input: this.handleInput,
+        keydown: this.core.handleKeyDown,
+        focus: this.core.handleFocus,
+        blur: this.core.handleBlur
+      };
+    },
+    resultListProps: function resultListProps() {
+      var _ref;
+
+      var yPosition = this.position === 'below' ? 'top' : 'bottom';
+      var ariaLabel = _trevoreyre_autocomplete_util_getAriaLabel__WEBPACK_IMPORTED_MODULE_4___default()(this.resultListLabel);
+      temp === null || temp === undefined ? undefined : temp.second;
+      return _ref = {
+        id: this.resultListId,
+        "class": "".concat(this.baseClass, "-result-list"),
+        role: 'listbox'
+      }, _defineProperty(_ref, ariaLabel.attribute === null || ariaLabel.attribute === undefined ? undefined : ariaLabel.attribute, ariaLabel.content === null || ariaLabel.content === undefined ? undefined : ariaLabel.content), _defineProperty(_ref, "style", _defineProperty({
+        position: 'absolute',
+        zIndex: 1,
+        width: '100%',
+        visibility: this.expanded ? 'visible' : 'hidden',
+        pointerEvents: this.expanded ? 'auto' : 'none'
+      }, yPosition, '100%')), _ref;
+    },
+    resultListListeners: function resultListListeners() {
+      return {
+        mousedown: this.core.handleResultMouseDown,
+        click: this.core.handleResultClick
+      };
+    },
+    resultProps: function resultProps() {
+      var _this = this;
+
+      return this.results.map(function (result, index) {
+        return _objectSpread({
+          id: "".concat(_this.baseClass, "-result-").concat(index),
+          "class": "".concat(_this.baseClass, "-result"),
+          'data-result-index': index,
+          role: 'option'
+        }, _this.selectedIndex === index ? {
+          'aria-selected': 'true'
+        } : {});
+      });
+    }
+  },
+  mounted: function mounted() {
+    document.body.addEventListener('click', this.handleDocumentClick);
+  },
+  beforeDestroy: function beforeDestroy() {
+    document.body.removeEventListener('click', this.handleDocumentClick);
+  },
+  updated: function updated() {
+    if (!this.$refs.input || !this.$refs.resultList) {
+      return;
+    }
+
+    if (this.resetPosition && this.results.length > 0) {
+      this.resetPosition = false;
+      this.position = Object(_trevoreyre_autocomplete_util_getRelativePosition_js__WEBPACK_IMPORTED_MODULE_2__["default"])(this.$refs.input, this.$refs.resultList);
+    }
+
+    this.core.checkSelectedResultVisible(this.$refs.resultList);
+  },
+  methods: {
+    setValue: function setValue(result) {
+      this.value = result ? this.getResultValue(result) : '';
+    },
+    handleUpdate: function handleUpdate(results, selectedIndex) {
+      this.results = results;
+      this.selectedIndex = selectedIndex;
+      this.$emit('update', results, selectedIndex);
+    },
+    handleShow: function handleShow() {
+      this.expanded = true;
+    },
+    handleHide: function handleHide() {
+      this.expanded = false;
+      this.resetPosition = true;
+    },
+    handleLoading: function handleLoading() {
+      this.loading = true;
+    },
+    handleLoaded: function handleLoaded() {
+      this.loading = false;
+    },
+    handleInput: function handleInput(event) {
+      this.value = event.target.value;
+      this.core.handleInput(event);
+    },
+    handleSubmit: function handleSubmit(selectedResult) {
+      this.$emit('submit', selectedResult);
+    },
+    handleDocumentClick: function handleDocumentClick(event) {
+      if (this.$refs.root.contains(event.target)) {
+        return;
+      }
+
+      this.core.hideResults();
+    }
+  }
+});
 
 /***/ }),
 
@@ -807,15 +1175,14 @@ function normalizeComponent (
 /*!**************************************************!*\
   !*** ./resources/js/components/Autocomplete.vue ***!
   \**************************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Autocomplete_vue_vue_type_template_id_c191a05a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Autocomplete.vue?vue&type=template&id=c191a05a& */ "./resources/js/components/Autocomplete.vue?vue&type=template&id=c191a05a&");
 /* harmony import */ var _Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Autocomplete.vue?vue&type=script&lang=js& */ "./resources/js/components/Autocomplete.vue?vue&type=script&lang=js&");
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -845,15 +1212,13 @@ component.options.__file = "resources/js/components/Autocomplete.vue"
 /*!***************************************************************************!*\
   !*** ./resources/js/components/Autocomplete.vue?vue&type=script&lang=js& ***!
   \***************************************************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./Autocomplete.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Autocomplete.vue?vue&type=script&lang=js&");
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__);
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
- /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0___default.a); 
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Autocomplete_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 

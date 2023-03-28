@@ -49,9 +49,10 @@
 							      <strong><label for="seccion">Seccion *</label></strong>
 							      <select name="seccion" v-model="articulo.seccion" class="form-control form-control-sm">
 							      	<option value="0">Seleccionar</option>
-							      	@foreach($secciones as $seccion)
+							      	<!--
+                                    foreach($secciones as $seccion)
 							      		<option value="{{$seccion['present_cod']}}"> {{ $seccion['present_descripcion'] }}</option>
-							      	@endforeach
+							      	endforeach -->
 							      </select>
 							    </div>
 							</div>
@@ -60,9 +61,9 @@
 							      <strong><label for="unidad">Unidad *</label></strong>
 							      <select name="unidad" v-model="articulo.unidad" class="form-control form-control-sm">
 							      	<option value="0">Seleccionar</option>
-							      	@foreach($unidades as $unidad)
+							      	<!-- foreach($unidades as $unidad)
 							      		<option value="{{$unidad['uni_codigo']}}">{{ $unidad['uni_nombre'] }}</option>
-							      	@endforeach
+							      	endforeach -->
 							      </select>
 							    </div>
 							</div>
@@ -99,10 +100,12 @@
 							      <strong><label for="sucursal">Sucursal</label></strong>
 							      <select v-model="stock.sucursal" class="form-control form-control-sm">
 							      	<option value="0">Seleccionar</option>
-							      	<template v-for="sucursal in sucursales">
-							      		<option :value="sucursal.suc_cod">@{{ sucursal.suc_desc }}</option>
+							      	<template >
+							      		<option v-for="(sucursal,index) in sucursales" :key="index"  :value="sucursal.suc_cod">@{{ sucursal.suc_desc }}</option>
 							      	</template>
 							      </select>
+
+
 							    </div>
 							</div>
 							
@@ -135,8 +138,8 @@
 									<th>Acciones</th>
 								</tr>
 								<template v-if="stocks">
-									<template v-for="stock in stocks">
-										<tr>
+									<template>
+										<tr  v-for="(stock,index) in stocks" :key="index">
 											<td>@{{getByIdSucursal(stock.sucursal)}}</td>
 											<td>@{{stock.cantidad}}</td>
 											<td>@{{stock.lotenew}}</td>

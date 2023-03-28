@@ -154,12 +154,13 @@ export default {
     resultListProps() {
       const yPosition = this.position === 'below' ? 'top' : 'bottom'
       const ariaLabel = getAriaLabel(this.resultListLabel)
-
+      temp === null || temp === undefined ? undefined : temp.second;
       return {
         id: this.resultListId,
         class: `${this.baseClass}-result-list`,
         role: 'listbox',
-        [ariaLabel?.attribute]: ariaLabel?.content,
+        [ariaLabel.attribute===null || ariaLabel.attribute===undefined ? undefined : ariaLabel.attribute ] : ariaLabel.content===null || ariaLabel.content===undefined ? undefined : ariaLabel.content ,
+        //[ariaLabel?.attribute]: ariaLabel?.content,
         style: {
           position: 'absolute',
           zIndex: 1,

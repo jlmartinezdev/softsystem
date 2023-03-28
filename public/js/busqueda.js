@@ -600,54 +600,51 @@ var render = function() {
                   [
                     _vm._m(1),
                     _vm._v(" "),
-                    _vm._l(_vm.articulos, function(articulo) {
-                      return [
-                        _c(
-                          "tr",
-                          { class: { "text-danger": articulo.cantidad == 0 } },
-                          [
-                            _c("td", [
-                              _vm._v(_vm._s(articulo.producto_c_barra))
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(_vm._s(articulo.producto_nombre))
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _c("strong", [
-                                _vm._v(
-                                  _vm._s(
-                                    new Intl.NumberFormat("de-DE").format(
-                                      articulo.pre_venta1
-                                    )
+                    _vm._l(_vm.articulos, function(articulo, index) {
+                      return _c(
+                        "tr",
+                        {
+                          key: index,
+                          class: { "text-danger": articulo.cantidad == 0 }
+                        },
+                        [
+                          _c("td", [_vm._v(_vm._s(articulo.producto_c_barra))]),
+                          _vm._v(" "),
+                          _c("td", [_vm._v(_vm._s(articulo.producto_nombre))]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _c("strong", [
+                              _vm._v(
+                                _vm._s(
+                                  new Intl.NumberFormat("de-DE").format(
+                                    articulo.pre_venta1
                                   )
                                 )
-                              ])
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _c("strong", [_vm._v(_vm._s(articulo.cantidad))])
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _c(
-                                "button",
-                                {
-                                  staticClass: "btn btn-outline-primary btn-sm",
-                                  attrs: { title: "Seleccionar" },
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.ArticuloSel(articulo)
-                                    }
-                                  }
-                                },
-                                [_c("span", { staticClass: "fa fa-cart-plus" })]
                               )
                             ])
-                          ]
-                        )
-                      ]
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _c("strong", [_vm._v(_vm._s(articulo.cantidad))])
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-outline-primary btn-sm",
+                                attrs: { title: "Seleccionar" },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.ArticuloSel(articulo)
+                                  }
+                                }
+                              },
+                              [_c("span", { staticClass: "fa fa-cart-plus" })]
+                            )
+                          ])
+                        ]
+                      )
                     })
                   ],
                   2

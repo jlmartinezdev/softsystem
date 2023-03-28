@@ -358,6 +358,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
 var defaultStock = {
   'id': 0,
   'cantidad': 0,
