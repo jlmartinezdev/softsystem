@@ -1,258 +1,344 @@
 <template>
-  <div ref="root">
-    <slot
-      :rootProps="rootProps"
-      :inputProps="inputProps"
-      :inputListeners="inputListeners"
-      :resultListProps="resultListProps"
-      :resultListListeners="resultListListeners"
-      :results="results"
-      :resultProps="resultProps"
-    >
-      <div v-bind="rootProps">
-        <input
-          ref="input"
-          v-bind="inputProps"
-          @input="handleInput"
-          @keydown="core.handleKeyDown"
-          @focus="core.handleFocus"
-          @blur="core.handleBlur"
-          v-on="$listeners"
-        />
-        <ul
-          ref="resultList"
-          v-bind="resultListProps"
-          v-on="resultListListeners"
+  <div
+    id="autocomplete"
+    :data-loading="[requestSend ? true : false]"
+    class="autocomplete"
+    data-position="below"
+  >
+    <input
+      type="text"
+      v-model="searchQuery"
+      placeholder="Buscar..."
+      class="autocomplete-input"
+      @keydown.down="selectNextItem"
+      @keydown.up="selectPrevItem"
+      @keydown.enter="selectItemEnter"
+      :aria-expanded="[showResults ? true : false]"
+      ref="inputsearch"
+    />
+    <ul v-if="showResults" ref="resultList" class="autocomplete-result-list">
+      <li
+        v-for="(result, index) in results"
+        :key="index"
+        :class="[result.cantidad == 0 ? 'text-maroon' : '']"
+        :aria-selected="[index === activeIndex ? true : false]"
+        @click="selectItem(index)"
+        :data-result-index="index"
+        class="autocomplete-result"
+      >
+        <span class="left">
+          {{ result.producto_nombre }}
+        </span>
+        <span class="right font-weight-bold">
+          <span v-show="result.cantidad > 0" class="badge badge-info">{{
+            result.cantidad
+          }}</span>
+          Gs
+          {{ new Intl.NumberFormat("de-DE").format(result.pre_venta1) }}</span
         >
-          <template v-for="(result, index) in results">
-            <slot name="result" :result="result" :props="resultProps[index]">
-              <li :key="resultProps[index].id" v-bind="resultProps[index]">
-                {{ getResultValue(result) }}
-              </li>
-            </slot>
-          </template>
-        </ul>
-      </div>
-    </slot>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
-import AutocompleteCore from '@trevoreyre/autocomplete/AutocompleteCore.js'
-import uniqueId from '@trevoreyre/autocomplete/util/uniqueId.js'
-import getRelativePosition from '@trevoreyre/autocomplete/util/getRelativePosition.js'
-import debounce from '@trevoreyre/autocomplete/util/debounce.js'
-import getAriaLabel from '@trevoreyre/autocomplete/util/getAriaLabel'
-
 export default {
-  name: 'Autocomplete',
-  inheritAttrs: false,
-
-  props: {
-    search: {
-      type: Function,
-      required: true,
-    },
-    baseClass: {
-      type: String,
-      default: 'autocomplete',
-    },
-    autoSelect: {
-      type: Boolean,
-      default: false,
-    },
-    getResultValue: {
-      type: Function,
-      default: result => result,
-    },
-    defaultValue: {
-      type: String,
-      default: '',
-    },
-    debounceTime: {
-      type: Number,
-      default: 0,
-    },
-    resultListLabel: {
-      type: String,
-      default: undefined,
-    },
-    submitOnEnter: {
-      type: Boolean,
-      default: false,
-    },
-  },
-
+  name: "Searcharticulo",
   data() {
-    const core = new AutocompleteCore({
-      search: this.search,
-      autoSelect: this.autoSelect,
-      setValue: this.setValue,
-      onUpdate: this.handleUpdate,
-      onSubmit: this.handleSubmit,
-      onShow: this.handleShow,
-      onHide: this.handleHide,
-      onLoading: this.handleLoading,
-      onLoaded: this.handleLoaded,
-      submitOnEnter: this.submitOnEnter,
-    })
-    if (this.debounceTime > 0) {
-      core.handleInput = debounce(core.handleInput, this.debounceTime)
-    }
-
     return {
-      core,
-      value: this.defaultValue,
-      resultListId: uniqueId(`${this.baseClass}-result-list-`),
+      searchQuery: "",
+      showResults: false,
       results: [],
-      selectedIndex: -1,
-      expanded: false,
-      loading: false,
-      position: 'below',
-      resetPosition: true,
-    }
+      activeIndex: null,
+      searchTerm: {},
+      requestSend: false,
+    };
   },
-
-  computed: {
-    rootProps() {
-      return {
-        class: this.baseClass,
-        style: { position: 'relative' },
-        'data-expanded': this.expanded,
-        'data-loading': this.loading,
-        'data-position': this.position,
+  props: ["url", "idsucursal", "validarLote"],
+  watch: {
+    searchQuery: function () {
+      if (this.searchQuery === "") {
+        this.showResults = false;
+        this.results = [];
+        return;
       }
-    },
-    inputProps() {
-      return {
-        class: `${this.baseClass}-input`,
-        value: this.value,
-        role: 'combobox',
-        autocomplete: 'off',
-        autocapitalize: 'off',
-        autocorrect: 'off',
-        spellcheck: 'false',
-        'aria-autocomplete': 'list',
-        'aria-haspopup': 'listbox',
-        'aria-owns': this.resultListId,
-        'aria-expanded': this.expanded ? 'true' : 'false',
-        'aria-activedescendant':
-          this.selectedIndex > -1
-            ? this.resultProps[this.selectedIndex].id
-            : '',
-        ...this.$attrs,
+      if (!isNaN(parseFloat(this.searchQuery))) {
+        return;
       }
-    },
-    inputListeners() {
-      return {
-        input: this.handleInput,
-        keydown: this.core.handleKeyDown,
-        focus: this.core.handleFocus,
-        blur: this.core.handleBlur,
-      }
-    },
-    resultListProps() {
-      const yPosition = this.position === 'below' ? 'top' : 'bottom'
-      const ariaLabel = getAriaLabel(this.resultListLabel)
-      temp === null || temp === undefined ? undefined : temp.second;
-      return {
-        id: this.resultListId,
-        class: `${this.baseClass}-result-list`,
-        role: 'listbox',
-        [ariaLabel.attribute===null || ariaLabel.attribute===undefined ? undefined : ariaLabel.attribute ] : ariaLabel.content===null || ariaLabel.content===undefined ? undefined : ariaLabel.content ,
-        //[ariaLabel?.attribute]: ariaLabel?.content,
-        style: {
-          position: 'absolute',
-          zIndex: 1,
-          width: '100%',
-          visibility: this.expanded ? 'visible' : 'hidden',
-          pointerEvents: this.expanded ? 'auto' : 'none',
-          [yPosition]: '100%',
-        },
-      }
-    },
-    resultListListeners() {
-      return {
-        mousedown: this.core.handleResultMouseDown,
-        click: this.core.handleResultClick,
-      }
-    },
-    resultProps() {
-      return this.results.map((result, index) => ({
-        id: `${this.baseClass}-result-${index}`,
-        class: `${this.baseClass}-result`,
-        'data-result-index': index,
-        role: 'option',
-        ...(this.selectedIndex === index ? { 'aria-selected': 'true' } : {}),
-      }))
+      this.getArticulo(false, this.searchQuery);
     },
   },
-
-  mounted() {
-    document.body.addEventListener('click', this.handleDocumentClick)
-  },
-
-  beforeDestroy() {
-    document.body.removeEventListener('click', this.handleDocumentClick)
-  },
-
   updated() {
-    if (!this.$refs.input || !this.$refs.resultList) {
-      return
+    if (!this.$refs.resultList) {
+      return;
     }
-    if (this.resetPosition && this.results.length > 0) {
-      this.resetPosition = false
-      this.position = getRelativePosition(
-        this.$refs.input,
-        this.$refs.resultList
-      )
-    }
-    this.core.checkSelectedResultVisible(this.$refs.resultList)
+    this.checkSelectedResultVisible(this.$refs.resultList);
   },
-
   methods: {
-    setValue(result) {
-      this.value = result ? this.getResultValue(result) : ''
-    },
-
-    handleUpdate(results, selectedIndex) {
-      this.results = results
-      this.selectedIndex = selectedIndex
-      this.$emit('update', results, selectedIndex)
-    },
-
-    handleShow() {
-      this.expanded = true
-    },
-
-    handleHide() {
-      this.expanded = false
-      this.resetPosition = true
-    },
-
-    handleLoading() {
-      this.loading = true
-    },
-
-    handleLoaded() {
-      this.loading = false
-    },
-
-    handleInput(event) {
-      this.value = event.target.value
-      this.core.handleInput(event)
-    },
-
-    handleSubmit(selectedResult) {
-      this.$emit('submit', selectedResult)
-    },
-
-    handleDocumentClick(event) {
-      if (this.$refs.root.contains(event.target)) {
-        return
+    searchOnEnter() {
+      if (!isNaN(parseFloat(this.searchQuery)) && this.searchQuery.length > 4) {
+        this.getArticulo(true, this.searchQuery);
       }
-      this.core.hideResults()
     },
+    getArticulo(isBarcode, textSearch) {
+      var Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+      });
+      this.requestSend = true;
+      if (isBarcode) {
+        axios
+          .get(this.url, {
+            params: {
+              cbarra: textSearch,
+              bus_suc: this.idsucursal,
+            },
+          })
+          .then((response) => {
+            this.requestSend= false;
+            if (response.data) {
+              if (response.data.length > 1 && this.validarLote=='true') {
+                this.checkLote(response.data);
+              } else {
+                this.searchTerm = response.data[0];
+                this.returnData();
+              }
+            } else {
+              Toast.fire({
+                icon: "error",
+                title: "Codigo ingresado no existe en la Base de Datos...",
+              });
+            }
+          })
+          .catch((error) => console.log(error));
+      } else {
+        axios
+          .get(this.url, {
+            params: {
+              buscar: textSearch,
+              bus_suc: this.idsucursal,
+            },
+          })
+          .then((response) => {
+            this.requestSend = false;
+            if (response.data) {
+              this.results = response.data;
+              this.showResults = true;
+            } else {
+              Toast.fire({
+                icon: "info",
+                title: `No hay resultado para: ${textSearch}`,
+              });
+              this.focusSearchInput();
+            }
+          })
+          .catch((error) => console.log(error));
+      }
+    },
+    returnData() {
+      this.searchQuery = "";
+      this.$emit("articulo", this.searchTerm);
+      this.focusSearchInput();
+    },
+    async checkLote(lotes) {
+      var values = {};
+      for (var i = 0; i < lotes.length; i++) {
+        values[i] = lotes[i].lote_nro;
+      }
+      const { value: lote } = await Swal.fire({
+        title: "Seleccione Lote",
+        input: "select",
+        inputOptions: values,
+        inputPlaceholder: "Seleccione lote",
+        showCancelButton: true,
+        confirmButtonText: "Aceptar",
+        cancelButtonText: "Cancelar",
+      });
+      if (lote) {
+        this.searchTerm = lotes[value];
+        this.returnData();
+      }
+    },
+    selectPrevItem() {
+      if (this.activeIndex === null) {
+        this.activeIndex = 0;
+      } else if (this.activeIndex > 0) {
+        this.activeIndex--;
+      }
+    },
+    selectNextItem() {
+      if (this.activeIndex === null) {
+        this.activeIndex = 0;
+      } else if (this.activeIndex < this.results.length - 1) {
+        this.activeIndex++;
+      }
+    },
+    selectItem(index) {
+      this.showResults = false;
+      this.activeIndex = null;
+      if (this.validarLote=='true') {
+        this.getArticulo(true, this.results[index].producto_c_barra);
+      } else {
+        this.searchTerm = this.results[index];
+        this.returnData();
+      }
+    },
+    selectItemEnter() {
+      if (this.results && this.activeIndex !== null) {
+        if (this.validarLote=='true') {
+          this.getArticulo(
+            true,
+            this.results[this.activeIndex].producto_c_barra
+          );
+        } else {
+          this.selectItem(this.activeIndex);
+        }
+      } else {
+        this.searchOnEnter();
+      }
+    },
+    checkSelectedResultVisible(resultsElement) {
+      const selectedResultElement = resultsElement.querySelector(
+        `[data-result-index="${this.activeIndex}"]`
+      );
+      if (!selectedResultElement) {
+        return;
+      }
+
+      const resultsPosition = resultsElement.getBoundingClientRect();
+      const selectedPosition = selectedResultElement.getBoundingClientRect();
+
+      if (selectedPosition.top < resultsPosition.top) {
+        // Element is above viewable area
+        resultsElement.scrollTop -= resultsPosition.top - selectedPosition.top;
+      } else if (selectedPosition.bottom > resultsPosition.bottom) {
+        // Element is below viewable area
+        resultsElement.scrollTop +=
+          selectedPosition.bottom - resultsPosition.bottom;
+      }
+    },
+    focusSearchInput(){
+      this.$refs.inputsearch.focus();
+    }
   },
-}
+  mounted(){
+    this.focusSearchInput();
+  }
+};
 </script>
+<style scoped>
+.autocomplete-input {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  width: 100%;
+  padding: 7px 7px 7px 48px;
+  box-sizing: border-box;
+  position: relative;
+  font-size: 16px;
+  line-height: 1.5;
+  flex: 1;
+  background-color: #eee;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjY2IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMSIgcj0iOCIvPjxwYXRoIGQ9Ik0yMSAyMWwtNC00Ii8+PC9zdmc+");
+  background-repeat: no-repeat;
+  background-position: 12px;
+}
+
+.autocomplete-input:focus,
+.autocomplete-input[aria-expanded="true"] {
+  border-color: rgba(0, 0, 0, 0.12);
+  background-color: #fff;
+  outline: none;
+  /* box-shadow: 0 2px 2px rgba(0, 0, 0, .16)*/
+}
+.dark-mode .autocomplete-input {
+  border-color: rgba(0, 0, 0, 0.12);
+  color: white;
+  background-color: #343a40;
+}
+
+[data-position="below"] .autocomplete-input[aria-expanded="true"] {
+  border-bottom-color: transparent;
+  border-radius: 8px 8px 0 0;
+}
+
+[data-position="above"] .autocomplete-input[aria-expanded="true"] {
+  border-top-color: transparent;
+  border-radius: 0 0 8px 8px;
+  z-index: 2;
+}
+
+.autocomplete[data-loading="true"]:after {
+  content: "";
+  border: 3px solid rgba(0, 0, 0, 0.12);
+  border-right-color: rgba(0, 0, 0, 0.48);
+  border-radius: 100%;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: rotate 1s linear infinite;
+}
+
+.autocomplete-result-list {
+  margin: 0;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0;
+  box-sizing: border-box;
+  max-height: 296px;
+  overflow-y: auto;
+  background: #fff;
+  list-style: none;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.16);
+}
+.dark-mode .autocomplete-result-list {
+  background: #343a40;
+}
+
+[data-position="below"] .autocomplete-result-list {
+  margin-top: -1px;
+  border-top-color: transparent;
+  border-radius: 0 0 8px 8px;
+  padding-bottom: 8px;
+}
+
+[data-position="above"] .autocomplete-result-list {
+  margin-bottom: -1px;
+  border-bottom-color: transparent;
+  border-radius: 8px 8px 0 0;
+  padding-top: 8px;
+}
+
+.autocomplete-result {
+  cursor: default;
+  padding: 7px 7px 7px 48px;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjY2NjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMSIgcj0iOCIvPjxwYXRoIGQ9Ik0yMSAyMWwtNC00Ii8+PC9zdmc+");
+  background-repeat: no-repeat;
+  background-position: 12px;
+  overflow: hidden;
+}
+.autocomplete-result .left {
+  float: left;
+  width: 80%;
+}
+.autocomplete-result .right {
+  float: right;
+}
+.autocomplete-result:hover,
+.autocomplete-result[aria-selected="true"] {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+@keyframes rotate {
+  0% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+
+  to {
+    transform: translateY(-50%) rotate(359deg);
+  }
+}
+</style>

@@ -28,3 +28,4 @@ window.Funciones = require('./funciones');
 Vue.component('vPagination', require('./components/vue-plain-pagination.vue').default);
 Vue.component('registro_mostrado', require('./components/registro_mostrado.vue').default);
 Vue.component('inNumber',require('./components/in_number.vue').default);
+Vue.component('Searcharticulo',require('./components/Autocomplete.vue').default);

@@ -2,6 +2,18 @@
 @section('title', 'Gestionar Venta')
 @section('style')
     <style type="text/css">
+        @font-face {
+            font-family: "Sofia";
+            font-style: normal;
+            font-weight: 400;
+            font-display: auto;
+            src: url({{ asset('webfonts/SofiaSans-Regular.ttf') }}) format("truetype");
+        }
+
+        #main {
+            font-family: 'Sofia';
+        }
+
         .form-group {
             margin-bottom: 7px;
         }
@@ -28,79 +40,83 @@
             <div class="row">
                 <!-- PANEL IZQUIERDA -->
                 <div class="col-md-8">
-                    <h4>Formulario de Venta</h4>
-                    <div class="input-group">
-                        <input type="text" v-model="txtbuscar" @keyup.enter="showBuscar()" class="form-control"
-                            placeholder="Buscar...." autofocus />
-                        <div class="input-group-append">
-                            <button class="btn btn-secondary" @click="showBuscar()">
-                                <template v-if="requestSend">
-                                    <span class="spinner-border spinner-border-sm" role="status"></span><span
-                                        class="sr-only">Buscando...</span> Cargando...
-                                </template>
-                                <template v-else>
-                                    <span class="fa fa-search"></span> Buscar
-                                </template>
-                            </button>
-                        </div>
-                    </div>
-                    <autocomplete :search="search"></autocomplete>
-
-                    <!-- TABLA ......................... -->
-                    <div class="card mt-2 table-responsive-sm">
-                        <table class="table table-striped table-sm ">
-                            <tr>
-                                <th>Codigo</th>
-                                <th>Descripcion</th>
-                                <th>Cantidad</th>
-                                <th>Precio</th>
-                                <th>Importe</th>
-                                <th>Opciones</th>
-                            </tr>
-                            <template v-if="carro.length>0">
-                                <template v-for="(item,index) in carro">
-                                    <tr>
-                                        <td>@{{ item.codigo }}</td>
-                                        <td>@{{ item.descripcion }}</td>
-                                        <td>@{{ item.cantidad }}</td>
-                                        <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio) }}</td>
-                                        <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio * item.cantidad) }}</td>
-                                        <td>
-                                            <div class="btn-group">
-                                                <button class="btn btn-link dropdown-toggle" data-toggle="dropdown"
-                                                    aria-haspopup="true" aria-expanded="false">
-                                                    <span class="fa fa-bars"></span>
-                                                </button>
-                                                <div class="dropdown-menu dropdown-menu-right">
-                                                    <button class="dropdown-item"
-                                                        @click="setCantidad(index,item.cantidad,item.stock)">
-                                                        <span class="fa fa-cubes text-primary" style="width: 13pt"></span>
-                                                        Cantidad
-                                                    </button>
-                                                    <button class="dropdown-item" @click="showModalPrecio(index,item)">
-                                                        <span class="fa fa-dollar-sign  text-info"
-                                                            style="width: 13pt"></span> Precio
-                                                    </button>
-                                                    <button class="dropdown-item" @click="delArticulo(item)">
-                                                        <span class="fa fa-times-circle text-danger"
-                                                            style="width: 13pt"></span> Quitar
+                    <h4>:: REGISTRAR VENTA ::</h4>
+                    <!--div class="input-group">
+                                                <input type="text" v-model="txtbuscar" @keyup.enter="showBuscar()" class="form-control"
+                                                    placeholder="Buscar...." autofocus />
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-secondary" @click="showBuscar()">
+                                                        <template v-if="requestSend">
+                                                            <span class="spinner-border spinner-border-sm" role="status"></span><span
+                                                                class="sr-only">Buscando...</span> Cargando...
+                                                        </template>
+                                                        <template v-else>
+                                                            <span class="fa fa-search"></span> Buscar
+                                                        </template>
                                                     </button>
                                                 </div>
-                                            </div>
+                                            </div -->
+                    <Searcharticulo url="{{ env('APP_APIDB') }}" :idsucursal="ventaCabecera.idSucursal"
+                        @articulo="addCarrito" validar-lote="false">
+                    </Searcharticulo>
 
-                                        </td>
+
+                        <!-- TABLA ......................... -->
+                        <div class="card mt-2 table-responsive-sm">
+                            <table class="table table-striped table-sm ">
+                                <tr>
+                                    <th>Codigo</th>
+                                    <th>Descripcion</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                    <th>Importe</th>
+                                    <th>Opciones</th>
+                                </tr>
+                                <template v-if="carro.length>0">
+                                    <template v-for="(item,index) in carro">
+                                        <tr>
+                                            <td>@{{ item.codigo }}</td>
+                                            <td>@{{ item.descripcion }}</td>
+                                            <td>@{{ item.cantidad }}</td>
+                                            <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio) }}</td>
+                                            <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio * item.cantidad) }}</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button class="btn btn-link dropdown-toggle" data-toggle="dropdown"
+                                                        aria-haspopup="true" aria-expanded="false">
+                                                        <span class="fa fa-bars"></span>
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-right">
+                                                        <button class="dropdown-item"
+                                                            @click="setCantidad(index,item.cantidad,item.stock)">
+                                                            <span class="fa fa-cubes text-primary"
+                                                                style="width: 13pt"></span>
+                                                            Cantidad
+                                                        </button>
+                                                        <button class="dropdown-item" @click="showModalPrecio(index,item)">
+                                                            <span class="fa fa-dollar-sign  text-info"
+                                                                style="width: 13pt"></span> Precio
+                                                        </button>
+                                                        <button class="dropdown-item" @click="delArticulo(item)">
+                                                            <span class="fa fa-times-circle text-danger"
+                                                                style="width: 13pt"></span> Quitar
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </template>
+                                <template v-else>
+                                    <tr>
+                                        <td colspan="6">S I N &nbsp; A R T I C U L O . . .</td>
                                     </tr>
                                 </template>
-                            </template>
-                            <template v-else>
-                                <tr>
-                                    <td colspan="6">S I N &nbsp; A R T I C U L O . . .</td>
-                                </tr>
-                            </template>
 
-                        </table>
+                            </table>
 
-                    </div>
+                        </div>
 
                 </div>
                 <!-- PANEL DERECHA  -->
@@ -171,7 +187,7 @@
             </div> <!-- end row -->
         </div>
         <!--end container -->
-        @include('articulo.buscar')
+
         @include('venta.finalizar')
         @include('cliente.buscar')
         @include('venta.selprecio')
@@ -186,35 +202,12 @@
     <script src="{{ asset('js/separator.js') }}"></script>
     <script type="text/javascript">
         var app = new Vue({
-            components: {
-                Autocomplete
-            },
             el: '#app',
             data: {
                 requestSend: false,
                 requestFinalizar: false,
                 currentPage: 1,
-                bootstrapPaginationClasses: {
-                    ul: 'pagination',
-                    li: 'page-item',
-                    liActive: 'active',
-                    liDisable: 'disabled',
-                    button: 'page-link'
-                },
-                customLabels: {
-                    first: 'Primer',
-                    prev: 'Ant',
-                    next: 'Sig',
-                    last: 'Ultimo'
-                },
-                paginacion: {
-                    'total': 0,
-                    'pagina_actual': 1,
-                    'por_pagina': 0,
-                    'ultima_pagina': 0,
-                    'desde': 0,
-                    'hasta': 0
-                },
+
                 ventaCabecera: {
                     fecha: '2020-01-01',
                     clienteId: '1',
@@ -265,143 +258,36 @@
                 cuotas: []
             },
             methods: {
-				search: function(input){
-					console.log(input);
-				},
-                onChange: function() { //Al cambiar pagina
-                    if (this.paginacion.ultima_pagina > 1) {
-                        this.buscar(true);
-                    }
+                search: function(input) {
+                    console.log(input);
                 },
+
                 setCuotas: function(cuotas) {
                     this.cuotas = cuotas;
                 },
-                buscar: function(isPaginate) {
-                    this.requestSend = true;
-                    if (this.txtbuscar.length == 0) {
-                        let pag = isPaginate ? this.currentPage : 1
-                        axios.get('articulo/buscar', {
-                                params: {
-                                    page: pag,
-                                    buscar: this.txtbuscar,
-                                    criterio: 0,
-                                    seccion: this.filtro.seccion,
-                                    col: this.filtro.columna,
-                                    ord: this.filtro.orden,
-                                    suc: this.ventaCabecera.idSucursal
-                                }
-                            })
-                            .then(response => {
-                                this.requestSend = false;
-                                if (response.data == 'NO') {
-                                    Swal.fire('No se encontrado resultado!', 'Para:  ' + this.txtbuscar,
-                                        'info');
-                                } else {
-                                    this.articulos = response.data.articulos.data;
-                                    this.paginacion = response.data.paginacion;
-                                    //this.paginacion.pagina_actual=1;
-                                }
-                                //this.error=response.data;
-                            })
-                            .catch(e => {
-                                this.requestSend = false;
-                                this.error = e.message;
-                            });
-                    } else {
-                        axios.get('{{ env('APP_APIDB') }}', {
-                                params: {
-                                    buscar: this.txtbuscar,
-                                    bus_suc: this.ventaCabecera.idSucursal
-                                }
-                            })
-                            .then(response => {
-                                this.requestSend = false;
-                                if (response.data != "no") {
-                                    this.articulos = response.data;
-                                } else {
-                                    this.articulos = [];
-                                }
 
-                            })
-                            .catch(error => {
-                                Swal.fire('Error', error.message, 'error');
-                            });
-                    }
+                addCarrito: function(a) {
 
-                },
-                showBuscar: function() {
                     var Toast = Swal.mixin({
                         toast: true,
-                        position: 'top-end',
+                        position: "top-end",
                         showConfirmButton: false,
-                        timer: 3000
+                        timer: 3000,
                     });
-
-                    var t = parseFloat(this.txtbuscar);
-                    if (isNaN(t)) {
-                        $('#busquedaArticulo').modal('show');
-                        this.buscar(0);
-                    } else {
-                        axios.get('{{ env('APP_APIDB') }}', {
-                                params: {
-                                    cbarra: this.txtbuscar,
-                                    bus_suc: this.ventaCabecera.idSucursal
-                                }
-                            })
-                            .then(response => {
-                                const articulo = response.data;
-                                if (articulo != "no") {
-                                    if (articulo.length > 1)
-                                        this.validarLote(articulo[0], articulo);
-                                    else
-                                        this.addCarrito(articulo[0], articulo[0].id_stock);
-                                } else {
-                                    Toast.fire({
-                                        icon: 'error',
-                                        title: 'Codigo ingresado no existe en la Base de Datos...'
-                                    })
-                                }
-                            })
-                            .catch(error => {
-                                console.log(error.message)
-                            })
-                    }
-
-                },
-                validarArticulo: function(a) {
+                    //Buscar articulo si no esta en la lista
                     if (a.cantidad == 0) {
-                        Swal.fire('Articulo en stock 0', 'No se puede agregar este articulo!', 'error');
+                        console.log("No se puede agregar")
+                        Toast.fire({
+                            title: 'No se puede agregar articulo con stock 0!',
+                            icon: 'error'
+                        });
                         return;
                     }
-                    this.requestLote = true;
-                    //Traer lotes
-                    axios.get('{{ env('APP_APIDB') }}', {
-                            params: {
-                                lote: a.ARTICULOS_cod,
-                                bus_suc: this.ventaCabecera.idSucursal
-                            }
-                        })
-                        .then(response => {
-                            const stocks = response.data;
-                            this.requestLote = false;
-                            if (stocks.length > 1) { //Si hay mas de un lote
-                                $('#busquedaArticulo').modal('hide');
-                                this.validarLote(a, stocks);
-                            } else {
-                                this.addCarrito(a, stocks[0].id_stock);
-                                $('#busquedaArticulo').modal('hide');
-                            }
-                        })
-                    this.txtbuscar = '';
-
-                },
-                addCarrito: function(a, idStock) {
-                    //Buscar articulo si no esta en la lista
-                    let i = this.carro.findIndex(x => x.codigo == a.ARTICULOS_cod && x.idstock == idStock);
+                    let i = this.carro.findIndex(x => x.codigo == a.ARTICULOS_cod && x.idstock == a.id_stock);
                     if (i == -1) {
                         let art = {
                             codigo: a.ARTICULOS_cod,
-                            idstock: idStock,
+                            idstock: a.id_stock,
                             descripcion: a.producto_nombre,
                             cantidad: 1,
                             stock: a.cantidad,
@@ -421,7 +307,15 @@
                         }
                         this.carro.push(art);
                     } else {
-                        this.carro[i].cantidad = parseInt(this.carro[i].cantidad) + 1; //Actualizar cantidad
+                        if((this.carro[i].cantidad + 1) <= a.cantidad){
+                             this.carro[i].cantidad = parseInt(this.carro[i].cantidad) + 1;
+                        }else{
+                            Toast.fire({
+                            title: `Hay ${a.cantidad} stock para agregar...`,
+                            icon: 'error'
+                        });
+                        }
+                        //Actualizar cantidad
                     }
                     this.saveDatos();
                 },

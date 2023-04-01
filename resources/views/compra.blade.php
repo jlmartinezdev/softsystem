@@ -5,7 +5,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-8">
-				<div class="card">
+				<!-- div class="card">
 					<div class="card-body">
 						<div class="input-group">
 			                <input type="text" v-model="txtbuscar" @keyup.enter="showBuscar()" class="form-control" placeholder="Buscar...." autofocus />
@@ -21,7 +21,10 @@
 			                </div>
 			            </div>
 					</div>
-				</div>
+				</div -->
+				<Searcharticulo url="{{ env('APP_APIDB') }}" :idsucursal="compraCabecera.idSucursal" @articulo="addCarrito"
+                        validar-lote="false">
+				</Searcharticulo>
 				<!-- END CARD -->
 				<div class="card mt-2">
 					<table class="table table-striped table-sm table-responsive-sm">
@@ -302,12 +305,12 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
 				this.addCarrito(articulo,lotes[lote].id_stock);
 			}
 		},
-		addCarrito: function(a,id_stock){
-			let i=this.carro.findIndex(x=> x.codigo == a.ARTICULOS_cod &&  x.idstock==idStock);
+		addCarrito: function(a){
+			let i=this.carro.findIndex(x=> x.codigo == a.ARTICULOS_cod &&  x.idstock==a.id_stock);
 			if(i == -1){
 				let art= {
 					codigo: a.ARTICULOS_cod, 
-					idstock: id_stock,
+					idstock: a.id_stock,
 					descripcion: a.producto_nombre,
 					cantidad: 1,
 					stock: a.cantidad,
