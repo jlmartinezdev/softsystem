@@ -96,6 +96,7 @@ Route::group(['middleware' => ['administrador']], function () {
     
     //CONFIGURACION
     Route::get('ajustes','AjusteController@index')->name('ajuste.index');
+    Route::post('ajustes','AjusteController@update');
     
     //SUCURSAL
     Route::get('sucursal/all', 'SucursalController@All');

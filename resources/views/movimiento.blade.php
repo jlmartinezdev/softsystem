@@ -6,8 +6,7 @@
 			<h5 class="card-header bg-info text-white">Movimiento de caja</h5>
 			<div class="card-body">
 				
-				<h5><span class="badge badge-warning"> CAJA: <strong>@{{ this.movimiento.caja}}</strong></span> | <span class="badge badge-secondary"> NRO. OPERACION: <strong>@{{ this.movimiento.nro_operacion }}</strong></span> | 
-				<span class="badge"><strong>EN CAJA:</strong> @{{ encaja }}</span>
+				<h5><span class="badge badge-warning"> CAJA: <strong>@{{ this.movimiento.caja}}</strong></span> | <span class="badge badge-secondary"> NRO. OPERACION: <strong>@{{ this.movimiento.nro_operacion }}</strong></span> 
 				</h5>
 			<hr>
 				<div class="row">
@@ -37,6 +36,9 @@
 					</div>	
 				</div>
 			</div>
+			<div class="card-footer">
+				<h6><span class="fa fa-money-bill text-olive"></span><strong> TOTAL:</strong> Gs. @{{ encaja }}</h6>
+			</div>
 		</div>
 		<div class="card mt-2 table-responsive-sm">
 			<table class="table table-sm table-striped">
@@ -61,7 +63,7 @@
 						<td>@{{m.mov_fecha }}</td>
 						<td>@{{m.mov_concepto }}</td>
 						<td class="text-right">
-							<strong>@{{new Intl.NumberFormat("de-DE").format(m.mov_monto)}} </strong>
+							<strong>Gs. <template v-if="m.mov_tipo=='Salida' && m.mov_monto > 0">-</template> @{{new Intl.NumberFormat("de-DE").format(m.mov_monto)}} </strong>
 							
 						</td>
 					</tr>
@@ -136,11 +138,13 @@
 				var total= 0;
 				for (var i = 0; i < this.movimientos.length; i++) {
 					if(this.movimientos[i].mov_tipo=='Entrada'){
-						total += parseInt(this.movimientos[i].mov_monto);
+						total += parseFloat(this.movimientos[i].mov_monto);
+						
 					}else{
-						total -= parseInt(this.movimientos[i].mov_monto);
+						total -= parseFloat(this.movimientos[i].mov_monto || "0");
 					}
 				}
+
 				return new Intl.NumberFormat("de-DE").format(total);
 			}
 		},

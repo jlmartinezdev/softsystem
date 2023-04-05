@@ -15,7 +15,7 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <label>Validez Apertura</label>
-                                    <select class="form-control form-control-sm">
+                                    <select v-model="caja[0].value" class="form-control form-control-sm">
                                         <option value="1">Dia a dia por Fecha</option>
                                         <option value="2">Cada 24 horas</option>
                                         <option value="3">Indefinido</option>
@@ -23,7 +23,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Usuario</label>
-                                    <select class="form-control form-control-sm">
+                                    <select v-model="caja[1].value" class="form-control form-control-sm">
                                         <option value="1">Una apertura multiusuario</option>
                                         <option value="2">Una apertura por cada usuario</option>
                                     </select>
@@ -37,17 +37,78 @@
                         <div class="card">
                             <div class="card-header"><span class="text-muted"><strong>Venta</strong></span></div>
                             <div class="card-body">
-                                <label ">Prederminado Compobante</label>
-                                <select class="form-control form-control-sm">
-                                    <option value="ticket">Ticket</option>
-                                    <option value="documento">Comprabante</option>
-                                    <option value="factura">Factura</option>
+                                <label>Prederminado Compobante</label>
+                                <select v-model="venta.tipo_comprobante" class="form-control form-control-sm">
+                                    <option value="Ticket">Ticket</option>
+                                    <option value="Comprobante">Comprabante</option>
+                                    <option value="Factura">Factura</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="card-footer">
+                <button class="btn btn-success btn-flat" @click="update"><span class="fa fa-save"></span> Guardar</button>
+            </div>
         </div>
     </div>
+@endsection
+@section('script')
+    <script>
+        var Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+        });
+        var app = new Vue({
+            el: '#app',
+            data: {
+                caja: [{
+                    name: 'validez',
+                    value: {{ $ajuste[0]->value}},
+                }, {
+                    name: 'usuario',
+                    value: {{ $ajuste[1]->value}}
+                }],
+                venta: {
+                    tipo_comprobante: "Ticket"
+                }
+            },
+            methods: {
+                updateCaja() {
+                    axios.post('ajustes', {
+                            caja: this.caja
+                        })
+                        .then(response => {
+                            Toast.fire({
+                                title: 'Ajustes actualizados...',
+                                icon: 'info'
+                            })
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        })
+                },
+                updateVenta() {
+                    localStorage.setItem('config_venta', JSON.stringify(this.venta));
+                },
+                getConfigVenta() {
+                    var venta = localStorage.getItem('config_venta');
+                    if (venta != null) {
+                        this.venta = JSON.parse(venta);
+                    }
+
+                },
+                update() {
+                    this.updateVenta();
+                    this.updateCaja();
+                }
+            },
+            mounted() {
+                this.getConfigVenta();
+            }
+        })
+    </script>
 @endsection

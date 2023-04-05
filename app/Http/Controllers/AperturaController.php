@@ -7,6 +7,7 @@ use App\Apertura;
 use App\Sucursal;
 use App\Caja;
 use App\MovimientoCaja;
+use App\Ajuste;
 use DB;
 
 class AperturaController extends Controller
@@ -76,26 +77,30 @@ class AperturaController extends Controller
     }
     public function getStatu($id){
         $date= date('Y-m-d');
-        $archivo= base_path()."/configuracion.ini";
-        $contenido= parse_ini_file($archivo);
-        switch ($contenido['validez_apertura']) {
+        $config= Ajuste::where("categoria","caja")->get();
+
+        switch ($config[0]->value) {
             case '1':
-                return Apertura::where('apert_cierres_caja.suc_cod','=',$id)
+                return Apertura::join('usuarios','apert_cierres_caja.cod_usuarios','=','usuarios.cod_usuarios')
+                ->where('apert_cierres_caja.suc_cod','=',$id)
                 ->where('apert_cierres_caja.apert_fecha','=',$date)
-                ->where('apert_estado','=','1')
+                ->usuario($config[1]->value)
+                ->where('apert_cierres_caja.apert_estado','=','1')
                 ->first();
                 break;
             case '2':
                 return Apertura::where('apert_cierres_caja.suc_cod','=',$id)
                 ->where(DB::raw('TIMESTAMPDIFF(HOUR,CONCAT(apert_cierres_caja.apert_fecha," ",apert_cierres_caja.apert_hora),NOW())'),'<','24')
-                ->where('apert_estado','=','1')
+                ->usuario($config[1]->value)
+                ->where('apert_cierres_caja.apert_estado','=','1')
                 ->get()
                 ->last();
                 break;
             
             default:
                 return Apertura::where('apert_cierres_caja.suc_cod','=',$id)
-                ->where('apert_estado','=','1')
+                ->usuario($config[1]->value)
+                ->where('apert_cierres_caja.apert_estado','=','1')
                 ->get()
                 ->last();
                 break;

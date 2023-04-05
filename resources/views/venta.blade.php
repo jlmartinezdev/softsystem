@@ -311,7 +311,7 @@
                              this.carro[i].cantidad = parseInt(this.carro[i].cantidad) + 1;
                         }else{
                             Toast.fire({
-                            title: `Hay ${a.cantidad} stock para agregar...`,
+                            title: `Cantidad supera stock disponible: ${a.cantidad} ...`,
                             icon: 'error'
                         });
                         }
@@ -560,6 +560,14 @@
                     localStorage.removeItem('ventaCabecera');
                     this.getFecha();
                     window.location.reload();
+                },
+                getConfigVenta() {
+                    var config = localStorage.getItem('config_venta');
+                    if (config != null) {
+                        config = JSON.parse(config);
+                        this.ventaCabecera.documento= config.tipo_comprobante;
+                    }
+
                 }
             },
             computed: {
@@ -575,11 +583,12 @@
                 }
             },
             mounted() {
-                this.getFecha();
+               // this.getFecha();
                 this.getApertura();
                 this.recuperarDatos();
                 this.getFecha();
                 this.getSucursal();
+                this.getConfigVenta();
             }
         });
         activarMenu('m_venta', '');
