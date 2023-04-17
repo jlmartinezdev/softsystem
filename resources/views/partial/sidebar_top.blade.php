@@ -7,7 +7,15 @@
         <li class="nav-item d-none d-sm-inline-block">
             <a href="{{ route('home') }}" class="nav-link"><span class="fa fa-home"></span> INICIO</a>
         </li>
-        <li class="nav-item"></li>
+        @if(request()->routeIs("venta"))
+        <li class="nav-item">
+            <a href="{{ route('infventa.imprimir') }}" class="nav-link"><span class="fa fa-print"></span> IMPRIMIR</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="{{ route('infventa') }}" class="nav-link"><span class="fa fa-file-alt"></span> INFORME</a>
+        </li>
+        @endif
+        
 
     </ul>
 

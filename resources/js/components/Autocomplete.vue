@@ -52,6 +52,7 @@ export default {
       activeIndex: null,
       searchTerm: {},
       requestSend: false,
+      articulos: [],
     };
   },
   props: ["url", "idsucursal", "validarLote"],
@@ -221,6 +222,13 @@ export default {
     },
     focusSearchInput(){
       this.$refs.inputsearch.focus();
+    },
+    getAllArticulos(){
+      setInterval(() => {
+        if(document.visibilityState == 'visible'){
+          this.getArticulo(false, '');
+        }
+      }, 1000*60*5);
     }
   },
   mounted(){

@@ -18,19 +18,38 @@
             justify-content: center;
             min-height: 100vh;
         }
+        body{
+            background-image: url("{{ asset('img/fondo.png') }}")
+        }
+        .transparent{
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .fixed-bottom{
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .fixed-top{
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0,0,0,.3);
+        }
 
     </style>
 </head>
 
 <body class="h-100">
+    <div class="fixed-top">
+        <div class="text-center text-white font-weigh-bold p-2"><h4>::VENTAPRO+ v2.1::</h4></div>
+    </div>
     <div class="container" id="app">
         <div class="abs-center">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <strong>Iniciar Sesi&oacute;n</strong>
-                </div>
+            <div class="card transparent" style="width: 350px">
                 <div class="card-body">
                     <div class="pl-3 pr-3">
+                    <strong>Iniciar Sesi&oacute;n</strong>
+                    <hr>
                       <template v-if="intento">
                         <div class="text-center text-danger font-weigh-bold p-2">&nbsp;Demasiado intento erroneo...</div>
                       </template>
@@ -41,7 +60,7 @@
                                     <span class="fa fa-user"></span>
                                 </span>
                             </span>
-                            <select v-model="usuario" class="custom-select" id="user" tabindex="1">
+                            <select v-model="usuario" class="custom-select" ref="inputUser">
                                 <option>Seleccionar</option>
                                 <template v-for="usuario in usuarios">
                                     <option v-bind:value="usuario.user_usuarios">
@@ -57,19 +76,22 @@
                                     <span class="fa fa-key"></span>
                                 </span>
                             </span>
-                            <input tabindex="2" v-on:keyup.enter="enviar()" type="password" v-model="password"
+                            <input ref="inputPassword" v-on:keyup.enter="enviar()" type="password" v-model="password"
                                 class="form-control" placeholder="Contraseña">
                         </div>
                     </div>
                 </div>
                 <div class="card-footer">
-                    <center><button v-on:click="enviar()" class="btn btn-success"><span
+                    <center><button v-on:click="enviar()" class="btn btn-success btn-block"><span
                                 class="fa fa-sign-in-alt"></span>&nbsp;Acceder al Sistema</button></center>
-                    <br>
-                    <span class="text-muted align-items-center">Sistema de Gestion de Stock, Compra, Venta &copy;
-                        {{ date('Y') }}</span>
+                  
+                    
                 </div>
+
             </div>
+        </div>
+        <div class="fixed-bottom">
+            <div class="text-center text-muted font-weigh-bold p-2">&nbsp;Sistema de Gestion de Stock, Compra, Venta &copy; {{ date('Y') }}</div>
         </div>
 
     </div>
@@ -93,6 +115,11 @@
                 axios.get(url)
                     .then(response => {
                         this.usuarios = response.data;
+                        let user = this.getUserData();
+                        if(user != null)
+                          this.usuario = user;
+                          this.focusInput(user == null);
+
                     })
                     .catch(e => {
                         this.error = e.message;
@@ -111,6 +138,7 @@
                         })
                         .then(response => {
                           this.isRequest= false;
+
                             if (response.data.success == "no") {
                                 Swal.fire(
                                     'Atencion!',
@@ -118,6 +146,7 @@
                                     'error'
                                 )
                             } else {
+                                this.storeUserData(this.usuario.trim());
                                 window.location.href = "{{ route('home') }}";
                             }
                         })
@@ -137,13 +166,26 @@
                         'warning'
                     )
                 }
-            }
+            },
+            focusInput: function(flag) {
+                if(flag)
+                  this.$refs.inputUser.focus();
+                else
+                this.$refs.inputPassword.focus();
+            },
+            storeUserData: function(data) {
+                if(data == 'Seleccionar')
+                  return false;
+                localStorage.setItem('login', JSON.stringify(data));
+            },
+            getUserData: function() {
+                return JSON.parse(localStorage.getItem('login'));
+            },
         },
         mounted() {
             this.getUser();
         }
     })
-    document.getElementById("user").focus();
 </script>
 
 </html>

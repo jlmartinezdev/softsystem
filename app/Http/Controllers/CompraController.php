@@ -127,9 +127,13 @@ VALUES (?, ?, ?, ?, ?, ?, ?);',[$detalle['codigo'],$compra->compra_cod,$detalle[
     }
     public function destroy(Request $request){
         foreach ($request->articulos as $articulo) {
+           try{
             Stock::where('ARTICULOS_cod',$articulo['id'])
             ->first()
             ->decrement('cantidad',$articulo['cantidad']);
+            }catch(\Throwable $error){
+               // echo ($error);
+            }
         }
         DB::table('detalle_compra')->where('compra_cod',$request->id)->delete();
         DB::table('compra')->where('compra_cod',$request->id)->delete();

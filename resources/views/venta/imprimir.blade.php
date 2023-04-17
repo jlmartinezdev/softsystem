@@ -4,51 +4,60 @@
     <style>
         table {
             font-family: Arial, Helvetica, sans-serif;
-            
-        }
-        .modal-dialog{
-		overflow-y: initial !important
-	}
-	.modal-body{
-		height: 390px;
-		overflow-y: auto;
-	}
 
+        }
+
+        .modal-dialog {
+            overflow-y: initial !important
+        }
+
+        .modal-body {
+            height: 390px;
+            overflow-y: auto;
+        }
+
+        @font-face {
+            font-family: "Sofia";
+            font-style: normal;
+            font-weight: 400;
+            font-display: auto;
+            src: url({{ asset('webfonts/SofiaSans-Regular.ttf') }}) format("truetype");
+        }
+
+        #main {
+            font-family: 'Sofia';
+        }
     </style>
 @endsection
 @section('main')
 
     <div class="container" id="app">
-        <div class="card">
-            <h4 class="text-primary card-header">Imprimir Venta</h4>
-            <div class="card-body">
-                <div class="input-group">
-                    <input type="text" v-model="txtbuscar" @keyup.enter="getVenta()" class="form-control"
-                        placeholder="Buscar Cliente...." autofocus />
-                    <div class="input-group-append">
-                        <button class="btn btn-secondary" @click="getVenta()">
-                            <template v-if="requestSend">
-                                <span class="spinner-border spinner-border-sm" role="status"></span>
-                                <span class="sr-only">Buscando...</span> Cargando...
-                            </template>
-                            <template v-else>
-                                <span class="fa fa-search"></span> Buscar
-                            </template>
-                        </button>
-                    </div>
-                </div>
+        <h4>:: IMPRIMIR VENTA ::</h4>
+        <div class="input-group">
+            <input type="text" v-model="txtbuscar" @keyup.enter="getVenta()" class="form-control"
+                placeholder="Buscar Cliente...." tabindex="1" />
+            <div class="input-group-append">
+                <button class="btn btn-secondary" @click="getVenta()">
+                    <template v-if="requestSend">
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                        <span class="sr-only">Buscando...</span> Cargando...
+                    </template>
+                    <template v-else>
+                        <span class="fa fa-search"></span> Buscar
+                    </template>
+                </button>
             </div>
-
-
         </div>
+        <hr>
         <div class="table-responsive-sm">
-            <table class="table table-hover table-striped">
+            <table class="table table-sm table-hover table-striped" style="font-size: 11pt;">
                 <tr>
                     <th>Opciones</th>
                     <th>Nro Venta</th>
                     <th>Fecha Hora</th>
                     <th>Cliente</th>
-                    <th>Documento</th>
+                    <th>Celular</th>
+                    <th>Tipo</th>
                     <th class="text-right">Total</th>
 
                 </tr>
@@ -68,20 +77,25 @@
                                 <div class="dropdown-menu dropdown-menu-left">
                                     <button class="dropdown-item  text-primary" @click="showDetalle(venta)">
                                         <span class="fa fa-file-alt"></span> Detalle</button>
-                                    <a :href="'{{ env('APP_URL') }}'+'pdf/boletaventa/'+venta.nro_fact_ventas+'/'"
-                                        class="dropdown-item text-primary"><span class="fa fa-print"></span> Comprobante</button>
-                                        <a :href="'facturar/'+venta.nro_fact_ventas+''" class="dropdown-item text-primary"><span
-                                                class="fa fa-print"></span> Facturar</a>
+                                    <a :href="'{{ env('APP_URL') }}' + 'ticket/venta/'+ venta.nro_fact_ventas "
+                                        class="dropdown-item text-primary"><span class="fa fa-print"></span>
+                                        Ticket</a>
+                                    <a :href="'{{ env('APP_URL') }}' + 'pdf/boletaventa/' + venta.nro_fact_ventas + '/'"
+                                        class="dropdown-item text-primary"><span class="fa fa-print"></span>
+                                        Comprobante</a>
+                                    <a :href="'facturar/' + venta.nro_fact_ventas + ''"
+                                        class="dropdown-item text-primary"><span class="fa fa-print"></span>
+                                        Facturar</a>
                                 </div>
                             </div>
                             <!-- <button class="btn btn-link" @click="showDetalle(venta)"><span class="fa fa-file-alt"></span> Detalle</button>
-                            <a :href="'facturar/'+venta.nro_fact_ventas+''" class="btn btn-link"><span class="fa fa-print"></span> Facturar</a>
-                        -->
+                                        <a :href="'facturar/' + venta.nro_fact_ventas + ''" class="btn btn-link"><span class="fa fa-print"></span> Facturar</a>
+                                    -->
                         </td>
                         <td>@{{ venta.nro_fact_ventas }}</td>
                         <td>@{{ venta.fecha }}</td>
                         <td>@{{ venta.cliente_nombre }}</td>
-
+                        <td>@{{ venta.cliente_cel }}</td>
                         <td>@{{ venta.documento }}</td>
                         <td class="text-right font-weight-bold">@{{ new Intl.NumberFormat("de-DE").format(venta.venta_total) }}</td>
 
@@ -91,7 +105,7 @@
             </table>
         </div>
 
-        
+
         <div class="modal fade" id="frmdetalle">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
@@ -110,14 +124,14 @@
                                     <strong> Nro de Venta</strong>
                                     <span class="d-block"> @{{ venta.nro_fact_ventas }}</span>
                                 </div>
-                                
+
                             </div>
                             <div class="col-sm-3 border-right">
                                 <div class="text-center">
                                     <span class="fa fa-calendar text-warning"></span><strong> Fecha</strong>
                                     <span class="d-block"> @{{ venta.fecha }}</span>
                                 </div>
-                                
+
                             </div>
                             <div class="col-sm-6">
                                 <div class="text-center">
@@ -128,15 +142,15 @@
                         </div>
                         <div class="row mt-2">
                             <div class="col-4">
-                                 Condicion de Venta:<strong> @{{ venta.tipo_factura== 1 ? "Contado" : "Credito" }}</strong>
+                                Condicion de Venta:<strong> @{{ venta.tipo_factura == 1 ? "Contado" : "Credito" }}</strong>
                             </div>
                             <div class="col-4">
-                                
-                                Descuento: <strong>@{{new Intl.NumberFormat("de-DE").format(venta.venta_descuento) }} Gs.</strong>
+
+                                Descuento: <strong>@{{ new Intl.NumberFormat("de-DE").format(venta.venta_descuento) }} Gs.</strong>
                             </div>
                             <div class="col-4">
-                                 Total: <strong>
-                                @{{new Intl.NumberFormat("de-DE").format(venta.venta_total) }} Gs.</strong>
+                                Total: <strong>
+                                    @{{ new Intl.NumberFormat("de-DE").format(venta.venta_total) }} Gs.</strong>
                             </div>
                         </div>
                         <span class="badge bg-info">Detalle Venta</span>
@@ -170,24 +184,24 @@
                                 </tr>
                                 <template v-for="c in cuotas">
                                     <tr>
-                                        <td>@{{c.nro_cuotas}}</td>
-                                        <td>@{{formatFecha(c.fecha_venc)}}</td>
-                                        <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_cuota)}}</td>
-                                        <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_cobrado)}}</td>
-                                        <td>@{{new Intl.NumberFormat("de-DE").format(c.monto_saldo)}}</td>
+                                        <td>@{{ c.nro_cuotas }}</td>
+                                        <td>@{{ formatFecha(c.fecha_venc) }}</td>
+                                        <td>@{{ new Intl.NumberFormat("de-DE").format(c.monto_cuota) }}</td>
+                                        <td>@{{ new Intl.NumberFormat("de-DE").format(c.monto_cobrado) }}</td>
+                                        <td>@{{ new Intl.NumberFormat("de-DE").format(c.monto_saldo) }}</td>
                                     </tr>
                                 </template>
                             </table>
                             <div class="row">
                                 <div class="col-4">
-                                    Monto Cobrado: <strong>@{{ new Intl.NumberFormat("de-DE").format(Cuenta.montoCobrado)}}</strong> 
+                                    Monto Cobrado: <strong>@{{ new Intl.NumberFormat("de-DE").format(Cuenta.montoCobrado) }}</strong>
                                 </div>
                                 <div class="col-4">
-                                    Saldo: <strong>@{{ new Intl.NumberFormat("de-DE").format(Cuenta.saldo)}}</strong> 
+                                    Saldo: <strong>@{{ new Intl.NumberFormat("de-DE").format(Cuenta.saldo) }}</strong>
                                 </div>
                             </div>
                         </template>
-                        
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"><span
@@ -205,7 +219,13 @@
             data: {
                 ventas: [],
                 cuotas: [],
-                Cuenta: {cantitad: 0, montoCuota: 0, saldo: 0, cobrado : 0, montoCobrado: 0},
+                Cuenta: {
+                    cantitad: 0,
+                    montoCuota: 0,
+                    saldo: 0,
+                    cobrado: 0,
+                    montoCobrado: 0
+                },
                 txtbuscar: '',
                 requestSend: false,
                 idSucursal: 1,
@@ -221,36 +241,36 @@
                     this.getDetalle();
                 },
                 getDetalle: function() {
-                    axios.get('{{ env('APP_URL') }}'+'infventa/detalle/' + this.venta.nro_fact_ventas)
+                    axios.get('{{ env('APP_URL') }}' + 'infventa/detalle/' + this.venta.nro_fact_ventas)
                         .then(response => {
                             this.detalleVenta = response.data;
                         })
                         .catch(error => {
                             console.log(error.message);
                         })
-                    if(this.venta.tipo_factura== '2'){
+                    if (this.venta.tipo_factura == '2') {
                         this.getCta();
                     }
                 },
-                getCta: function(){
-                    axios.get('{{ env('APP_URL') }}'+'cuotas/' + this.venta.nro_fact_ventas)
-                    .then(response => {
-                        const c= response.data;
-                        this.cuotas= c;
-                        let saldo= 0;
-                        let cobrado= 0;
-                        
-                        for (let i = 0; i < c.length; i++) {
-                            saldo += parseInt(c[i].monto_saldo);
-                            cobrado += parseInt(c[i].monto_cobrado);
+                getCta: function() {
+                    axios.get('{{ env('APP_URL') }}' + 'cuotas/' + this.venta.nro_fact_ventas)
+                        .then(response => {
+                            const c = response.data;
+                            this.cuotas = c;
+                            let saldo = 0;
+                            let cobrado = 0;
 
-                        }
-                        this.Cuenta.saldo= saldo;
-                        this.Cuenta.montoCobrado= cobrado;
-                    })
-                    .catch(error => {
-                        console.log(error.message);
-                    })
+                            for (let i = 0; i < c.length; i++) {
+                                saldo += parseInt(c[i].monto_saldo);
+                                cobrado += parseInt(c[i].monto_cobrado);
+
+                            }
+                            this.Cuenta.saldo = saldo;
+                            this.Cuenta.montoCobrado = cobrado;
+                        })
+                        .catch(error => {
+                            console.log(error.message);
+                        })
                 },
                 showBuscar: function() {
 
@@ -258,7 +278,7 @@
                 getVenta: function() {
                     this.requestSend = true;
                     const isNumber = isNaN(parseFloat(this.txtbuscar)) ? 0 : 1;
-            			
+
                     axios.get('{{ Route('infventa.cliente') }}', {
                             params: {
                                 cliente: this.txtbuscar,
@@ -283,7 +303,7 @@
                 formatFecha: function(fecha) {
                     const f = fecha.split("-");
                     return f[2] + "/" + f[1] + "/" + f[0];
-                } 
+                }
             },
             mounted() {
                 this.getSucursal();

@@ -44,7 +44,7 @@
 
         .slider::before {
            /* background-color: #fff;*/
-            background-image: url('css/day.svg' );
+            background-image: url({{ asset('css/day.svg') }});
             color: white;
             bottom: 4px;
             content: "";
@@ -60,7 +60,7 @@
         }
         input:checked+.slider::before {
            /* background-color: #fff;*/
-            background-image: url('css/night.svg' );
+            background-image: url({{ asset('css/night.svg') }});
         }
 
         input:checked+.slider::before {

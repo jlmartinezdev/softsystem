@@ -50,7 +50,7 @@ class VentaController extends Controller
 
     }
     public function getVentaByCliente(Request $request){
-        return Venta::select('ventas.nro_fact_ventas','ventas.documento','ventas.venta_descuento','ventas.venta_total',DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y %H:%i") AS fecha'),'c.cliente_nombre', 'c.cliente_direccion', 'c.cliente_ruc','s.suc_desc','ventas.tipo_factura')
+        return Venta::select('ventas.nro_fact_ventas','ventas.documento','ventas.venta_descuento','ventas.venta_total',DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y %H:%i") AS fecha'),'c.cliente_nombre', 'c.cliente_direccion','c.cliente_cel', 'c.cliente_ruc','s.suc_desc','ventas.tipo_factura')
         ->join('clientes as c','ventas.clientes_cod','=','c.clientes_cod')
         ->join('sucursales as s','ventas.suc_cod','=','s.suc_cod')
         ->filtrocliente($request->cliente,$request->isNumber)
@@ -225,6 +225,12 @@ class VentaController extends Controller
    public function ticketfactura(){
        $empresa= Empresa::first();
        return view('ticket.factura',compact('empresa'));
+   }
+   public function ticket($id){
+    $venta= $this->getCabecera($id);
+    $empresa= Empresa::first();
+    //return $venta;
+    return view('ticket.venta',compact('venta','empresa'));
    }
    public function imprimir(){
        return view('venta.imprimir');

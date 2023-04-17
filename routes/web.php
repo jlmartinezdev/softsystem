@@ -126,6 +126,7 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('/clear-cache', 'AperturaController@comando');
     //TICKET
     Route::get('ticket/factura/{id}', 'FacturarController@ticket');
+    Route::get('ticket/venta/{id}','VentaController@ticket');
 
 Route::get('usuario/all', 'UserController@showAll')->name('showalluser');
 Route::get('seccion', 'SeccionController@index')->name('seccion.index');

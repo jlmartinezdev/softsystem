@@ -42,81 +42,80 @@
                 <div class="col-md-8">
                     <h4>:: REGISTRAR VENTA ::</h4>
                     <!--div class="input-group">
-                                                <input type="text" v-model="txtbuscar" @keyup.enter="showBuscar()" class="form-control"
-                                                    placeholder="Buscar...." autofocus />
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-secondary" @click="showBuscar()">
-                                                        <template v-if="requestSend">
-                                                            <span class="spinner-border spinner-border-sm" role="status"></span><span
-                                                                class="sr-only">Buscando...</span> Cargando...
-                                                        </template>
-                                                        <template v-else>
-                                                            <span class="fa fa-search"></span> Buscar
-                                                        </template>
-                                                    </button>
-                                                </div>
-                                            </div -->
+                                                    <input type="text" v-model="txtbuscar" @keyup.enter="showBuscar()" class="form-control"
+                                                        placeholder="Buscar...." autofocus />
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-secondary" @click="showBuscar()">
+                                                            <template v-if="requestSend">
+                                                                <span class="spinner-border spinner-border-sm" role="status"></span><span
+                                                                    class="sr-only">Buscando...</span> Cargando...
+                                                            </template>
+                                                            <template v-else>
+                                                                <span class="fa fa-search"></span> Buscar
+                                                            </template>
+                                                        </button>
+                                                    </div>
+                                                </div -->
                     <Searcharticulo url="{{ env('APP_APIDB') }}" :idsucursal="ventaCabecera.idSucursal"
                         @articulo="addCarrito" validar-lote="false">
                     </Searcharticulo>
 
 
-                        <!-- TABLA ......................... -->
-                        <div class="card mt-2 table-responsive-sm">
-                            <table class="table table-striped table-sm ">
-                                <tr>
-                                    <th>Codigo</th>
-                                    <th>Descripcion</th>
-                                    <th>Cantidad</th>
-                                    <th>Precio</th>
-                                    <th>Importe</th>
-                                    <th>Opciones</th>
-                                </tr>
-                                <template v-if="carro.length>0">
-                                    <template v-for="(item,index) in carro">
-                                        <tr>
-                                            <td>@{{ item.codigo }}</td>
-                                            <td>@{{ item.descripcion }}</td>
-                                            <td>@{{ item.cantidad }}</td>
-                                            <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio) }}</td>
-                                            <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio * item.cantidad) }}</td>
-                                            <td>
-                                                <div class="btn-group">
-                                                    <button class="btn btn-link dropdown-toggle" data-toggle="dropdown"
-                                                        aria-haspopup="true" aria-expanded="false">
-                                                        <span class="fa fa-bars"></span>
-                                                    </button>
-                                                    <div class="dropdown-menu dropdown-menu-right">
-                                                        <button class="dropdown-item"
-                                                            @click="setCantidad(index,item.cantidad,item.stock)">
-                                                            <span class="fa fa-cubes text-primary"
-                                                                style="width: 13pt"></span>
-                                                            Cantidad
-                                                        </button>
-                                                        <button class="dropdown-item" @click="showModalPrecio(index,item)">
-                                                            <span class="fa fa-dollar-sign  text-info"
-                                                                style="width: 13pt"></span> Precio
-                                                        </button>
-                                                        <button class="dropdown-item" @click="delArticulo(item)">
-                                                            <span class="fa fa-times-circle text-danger"
-                                                                style="width: 13pt"></span> Quitar
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </template>
-                                <template v-else>
+                    <!-- TABLA ......................... -->
+                    <div class="card mt-2 table-responsive-sm">
+                        <table class="table table-striped table-sm ">
+                            <tr>
+                                <th>Codigo</th>
+                                <th>Descripcion</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Importe</th>
+                                <th>Opciones</th>
+                            </tr>
+                            <template v-if="carro.length>0">
+                                <template v-for="(item,index) in carro">
                                     <tr>
-                                        <td colspan="6">S I N &nbsp; A R T I C U L O . . .</td>
+                                        <td>@{{ item.codigo }}</td>
+                                        <td>@{{ item.descripcion }}</td>
+                                        <td>@{{ item.cantidad }}</td>
+                                        <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio) }}</td>
+                                        <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio * item.cantidad) }}</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-link dropdown-toggle" data-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="false">
+                                                    <span class="fa fa-bars"></span>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-right">
+                                                    <button class="dropdown-item"
+                                                        @click="setCantidad(index,item.cantidad,item.stock)">
+                                                        <span class="fa fa-cubes text-primary" style="width: 13pt"></span>
+                                                        Cantidad
+                                                    </button>
+                                                    <button class="dropdown-item" @click="showModalPrecio(index,item)">
+                                                        <span class="fa fa-dollar-sign  text-info"
+                                                            style="width: 13pt"></span> Precio
+                                                    </button>
+                                                    <button class="dropdown-item" @click="delArticulo(item)">
+                                                        <span class="fa fa-times-circle text-danger"
+                                                            style="width: 13pt"></span> Quitar
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                        </td>
                                     </tr>
                                 </template>
+                            </template>
+                            <template v-else>
+                                <tr>
+                                    <td colspan="6">S I N &nbsp; A R T I C U L O . . .</td>
+                                </tr>
+                            </template>
 
-                            </table>
+                        </table>
 
-                        </div>
+                    </div>
 
                 </div>
                 <!-- PANEL DERECHA  -->
@@ -177,10 +176,7 @@
                             </button>
                             <button class="btn btn-secondary" @click="cancelar"> <span class="fa fa-times"></span>
                                 CANCELAR</button>
-                            <hr>
-                            <a href="venta/imprimir" class="btn btn-outline-success"> <span class="fa fa-print"></span>
-                                Imprimir</a>
-                            <button class="btn btn-outline-success"><span class="fa fa-file-alt"></span> Informe</button>
+                            
                         </div>
                     </div>
                 </div>
@@ -307,13 +303,13 @@
                         }
                         this.carro.push(art);
                     } else {
-                        if((this.carro[i].cantidad + 1) <= a.cantidad){
-                             this.carro[i].cantidad = parseInt(this.carro[i].cantidad) + 1;
-                        }else{
+                        if ((this.carro[i].cantidad + 1) <= a.cantidad) {
+                            this.carro[i].cantidad = parseInt(this.carro[i].cantidad) + 1;
+                        } else {
                             Toast.fire({
-                            title: `Cantidad supera stock disponible: ${a.cantidad} ...`,
-                            icon: 'error'
-                        });
+                                title: `Cantidad supera stock disponible: ${a.cantidad} ...`,
+                                icon: 'error'
+                            });
                         }
                         //Actualizar cantidad
                     }
@@ -464,8 +460,14 @@
                             localStorage.removeItem('carro_venta');
                             localStorage.removeItem('ventaCabecera');
                             if (print) {
-                                window.location.assign('{{ env('APP_URL') }}' + 'pdf/boletaventa/' +
-                                    response.data);
+                                if (this.ventaCabecera.documento == 'Ticket') {
+
+                                    window.location.assign('{{ env('APP_URL') }}' + 'ticket/venta/'+ response.data);
+                                } else {
+                                    window.location.assign('{{ env('APP_URL') }}' + 'pdf/boletaventa/' +
+                                        response.data);
+                                }
+
                             } else {
                                 $('#finalizarventa').modal('hide');
                                 window.location.reload();
@@ -565,7 +567,7 @@
                     var config = localStorage.getItem('config_venta');
                     if (config != null) {
                         config = JSON.parse(config);
-                        this.ventaCabecera.documento= config.tipo_comprobante;
+                        this.ventaCabecera.documento = config.tipo_comprobante;
                     }
 
                 }
@@ -583,7 +585,7 @@
                 }
             },
             mounted() {
-               // this.getFecha();
+                // this.getFecha();
                 this.getApertura();
                 this.recuperarDatos();
                 this.getFecha();
