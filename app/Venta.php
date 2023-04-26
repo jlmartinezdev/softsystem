@@ -30,6 +30,11 @@ class Venta extends Model
             return $query->where('s.suc_cod','=',$suc);
         }
     }
+    public function scopeWheresuc($query,$suc){
+        if($suc!='0'){
+            return $query->where('ventas.suc_cod','=',$suc);
+        }
+    }
     public function scopeFiltrocliente($query, $cliente, $isNumber){
         if(!empty($cliente)){
             if($isNumber=='1'){

@@ -12,10 +12,10 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::post('usuario', 'UserController@store');
     Route::delete('usuario/{id}', 'UserController@destroy');
     Route::get('usuario', 'UserController@index')->name('usuario');
-
-
     //Stock
     Route::get('excel/articulos_costo/','ArticuloController@export_costo');
+    Route::get('resumen','ResumenController@index')->name('resumen');
+    Route::get('resumen/datos','ResumenController@resumen');
 });
     //Articulos
     Route::get('inf/articulo', 'ArticuloController@informe')->name('articulo@informe');
@@ -115,6 +115,7 @@ Route::group(['middleware' => ['administrador']], function () {
     //PDF A IMPRIMIR 
     Route::get('pdf/boletaventa/{id}', 'VentaController@pdfboleta')->name('pfd.boletaventa');
     Route::get('pdf/boletacompra/{id}', 'CompraController@pdfboleta')->name('pdf.boletacompra');
+    route::get('pdf/recibo/{id}','VentaController@pdfrecibo')->name('pdf.reciboventa');
     //EXCEL 
     Route::get('excel/articulos/','ArticuloController@export');
     Route::get('excel/articulosprecios/','ArticuloController@exportPrecio');

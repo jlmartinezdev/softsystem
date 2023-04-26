@@ -202,7 +202,13 @@
                                 <p>Stock</p>
                             </a>
                         </li>
-
+                        <li class="nav-item">
+                            <a href="{{ route('resumen') }}" id="m_iresumen" class="nav-link">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Resumen</p>
+                            </a>
+                        </li>
+                    
                     </ul>
                 </li>
                 <li class="nav-item">
