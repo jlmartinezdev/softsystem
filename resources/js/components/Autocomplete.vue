@@ -16,28 +16,30 @@
       :aria-expanded="[showResults ? true : false]"
       ref="inputsearch"
     />
-    <ul v-if="showResults" ref="resultList" class="autocomplete-result-list">
-      <li
-        v-for="(result, index) in results"
-        :key="index"
-        :class="[result.cantidad == 0 ? 'text-maroon' : '']"
-        :aria-selected="[index === activeIndex ? true : false]"
-        @click="selectItem(index)"
-        :data-result-index="index"
-        class="autocomplete-result"
-      >
-        <span class="left">
-          {{ result.producto_nombre }}
-        </span>
-        <span class="right font-weight-bold">
-          <span v-show="result.cantidad > 0" class="badge badge-info">{{
-            result.cantidad
-          }}</span>
-          Gs
-          {{ new Intl.NumberFormat("de-DE").format(result.pre_venta1) }}</span
+    <div class="autocomplete-result-container">
+      <ul v-if="showResults" ref="resultList" class="autocomplete-result-list">
+        <li
+          v-for="(result, index) in results"
+          :key="index"
+          :class="[result.cantidad == 0 ? 'text-maroon' : '']"
+          :aria-selected="[index === activeIndex ? true : false]"
+          @click="selectItem(index)"
+          :data-result-index="index"
+          class="autocomplete-result"
         >
-      </li>
-    </ul>
+          <span class="left">
+            {{ result.producto_nombre }}
+          </span>
+          <span class="right font-weight-bold">
+            <span v-show="result.cantidad > 0" class="badge badge-info">{{
+              result.cantidad
+            }}</span>
+            Gs
+            {{ new Intl.NumberFormat("de-DE").format(result.pre_venta1) }}</span
+          >
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -63,7 +65,7 @@ export default {
         this.results = [];
         return;
       }
-      if (!isNaN(parseFloat(this.searchQuery))) {
+      if (!isNaN(parseFloat(this.searchQuery)) && this.searchQuery.length > 4) {
         return;
       }
       this.getArticulo(false, this.searchQuery);
@@ -98,9 +100,16 @@ export default {
             },
           })
           .then((response) => {
-            this.requestSend= false;
+            this.requestSend = false;
+            if (response.data == "no") {
+              Toast.fire({
+                icon: "error",
+                title: "Codigo ingresado no existe en la Base de Datos...",
+              });
+              return;
+            }
             if (response.data) {
-              if (response.data.length > 1 && this.validarLote=='true') {
+              if (response.data.length > 1 && this.validarLote == "true") {
                 this.checkLote(response.data);
               } else {
                 this.searchTerm = response.data[0];
@@ -179,7 +188,7 @@ export default {
     selectItem(index) {
       this.showResults = false;
       this.activeIndex = null;
-      if (this.validarLote=='true') {
+      if (this.validarLote == "true") {
         this.getArticulo(true, this.results[index].producto_c_barra);
       } else {
         this.searchTerm = this.results[index];
@@ -188,7 +197,7 @@ export default {
     },
     selectItemEnter() {
       if (this.results && this.activeIndex !== null) {
-        if (this.validarLote=='true') {
+        if (this.validarLote == "true") {
           this.getArticulo(
             true,
             this.results[this.activeIndex].producto_c_barra
@@ -220,23 +229,32 @@ export default {
           selectedPosition.bottom - resultsPosition.bottom;
       }
     },
-    focusSearchInput(){
+    focusSearchInput() {
       this.$refs.inputsearch.focus();
     },
-    getAllArticulos(){
+    getAllArticulos() {
       setInterval(() => {
-        if(document.visibilityState == 'visible'){
-          this.getArticulo(false, '');
+        if (document.visibilityState == "visible") {
+          this.getArticulo(false, "");
         }
-      }, 1000*60*5);
-    }
+      }, 1000 * 60 * 5);
+    },
   },
-  mounted(){
+  mounted() {
     this.focusSearchInput();
-  }
+  },
 };
 </script>
 <style scoped>
+.autocomplete {
+  position: relative;
+}
+.autocomplete-result-container {
+  position: absolute;
+  z-index: 100;
+  position: absolute;
+  width: 100%;
+}
 .autocomplete-input {
   border: 1px solid #eee;
   border-radius: 8px;
@@ -296,7 +314,7 @@ export default {
   border: 1px solid rgba(0, 0, 0, 0.12);
   padding: 0;
   box-sizing: border-box;
-  max-height: 296px;
+  max-height: 370px;
   overflow-y: auto;
   background: #fff;
   list-style: none;

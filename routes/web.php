@@ -33,7 +33,9 @@ Route::group(['middleware' => ['administrador']], function () {
     //STOCK
     Route::delete('stock/{id}', 'StockController@destroy');
     Route::post('stock/{id}', 'StockController@update');
-    Route::get('stock/informe','StockController@infstock')->name('infstock');
+    //INVENTARIO
+    Route::get('inventario','StockController@infstock')->name('infstock');
+    Route::get('inventario/fecha','ArticuloController@getInventario');
     //VENTA
     Route::get('infventa', 'VentaController@indexInf')->name('infventa');
     Route::get('infventa/fecha', 'VentaController@getVentaByFecha')->name('infventa.fecha');

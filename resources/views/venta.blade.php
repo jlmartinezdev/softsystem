@@ -42,78 +42,91 @@
                 <div class="col-md-8">
                     <h4>:: REGISTRAR VENTA ::</h4>
                     <!--div class="input-group">
-                                                    <input type="text" v-model="txtbuscar" @keyup.enter="showBuscar()" class="form-control"
-                                                        placeholder="Buscar...." autofocus />
-                                                    <div class="input-group-append">
-                                                        <button class="btn btn-secondary" @click="showBuscar()">
-                                                            <template v-if="requestSend">
-                                                                <span class="spinner-border spinner-border-sm" role="status"></span><span
-                                                                    class="sr-only">Buscando...</span> Cargando...
-                                                            </template>
-                                                            <template v-else>
-                                                                <span class="fa fa-search"></span> Buscar
-                                                            </template>
-                                                        </button>
-                                                    </div>
-                                                </div -->
+                                                            <input type="text" v-model="txtbuscar" @keyup.enter="showBuscar()" class="form-control"
+                                                                placeholder="Buscar...." autofocus />
+                                                            <div class="input-group-append">
+                                                                <button class="btn btn-secondary" @click="showBuscar()">
+                                                                    <template v-if="requestSend">
+                                                                        <span class="spinner-border spinner-border-sm" role="status"></span><span
+                                                                            class="sr-only">Buscando...</span> Cargando...
+                                                                    </template>
+                                                                    <template v-else>
+                                                                        <span class="fa fa-search"></span> Buscar
+                                                                    </template>
+                                                                </button>
+                                                            </div>
+                                                        </div -->
                     <Searcharticulo url="{{ env('APP_APIDB') }}" :idsucursal="ventaCabecera.idSucursal"
-                        @articulo="addCarrito" validar-lote="false">
+                        @articulo="addCarrito" validar-lote="false" ref="Searcharticulo">
                     </Searcharticulo>
 
 
                     <!-- TABLA ......................... -->
-                    <div class="card mt-2 table-responsive-sm">
-                        <table class="table table-striped table-sm ">
-                            <tr>
-                                <th>Codigo</th>
-                                <th>Descripcion</th>
-                                <th>Cantidad</th>
-                                <th>Precio</th>
-                                <th>Importe</th>
-                                <th>Opciones</th>
-                            </tr>
-                            <template v-if="carro.length>0">
-                                <template v-for="(item,index) in carro">
-                                    <tr>
-                                        <td>@{{ item.codigo }}</td>
-                                        <td>@{{ item.descripcion }}</td>
-                                        <td>@{{ item.cantidad }}</td>
-                                        <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio) }}</td>
-                                        <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio * item.cantidad) }}</td>
-                                        <td>
-                                            <div class="btn-group">
-                                                <button class="btn btn-link dropdown-toggle" data-toggle="dropdown"
-                                                    aria-haspopup="true" aria-expanded="false">
-                                                    <span class="fa fa-bars"></span>
-                                                </button>
-                                                <div class="dropdown-menu dropdown-menu-right">
-                                                    <button class="dropdown-item"
-                                                        @click="setCantidad(index,item.cantidad,item.stock)">
-                                                        <span class="fa fa-cubes text-primary" style="width: 13pt"></span>
-                                                        Cantidad
-                                                    </button>
-                                                    <button class="dropdown-item" @click="showModalPrecio(index,item)">
-                                                        <span class="fa fa-dollar-sign  text-info"
-                                                            style="width: 13pt"></span> Precio
-                                                    </button>
-                                                    <button class="dropdown-item" @click="delArticulo(item)">
-                                                        <span class="fa fa-times-circle text-danger"
-                                                            style="width: 13pt"></span> Quitar
-                                                    </button>
-                                                </div>
-                                            </div>
+                    <div class="card mt-2">
+                        <div class="table-responsive-sm">
+                            <table class="table table-striped">
+                                <tr>
 
-                                        </td>
+                                    <th>Codigo</th>
+                                    <th>Descripcion</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                    <th>Importe</th>
+                                    <th colspan="2">Opciones</th>
+
+                                </tr>
+                                <template v-if="carro.length>0">
+                                    <template v-for="(item,index) in carro">
+                                        <tr>
+
+                                            <td>@{{ item.codigo }}</td>
+                                            <td>@{{ item.descripcion }}</td>
+                                            <td> <input type="number"
+                                                    style="width: 50px; border: none; background-color: transparent;"
+                                                    min="1" :max="item.stock" v-model="item.cantidad"> </td>
+                                            <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio) }}</td>
+                                            <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio * item.cantidad) }}</td>
+
+
+                                            <td><button class="btn btn-link btn-sm" title="Quitar de la lista" @click="delArticulo(item)">
+                                                    <span class="fa fa-trash-alt text-secondary"></span>
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button class="btn btn-link dropdown-toggle" data-toggle="dropdown"
+                                                        aria-haspopup="true" aria-expanded="false">
+                                                        <span class="fa fa-bars"></span>
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-right">
+                                                        <button class="dropdown-item"
+                                                            @click="setCantidad(index,item.cantidad,item.stock)">
+                                                            <span class="fa fa-cubes text-primary"
+                                                                style="width: 13pt"></span>
+                                                            Cantidad
+                                                        </button>
+                                                        <div class="dropdown-divider"></div>
+                                                        <button class="dropdown-item" @click="showModalPrecio(index,item)">
+                                                            <span class="fa fa-dollar-sign  text-info"
+                                                                style="width: 13pt"></span> Precio
+                                                        </button>
+                                                      
+                                                    </div>
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </template>
+                                <template v-else>
+                                    <tr>
+                                        <td colspan="6">S I N &nbsp; A R T I C U L O . . .</td>
                                     </tr>
                                 </template>
-                            </template>
-                            <template v-else>
-                                <tr>
-                                    <td colspan="6">S I N &nbsp; A R T I C U L O . . .</td>
-                                </tr>
-                            </template>
 
-                        </table>
+                            </table>
+                        </div>
+
 
                     </div>
 
@@ -176,7 +189,7 @@
                             </button>
                             <button class="btn btn-secondary" @click="cancelar"> <span class="fa fa-times"></span>
                                 CANCELAR</button>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -251,7 +264,8 @@
                 articulo: null,
                 clientes: [],
                 requestLote: false,
-                cuotas: []
+                cuotas: [],
+                enfocar: false,
             },
             methods: {
                 search: function(input) {
@@ -350,6 +364,7 @@
                         this.carro[index].cantidad = cant;
                         this.saveDatos();
                     }
+                    this.$refs.Searcharticulo.focusSearchInput();
                 },
                 showModalPrecio: function(index, articulo) {
 
@@ -398,15 +413,17 @@
                         }
 
                     }
-
+                    this.$refs.Searcharticulo.focusSearchInput();
                     this.saveDatos();
                 },
                 delArticulo: function(a) {
+                    this.$refs.Searcharticulo.focusSearchInput();
                     let validar = this.carro.findIndex(x => x.codigo == a.codigo)
                     if (validar > -1) {
                         this.carro.splice(validar, 1);
                     }
                     this.saveDatos();
+                    
                 },
                 format: function(numero) {
                     return new Intl.NumberFormat("de-DE").format(numero);
@@ -462,7 +479,8 @@
                             if (print) {
                                 if (this.ventaCabecera.documento == 'Ticket') {
 
-                                    window.location.assign('{{ env('APP_URL') }}' + 'ticket/venta/'+ response.data);
+                                    window.location.assign('{{ env('APP_URL') }}' + 'ticket/venta/' +
+                                        response.data);
                                 } else {
                                     window.location.assign('{{ env('APP_URL') }}' + 'pdf/boletaventa/' +
                                         response.data);

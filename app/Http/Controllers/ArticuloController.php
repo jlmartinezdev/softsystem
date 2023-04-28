@@ -49,6 +49,11 @@ class ArticuloController extends Controller
         
         return $articulos;
     }
+    public function getInventario(Request $request){
+        $articulos= DB::select('SELECT a.producto_c_barra,a.producto_nombre,a.pre_venta1,p.present_descripcion, SUM(s.cantidad) AS cantidad, SUM(dv.venta_cantidad) AS salida, SUM(dc.compra_cantidad) AS entrada FROM articulos a INNER JOIN presentacion p ON a.present_cod= p.present_cod INNER JOIN stock s ON a.ARTICULOS_cod=s.ARTICULOS_cod LEFT JOIN detalle_venta dv ON a.ARTICULOS_cod= dv.ARTICULOS_cod LEFT JOIN detalle_compra dc ON a.ARTICULOS_cod= dc.ARTICULOS_cod LEFT JOIN ventas v ON dv.nro_fact_ventas= v.nro_fact_ventas WHERE DATE(v.venta_fecha) BETWEEN ? AND ? GROUP BY a.ARTICULOS_cod',[$request->desde,$request->hasta]);
+            
+        return $articulos;
+    }
     public function getPrecios($id){
         return DB::select("SELECT truncate(precio,0) as p, truncate(margen,0) as m, truncate(monto_cuota,0) as c FROM precios where ARTICULOS_cod=".$id);
     }

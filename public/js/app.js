@@ -1826,6 +1826,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Searcharticulo",
   data: function data() {
@@ -1835,7 +1837,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       results: [],
       activeIndex: null,
       searchTerm: {},
-      requestSend: false
+      requestSend: false,
+      articulos: []
     };
   },
   props: ["url", "idsucursal", "validarLote"],
@@ -1847,7 +1850,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return;
       }
 
-      if (!isNaN(parseFloat(this.searchQuery))) {
+      if (!isNaN(parseFloat(this.searchQuery)) && this.searchQuery.length > 4) {
         return;
       }
 
@@ -1887,8 +1890,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }).then(function (response) {
           _this.requestSend = false;
 
+          if (response.data == "no") {
+            Toast.fire({
+              icon: "error",
+              title: "Codigo ingresado no existe en la Base de Datos..."
+            });
+            return;
+          }
+
           if (response.data) {
-            if (response.data.length > 1 && _this.validarLote == 'true') {
+            if (response.data.length > 1 && _this.validarLote == "true") {
               _this.checkLote(response.data);
             } else {
               _this.searchTerm = response.data[0];
@@ -2002,7 +2013,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.showResults = false;
       this.activeIndex = null;
 
-      if (this.validarLote == 'true') {
+      if (this.validarLote == "true") {
         this.getArticulo(true, this.results[index].producto_c_barra);
       } else {
         this.searchTerm = this.results[index];
@@ -2011,7 +2022,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     selectItemEnter: function selectItemEnter() {
       if (this.results && this.activeIndex !== null) {
-        if (this.validarLote == 'true') {
+        if (this.validarLote == "true") {
           this.getArticulo(true, this.results[this.activeIndex].producto_c_barra);
         } else {
           this.selectItem(this.activeIndex);
@@ -2040,6 +2051,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     focusSearchInput: function focusSearchInput() {
       this.$refs.inputsearch.focus();
+    },
+    getAllArticulos: function getAllArticulos() {
+      var _this2 = this;
+
+      setInterval(function () {
+        if (document.visibilityState == "visible") {
+          _this2.getArticulo(false, "");
+        }
+      }, 1000 * 60 * 5);
     }
   },
   mounted: function mounted() {
@@ -6807,7 +6827,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.autocomplete-input[data-v-c191a05a] {\r\n  border: 1px solid #eee;\r\n  border-radius: 8px;\r\n  width: 100%;\r\n  padding: 7px 7px 7px 48px;\r\n  box-sizing: border-box;\r\n  position: relative;\r\n  font-size: 16px;\r\n  line-height: 1.5;\r\n  flex: 1;\r\n  background-color: #eee;\r\n  background-image: url(\"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjY2IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMSIgcj0iOCIvPjxwYXRoIGQ9Ik0yMSAyMWwtNC00Ii8+PC9zdmc+\");\r\n  background-repeat: no-repeat;\r\n  background-position: 12px;\n}\n.autocomplete-input[data-v-c191a05a]:focus,\r\n.autocomplete-input[aria-expanded=\"true\"][data-v-c191a05a] {\r\n  border-color: rgba(0, 0, 0, 0.12);\r\n  background-color: #fff;\r\n  outline: none;\r\n  /* box-shadow: 0 2px 2px rgba(0, 0, 0, .16)*/\n}\n.dark-mode .autocomplete-input[data-v-c191a05a] {\r\n  border-color: rgba(0, 0, 0, 0.12);\r\n  color: white;\r\n  background-color: #343a40;\n}\n[data-position=\"below\"] .autocomplete-input[aria-expanded=\"true\"][data-v-c191a05a] {\r\n  border-bottom-color: transparent;\r\n  border-radius: 8px 8px 0 0;\n}\n[data-position=\"above\"] .autocomplete-input[aria-expanded=\"true\"][data-v-c191a05a] {\r\n  border-top-color: transparent;\r\n  border-radius: 0 0 8px 8px;\r\n  z-index: 2;\n}\n.autocomplete[data-loading=\"true\"][data-v-c191a05a]:after {\r\n  content: \"\";\r\n  border: 3px solid rgba(0, 0, 0, 0.12);\r\n  border-right-color: rgba(0, 0, 0, 0.48);\r\n  border-radius: 100%;\r\n  width: 20px;\r\n  height: 20px;\r\n  position: absolute;\r\n  right: 12px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\r\n  animation: rotate-data-v-c191a05a 1s linear infinite;\n}\n.autocomplete-result-list[data-v-c191a05a] {\r\n  margin: 0;\r\n  border: 1px solid rgba(0, 0, 0, 0.12);\r\n  padding: 0;\r\n  box-sizing: border-box;\r\n  max-height: 296px;\r\n  overflow-y: auto;\r\n  background: #fff;\r\n  list-style: none;\r\n  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.16);\n}\n.dark-mode .autocomplete-result-list[data-v-c191a05a] {\r\n  background: #343a40;\n}\n[data-position=\"below\"] .autocomplete-result-list[data-v-c191a05a] {\r\n  margin-top: -1px;\r\n  border-top-color: transparent;\r\n  border-radius: 0 0 8px 8px;\r\n  padding-bottom: 8px;\n}\n[data-position=\"above\"] .autocomplete-result-list[data-v-c191a05a] {\r\n  margin-bottom: -1px;\r\n  border-bottom-color: transparent;\r\n  border-radius: 8px 8px 0 0;\r\n  padding-top: 8px;\n}\n.autocomplete-result[data-v-c191a05a] {\r\n  cursor: default;\r\n  padding: 7px 7px 7px 48px;\r\n  background-image: url(\"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjY2NjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMSIgcj0iOCIvPjxwYXRoIGQ9Ik0yMSAyMWwtNC00Ii8+PC9zdmc+\");\r\n  background-repeat: no-repeat;\r\n  background-position: 12px;\r\n  overflow: hidden;\n}\n.autocomplete-result .left[data-v-c191a05a] {\r\n  float: left;\r\n  width: 80%;\n}\n.autocomplete-result .right[data-v-c191a05a] {\r\n  float: right;\n}\n.autocomplete-result[data-v-c191a05a]:hover,\r\n.autocomplete-result[aria-selected=\"true\"][data-v-c191a05a] {\r\n  background-color: rgba(0, 0, 0, 0.12);\n}\n@keyframes rotate-data-v-c191a05a {\n0% {\r\n    transform: translateY(-50%) rotate(0deg);\n}\nto {\r\n    transform: translateY(-50%) rotate(359deg);\n}\n}\r\n", ""]);
+exports.push([module.i, "\n.autocomplete[data-v-c191a05a] {\r\n  position: relative;\n}\n.autocomplete-result-container[data-v-c191a05a] {\r\n  position: absolute;\r\n  z-index: 100;\r\n  position: absolute;\r\n  width: 100%;\n}\n.autocomplete-input[data-v-c191a05a] {\r\n  border: 1px solid #eee;\r\n  border-radius: 8px;\r\n  width: 100%;\r\n  padding: 7px 7px 7px 48px;\r\n  box-sizing: border-box;\r\n  position: relative;\r\n  font-size: 16px;\r\n  line-height: 1.5;\r\n  flex: 1;\r\n  background-color: #eee;\r\n  background-image: url(\"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjY2IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMSIgcj0iOCIvPjxwYXRoIGQ9Ik0yMSAyMWwtNC00Ii8+PC9zdmc+\");\r\n  background-repeat: no-repeat;\r\n  background-position: 12px;\n}\n.autocomplete-input[data-v-c191a05a]:focus,\r\n.autocomplete-input[aria-expanded=\"true\"][data-v-c191a05a] {\r\n  border-color: rgba(0, 0, 0, 0.12);\r\n  background-color: #fff;\r\n  outline: none;\r\n  /* box-shadow: 0 2px 2px rgba(0, 0, 0, .16)*/\n}\n.dark-mode .autocomplete-input[data-v-c191a05a] {\r\n  border-color: rgba(0, 0, 0, 0.12);\r\n  color: white;\r\n  background-color: #343a40;\n}\n[data-position=\"below\"] .autocomplete-input[aria-expanded=\"true\"][data-v-c191a05a] {\r\n  border-bottom-color: transparent;\r\n  border-radius: 8px 8px 0 0;\n}\n[data-position=\"above\"] .autocomplete-input[aria-expanded=\"true\"][data-v-c191a05a] {\r\n  border-top-color: transparent;\r\n  border-radius: 0 0 8px 8px;\r\n  z-index: 2;\n}\n.autocomplete[data-loading=\"true\"][data-v-c191a05a]:after {\r\n  content: \"\";\r\n  border: 3px solid rgba(0, 0, 0, 0.12);\r\n  border-right-color: rgba(0, 0, 0, 0.48);\r\n  border-radius: 100%;\r\n  width: 20px;\r\n  height: 20px;\r\n  position: absolute;\r\n  right: 12px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\r\n  animation: rotate-data-v-c191a05a 1s linear infinite;\n}\n.autocomplete-result-list[data-v-c191a05a] {\r\n  margin: 0;\r\n  border: 1px solid rgba(0, 0, 0, 0.12);\r\n  padding: 0;\r\n  box-sizing: border-box;\r\n  max-height: 370px;\r\n  overflow-y: auto;\r\n  background: #fff;\r\n  list-style: none;\r\n  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.16);\n}\n.dark-mode .autocomplete-result-list[data-v-c191a05a] {\r\n  background: #343a40;\n}\n[data-position=\"below\"] .autocomplete-result-list[data-v-c191a05a] {\r\n  margin-top: -1px;\r\n  border-top-color: transparent;\r\n  border-radius: 0 0 8px 8px;\r\n  padding-bottom: 8px;\n}\n[data-position=\"above\"] .autocomplete-result-list[data-v-c191a05a] {\r\n  margin-bottom: -1px;\r\n  border-bottom-color: transparent;\r\n  border-radius: 8px 8px 0 0;\r\n  padding-top: 8px;\n}\n.autocomplete-result[data-v-c191a05a] {\r\n  cursor: default;\r\n  padding: 7px 7px 7px 48px;\r\n  background-image: url(\"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjY2NjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMSIgcj0iOCIvPjxwYXRoIGQ9Ik0yMSAyMWwtNC00Ii8+PC9zdmc+\");\r\n  background-repeat: no-repeat;\r\n  background-position: 12px;\r\n  overflow: hidden;\n}\n.autocomplete-result .left[data-v-c191a05a] {\r\n  float: left;\r\n  width: 80%;\n}\n.autocomplete-result .right[data-v-c191a05a] {\r\n  float: right;\n}\n.autocomplete-result[data-v-c191a05a]:hover,\r\n.autocomplete-result[aria-selected=\"true\"][data-v-c191a05a] {\r\n  background-color: rgba(0, 0, 0, 0.12);\n}\n@keyframes rotate-data-v-c191a05a {\n0% {\r\n    transform: translateY(-50%) rotate(0deg);\n}\nto {\r\n    transform: translateY(-50%) rotate(359deg);\n}\n}\r\n", ""]);
 
 // exports
 
@@ -42598,65 +42618,71 @@ var render = function() {
         }
       }),
       _vm._v(" "),
-      _vm.showResults
-        ? _c(
-            "ul",
-            { ref: "resultList", staticClass: "autocomplete-result-list" },
-            _vm._l(_vm.results, function(result, index) {
-              return _c(
-                "li",
-                {
-                  key: index,
-                  staticClass: "autocomplete-result",
-                  class: [result.cantidad == 0 ? "text-maroon" : ""],
-                  attrs: {
-                    "aria-selected": [index === _vm.activeIndex ? true : false],
-                    "data-result-index": index
-                  },
-                  on: {
-                    click: function($event) {
-                      return _vm.selectItem(index)
+      _c("div", { staticClass: "autocomplete-result-container" }, [
+        _vm.showResults
+          ? _c(
+              "ul",
+              { ref: "resultList", staticClass: "autocomplete-result-list" },
+              _vm._l(_vm.results, function(result, index) {
+                return _c(
+                  "li",
+                  {
+                    key: index,
+                    staticClass: "autocomplete-result",
+                    class: [result.cantidad == 0 ? "text-maroon" : ""],
+                    attrs: {
+                      "aria-selected": [
+                        index === _vm.activeIndex ? true : false
+                      ],
+                      "data-result-index": index
+                    },
+                    on: {
+                      click: function($event) {
+                        return _vm.selectItem(index)
+                      }
                     }
-                  }
-                },
-                [
-                  _c("span", { staticClass: "left" }, [
-                    _vm._v(
-                      "\n        " + _vm._s(result.producto_nombre) + "\n      "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("span", { staticClass: "right font-weight-bold" }, [
-                    _c(
-                      "span",
-                      {
-                        directives: [
-                          {
-                            name: "show",
-                            rawName: "v-show",
-                            value: result.cantidad > 0,
-                            expression: "result.cantidad > 0"
-                          }
-                        ],
-                        staticClass: "badge badge-info"
-                      },
-                      [_vm._v(_vm._s(result.cantidad))]
-                    ),
-                    _vm._v(
-                      "\n        Gs\n        " +
-                        _vm._s(
-                          new Intl.NumberFormat("de-DE").format(
-                            result.pre_venta1
+                  },
+                  [
+                    _c("span", { staticClass: "left" }, [
+                      _vm._v(
+                        "\n          " +
+                          _vm._s(result.producto_nombre) +
+                          "\n        "
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "right font-weight-bold" }, [
+                      _c(
+                        "span",
+                        {
+                          directives: [
+                            {
+                              name: "show",
+                              rawName: "v-show",
+                              value: result.cantidad > 0,
+                              expression: "result.cantidad > 0"
+                            }
+                          ],
+                          staticClass: "badge badge-info"
+                        },
+                        [_vm._v(_vm._s(result.cantidad))]
+                      ),
+                      _vm._v(
+                        "\n          Gs\n          " +
+                          _vm._s(
+                            new Intl.NumberFormat("de-DE").format(
+                              result.pre_venta1
+                            )
                           )
-                        )
-                    )
-                  ])
-                ]
-              )
-            }),
-            0
-          )
-        : _vm._e()
+                      )
+                    ])
+                  ]
+                )
+              }),
+              0
+            )
+          : _vm._e()
+      ])
     ]
   )
 }
