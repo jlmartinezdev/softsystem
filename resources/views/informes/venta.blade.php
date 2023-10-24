@@ -191,12 +191,9 @@
                         <div class="form-inline">
                             <label for="filtro"><strong>Año</strong></label>
                             <select class="custom-select mx-2" name="filtro" v-model="chart.anho">
-                                <option value="2022">2022</option>
-                                <option value="2021">2021</option>
-                                <option value="2020">2020</option>
-                                <option value="2019">2019</option>
-                                <option value="2018">2018</option>
-                                <option value="2018">2017</option>
+                                @for($i=2017;$i<=date('Y');$i++)
+                                <option value="{{ $i }}">{{ $i }}</option>
+                                @endfor
                             </select>
                             <label for="opcion"><strong>Mes</strong></label>
                             <select class="custom-select mx-2" name="opcion" v-model="chart.mes">
@@ -444,7 +441,7 @@
                 },
                 chart: {
                     mes: '1',
-                    anho: '2022',
+                    anho: {{date('Y')}},
                     byYear: false
                 },
                 txtbuscar: '',

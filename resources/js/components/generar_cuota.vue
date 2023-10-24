@@ -20,7 +20,8 @@
             </div>
             <div class="form-group">
                 <label>Cantidad Cuota</label>
-                <input type="Number" class="form-control form-control-sm" :disabled="!calcularcuota" v-model="cant_cuota" placeholder="Cant. Cuota ...">
+                <input type="Number" class="form-control form-control-sm"  v-model="cant_cuota" placeholder="Cant. Cuota ...">
+                <!-- :disabled="!calcularcuota" // para modificar cantidad de cuotas-->
             </div>
             
             
@@ -47,12 +48,12 @@
             <th>Tipo</th>
         </tr>
         <tbody>  
-        <template v-for="c in cuotas">
-            <tr>
+        <template >
+            <tr v-for="(c,index) in cuotas" :key="index">
                 <td>{{c.nro}}</td>
-                <td>{{new Intl.NumberFormat("de-DE").format(c.monto)}}</td>
+                <td>{{new Intl.NumberFormat("de-DE").format(c.monto)}} <button class="btn btn-outline-primary" title="Modificar Monto"><span class="fa fa-edit"></span></button>  </td>
                 <td>{{c.vencimiento}}</td>
-                <td>{{c.tipo}}</td>
+                <td>{{c.tipo}} </td>
             </tr>
         </template>
         </tbody>
@@ -162,6 +163,11 @@ export default {
 
             if (this.redondear && cantidad > 1 && restoDivision!=0) {
 
+
+                //redondear ultimos 3 digitos de monto_cuota  a 500 0 1000
+
+
+
                 if (monto_cuota.toString().length > 3) {
                     let ultimo_digito= monto_cuota.toString().substr(monto_cuota.toString().length-1,3);
                     let ultimos_tresdigitos= monto_cuota.toString().substr(monto_cuota.toString().length-3,3);
@@ -210,6 +216,9 @@ export default {
                 Swal.fire('Atención...','Número ingresado es mayor a Monto de Venta!','warning');
                 this.saldo = 0; 
             }
+        },
+        setMontoCuota: function(){
+            
         }
            
     },

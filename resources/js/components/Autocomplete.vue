@@ -38,6 +38,10 @@
             {{ new Intl.NumberFormat("de-DE").format(result.pre_venta1) }}</span
           >
         </li>
+        <li v-if="noresult" class="autocomplete-result">
+          <span class="left"> No hay resultado para <i>{{ searchQuery }}</i> </span>
+          <span class="right"><button class="btn btn-link btn-sm"><i class="fa fa-plus"></i>  Crear Articulo</button></span>
+        </li>
       </ul>
     </div>
   </div>
@@ -55,6 +59,7 @@ export default {
       searchTerm: {},
       requestSend: false,
       articulos: [],
+      noresult: false,
     };
   },
   props: ["url", "idsucursal", "validarLote"],
@@ -136,11 +141,11 @@ export default {
             if (response.data) {
               this.results = response.data;
               this.showResults = true;
+              this.noresult = false;
             } else {
-              Toast.fire({
-                icon: "info",
-                title: `No hay resultado para: ${textSearch}`,
-              });
+              this.showResults = true;
+              this.noresult = true;
+              this.results = [];
               this.focusSearchInput();
             }
           })

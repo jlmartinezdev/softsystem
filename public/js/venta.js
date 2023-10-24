@@ -157,6 +157,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'generar_cuota',
   props: ['total', 'fecha', 'datoscuota', 'calcularcuota'],
@@ -264,6 +265,7 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       if (this.redondear && cantidad > 1 && restoDivision != 0) {
+        //redondear ultimos 3 digitos de monto_cuota  a 500 0 1000
         if (monto_cuota.toString().length > 3) {
           var ultimo_digito = monto_cuota.toString().substr(monto_cuota.toString().length - 1, 3);
           var ultimos_tresdigitos = monto_cuota.toString().substr(monto_cuota.toString().length - 3, 3);
@@ -317,7 +319,8 @@ __webpack_require__.r(__webpack_exports__);
         Swal.fire('Atención...', 'Número ingresado es mayor a Monto de Venta!', 'warning');
         this.saldo = 0;
       }
-    }
+    },
+    setMontoCuota: function setMontoCuota() {}
   },
   mounted: function mounted() {
     this.saldo = this.total;
@@ -442,11 +445,7 @@ var render = function() {
               }
             ],
             staticClass: "form-control form-control-sm",
-            attrs: {
-              type: "Number",
-              disabled: !_vm.calcularcuota,
-              placeholder: "Cant. Cuota ..."
-            },
+            attrs: { type: "Number", placeholder: "Cant. Cuota ..." },
             domProps: { value: _vm.cant_cuota },
             on: {
               input: function($event) {
@@ -539,20 +538,21 @@ var render = function() {
       _c(
         "tbody",
         [
-          _vm._l(_vm.cuotas, function(c) {
-            return [
-              _c("tr", [
-                _c("td", [_vm._v(_vm._s(c.nro))]),
-                _vm._v(" "),
-                _c("td", [
-                  _vm._v(_vm._s(new Intl.NumberFormat("de-DE").format(c.monto)))
-                ]),
-                _vm._v(" "),
-                _c("td", [_vm._v(_vm._s(c.vencimiento))]),
-                _vm._v(" "),
-                _c("td", [_vm._v(_vm._s(c.tipo))])
-              ])
-            ]
+          _vm._l(_vm.cuotas, function(c, index) {
+            return _c("tr", { key: index }, [
+              _c("td", [_vm._v(_vm._s(c.nro))]),
+              _vm._v(" "),
+              _c("td", [
+                _vm._v(
+                  _vm._s(new Intl.NumberFormat("de-DE").format(c.monto)) + " "
+                ),
+                _vm._m(1, true)
+              ]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(c.vencimiento))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(c.tipo) + " ")])
+            ])
           })
         ],
         2
@@ -574,6 +574,19 @@ var staticRenderFns = [
       _vm._v(" "),
       _c("th", [_vm._v("Tipo")])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "btn btn-outline-primary",
+        attrs: { title: "Modificar Monto" }
+      },
+      [_c("span", { staticClass: "fa fa-edit" })]
+    )
   }
 ]
 render._withStripped = true

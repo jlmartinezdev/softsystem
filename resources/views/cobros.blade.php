@@ -215,7 +215,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header bg-teal">
-                        <spam class="header-title">Detalle Cobro</spam>
+                        <span class="header-title">Detalle Cobro</span>
                     </div>
                     <div class="card-body p-3">
 
@@ -665,12 +665,17 @@
                             Swal.fire('Datos incorrecto...', 'Monto ingresado es mayor al saldo!', 'error');
                             return false;
                         }
+                        if(this.ctas.length > 1){
+                            //ordenar allcuota por fecha de vencimiento
+                            this.allCuota.sort(function(a, b) {
+                                return app.convertToDate(a.fecha_venc) > app.convertToDate(b.fecha_venc) ? 1 : app.convertToDate(a.fecha_venc) < app.convertToDate(b.fecha_venc) ? -1 : 0;
+                            });
 
+                        }
                         let iCuotasAcobrar = [];
                         let sumatoria = 0;
 
-                        for (i = 0; i < this.allCuota
-                            .length; i++) { //mientras cuotas seleccionada sea menor a monto a cobrar
+                        for (i = 0; i < this.allCuota.length; i++) { //mientras cuotas seleccionada sea menor a monto a cobrar
 
                             if (sumatoria < this.montoParcial) {
                                 if (this.allCuota[i].monto_saldo > 0) { //Verifica si cuota ya se cobro
@@ -704,6 +709,12 @@
 
                     }
                 },
+                //funcion para convertir string YYYY-mm-dd a date
+                convertToDate: function(date) {
+                    var parts = date.split("-");
+                    return new Date(parts[0], parts[1] - 1, parts[2]);
+                },
+
                 modalCobroParcial: function() {
 
                     if (this.cobro.saldo > 0 && this.cuotasAcobrar.length == 0) {

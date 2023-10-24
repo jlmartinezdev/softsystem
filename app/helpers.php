@@ -20,6 +20,9 @@ function diferenciaFecha($fecha, $fechaCobro="now"){
 function subFecha($fecha) {
     $date1 = new DateTime($fecha);
     $date2 = new DateTime("now");
+    if( $date1 > $date2) {
+        return 0;
+    }
     $diff = $date1->diff($date2);
     return $diff->days;
 }

@@ -9,3 +9,7 @@ Atrasos, calificacion , porcetanje de cobro
 Recibo 
 Agregar dias de mora ✔
 Opcion para imprimir cuenta ✔
+
+En Venta para generar cuota habilitar la opcion para modificar los montos
+En cobro al ingresar monto seleccionar las ventas para distribuir monto ✔
+En estado cuenta eliminar interes adelantado ✔

@@ -1828,6 +1828,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Searcharticulo",
   data: function data() {
@@ -1838,7 +1842,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       activeIndex: null,
       searchTerm: {},
       requestSend: false,
-      articulos: []
+      articulos: [],
+      noresult: false
     };
   },
   props: ["url", "idsucursal", "validarLote"],
@@ -1927,11 +1932,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           if (response.data) {
             _this.results = response.data;
             _this.showResults = true;
+            _this.noresult = false;
           } else {
-            Toast.fire({
-              icon: "info",
-              title: "No hay resultado para: ".concat(textSearch)
-            });
+            _this.showResults = true;
+            _this.noresult = true;
+            _this.results = [];
 
             _this.focusSearchInput();
           }
@@ -42623,70 +42628,95 @@ var render = function() {
           ? _c(
               "ul",
               { ref: "resultList", staticClass: "autocomplete-result-list" },
-              _vm._l(_vm.results, function(result, index) {
-                return _c(
-                  "li",
-                  {
-                    key: index,
-                    staticClass: "autocomplete-result",
-                    class: [result.cantidad == 0 ? "text-maroon" : ""],
-                    attrs: {
-                      "aria-selected": [
-                        index === _vm.activeIndex ? true : false
-                      ],
-                      "data-result-index": index
-                    },
-                    on: {
-                      click: function($event) {
-                        return _vm.selectItem(index)
+              [
+                _vm._l(_vm.results, function(result, index) {
+                  return _c(
+                    "li",
+                    {
+                      key: index,
+                      staticClass: "autocomplete-result",
+                      class: [result.cantidad == 0 ? "text-maroon" : ""],
+                      attrs: {
+                        "aria-selected": [
+                          index === _vm.activeIndex ? true : false
+                        ],
+                        "data-result-index": index
+                      },
+                      on: {
+                        click: function($event) {
+                          return _vm.selectItem(index)
+                        }
                       }
-                    }
-                  },
-                  [
-                    _c("span", { staticClass: "left" }, [
-                      _vm._v(
-                        "\n          " +
-                          _vm._s(result.producto_nombre) +
-                          "\n        "
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("span", { staticClass: "right font-weight-bold" }, [
-                      _c(
-                        "span",
-                        {
-                          directives: [
-                            {
-                              name: "show",
-                              rawName: "v-show",
-                              value: result.cantidad > 0,
-                              expression: "result.cantidad > 0"
-                            }
-                          ],
-                          staticClass: "badge badge-info"
-                        },
-                        [_vm._v(_vm._s(result.cantidad))]
-                      ),
-                      _vm._v(
-                        "\n          Gs\n          " +
-                          _vm._s(
-                            new Intl.NumberFormat("de-DE").format(
-                              result.pre_venta1
+                    },
+                    [
+                      _c("span", { staticClass: "left" }, [
+                        _vm._v(
+                          "\n          " +
+                            _vm._s(result.producto_nombre) +
+                            "\n        "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("span", { staticClass: "right font-weight-bold" }, [
+                        _c(
+                          "span",
+                          {
+                            directives: [
+                              {
+                                name: "show",
+                                rawName: "v-show",
+                                value: result.cantidad > 0,
+                                expression: "result.cantidad > 0"
+                              }
+                            ],
+                            staticClass: "badge badge-info"
+                          },
+                          [_vm._v(_vm._s(result.cantidad))]
+                        ),
+                        _vm._v(
+                          "\n          Gs\n          " +
+                            _vm._s(
+                              new Intl.NumberFormat("de-DE").format(
+                                result.pre_venta1
+                              )
                             )
-                          )
-                      )
+                        )
+                      ])
+                    ]
+                  )
+                }),
+                _vm._v(" "),
+                _vm.noresult
+                  ? _c("li", { staticClass: "autocomplete-result" }, [
+                      _c("span", { staticClass: "left" }, [
+                        _vm._v(" No hay resultado para "),
+                        _c("i", [_vm._v(_vm._s(_vm.searchQuery))])
+                      ]),
+                      _vm._v(" "),
+                      _vm._m(0)
                     ])
-                  ]
-                )
-              }),
-              0
+                  : _vm._e()
+              ],
+              2
             )
           : _vm._e()
       ])
     ]
   )
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "right" }, [
+      _c("button", { staticClass: "btn btn-link btn-sm" }, [
+        _c("i", { staticClass: "fa fa-plus" }),
+        _vm._v("  Crear Articulo")
+      ])
+    ])
+  }
+]
 render._withStripped = true
 
 
