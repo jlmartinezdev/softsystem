@@ -2,8 +2,10 @@
 /public/hot
 /public/storage
 /public/api
+/public/css/ticket.css
 /storage/*.key
 /vendor
+
 .env
 .phpunit.result.cache
 Homestead.json

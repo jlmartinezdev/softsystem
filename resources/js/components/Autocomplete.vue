@@ -60,6 +60,7 @@ export default {
       requestSend: false,
       articulos: [],
       noresult: false,
+      timeout: null,
     };
   },
   props: ["url", "idsucursal", "validarLote"],
@@ -73,7 +74,14 @@ export default {
       if (!isNaN(parseFloat(this.searchQuery)) && this.searchQuery.length > 4) {
         return;
       }
-      this.getArticulo(false, this.searchQuery);
+      //this.getArticulo(false, this.searchQuery);
+
+      if (this.timeout) 
+        clearTimeout(this.timeout); 
+
+      this.timeout = setTimeout(() => {
+        this.getArticulo(false, this.searchQuery);
+      }, 250); 
     },
   },
   updated() {
@@ -84,9 +92,15 @@ export default {
   },
   methods: {
     searchOnEnter() {
-      if (!isNaN(parseFloat(this.searchQuery)) && this.searchQuery.length > 4) {
-        this.getArticulo(true, this.searchQuery);
-      }
+      if (this.timeout) 
+        clearTimeout(this.timeout); 
+
+      this.timeout = setTimeout(() => {
+        if (!isNaN(parseFloat(this.searchQuery)) && this.searchQuery.length > 4) {
+            this.getArticulo(true, this.searchQuery);
+          }
+      }, 250); 
+      
     },
     getArticulo(isBarcode, textSearch) {
       var Toast = Swal.mixin({
@@ -143,7 +157,7 @@ export default {
               this.showResults = true;
               this.noresult = false;
             } else {
-              this.showResults = true;
+              this.showResults = false;
               this.noresult = true;
               this.results = [];
               this.focusSearchInput();
@@ -155,7 +169,11 @@ export default {
     returnData() {
       this.searchQuery = "";
       this.$emit("articulo", this.searchTerm);
+      this.showResults = false;
+      this.results = [];
+      this.noresult = false;
       this.focusSearchInput();
+      console.log("Return Data");
     },
     async checkLote(lotes) {
       var values = {};
@@ -191,7 +209,7 @@ export default {
       }
     },
     selectItem(index) {
-      this.showResults = false;
+      
       this.activeIndex = null;
       if (this.validarLote == "true") {
         this.getArticulo(true, this.results[index].producto_c_barra);
@@ -199,6 +217,7 @@ export default {
         this.searchTerm = this.results[index];
         this.returnData();
       }
+      
     },
     selectItemEnter() {
       if (this.results && this.activeIndex !== null) {

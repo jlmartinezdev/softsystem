@@ -1843,12 +1843,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       searchTerm: {},
       requestSend: false,
       articulos: [],
-      noresult: false
+      noresult: false,
+      timeout: null
     };
   },
   props: ["url", "idsucursal", "validarLote"],
   watch: {
     searchQuery: function searchQuery() {
+      var _this = this;
+
       if (this.searchQuery === "") {
         this.showResults = false;
         this.results = [];
@@ -1857,9 +1860,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       if (!isNaN(parseFloat(this.searchQuery)) && this.searchQuery.length > 4) {
         return;
-      }
+      } //this.getArticulo(false, this.searchQuery);
 
-      this.getArticulo(false, this.searchQuery);
+
+      if (this.timeout) clearTimeout(this.timeout);
+      this.timeout = setTimeout(function () {
+        _this.getArticulo(false, _this.searchQuery);
+      }, 250);
     }
   },
   updated: function updated() {
@@ -1871,12 +1878,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   methods: {
     searchOnEnter: function searchOnEnter() {
-      if (!isNaN(parseFloat(this.searchQuery)) && this.searchQuery.length > 4) {
-        this.getArticulo(true, this.searchQuery);
-      }
+      var _this2 = this;
+
+      if (this.timeout) clearTimeout(this.timeout);
+      this.timeout = setTimeout(function () {
+        if (!isNaN(parseFloat(_this2.searchQuery)) && _this2.searchQuery.length > 4) {
+          _this2.getArticulo(true, _this2.searchQuery);
+        }
+      }, 250);
     },
     getArticulo: function getArticulo(isBarcode, textSearch) {
-      var _this = this;
+      var _this3 = this;
 
       var Toast = Swal.mixin({
         toast: true,
@@ -1893,7 +1905,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             bus_suc: this.idsucursal
           }
         }).then(function (response) {
-          _this.requestSend = false;
+          _this3.requestSend = false;
 
           if (response.data == "no") {
             Toast.fire({
@@ -1904,12 +1916,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }
 
           if (response.data) {
-            if (response.data.length > 1 && _this.validarLote == "true") {
-              _this.checkLote(response.data);
+            if (response.data.length > 1 && _this3.validarLote == "true") {
+              _this3.checkLote(response.data);
             } else {
-              _this.searchTerm = response.data[0];
+              _this3.searchTerm = response.data[0];
 
-              _this.returnData();
+              _this3.returnData();
             }
           } else {
             Toast.fire({
@@ -1927,18 +1939,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             bus_suc: this.idsucursal
           }
         }).then(function (response) {
-          _this.requestSend = false;
+          _this3.requestSend = false;
 
           if (response.data) {
-            _this.results = response.data;
-            _this.showResults = true;
-            _this.noresult = false;
+            _this3.results = response.data;
+            _this3.showResults = true;
+            _this3.noresult = false;
           } else {
-            _this.showResults = true;
-            _this.noresult = true;
-            _this.results = [];
+            _this3.showResults = false;
+            _this3.noresult = true;
+            _this3.results = [];
 
-            _this.focusSearchInput();
+            _this3.focusSearchInput();
           }
         })["catch"](function (error) {
           return console.log(error);
@@ -1948,7 +1960,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     returnData: function returnData() {
       this.searchQuery = "";
       this.$emit("articulo", this.searchTerm);
+      this.showResults = false;
+      this.results = [];
+      this.noresult = false;
       this.focusSearchInput();
+      console.log("Return Data");
     },
     checkLote: function () {
       var _checkLote = _asyncToGenerator(
@@ -2015,7 +2031,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     selectItem: function selectItem(index) {
-      this.showResults = false;
       this.activeIndex = null;
 
       if (this.validarLote == "true") {
@@ -2058,11 +2073,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.$refs.inputsearch.focus();
     },
     getAllArticulos: function getAllArticulos() {
-      var _this2 = this;
+      var _this4 = this;
 
       setInterval(function () {
         if (document.visibilityState == "visible") {
-          _this2.getArticulo(false, "");
+          _this4.getArticulo(false, "");
         }
       }, 1000 * 60 * 5);
     }
