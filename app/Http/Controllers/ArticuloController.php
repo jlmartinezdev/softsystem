@@ -66,6 +66,9 @@ class ArticuloController extends Controller
             ->groupBy('articulos.articulos_cod')
             ->first();
     }
+    public function validarCbarra(Request $request){
+        return Articulo::where('producto_c_barra',$request->cbarra)->count();
+    }
     public function getUltimo(){
         return Articulo::max('articulos_cod');
     }

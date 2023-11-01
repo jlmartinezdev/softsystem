@@ -231,9 +231,18 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
             },
             methods: {
                 busqueda_tabla: function(row, col, cellValue, searchTerm){
-                    if(row.descripcion.toUpperCase().includes(searchTerm.toUpperCase())){
-                        return cellValue;
+                    
+                    if(!isNaN(searchTerm) && searchTerm.length>5){
+                        
+                        if(row.codigo.includes(searchTerm)){
+                            return cellValue;
+                        } 
+                    }else{
+                        if(row.descripcion.toUpperCase().includes(searchTerm.toUpperCase())){
+                            return cellValue;
+                        } 
                     }
+                    
                 },
                 setMargen: function(index) {
                     if(this.viewPrecio){
@@ -392,7 +401,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                                 this.articulos = response.data;
                                 for (let i = 0; i < response.data.length; i++) {
                                     const item = {
-                                        codigo : this.articulos[i].producto_c_barra,
+                                        codigo : this.articulos[i].producto_c_barra== null ? '' : this.articulos[i].producto_c_barra,
                                         descripcion: this.articulos[i].producto_nombre,
                                         seccion: this.articulos[i].present_descripcion,
                                         precio : this.separador(this.articulos[i].pre_venta1),
@@ -877,7 +886,22 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                         let u = new URLSearchParams(params).toString();
                         window.open('excel/articulosprecios?'+u);
                     }
+                },
+                validar_codigo_de_barra: function(){
+                    if(this.articulo.c_barra.length > 0){
+                        axios.get('articulo/validar/cbarra/'+this.articulo.c_barra)
+                        .then(response => {
+                            if(response.data == '1'){
+                                Swal.fire('Atención','El codigo de barra ya esta registrado en la base de datos','warning');
+                                this.articulo.c_barra = '';
+                            }
+                        })
+                        .catch(e => {
+                            this.error = e.message;
+                        })
+                    }
                 }
+                
             },
             computed: {
                 totalStock() {

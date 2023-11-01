@@ -1847,7 +1847,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       timeout: null
     };
   },
-  props: ["url", "idsucursal", "validarLote"],
+  props: ["url", "idsucursal", "validarLote", "routeArticulo"],
   watch: {
     searchQuery: function searchQuery() {
       var _this = this;
@@ -1946,7 +1946,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             _this3.showResults = true;
             _this3.noresult = false;
           } else {
-            _this3.showResults = false;
+            _this3.showResults = true;
             _this3.noresult = true;
             _this3.results = [];
 
@@ -1961,10 +1961,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.searchQuery = "";
       this.$emit("articulo", this.searchTerm);
       this.showResults = false;
-      this.results = [];
-      this.noresult = false;
+      this.results = []; //this.noresult = false;
+
       this.focusSearchInput();
-      console.log("Return Data");
     },
     checkLote: function () {
       var _checkLote = _asyncToGenerator(
@@ -42708,7 +42707,19 @@ var render = function() {
                         _c("i", [_vm._v(_vm._s(_vm.searchQuery))])
                       ]),
                       _vm._v(" "),
-                      _vm._m(0)
+                      _c("span", { staticClass: "right" }, [
+                        _c(
+                          "a",
+                          {
+                            staticClass: "btn btn-link btn-sm",
+                            attrs: { href: _vm.routeArticulo }
+                          },
+                          [
+                            _c("i", { staticClass: "fa fa-plus" }),
+                            _vm._v("  Crear Articulo")
+                          ]
+                        )
+                      ])
                     ])
                   : _vm._e()
               ],
@@ -42719,19 +42730,7 @@ var render = function() {
     ]
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("span", { staticClass: "right" }, [
-      _c("button", { staticClass: "btn btn-link btn-sm" }, [
-        _c("i", { staticClass: "fa fa-plus" }),
-        _vm._v("  Crear Articulo")
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 

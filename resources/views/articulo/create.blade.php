@@ -27,7 +27,7 @@
 							<div class="col">
 								<div class="form-group">
 							      <strong><label for="cbarra">Codigo de Barra</label></strong>
-							      <input type="text" v-model="articulo.c_barra" class="form-control form-control-sm" name="cbarraN" id="cbarraN" placeholder="Codigo de Barra">
+							      <input type="text" v-model="articulo.c_barra" v-on:blur="validar_codigo_de_barra" class="form-control form-control-sm" name="cbarraN" id="cbarraN" placeholder="Codigo de Barra">
 							    </div> 
 							</div>
 						</div>

@@ -26,7 +26,7 @@ class ResumenController extends Controller
         $sucursal = $request->idsucursal;
         $fecha_inicio = $request->desde;
         $fecha_fin = $request->hasta;
-        $ventas = Venta::select('ventas.venta_total','ventas.venta_descuento','ventas.tipo_factura')->wheresuc($sucursal)->whereBetween('ventas.venta_fecha',[$fecha_inicio,$fecha_fin])->get();
+        $ventas = Venta::select('ventas.venta_total','ventas.venta_descuento','ventas.tipo_factura')->wheresuc($sucursal)->whereBetween(DB::raw("date(ventas.venta_fecha)"),[$fecha_inicio,$fecha_fin])->get();
         $d_ventas= ['contado'=>0,'credito'=>0,'total'=>0,'descuento'=>0,'ganancia'=>0];
         foreach($ventas as $venta){
 

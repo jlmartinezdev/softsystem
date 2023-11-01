@@ -50,7 +50,7 @@ class CompraController extends Controller
             DB::insert('INSERT INTO detalle_compra (ARTICULOS_cod, compra_cod, compra_precio, compra_cantidad, exentas, grabadas5, grabadas10)
 VALUES (?, ?, ?, ?, ?, ?, ?);',[$detalle['codigo'],$compra->compra_cod,$detalle['costo'],$detalle['cantidad'],0,0,0]);
            DB::update('update stock set cantidad = (cantidad + ?) where id_stock=?',[$detalle['cantidad'],$detalle['idstock']]);
-           DB::update('update ariticulos set producto_costo_compra = ?, pre_venta1=?, pre_venta2=?,pre_venta3=?, pre_venta4=?, pre_margen1=?, pre_margen2=?,pre_margen3=?,pre_margen4=? where ARTICULOS_cod=?',[$detalle['costo'],$detalle['p1'],$detalle['p2'],$detalle['p3'],$detalle['p4'],$detalle['m1'],$detalle['m2'],$detalle['m3'],$detalle['m4'],$detalle['codigo']]);
+           DB::update('update articulos set producto_costo_compra = ?, pre_venta1=?, pre_venta2=?,pre_venta3=?, pre_venta4=?, pre_margen1=?, pre_margen2=?,pre_margen3=?,pre_margen4=? where ARTICULOS_cod=?',[$detalle['costo'],$detalle['p1'],$detalle['p2'],$detalle['p3'],$detalle['p4'],$detalle['m1'],$detalle['m2'],$detalle['m3'],$detalle['m4'],$detalle['codigo']]);
         } 
         for($i=0;$i< count($request->precios);$i++){
             $suma = 0;

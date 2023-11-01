@@ -40,7 +40,7 @@
         </li>
         <li v-if="noresult" class="autocomplete-result">
           <span class="left"> No hay resultado para <i>{{ searchQuery }}</i> </span>
-          <span class="right"><button class="btn btn-link btn-sm"><i class="fa fa-plus"></i>  Crear Articulo</button></span>
+          <span class="right"><a :href="routeArticulo" class="btn btn-link btn-sm"><i class="fa fa-plus"></i>  Crear Articulo</a></span>
         </li>
       </ul>
     </div>
@@ -63,7 +63,7 @@ export default {
       timeout: null,
     };
   },
-  props: ["url", "idsucursal", "validarLote"],
+  props: ["url", "idsucursal", "validarLote", "routeArticulo"],
   watch: {
     searchQuery: function () {
       if (this.searchQuery === "") {
@@ -157,7 +157,7 @@ export default {
               this.showResults = true;
               this.noresult = false;
             } else {
-              this.showResults = false;
+              this.showResults = true;
               this.noresult = true;
               this.results = [];
               this.focusSearchInput();
@@ -171,9 +171,8 @@ export default {
       this.$emit("articulo", this.searchTerm);
       this.showResults = false;
       this.results = [];
-      this.noresult = false;
+      //this.noresult = false;
       this.focusSearchInput();
-      console.log("Return Data");
     },
     async checkLote(lotes) {
       var values = {};

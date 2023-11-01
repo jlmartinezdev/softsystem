@@ -27,6 +27,7 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::post('articulo', 'ArticuloController@store');
     Route::put('articulo/{id}', 'ArticuloController@update')->name('articulo.update');
     Route::delete('articulo/res/{id}', 'ArticuloController@destroy')->name('articulo.destroy');
+    Route::get('articulo/validar/cbarra/{cbarra}','ArticuloController@validarCbarra');
     
     
     

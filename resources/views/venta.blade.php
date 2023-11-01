@@ -57,7 +57,7 @@
                                                             </div>
                                                         </div -->
                     <Searcharticulo url="{{ env('APP_APIDB') }}" :idsucursal="ventaCabecera.idSucursal"
-                        @articulo="addCarrito" validar-lote="false" ref="Searcharticulo">
+                        @articulo="addCarrito" validar-lote="false" ref="Searcharticulo" route-articulo="{{ route('articulo')}}">
                     </Searcharticulo>
 
 
