@@ -196,12 +196,12 @@
                                 <p>Cobros</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('infstock') }}" id="m_istock" class="nav-link">
+                        <!--li class="nav-item">
+                            <a href="{ route('infstock') }}" id="m_istock" class="nav-link">
                                 <i class="fa fa-chevron-right nav-icon"></i>
                                 <p>Inventario</p>
                             </a>
-                        </li>
+                        </li -->
                         <li class="nav-item">
                             <a href="{{ route('resumen') }}" id="m_iresumen" class="nav-link">
                                 <i class="fa fa-chevron-right nav-icon"></i>

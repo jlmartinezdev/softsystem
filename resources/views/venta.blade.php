@@ -31,6 +31,10 @@
             height: 350px;
             overflow-y: auto;
         }
+        .dark-mode .bg-light {
+            background-color: #454d55 !important;
+            color: #fff !important;
+        }
     </style>
 @endsection
 @section('main')
@@ -40,7 +44,28 @@
             <div class="row">
                 <!-- PANEL IZQUIERDA -->
                 <div class="col-md-8">
-                    <h4>:: REGISTRAR VENTA ::</h4>
+                   
+                    <div class="content-header">
+                        <div class="row">
+                            <div class="col-6">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+                                    <li class="breadcrumb-item active">Venta</li>
+                                </ol>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-secondary float-sm-right">
+                                    <span class="badge badge-default"><span class="fa fa-cash-register"></span> CAJA
+                                    </span><span class="badge badge-pill "
+                                        :class="[caja == 'ABIERTA' ? 'badge-success pr-2 pl-2' : 'badge-danger']">
+                                        @{{ caja }} - @{{ nrooperacion }}
+                                    </span>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!--div class="input-group">
                                                             <input type="text" v-model="txtbuscar" @keyup.enter="showBuscar()" class="form-control"
                                                                 placeholder="Buscar...." autofocus />
@@ -135,18 +160,7 @@
                 <div class="col-md-4">
                     <div class="card">
                         <div class="card-body">
-                            <div class="text-secondary text-center">
-                                <span class="badge badge-default"><span class="fa fa-cash-register"></span> CAJA
-                                </span><span class="badge badge-pill "
-                                    :class="[caja == 'ABIERTA' ? 'badge-success pr-2 pl-2' : 'badge-danger']">
-                                    @{{ caja }} </span> |<span class="badge badge-default"><span
-                                        class="fa fa-info-circle"></span> NRO OPERACION </span><span
-                                    class="badge badge-pill "
-                                    :class="[caja == 'ABIERTA' ? 'badge-success' : 'badge-danger']"> @{{ nrooperacion }}
-                                </span>
-
-                            </div>
-                            <hr>
+                            
                             <fieldset class="form-group">
                                 <label>Documento</label>
                                 <select class="form-control form-control-sm" v-model="ventaCabecera.documento">
@@ -179,15 +193,23 @@
                                 <input type="number" @keyup="saveDatos" class="form-control form-control-sm"
                                     v-model="ventaCabecera.descuento" placeholder="Descuento...">
                             </fieldset>
-                            <hr>
+                            <div class="description-block border-right">
+                                <div class="descripcion-percentage text-muted">
+                                    <i class="fa fa-money-bill"></i> TOTAL
+                                </div>
+                                <div class="description-header">
+                                    <h3><template>Gs. @{{ totalVenta }}</template></h3>
+                                </div>
+                            </div>
 
-                            <h3><template>TOTAL: @{{ totalVenta }}</template></h3>
-                            <hr>
+                            
+                        </div>
+                        <div class="card-footer">
                             <button class="btn btn-success" @click="showFinalizar">
                                 <span class="fa fa-check"></span>
                                 <strong>FINALIZAR</strong>
                             </button>
-                            <button class="btn btn-secondary" @click="cancelar"> <span class="fa fa-times"></span>
+                            <button class="btn btn-secondary float-right" @click="cancelar"> <span class="fa fa-times"></span>
                                 CANCELAR</button>
 
                         </div>

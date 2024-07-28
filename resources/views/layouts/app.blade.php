@@ -74,6 +74,9 @@
         .slider.round::before {
             border-radius: 50%;
         }
+        .table {
+            margin-bottom: 0;
+        }
     </style>
     @yield('style')
 </head>

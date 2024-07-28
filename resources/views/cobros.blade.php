@@ -11,6 +11,10 @@
             src: url({{ asset('webfonts/SofiaSans-Regular.ttf') }}) format("truetype");
         }
 
+        .descripcion-header {
+            font-size: 18px;
+        }
+
         #main {
             font-family: 'Sofia';
         }
@@ -36,6 +40,7 @@
             height: 350px;
             overflow-y: auto;
         }
+        
 
         .table th {
             vertical-align: middle;
@@ -57,28 +62,89 @@
         <div class="row">
             <!-- PANEL IZQUIERDO -->
             <div class="col-md-12">
-                <div class="card">
-                    <div class="p-2 mb-3">
-                        <!-- Buscador -->
-                        <div class="input-group">
-                            <input type="text" v-model="txtbuscar" tabindex="1" @keyup.enter="buscar(false)"
-                                class="form-control" id="txtbuscar" placeholder="Buscar...." />
-                            <div class="input-group-append">
-                                <button class="btn btn-secondary" @click="buscar(false)">
-                                    <template v-if="request.buscar">
-                                        <span class="spinner-border spinner-border-sm" role="status"></span><span
-                                            class="sr-only">Buscando...</span> Cargando...
-                                    </template>
-                                    <template v-else>
-                                        <span class="fa fa-search"></span> Buscar
-                                    </template>
-                                </button>
+                <div class="content-header">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+                        <li class="breadcrumb-item active">Cobro Cuenta</li>
+                    </ol>
+                </div>
+                <div class="card p-4">
+
+               
+                <div class="row">
+                    <div class="col-3"></div>
+                    <div class="col-12 col-sm-12 col-md-6 ">
+                        <div class="p-2 mb-3">
+                            <!-- Buscador -->
+                            <div class="input-group">
+                                <input type="text" v-model="txtbuscar" tabindex="1" @keyup.enter="buscar(false)"
+                                    class="form-control" id="txtbuscar" placeholder="Buscar cliente...." />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary" @click="buscar(false)">
+                                        <template v-if="request.buscar">
+                                            <span class="spinner-border spinner-border-sm" role="status"></span><span
+                                                class="sr-only">Buscando...</span> Cargando...
+                                        </template>
+                                        <template v-else>
+                                            <span class="fa fa-search"></span> Buscar
+                                        </template>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <div class="col-3"></div>
+                </div>
+                
+                <div class="row">
+                   
+                    <div class="col-sm-2 col-6">
+                        <div class="description-block border-right">
+                            <div class="descripcion-percentage text-muted">
+                                <i class="fa fa-id-card"></i> NRO. DOCUMENTO
+                            </div>
+                            <div class="description-header">
+                                <template>@{{ cliente.documento }}</template>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-6">
+                        <div class="description-block">
+                            <div class="descripcion-percentage text-muted">
+                                <i class="fa fa-user"></i> NOMBRE CLIENTE
+                            </div>
+                            <div class="description-header">
+                                <template>@{{ cliente.nombre }}</template>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-6">
+                        <div class="description-block">
+                            <div class="descripcion-percentage text-muted">
+                                <i class="fa fa-money-bill"></i> TOTAL COBRADO
+                            </div>
+                            <div class="description-header">
+                                <template>@{{ format(cobro.cobrado) }}</template>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-6">
+                        <div class="description-block">
+                            <div class="descripcion-percentage text-muted">
+                                <i class="fa fa-money-bill"></i> SALDO
+                            </div>
+                            <div class="description-header text-danger">
+                                <template>@{{ format(cobro.saldo) }}</template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+                <div class="card card-outline card-primary">
                     <!-- End Buscador -->
 
-                    <div class="table-responsive-sm ml-2 mr-2">
+                    <div class="table-responsive-sm">
                         <table class="table table-sm table-hover table-bordered" style="overflow-x: initial; heigh: 100px">
                             <tr class="bg-light">
                                 <th>N de Venta</th>
@@ -92,7 +158,7 @@
                             </tr>
                             <template v-if="ctas.length==0">
                                 <tr>
-                                    <td colspan="8">NO HAY CUENTA PARA MOSTRAR...</td>
+                                    <td colspan="8" class="text-muted">NO HAY CUENTA PARA MOSTRAR...</td>
                                 </tr>
                             </template>
                             <template v-for="(c,index) in ctas">
@@ -142,36 +208,18 @@
 
 
                     </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-sm-6 col-md-4">
-                                <div>
-                                    TOTAL COBRADO: &nbsp;<input type="text" :value="format(cobro.cobrado)" disabled
-                                        class="form-control form-control-sm text-success font-weight-bold text-monospace">
-                                </div>
-                            </div>
-                            <div class="col-sm-6 col-md-4">
-                                <div>
-                                    SALDO: <input type="text" :value="format(cobro.saldo)" disabled
-                                        class="form-control form-control-sm text-danger font-weight-bold text-monospace">
-                                </div>
-                            </div>
-                            <div class="col-sm-6 col-md-4">
+                    <template v-if="cliente.id.length > 0">
+                        <div class="card-footer">
+                            <button class="btn btn-primary" @click="modalCobroParcial"><span class="fa fa-edit"></span>&nbsp;Ingresar Monto Cobro Parcial</button>
 
-                                <div class="mt-4"><button class="btn btn-primary btn-sm" @click="modalCobroParcial"><span
-                                            class="fa fa-edit"></span>&nbsp;Ingresar
-                                        Monto</button></div>
-
-                            </div>
                         </div>
-
-                    </div>
+                    </template>
 
 
                 </div>
                 <template v-if="cuotasAcobrar.length > 0">
-                    <div class="card">
-                        <div class="card-header bg-info">Cuotas a Cobrar</div>
+                    <div class="card card-outline card-info">
+                        <div class="card-header font-weight-bold">Cuotas a Cobrar</div>
                         <div class="card-body">
                             <div class="table-responsive-sm">
                                 <table class="table table-sm table-bordered table-hover">
@@ -213,172 +261,142 @@
         <div class="row">
 
             <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-teal">
-                        <span class="header-title">Detalle Cobro</span>
-                    </div>
-                    <div class="card-body p-3">
-
-
-
-                        <div class="row">
-                            <div class="col-sm-3 col-6">
-                                <div class="description-block border-right">
-                                    <div class="descripcion-percentage text-secondary">
-                                        <i class="fa fa-cash-register"></i>
-                                    </div>
-                                    <div class="description-header">
-                                        <span class="badge badge-pill "
-                                            :class="[caja.estado == 'ABIERTA' ? 'badge-success pr-2 pl-2' : 'badge-danger']">
-                                            @{{ caja.estado }} </span>
-                                    </div>
-                                    <div class="description-text">
-                                        Estado Caja
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-3 col-6">
-                                <div class="description-block">
-                                    <div class="descripcion-percentage text-secondary">
-                                        <i class="fa fa-info-circle"></i>
-                                    </div>
-                                    <div class="description-header">
-                                        <span class="badge badge-pill "
-                                            :class="[caja.estado == 'ABIERTA' ? 'badge-success' : 'badge-danger']">
-                                            @{{ caja.nrooperacion }}
-                                    </div>
-                                    <div class="description-text">
-                                        # Operacion
-                                    </div>
-                                </div>
-                            </div>
+                <template v-if="cliente.id.length > 0">
+                    <div class="card card-outline card-success">
+                        <div class="card-header">
+                            <span class="header-title font-weight-bold">Detalle Cobro</span>
                         </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-sm-3 col-6">
-                                <div class="description-block border-right">
-                                    <div class="descripcion-percentage text-info">
-                                        <i class="fa fa-calendar"></i>
-                                    </div>
-                                    <div class="description-header mr-2">
-                                        <input type="date" id="fecha" class="form-control form-control-sm"
-                                            v-model="cobro.fecha" placeholder="Fecha">
-                                    </div>
-                                    <div class="description-text">
-                                        Fecha
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-3 col-6">
-                                <div class="description-block border-right">
-                                    <div class="descripcion-percentage text-info">
-                                        <i class="fa fa-id-card"></i>
-                                    </div>
-                                    <div class="description-header">
-                                        <template>@{{ cliente.documento }}</template>
-                                    </div>
-                                    <div class="description-text">
-                                        Nro. Documento
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-3 col-6">
-                                <div class="description-block">
-                                    <div class="descripcion-percentage text-info">
-                                        <i class="fa fa-user"></i>
-                                    </div>
-                                    <div class="description-header">
-                                        <template>@{{ cliente.nombre }}</template>
-                                    </div>
-                                    <div class="description-text">
-                                        Nombre Cliente
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="card-body p-3">
 
-                        </div>
-                        <hr>
-                        <label for="interes" @change="changeMontoInteres"><input v-model="cobro.cobrarInteres"
-                                type="checkbox" id="interes"> Cobrar Interes por Mora</label>
+                            <div class="row">
+                                <div class="col-sm-2 col-6">
+                                    <div class="description-block border-right">
+                                        <div class="descripcion-percentage text-muted">
+                                            <i class="fa fa-cash-register"></i> ESTADO CAJA
+                                        </div>
+                                        <div class="description-header">
+                                            <span class="badge"
+                                                :class="[caja.estado == 'ABIERTA' ? 'badge-success' : 'badge-danger']">
+                                                @{{ caja.estado }} - # @{{ caja.nrooperacion }} </span>
+                                        </div>
 
-                        <div class="row">
-                            <div class="col-sm-3 col-6">
-                                <div class="description-block border-right">
-                                    <div class="descripcion-percentage text-success">
-                                        <i class="fa fa-dollar-sign"></i>
-                                    </div>
-                                    <div class="description-header">
-                                        <template>@{{ totalCuota }}</template>
-                                    </div>
-                                    <div class="description-text">
-                                        Total Cuota
                                     </div>
                                 </div>
+
+
+                                <div class="col-sm-2 col-6">
+                                    <div class="description-block border-right">
+                                        <div class="descripcion-percentage text-muted">
+                                            <i class="fa fa-calendar"></i> FECHA
+                                        </div>
+                                        <div class="description-header mr-2">
+                                            <input type="date" id="fecha" class="form-control form-control-sm"
+                                                v-model="cobro.fecha" placeholder="Fecha">
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 col-6">
+                                    <div class="description-block border-right">
+                                        <div class="descripcion-percentage text-muted">
+                                            <i class="fa fa-money-bill"></i> Cobrar interes por Mora
+                                        </div>
+                                        <div class="description-header mr-2">
+                                            <select class="form-control form-control-sm" id="interes" v-model="cobro.cobrarInteres"  @change="changeMontoInteres">
+                                                <option :value="true">SI</option>
+                                                <option :value="false">NO</option>
+                                            </select>
+                                            
+                                        </div>
+
+                                    </div>
+                                   
+                                </div>
+                                
+
                             </div>
-                            <div class="col-sm-3 col-6">
-                                <div class="description-block border-right">
-                                    <div class="descripcion-percentage">
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-primary" title="Ingresar Monto Interes"
-                                                @click="setInteres"><span class="fa fa-edit"></span></button>
-                                            <button class="btn btn-outline-warning"
-                                                title="Usar monto genterado por sistema"
-                                                @click="cobro.isInteresFija= false"><span
-                                                    class="fa fa-retweet"></span></button>
-                                            <button class="btn btn-outline-success"
-                                                title="Cobrar solo interes y finalizar cobro..."
-                                                @click="cobrarInteres"><span class="fa fa-check"></span></button>
+                            <hr>
+                            
+
+                            <div class="row">
+                                <div class="col-sm-3 col-6">
+                                    <div class="description-block border-right">
+                                        <div class="descripcion-percentage text-success">
+                                            GS
+                                        </div>
+                                        <div class="description-header">
+                                            <template>@{{ totalCuota }}</template>
+                                        </div>
+                                        <div class="description-text text-muted">
+                                            Total Cuota
                                         </div>
                                     </div>
-                                    <div class="description-header">
-                                        <template>@{{ format(cobro.totalInteres) }}
+                                </div>
+                                <div class="col-sm-3 col-6">
+                                    <div class="description-block border-right">
+                                        <div class="descripcion-percentage">
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" title="Ingresar Monto Interes"
+                                                    @click="setInteres"><span class="fa fa-edit"></span></button>
+                                                <button class="btn btn-outline-warning"
+                                                    title="Usar monto genterado por sistema"
+                                                    @click="cobro.isInteresFija= false"><span
+                                                        class="fa fa-retweet"></span></button>
+                                                <button class="btn btn-outline-success"
+                                                    title="Cobrar solo interes y finalizar cobro..."
+                                                    @click="cobrarInteres"><span class="fa fa-check"></span></button>
+                                            </div>
+                                        </div>
+                                        <div class="description-header">
+                                            <template>@{{ format(cobro.totalInteres) }}
 
-                                        </template>
-                                    </div>
-                                    <div class="description-text">
-                                        Interes
+                                            </template>
+                                        </div>
+                                        <div class="description-text text-muted">
+                                            Interes
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-3 col-6">
+                                <div class="col-sm-3 col-6">
 
-                                <div class="description-block border-right">
-                                    <div class="descripcion-percentage text-success">
-                                        <i class="fa fa-dollar-sign"></i>
-                                    </div>
-                                    <div class="description-header">
-                                        <template>@{{ format(cobro.saldonuevo) }}</template>
-                                    </div>
-                                    <div class="description-text">
-                                        Saldo
+                                    <div class="description-block border-right">
+                                        <div class="descripcion-percentage text-success">
+                                            GS
+                                        </div>
+                                        <div class="description-header">
+                                            <template>@{{ format(cobro.saldonuevo) }}</template>
+                                        </div>
+                                        <div class="description-text text-muted">
+                                            Saldo
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-3 col-6">
+                                <div class="col-sm-3 col-6">
 
-                                <div class="description-block border-right">
-                                    <div class="descripcion-percentage text-success">
-                                        <i class="fa fa-dollar-sign"></i>
-                                    </div>
-                                    <div class="description-header">
-                                        <strong><template>@{{ totalCobrar }}</template></strong>
-                                    </div>
-                                    <div class="description-text">
-                                        Total a Cobrar
+                                    <div class="description-block border-right">
+                                        <div class="descripcion-percentage text-success">
+                                            GS
+                                        </div>
+                                        <div class="description-header">
+                                            <template>@{{ totalCobrar }}</template>
+                                        </div>
+                                        <div class="description-text text-muted">
+                                            Total a Cobrar
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="card-footer">
+                            <button class="btn btn-flat bg-success" @click="showFinalizar">
+                                <span class="fas fa-check mr-2"></span> FINALIZAR
+                            </button>&nbsp;
+                            <button class="btn btn-flat bg-secondary " @click="cancelar"> <span
+                                    class="fas fa-times mr-2"></span>
+                                CANCELAR</button>
+                        </div>
                     </div>
-                    <div class="card-footer">
-                        <button class="btn btn-flat bg-success" @click="showFinalizar">
-                            <span class="fas fa-check mr-2"></span> FINALIZAR
-                        </button>&nbsp;
-                        <button class="btn btn-flat bg-secondary " @click="cancelar"> <span
-                                class="fas fa-times mr-2"></span>
-                            CANCELAR</button>
-                    </div>
-                </div>
+                </template>
             </div>
         </div>
         @include('cobro.cuotas')
@@ -427,7 +445,7 @@
                     fecha: '',
                     idSucursal: 0,
                     totalInteres: 0,
-                    cobrarInteres: true,
+                    cobrarInteres: false,
                     isInteresFija: false,
                     interesFija: 0
                 },
@@ -454,6 +472,8 @@
 
                     var t = parseFloat(this.txtbuscar);
                     if (isNaN(t)) {
+                        this.cuotas = [];
+                        this.cuotasAcobrar = [];
                         this.txtcliente = this.txtbuscar
                         $('#busquedaCliente').modal('show');
                         this.buscarCliente();
@@ -644,8 +664,9 @@
                     let c = {
                         estado: cuota.estado,
                         fecha_venc: cuota.fecha_venc,
-                        interes: this.cobro.cobrarInteres && cuota.estado_interes== '0' ? this.setMontoInteres(cuota.fecha_venc, cuota
-                            .monto_cuota) : 0,
+                        interes: this.cobro.cobrarInteres && cuota.estado_interes == '0' ? this
+                            .setMontoInteres(cuota.fecha_venc, cuota
+                                .monto_cuota) : 0,
                         monto_cobrado: cuota.monto_cobrado,
                         monto_cuota: cuota.monto_cuota,
                         monto_saldo: cuota.monto_saldo,
@@ -665,17 +686,20 @@
                             Swal.fire('Datos incorrecto...', 'Monto ingresado es mayor al saldo!', 'error');
                             return false;
                         }
-                        if(this.ctas.length > 1){
+                        if (this.ctas.length > 1) {
                             //ordenar allcuota por fecha de vencimiento
                             this.allCuota.sort(function(a, b) {
-                                return app.convertToDate(a.fecha_venc) > app.convertToDate(b.fecha_venc) ? 1 : app.convertToDate(a.fecha_venc) < app.convertToDate(b.fecha_venc) ? -1 : 0;
+                                return app.convertToDate(a.fecha_venc) > app.convertToDate(b
+                                    .fecha_venc) ? 1 : app.convertToDate(a.fecha_venc) < app
+                                    .convertToDate(b.fecha_venc) ? -1 : 0;
                             });
 
                         }
                         let iCuotasAcobrar = [];
                         let sumatoria = 0;
 
-                        for (i = 0; i < this.allCuota.length; i++) { //mientras cuotas seleccionada sea menor a monto a cobrar
+                        for (i = 0; i < this.allCuota
+                            .length; i++) { //mientras cuotas seleccionada sea menor a monto a cobrar
 
                             if (sumatoria < this.montoParcial) {
                                 if (this.allCuota[i].monto_saldo > 0) { //Verifica si cuota ya se cobro
@@ -743,9 +767,10 @@
                     }
                     const diff = fechaFin - fechaInicio;
                     return parseInt(diff / (1000 * 60 * 60 * 24));
+                   
                 },
                 diferenciaFecha: function(fecha_vent, monto_saldo, isInteres) {
-                    if(isInteres=='1'){
+                    if (isInteres == '1') {
                         return "-";
                     }
                     //2016-07-12
@@ -854,6 +879,7 @@
                     }
                 },
                 changeMontoInteres: function() {
+                    console.log("ChangeCobrar Interes")
                     if (this.cobro.isInteresFija) {
                         let l = this.cuotasAcobrar.length;
                         for (let i = 0; i < l; i++) {
