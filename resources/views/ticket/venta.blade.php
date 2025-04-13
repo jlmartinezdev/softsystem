@@ -20,7 +20,7 @@
     <div class="ticket">
 
         <p class="centrado">
-            <strong>{{ $empresa->emp_nombre }}</strong>
+            <strong><!-- {$empresa->emp_nombre } --> <img src="{{ asset('img/logo_negro.png')}}" height="150"/></strong>
             <br>
             {{ $empresa->emp_direccion }}
             <br>

@@ -17,7 +17,7 @@ class Apertura extends Model
     public function scopeUsuario($query, $user){
         if($user){
             if($user=="2"){
-                return $query->where("a.cod_usuarios",Auth::user()->cod_usuarios);
+                return $query->where("apert_cierres_caja.cod_usuarios",Auth::user()->cod_usuarios);
             }
         }
     }

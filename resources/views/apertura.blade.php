@@ -52,27 +52,28 @@
 			<table class="table table-striped table-hover table-sm">
 			<tr>
 				<th>Nro. Operacion</th>
-				<th>Sucursal</th>
+				<th>Usuario</th>
 				<th>Caja</th>
 				<th>Fecha</th>
 				<th>Hora</th>
 				<th>Estado</th>
-				<th>Cerrar </th>
+				<th>Opcion </th>
 
 			</tr>
 			@foreach($aperturas as $apertura)
 			<tr>
 				<td>{{$apertura['nro_operacion']}}</td>
-				<td>{{$apertura['suc_desc']}}</td>
+				<td>{{$apertura['nom_usuarios']}}</td>
 				<td>{{$apertura['caja_descrip']}}</td>
 				<td>{{date('d/m/Y',strtotime($apertura['apert_fecha']))}}</td>
 				<td>{{$apertura['apert_hora']}}</td>
 				<td class="{{$apertura['apert_estado']=='1' ? 'text-danger font-weight-bold':'text-success font-weight-bold'}}">{{$apertura['apert_estado']=='1' ? 'Abierta': 'Cerrada'}}</td>
 				<td>
 					@if($apertura['apert_estado']=='1')
-					<a href="{{ route('cierre',$apertura) }}" class="btn btn-outline-info btn-sm" title="Cerrar Caja"><span class="fa fa-lock"></span></a>
+					<a href="{{ route('cierre',$apertura) }}" class="btn btn-outline-info btn-sm" title="Cerrar Caja"><span class="fa fa-lock"></span> Cerrar caja</a>
 					@else
-					...
+					<a href="{{ route('caja.informe',$apertura['nro_operacion'])}}" class="btn btn-outline-success btn-sm"><span class="fa fa-file"></span> Detalle</a>
+					
 					@endif
 				</td>
 			</tr>

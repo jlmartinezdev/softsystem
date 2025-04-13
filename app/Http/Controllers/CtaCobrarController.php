@@ -122,7 +122,7 @@ class CtaCobrarController extends Controller
             ->select('ctas_cobrar.nro_fact_ventas', DB::raw('COUNT(ctas_cobrar.nro_cuotas) as "cuotas"'), DB::raw('SUM(ctas_cobrar.monto_cobrado) as "cobrado"'), DB::raw('SUM(ctas_cobrar.monto_cuota) as "total"'), DB::raw('SUM(ctas_cobrar.monto_saldo) as "saldo"'), DB::raw('COUNT(IF(ctas_cobrar.estado=1,1,NULL)) AS "nopagada"'), DB::raw('COUNT(IF(ctas_cobrar.estado=0,1,NULL)) AS "pagada"'), DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y") as venta_fecha'), DB::raw('DATE_FORMAT(ctas_cobrar.fecha_venc,"%Y-%m-%d") as fecha_v'), 'ventas.venta_descuento', 'c.cliente_ruc', 'c.cliente_nombre', 'c.cliente_direccion', 'c.cliente_cel')
             ->cliente($request->buscar, $request->buscarpor)
             ->groupBy('ctas_cobrar.nro_fact_ventas')
-            ->having('saldo', '>', 0)
+            /*->having('saldo', '>', 0)*/
             ->ordenar($request->ordenarpor, $request->ord, $request->buscar)
             ->get();
         } else {
@@ -334,7 +334,7 @@ class CtaCobrarController extends Controller
                 ->join('ctas_cobrar as cc', 'cd.nro_fact_ventas', 'cc.nro_fact_ventas')
                 ->join('ventas as v', 'cd.nro_fact_ventas', 'v.nro_fact_ventas')
                 ->join('clientes as c', 'v.clientes_cod', 'c.clientes_cod')
-                ->select('cobranzas.*', 'c.cliente_nombre', 'c.cliente_ruc')
+                ->select('cobranzas.*', 'c.cliente_nombre', 'c.cliente_ruc','c.clientes_cod')
                 ->where('cobranzas.cc_numero', $id)
                 ->first();
         $cuotas = Cobro::join('cobranza_detalle as cd', 'cobranzas.cc_numero', 'cd.cc_numero')
@@ -369,8 +369,17 @@ class CtaCobrarController extends Controller
                     ->where('cobranzas.cc_numero', $id)
                     ->groupBy('a.articulos_cod')
                     ->get();
-                    
-        return view('documento.recibocobro', compact('empresa', 'cobro', 'cuotas', 'articulos','cantidad_cuotas'));
+          if (env('PRINT_RECIBO_V',1)==1){
+            return view('documento.recibocobro', compact('empresa', 'cobro', 'cuotas', 'articulos','cantidad_cuotas'));
+          }else{
+            $saldo= DB::table('ctas_cobrar as cc')
+            ->join('ventas as v', 'cc.nro_fact_ventas','v.nro_fact_ventas')
+            ->join('clientes as c', 'v.CLIENTES_cod','c.CLIENTES_cod')
+            ->select(DB::raw('SUM(cc.monto_saldo) as saldo'))
+            ->where('c.CLIENTES_cod',$cobro->clientes_cod)
+            ->first();
+            return view('documento.recibodahianita', compact('empresa', 'cobro', 'cuotas', 'articulos','cantidad_cuotas','saldo'));
+          }        
     }
     
     public function printExtracto($id){

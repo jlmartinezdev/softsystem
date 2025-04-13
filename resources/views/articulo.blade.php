@@ -1,66 +1,96 @@
 @extends('layouts.app')
 @section('title', 'Articulo')
 @section('style')
+<link href="{{ asset('css/icheck-bootstrap.min.css') }}" rel="stylesheet">
 <style>
+    
+        @font-face {
+            font-family: "Sofia";
+            font-style: normal;
+            font-weight: 400;
+            font-display: auto;
+            src: url({{ asset('webfonts/SofiaSans-Regular.ttf') }}) format("truetype");
+        }
+
+        #main {
+            font-family: 'Sofia';
+        }
     .vgt-table tr{
         font-family: Arial, Helvetica, sans-serif;
     }
     .vgt-table td{
         color: rgb(8, 8, 8);
     }
+    .modal-dialog-rigth {
+    position: fixed;
+    margin: auto;
+    width: 360px;
+    height: 100%;
+    right: 0px;
+}
+.modal-content {
+    height: 100%;
+}
+.autocomplete-input {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  width: 100%;
+  padding: 7px 7px 7px 48px;
+  box-sizing: border-box;
+  position: relative;
+  font-size: 16px;
+  line-height: 1.5;
+  flex: 1;
+  background-color: #eee;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjY2IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMSIgcj0iOCIvPjxwYXRoIGQ9Ik0yMSAyMWwtNC00Ii8+PC9zdmc+");
+  background-repeat: no-repeat;
+  background-position: 12px;
+}
+.autocomplete-input:focus,
+.autocomplete-input[aria-expanded="true"] {
+  border-color: #17a2b8;
+  background-color: #fff;
+  outline: none;
+  /* box-shadow: 0 2px 2px rgba(0, 0, 0, .16)*/
+}
+.dark-mode .autocomplete-input {
+  border-color: rgba(0, 0, 0, 0.12);
+  color: white;
+  background-color: #343a40;
+}
 </style>
 @endsection
 @section('main')
     <div class="container" id="app">
-        <div class="font-weight-bold" style="font-size: 14pt;">Mantimiento de Articulos</div>
-        <div class="card">
+        <div class="py-2"  ><span class="font-weight-bold" style="font-size: 18pt;">Productos</span><template><span class="pl-3">@{{articulos.length}} articulos registrados</span></template></div>
+        <div class="card shadow-sm">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-sm-4 col-md-2 pl-2 pb-2">
-                        <button class="btn btn-primary btn-block" @click="showMArticulo"><span class="fa fa-plus"></span>
-                            Nuevo</button>
-                    </div>
+                    
                    
-                    <div class="col-sm-8 col-md-6">
-                        <div class="input-group">
-                            <input type="text" v-model="txtbuscar" @keyup.enter="buscar(false)" class="form-control"
-                                placeholder="Buscar...." />
-                            <div class="input-group-append">
-                                <button class="btn btn-secondary" @click="buscar(false)">
-                                    <template v-if="requestSend">
-                                        <span class="spinner-border spinner-border-sm" role="status"></span><span
-                                            class="sr-only">Cargando...</span> Cargando...
-                                    </template>
-                                    <template v-else>
-                                        <span class="fa fa-sync"></span> Recargar
-                                    </template>
-                                </button>
-                            </div>
-                        </div>
+                    <div class="col-sm-12 col-md-4 py-2">
+                        <input
+                        type="text"
+                        v-model="txtbuscar"
+                        placeholder="Articulo o Codigo"
+                        @keyup.enter="buscar(false)"
+                        class="autocomplete-input"
+                      />
+                        
                     </div>
-                    <div class="col-md-2">
-                        <select class="form-control" @click="buscar(false)" v-model="filtro.seccion">
-                            <option value="0">Todos</option>
-                            @foreach ($secciones as $seccion)
-                                <option value="{{ $seccion['present_cod'] }}">{{ $seccion['present_descripcion'] }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <div class="col-sm-12 col-md-6 py-2">
+                        <button :class="[filtro.seccion=='0' ? 'btn btn-link text-secondary': 'btn btn-outline-light text-primary']" data-toggle="modal" data-target="#modalfiltro"><i :class="[filtro.seccion=='0' ? 'fa-regular fa-filter':'fa-solid fa-filter text-primary']"></i> Filtro</button>
+                            
+                          
+                
+                        <button class="btn btn-link text-secondary"><i class="fa-regular fa-folder"></i> Seccion</button>
+                    
+                        <button class="btn btn-link text-secondary" data-toggle="modal" data-target="#modalexportar"><i class="fa-regular fa-upload"></i> Exportar</button>
                     </div>
-                    <div class="pl-3" >
-                        <!-- Example single danger button -->
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
-                                aria-expanded="false">
-                                <span class="fa fa-file-excel"></span> Exportar
-                            </button>
-                            <div class="dropdown-menu">
-                                <button class="dropdown-item" @click="exportar('stock')">Con Stock</button>
-                                <div class="dropdown-divider"></div>
-                                <button class="dropdown-item" @click="exportar('precios')">Precios Creditos</button>
-                            </div>
-                        </div>
-
+                    
+                    <div class="col-sm-4 col-md-2 py-2 ml-auto">
+                        <a href="{{ route('articulo.cm')}}" class="btn btn-info btn-block" ><span class="fa-regular fa-plus"></span>
+                            Producto</a>
                     </div>
                     
                 </div>
@@ -85,11 +115,11 @@
                   >
                   <template slot="table-row" slot-scope="props">
                     <span v-if="props.row.stock=='0'">
-                      <span style="color: rgb(226, 0, 0);">
+                      <span  style="color: rgb(226, 0, 0);">
                         <span v-if="!props.column.html">
                             @{{props.formattedRow[props.column.field]}}
                         </span>
-                        <span v-else v-html="props.row[props.column.field]">
+                        <span  v-else v-html="props.row[props.column.field]">
                         </span>
                        
                     </span> 
@@ -99,55 +129,176 @@
                 </vue-good-table>
                   
               </div>
+
         </template>
         
 
-        @include('articulo.create')
-        @include('articulo.edit')
+        
+        
         @include('articulo.delete')
         @include('articulo.detalle')
         @include('articulo.precio')
+        <div class="modal fade" id="modalfiltro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-rigth" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  Filtrar
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+                <div class="modal-body">
+                  
+                  <table class="table table-hover table-borderless">
+                    <tr>
+                        <td>
+                            <div class="icheck-primary d-inline">
+                            <input type="radio" id="r1" name="r1"  v-model="filtro.seccion" value="0">
+                            <label for="r1">
+                                TODAS LAS SECCIONES
+                            </label>
+                            </div>
+                        </td>
+                    </tr>
+                     
+                    @foreach ($secciones as $seccion)
+                        <tr>
+                            <td>
+                                <div class="icheck-primary d-inline">
+                                <input type="radio" id="{{ $seccion['present_cod'] }}"  v-model="filtro.seccion" name="r1" value="{{ $seccion['present_cod'] }}">
+                                <label for="{{ $seccion['present_cod'] }}">
+                                    {{ $seccion['present_descripcion'] }}
+                                </label>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                       
+                    
 
+                  </table>
+                  
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-info"  data-dismiss="modal" @click="buscar(false)">Filtrar</button>
+              </div>
+              </div>
+
+            </div>
+        </div>
+        <div class="modal fade" id="modalseccion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  Filtrar
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+                <div class="modal-body">
+                   <!--select class="form-control" @@click="buscar(false)" v-model="filtro.seccion">
+                            <option value="0">Todos</option>
+                            @@foreach ($secciones as $seccion)
+                                <option value="{ $seccion['present_cod'] }}">{ $seccion['present_descripcion'] }}
+                                </option>
+                            @@endforeach
+                        </select -->
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-info">Filtrar</button>
+              </div>
+              </div>
+
+            </div>
+        </div>
+        <div class="modal fade" id="modalexportar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+            <div class="modal-dialog modal-dialog-rigth" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  Exportar
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+                
+                <div class="list-group">
+                    <button type="button" class="list-group-item list-group-item-action" @click="exportar('stock')"><i class="fa-solid fa-file-excel text-success"></i> Con stock</button>
+                    <button type="button" class="list-group-item list-group-item-action" @click="exportar('precios')"><i class="fa-solid fa-file-excel text-success"></i> Precio Credito</button>
+                </div>
+                
+              </div>
+
+            </div>
+        </div>
     </div>
 @endsection
 @section('script')
     <script src="{{ asset('js/separator.js') }}"></script>
     <script>
-        const defaultStock= {
-                        'id': 0,
-                        'cantidad': 0,
-                        'loteold': '',
-                        'lotenew': '',
-                        'vencimiento': '',
-                        'sucursal': 1
-                    };
-        const defaultPrecio= [{p: 50,m: 5,c: 2}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,
-c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {
-p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,
-c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
-        const defaultArticulo= { 'codigo': '',
-                        'c_barra': '',
-                        'descripcion': '',
-                        'indicaciones': '',
-                        'modouso': '',
-                        'seccion': 1,
-                        'unidad': 1,
-                        'factor': 1,
-                        'ubicacion': '',
-                        'costo': 0,
-                        'p1': 0,
-                        'p2': 0,
-                        'p3': 0,
-                        'p4': 0,
-                        'p5': 0,
-                        'm1': 0,
-                        'm2': 0,
-                        'm3': 0,
-                        'm4': 0,
-                        'm5': 0,
-                        'svenc': '0',
-                        existePrecios: false
-                    }
+        const defaultPrecio = [{
+            p: 50,
+            m: 5,
+            c: 2
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }, {
+            p: 0,
+            m: 0,
+            c: 0
+        }];
         var app = new Vue({
             el: '#app',
             data: {
@@ -173,8 +324,8 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                     columna: 0,
                     orden: 'ASC'
                 },
-                articulo: {...defaultArticulo},
-                stock: {...defaultStock},
+                articulo: {},
+                stock: {},
                 stocks: [],
                 error: '',
                 cantidadStock: 0,
@@ -216,19 +367,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                 ],
                 rows: []
             },
-            watch: {
-                chprecio: function(newVal, oldVal) {
-                    for (i = 0; i < this.precios.length; i++) {
-                        this.setPrecio(i);
-                    }
-                },
-                chcuota: function(newVal, oldVal) {
-                    for (i = 0; i < this.precios.length; i++) {
-                        this.setCuota(i);
-                    }
-                }
 
-            },
             methods: {
                 busqueda_tabla: function(row, col, cellValue, searchTerm){
                     
@@ -244,61 +383,8 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                     }
                     
                 },
-                setMargen: function(index) {
-                    if(this.viewPrecio){
-                        return false;
-                    }
-                    if (typeof(this.articulo.costo === 'string')) {
-                        this.articulo.costo = this.articulo.costo * 1;
-                    }
-                    if (this.articulo.costo > 0 && this.precios[index].p > 0) {
-                        if (this.precios[index].p > this.articulo.costo) {
-                            var res = this.precios[index].p - this.articulo.costo;
-                            this.precios[index].m = Math.round(res * 100 / this.articulo.costo);
-                        } else {
-                            this.precios[index].m = 0;
-                        }
-                        this.setCuota(index)
-                    }
-                },
-                setPrecio: function(index) {
-                    if(this.viewPrecio){
-                        return false;
-                    }
-                    if (typeof(this.articulo.costo === 'string')) {
-                        this.articulo.costo = parseInt(this.articulo.costo)
-                    }
-                    if (this.articulo.costo < 1) {
-                        this.precios[index].p = 0;
-                        return;
-                    }
-                    if (parseInt(this.precios[index].m) < 1 || this.precios[index].m.length == 0) {
-                        this.precios[index].p = 0;
-                        return;
-                    }
-
-                    var retornar = parseInt((this.articulo.costo * parseInt(this.precios[index].m)) / 100 + this.articulo.costo)
-                    if (this.chprecio)
-                        this.precios[index].p = this.redondear(retornar);
-                    else
-                        this.precios[index].p = retornar; //parseInt(retornar) 
-
-                },
-                setCuota: function(index) {
-                    if(this.viewPrecio){
-                        return false;
-                    }
-                    if (this.precios[index].p > 0) {
-                        if (this.chcuota) {
-                            this.precios[index].c = this.precios[index].p / (index + 2);
-                            this.precios[index].c = this.redondear(parseInt(this.precios[index].c));
-                        } else {
-                            this.precios[index].c = parseInt(this.precios[index].p / (index + 2));
-                        }
-                    } else {
-                        this.precios[index].c = 0;
-                    }
-                },
+                
+               
                 redondear: function(monto) {
                     var longitud = 0,
                         x = "",
@@ -321,11 +407,7 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                     }
                     return PFinal;
                 },
-                validar_Cbarra: function() {
-                    if (this.articulo.c_barra.length == 0) {
-                        this.articulo.c_barra = this.articulo.codigo.toString().padStart(7, '0')
-                    }
-                },
+                
                 onChange: function() { //Al cambiar pagina
                     if (this.paginacion.ultima_pagina > 1) {
                         this.buscar(true);
@@ -412,8 +494,8 @@ c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
                                             <span class="fa fa-bars"></span>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
-                                            <button class='dropdown-item' onclick="app.showEArticulo('${this.articulos[i].ARTICULOS_cod}')"><span
-                                                    class="fa fa-edit text-primary"></span> Editar</button>
+                                            <a class='dropdown-item' href='{{env("APP_URL")}}articulo/cm/${this.articulos[i].ARTICULOS_cod}'><span
+                                                    class="fa fa-edit text-primary"></span> Editar</a>
                                             <button class='dropdown-item' onclick="app.verPreciosCredito( '${this.articulos[i].ARTICULOS_cod}','${this.articulos[i].producto_costo_compra}')"><span
                                                 class="fa fa-edit text-primary"></span> Ver Precios Credito</button>
                                             <button class='dropdown-item'

@@ -8,7 +8,7 @@
     <title>Extracto de Cuenta</title>
     <style>
         .cabecera{
-            height: 115px;
+            height: 125px;
         }
     </style>
 </head>
@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div class="col-4">
-               <div class="m-2 border border-dark p-2 d-flex flex-column text-center  cabecera">
+               <div class="m-2 border rounded-lg border-dark p-2 d-flex flex-column text-center  cabecera">
                    <span><strong>{{$empresa->emp_nombre}}</strong></span>
                    <span>Cel: {{$empresa->emp_celular}}</span>
                    <span>Direc: {{$empresa->emp_direccion}}</span>

@@ -1,0 +1,1749 @@
+
+***module_bsp***
+
+prtHardInfo
+Start at 1970-01-01 00:00:19
+Serial NO :DS-2CD1023G0E-I20240329AAWRFC2484411 
+V5.7.21 build 231213
+NetProcess Version: 1.1.1 [11:22:42-Jul 28 2023]
+Path: /Camera/Platform/Branches/branches_FSP_network_protocol/BASE_wifi_service/FSP_netprocess_2.0
+Last Changed Author: yuanchongjing
+Last Changed Rev: 3590369
+Last Changed Date: 2023-07-27 19:11:43 +0800 (Thu, 27 Jul 2023)
+
+Db Encrypt Version: 131072
+hardwareVersion	= 0x0
+hardWareExtVersion	= 0x0
+encodeChans		= 1
+decodeChans		= 1
+alarmInNums		= 0
+alarmOutNums		= 0
+ataCtrlNums		= 0
+flashChipNums		= 0
+ramSize			= 0x40
+networksNums		= 1
+language			= 1
+devType			= 0x24231
+net reboot count	= 0
+firmwareCode		= 00000002000001000000000108a1bc6f000000010000000100000002ffffffff0507001500170c0d00024231
+Path: .
+Working Copy Root Path: /usr/local/jenkins_frontend/workspace/Frontend.Baseline.pci.publish.pipeline-devCloud@2/124954/124954
+URL: https://192.0.0.140/Camera/Platform/Branches/branches_frontend_software_platform/IPC_develop_branch/ipc_baseline/baseline_V5.7.21_E8_SP_OSD
+Relative URL: ^/Platform/Branches/branches_frontend_software_platform/IPC_develop_branch/ipc_baseline/baseline_V5.7.21_E8_SP_OSD
+Repository Root: https://192.0.0.140/Camera
+Repository UUID: df2d70c3-7593-7941-af1e-571b313c0946
+Revision: 3900621
+Node Kind: directory
+Schedule: normal
+Last Changed Author: chenjiali9
+Last Changed Rev: 3892789
+Last Changed Date: 2023-12-11 20:39:48 +0800 (Mon, 11 Dec 2023)
+hikPipeID:84d068aa-14a6-42bc-8a14-2ac094735127
+
+
+mpstat
+Linux 4.9.129 ((none))	10/01/24	_ck810l_	(1 CPU)
+
+12:05:46     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest   %idle
+12:05:46     all   42.10    0.00   26.61    0.00    0.00    2.16    0.00    0.00   29.13
+
+dmesg
+[    0.000000] Booting Linux on physical CPU 0x0
+[    0.000000] Linux version 4.9.129 (root@CI-HZV-FRONTEND-SLAVE-71-99) (gcc version 6.5.0 (arm_multilib_uclibc_20200924) ) #1 Thu Oct 19 11:24:38 CST 2023
+[    0.000000] CPU: CK810  revision 7 
+[    0.000000] CPU: VIPT aliasing data cache, VIPT aliasing instruction cache
+[    0.000000] Machine: FH885xV200
+[    0.000000] Ignoring unrecognised tag 0x41000601
+[    0.000000] Malformed early option 'dbg'
+[    0.000000] Malformed early option 'dbg'
+[    0.000000] Memory policy: Data cache writeback
+[    0.000000] On node 0 totalpages: 10240
+[    0.000000] free_area_init_node: node 0, pgdat c04dc774, node_mem_map c27a9000
+[    0.000000]   Normal zone: 80 pages used for memmap
+[    0.000000]   Normal zone: 0 pages reserved
+[    0.000000]   Normal zone: 10240 pages, LIFO batch:1
+[    0.000000] pcpu-alloc: s0 r0 d32768 u32768 alloc=1*32768
+[    0.000000] pcpu-alloc: [0] 0 
+[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 10160
+[    0.000000] Kernel command line: console=ttyS0,115200 root=/dev/ram0  KRN_PRT=pri mdio_intf=<NULL> phy_addr=1 mac=04:03:12:87:50:55 rst_flag=0 bld_rev=4103346 flash_type=spinor flash_size=16MB dram_size=64MB devtype=0x24231 chip_id=0x52 trspt_mode=0x0 burn_mode=0x0 dbg=<NULL> tty_auth=1 tty_active=0 sys_nobackup=1
+[    0.000000] PID hash table entries: 256 (order: -2, 1024 bytes)
+[    0.000000] Dentry cache hash table entries: 8192 (order: 3, 32768 bytes)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 2, 16384 bytes)
+[    0.000000] Memory: 35452K/40960K available (2785K kernel code, 164K rwdata, 744K rodata, 1144K init, 109K bss, 5508K reserved, 0K cma-reserved)
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]     vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+[    0.000000]     fixmap  : 0xffc00000 - 0xfff00000   (3072 kB)
+[    0.000000]     vmalloc : 0xc3000000 - 0xff800000   ( 968 MB)
+[    0.000000]     lowmem  : 0xc0000000 - 0xc2800000   (  40 MB)
+[    0.000000]     modules : 0xbf000000 - 0xc0000000   (  16 MB)
+[    0.000000]       .text : 0xc0008000 - 0xc02c0730   (2786 kB)
+[    0.000000]       .init : 0xc0396000 - 0xc04b4000   (1144 kB)
+[    0.000000]       .data : 0xc04b4000 - 0xc04dd0e0   ( 165 kB)
+[    0.000000]        .bss : 0xc04dd0e0 - 0xc04f8674   ( 110 kB)
+[    0.000000] SLUB: HWalign=32, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] NR_IRQS:16 nr_irqs:16 16
+[    0.000000] Switching to timer-based delay loop, resolution 1000ns
+[    0.000000] clocksource: timer1: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275 ns
+[    0.000010] sched_clock: 32 bits at 1000kHz, resolution 1000ns, wraps every 2147483647500ns
+[    0.000225] Console: colour dummy device 80x30
+[    0.000266] console [ttyS0] enabled
+[    0.000285] Calibrating delay loop (skipped), value calculated using timer frequency.. 789.70 BogoMIPS (lpj=3948544)
+[    0.090140] pid_max: default: 32768 minimum: 301
+[    0.090260] Mount-cache hash table entries: 1024 (order: 0, 4096 bytes)
+[    0.090273] Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes)
+[    0.090919] CPU: Testing write buffer coherency: ok
+[    0.091292] Setting up static identity map for 0xa0008200 - 0xa0008238
+[    0.092953] devtmpfs: initialized
+[    0.094215] VFP support v0.3: implementor 41 architecture 1 part 20 variant b rev 5
+[    0.094374] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+[    0.094392] futex hash table entries: 256 (order: -1, 3072 bytes)
+[    0.094911] NET: Registered protocol family 16
+[    0.095524] DMA: preallocated 256 KiB pool for atomic coherent allocations
+[    0.098613] boot_media = 1, hik_flash_size = 0x1000000
+[    0.104974] fh_axi_dmac fh_axi_dmac.0: FH DMA Controller, 6 channels
+[    0.106262] clocksource: Switched to clocksource timer1
+[    0.106556] FS-Cache: Loaded
+[    0.117524] NET: Registered protocol family 2
+[    0.118397] TCP established hash table entries: 1024 (order: 0, 4096 bytes)
+[    0.118427] TCP bind hash table entries: 1024 (order: 0, 4096 bytes)
+[    0.118448] TCP: Hash tables configured (established 1024 bind 1024)
+[    0.118528] UDP hash table entries: 256 (order: 0, 4096 bytes)
+[    0.118551] UDP-Lite hash table entries: 256 (order: 0, 4096 bytes)
+[    0.118727] NET: Registered protocol family 1
+[    1.836599] workingset: timestamp_bits=30 max_order=14 bucket_order=0
+[    1.844231] squashfs: version 4.0 (2009/01/31) Phillip Lougher
+[    1.844544] jffs2: version 2.2. (NAND) © 2001-2006 Red Hat, Inc.
+[    1.850365] NET: Registered protocol family 38
+[    1.850382] Key type asymmetric registered
+[    1.850413] io scheduler noop registered (default)
+[    1.854680] fh_pwm_probe: clk_rate: 50000000
+[    1.854926] PWM driver, Number: 12, IO base addr: 0xc38b8000
+[    1.857542] Serial: fh serial driver
+[    1.857659] ttyS.0: ttyS0 at MMIO 0xf0700000 (irq = 46, base_baud = 1041666) is a ttyS
+[    1.857940] fh serial at 0xf0700000, irq 46
+[    1.858028] ttyS.1: ttyS1 at MMIO 0xf0800000 (irq = 47, base_baud = 1041666) is a ttyS
+[    1.858285] fh serial at 0xf0800000, irq 47
+[    1.858355] ttyS.2: ttyS2 at MMIO 0xf1300000 (irq = 57, base_baud = 1041666) is a ttyS
+[    1.858629] fh serial at 0xf1300000, irq 57
+[    1.859895] brd: module loaded
+[    1.867851] loop: module loaded
+[    1.868673] efuse open mode is 307
+[    1.869327] CLK misc driver init successfully
+[    1.870636] m25p80 spi0.0: found xm25qh128c, expected m25p80
+[    1.870672] m25p80 spi0.0: xm25qh128c (16384 Kbytes)
+[    1.870683] mem_size =0x1000000 erease_shift=16 quality_size=0x100 
+[    1.870693] flash quality stroage addr is 3c0000 
+[    1.870711] kzalloc quality ok
+[    1.878422] Creating 7 MTD partitions on "spi0.0":
+[    1.878443] 0x000000000000-0x000000060000 : "bld"
+[    1.879786] 0x000000060000-0x000000070000 : "env"
+[    1.881057] 0x000000070000-0x000000080000 : "enc"
+[    1.882327] 0x000000080000-0x000000090000 : "sysflg"
+[    1.883616] 0x000000090000-0x0000003c0000 : "sys0"
+[    1.884939] 0x0000003e0000-0x000000f20000 : "app0"
+[    1.886221] 0x000000f20000-0x000001000000 : "cfg0"
+[    1.888399] libphy: Fixed MDIO Bus: probed
+[    1.888453] GMAC driver:
+[    1.888453] 	platform registration... 
+[    1.888587] ERROR: PIN_BACKUP, oldpin is null
+[    1.888594] pin mux error!!!!
+[    1.888601] ERROR: PIN_BACKUP, oldpin is null
+[    1.888603] pin mux error!!!!
+[    1.888609] ERROR: PIN_BACKUP, oldpin is null
+[    1.888612] pin mux error!!!!
+[    2.123395] fh_gmac fh_gmac.0 eth0: mixed HW and IP checksum settings.
+[    2.123614] 	eth0 - (dev. name: fh_gmac - id: 0, IRQ #60
+[    2.123614] 		IO base addr: 0xc38e8000)
+[    2.342900] libphy: gmac_rmii: probed
+[    2.345716] eth0: PHY ID 00441400 at 0 IRQ -1 (0:00) active
+[    2.350845] random: fast init done
+[    2.368881] rtc GET CORE REG TIMEOUT line 353
+[    2.368886] rtc get time:rtc core busy
+[    2.368889] rtc get time:rtc core busy
+[    2.368892] rtc get time:rtc core busy
+[    2.368926] fh rtc get time error ffffffff
+[    2.368940] rtc get time:rtc core busy 339
+[    2.368949] fh rtc get time error ffffffff
+[    2.369243] fh_rtc fh_rtc.0: rtc core: registered fh_rtc as rtc0
+[    2.369407] rtc get time:rtc core busy
+[    2.369413] rtc get time:rtc core busy
+[    2.369416] rtc get time:rtc core busy
+[    2.369418] rtc get time:rtc core busy
+[    2.369421] rtc get time:rtc core busy
+[    2.369423] rtc get time:rtc core busy
+[    2.369426] rtc get time:rtc core busy
+[    2.369428] rtc get time:rtc core busy
+[    2.369431] rtc get time:rtc core busy
+[    2.369434] rtc get time:rtc core busy
+[    2.369436] rtc get time:rtc core busy
+[    2.369439] rtc get time:rtc core busy
+[    2.369446] rtc get time:rtc core busy 339
+[    2.369449] rtc get time:rtc core busy
+[    2.369452] rtc get time:rtc core busy 339
+[    2.369455] rtc get time:rtc core busy
+[    2.369458] rtc get time:rtc core busy
+[    2.369530] i2c /dev entries driver
+[    2.369610] I2C driver:
+[    2.369610] 	platform registration... 
+[    2.369701] 	tx fifo depth: 16, rx fifo depth: 16
+[    2.370081] 	I2C - (dev. name: fh_i2c id: 0, IRQ #27
+[    2.370081] 		IO base addr: 0xc38f8000)
+[    2.370114] I2C driver:
+[    2.370114] 	platform registration... 
+[    2.370197] 	tx fifo depth: 16, rx fifo depth: 16
+[    2.370565] 	I2C - (dev. name: fh_i2c id: 1, IRQ #28
+[    2.370565] 		IO base addr: 0xc3900000)
+[    2.370617] I2C driver:
+[    2.370617] 	platform registration... 
+[    2.370698] 	tx fifo depth: 16, rx fifo depth: 16
+[    2.371091] 	I2C - (dev. name: fh_i2c id: 2, IRQ #62
+[    2.371091] 		IO base addr: 0xc3908000)
+[    2.371662] eMMC netlink init ok.
+[    2.373585] card0 disconnected!
+[    2.375929] card1 connected!
+[    2.377883] aes driver registered
+[    2.378224] nf_conntrack version 0.5.0 (1024 buckets, 4096 max)
+[    2.378960] ip_tables: (C) 2000-2006 Netfilter Core Team
+[    2.379565] NET: Registered protocol family 10
+[    2.380931] ip6_tables: (C) 2000-2006 Netfilter Core Team
+[    2.381018] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[    2.381995] NET: Registered protocol family 17
+[    2.382048] Key type dns_resolver registered
+[    2.382289] mmc0 power register success!
+[    2.382293] it is in _set_mmc_power 
+[    2.382314] mmc1 power register success!
+[    2.382317] it is in _set_mmc_power 
+[    2.382321]  power register success!
+[    2.382324] it is in _set_mmc_power 
+[    2.385320] fh rtc get time error ffffffff
+[    2.388627] Freeing unused kernel memory: 1144K
+[    2.388638] This architecture does not have kernel memory protection.
+[    3.838465] base: loading out-of-tree module taints kernel.
+[    3.840106] base module init.
+[    3.865459] hikcore: module license 'Proprietary' taints kernel.
+[    3.865468] Disabling lock debugging due to kernel taint
+[    3.866978] initialized demo_event
+[    3.866987] initialized wps_event
+[    3.866990] initialized wifi_event
+[    3.866993] initialized alarm
+[    3.866996] initialized wps_reset
+[    3.866999] initialized 
+[    3.867002] initialized 
+[    3.867005] initialized 
+[    3.867008] initialized 
+[    3.867010] initialized 
+[    3.867013] initialized an41908a
+[    3.912672] init hikio.
+[    3.947191] watch module init.
+[    4.097892] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[    4.098491] fh_gmac fh_gmac.0 eth0: Link is Up - 100Mbps/Full - flow control off
+[    4.098521] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[    4.934086] Video Memory Manager
+[    4.934101] [VMM] version: V1.0.2.P94(g6007e6b),build: 2022-11-01
+[    4.934105] 
+[    4.934130] media_mem_parse_cmdline: s=anonymous,0,0xa2800000,24064K.
+[    4.934139] media_mem_parse_cmdline: i=4.
+[    4.934151] vmm:anonymous,a2800000,1780000.
+[    5.100964] [XBUS] version: V1.0.2.P94(g6007e6b),build: 2022-11-01
+[    5.122925] Xbus: fwver=00000000,phyaddr=bfffe000,len=8192.
+[    5.762724] func:motor_module_init, successful to initialize motor!
+[    5.787064] init vd_notify.
+[    5.820358] get i2c adapter 1 ok
+[    5.820513] get i2c client ok!
+[    5.824439] register miscdev OK
+[    5.918082] insmod uart232 module succeed!
+[    7.023920] sbal-
+[    7.024274] <sbal_wb_aes_update>...decrypt
+[    7.025902] <sbal_wb_aes_update>...decrypt
+[    7.027145] body_total_len=17856
+[    7.057203] verify success 
+[    7.057444] ##successful to hik_decode_daemon_toplained :/home/daemon##
+[   11.713398] Chipid is 0x52 
+[   14.536448] fh_wdt: [wdt] set topval: 9
+[   14.537119] fh_wdt: [wdt] set topval: 9
+[   15.096741] remap_pfn_range start~end: 0xb44e8000 0xb4968000, phy:0xa2800, cached, pid:448|448.
+[   15.707250] remap_pfn_range start~end: 0xb44b4000 0xb44e8000, phy:0xa2c80, nocached, pid:448|448.
+[   15.707973] remap_pfn_range start~end: 0xb4198000 0xb44b4000, phy:0xa2cb4, cached, pid:448|448.
+[   15.708318] remap_pfn_range start~end: 0xb4124000 0xb4195000, phy:0xa2fd0, cached, pid:448|448.
+[   15.708630] remap_pfn_range start~end: 0xb40d9000 0xb4124000, phy:0xa3041, cached, pid:448|448.
+[   15.709130] remap_pfn_range start~end: 0xb3dd4000 0xb40d6000, phy:0xa308c, nocached, pid:448|448.
+[   17.338108] remap_pfn_range start~end: 0xb1fbc000 0xb24f5000, phy:0xa3390, nocached, pid:448|448.
+[   17.394321] i2c_fh_handle_tx_abort: data not acknowledged
+[   17.738429] remap_pfn_range start~end: 0xaf46d000 0xaf49f000, phy:0xa38c9, nocached, pid:448|448.
+[   17.888060] remap_pfn_range start~end: 0xaf43b000 0xaf46d000, phy:0xa38fb, nocached, pid:448|448.
+[   18.051559] remap_pfn_range start~end: 0xaf3fd000 0xaf43b000, phy:0xa392d, nocached, pid:448|448.
+[   18.103003] Chipid is 0x52 
+[   18.319830] remap_pfn_range start~end: 0xadc8b000 0xadcf0000, phy:0xa396b, nocached, pid:448|448.
+[   20.443017] random: crng init done
+[   20.738652] fh_gmac fh_gmac.0 eth0: Link is Down
+[   20.813324] Chipid is 0x52 
+[   20.839451] remap_pfn_range start~end: 0xad8f4000 0xadc88000, phy:0xa39d0, nocached, pid:468|448.
+[   21.549395] remap_pfn_range start~end: 0xad828000 0xad8f1000, phy:0xa3d64, nocached, pid:468|448.
+[   21.783431] fh_gmac fh_gmac.0 eth0: Link is Up - 100Mbps/Full - flow control off
+[   23.077675] sched: RT throttling activated
+[   23.208720] remap_pfn_range start~end: 0xad815000 0xad826000, phy:0xa3e2d, nocached, pid:468|448.
+[   23.209641] remap_pfn_range start~end: 0xad802000 0xad813000, phy:0xa3e3e, nocached, pid:468|448.
+[   25.579542] remap_pfn_range start~end: 0xad7ef000 0xad800000, phy:0xa3e4f, nocached, pid:468|448.
+[   25.580384] remap_pfn_range start~end: 0xad7dc000 0xad7ed000, phy:0xa3e60, nocached, pid:468|448.
+[   26.787673] fh rtc get time error ffffffff
+[   30.633639] hik_get_pwm_clk_source do nothing
+[   30.703011] hik_get_pwm_clk_source do nothing
+[  245.629780] hrtimer: interrupt took 21000 ns
+[  536.622652] remap_pfn_range start~end: 0xad791000 0xad7d9000, phy:0xa3e71, nocached, pid:468|448.
+[  536.824645] remap_pfn_range start~end: 0xad749000 0xad791000, phy:0xa3eb9, nocached, pid:468|448.
+
+cat /proc/uptime
+4610.26 1342.73
+
+cat /proc/meminfo
+MemTotal:          36596 kB
+MemFree:            1996 kB
+MemAvailable:      10340 kB
+Buffers:            2140 kB
+Cached:            15244 kB
+SwapCached:            0 kB
+Active:            13800 kB
+Inactive:           5864 kB
+Active(anon):       6944 kB
+Inactive(anon):     1132 kB
+Active(file):       6856 kB
+Inactive(file):     4732 kB
+Unevictable:        4664 kB
+Mlocked:               0 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+Dirty:                 0 kB
+Writeback:             0 kB
+AnonPages:          6960 kB
+Mapped:            10180 kB
+Shmem:              1132 kB
+Slab:               4916 kB
+SReclaimable:       1956 kB
+SUnreclaim:         2960 kB
+KernelStack:        1384 kB
+PageTables:          784 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:       18296 kB
+Committed_AS:     332512 kB
+VmallocTotal:     991232 kB
+VmallocUsed:           0 kB
+VmallocChunk:          0 kB
+
+cat /proc/net/snmp
+Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests OutDiscards OutNoRoutes ReasmTimeout ReasmReqds ReasmOKs ReasmFails FragOKs FragFails FragCreates
+Ip: 2 64 252142 0 2 0 0 0 252069 447055 0 0 0 0 0 0 1 0 2
+Icmp: InMsgs InErrors InCsumErrors InDestUnreachs InTimeExcds InParmProbs InSrcQuenchs InRedirects InEchos InEchoReps InTimestamps InTimestampReps InAddrMasks InAddrMaskReps OutMsgs OutErrors OutDestUnreachs OutTimeExcds OutParmProbs OutSrcQuenchs OutRedirects OutEchos OutEchoReps OutTimestamps OutTimestampReps OutAddrMasks OutAddrMaskReps
+Icmp: 5 0 0 5 0 0 0 0 0 0 0 0 0 0 8 0 8 0 0 0 0 0 0 0 0 0 0
+IcmpMsg: InType3 OutType3
+IcmpMsg: 5 8
+Tcp: RtoAlgorithm RtoMin RtoMax MaxConn ActiveOpens PassiveOpens AttemptFails EstabResets CurrEstab InSegs OutSegs RetransSegs InErrs OutRsts InCsumErrors
+Tcp: 1 200 120000 -1 0 655 0 448 3 244456 1285555 3739 0 63 0
+Udp: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors InCsumErrors IgnoredMulti
+Udp: 424 3 27 34710 27 0 0 7022
+UdpLite: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors InCsumErrors IgnoredMulti
+UdpLite: 0 0 0 0 0 0 0 0
+
+cat /proc/interrupts
+           CPU0       
+ 18:          0         -   2 Level     wdt
+ 19:   14033037         -   3 Level     timer0
+ 20:     443457         -   4 Level     enc
+ 21:          0         -   5 Level     fh_perf
+ 23:     344425         -   7 Level     ispp
+ 24:     572920         -   8 Level     ispf
+ 25:     229614         -   9 Level     vpu
+ 27:       1956         -  11 Level     i2c-0
+ 28:          0         -  12 Level     i2c-1
+ 29:          0         -  13 Level     jpeg
+ 30:          0         -  14 Level     bgm
+ 31:          0         -  15 Level     veu_loop
+ 32:          4         -  16 Level     fh-aes
+ 36:          1         -  20 Level     sadc
+ 37:          0         -  21 Level     spi-1
+ 38:          0         -  22 Level     jpg_loop
+ 39:          0         -  23 Level     fh-axi-dmac
+ 44:          0         -  28 Level     spi-0
+ 46:       7885         -  30 Level     ttyS-0
+ 48:     343933         -  32 Level     xbus
+ 49:          0         -  33 Level     fh_rtc
+ 52:          0         -  36 Level     pwm
+ 58:          0         -  42 Level     sdio-0
+ 59:          0         -  43 Level     sdio-1
+ 60:    1434198         -  44 Level     eth0
+ 62:          0         -  46 Level     i2c-2
+107:          0  FH_GPIO_INTC  27 Edge      wps
+Err:          0
+
+cat /proc/interrupts
+           CPU0       
+ 18:          0         -   2 Level     wdt
+ 19:   14036074         -   3 Level     timer0
+ 20:     443555         -   4 Level     enc
+ 21:          0         -   5 Level     fh_perf
+ 23:     344501         -   7 Level     ispp
+ 24:     573045         -   8 Level     ispf
+ 25:     229664         -   9 Level     vpu
+ 27:       1956         -  11 Level     i2c-0
+ 28:          0         -  12 Level     i2c-1
+ 29:          0         -  13 Level     jpeg
+ 30:          0         -  14 Level     bgm
+ 31:          0         -  15 Level     veu_loop
+ 32:          4         -  16 Level     fh-aes
+ 36:          1         -  20 Level     sadc
+ 37:          0         -  21 Level     spi-1
+ 38:          0         -  22 Level     jpg_loop
+ 39:          0         -  23 Level     fh-axi-dmac
+ 44:          0         -  28 Level     spi-0
+ 46:       7885         -  30 Level     ttyS-0
+ 48:     344009         -  32 Level     xbus
+ 49:          0         -  33 Level     fh_rtc
+ 52:          0         -  36 Level     pwm
+ 58:          0         -  42 Level     sdio-0
+ 59:          0         -  43 Level     sdio-1
+ 60:    1434586         -  44 Level     eth0
+ 62:          0         -  46 Level     i2c-2
+107:          0  FH_GPIO_INTC  27 Edge      wps
+Err:          0
+
+cat /proc/interrupts
+           CPU0       
+ 18:          0         -   2 Level     wdt
+ 19:   14039107         -   3 Level     timer0
+ 20:     443652         -   4 Level     enc
+ 21:          0         -   5 Level     fh_perf
+ 23:     344578         -   7 Level     ispp
+ 24:     573175         -   8 Level     ispf
+ 25:     229716         -   9 Level     vpu
+ 27:       1956         -  11 Level     i2c-0
+ 28:          0         -  12 Level     i2c-1
+ 29:          0         -  13 Level     jpeg
+ 30:          0         -  14 Level     bgm
+ 31:          0         -  15 Level     veu_loop
+ 32:          4         -  16 Level     fh-aes
+ 36:          1         -  20 Level     sadc
+ 37:          0         -  21 Level     spi-1
+ 38:          0         -  22 Level     jpg_loop
+ 39:          0         -  23 Level     fh-axi-dmac
+ 44:          0         -  28 Level     spi-0
+ 46:       7885         -  30 Level     ttyS-0
+ 48:     344087         -  32 Level     xbus
+ 49:          0         -  33 Level     fh_rtc
+ 52:          0         -  36 Level     pwm
+ 58:          0         -  42 Level     sdio-0
+ 59:          0         -  43 Level     sdio-1
+ 60:    1434951         -  44 Level     eth0
+ 62:          0         -  46 Level     i2c-2
+107:          0  FH_GPIO_INTC  27 Edge      wps
+Err:          0
+
+cat /sys/class/net/eth0/speed
+100
+
+netstat -an
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       
+tcp        0      0 :::8000                 :::*                    LISTEN      
+tcp        0      0 :::554                  :::*                    LISTEN      
+tcp        0      0 :::80                   :::*                    LISTEN      
+tcp        0      0 :::443                  :::*                    LISTEN      
+tcp        0      0 ::ffff:192.168.0.103:80 ::ffff:192.168.0.106:52118 TIME_WAIT   
+tcp        0      0 ::ffff:192.168.0.103:80 ::ffff:192.168.0.106:52116 TIME_WAIT   
+tcp        0      0 ::ffff:192.168.0.103:80 ::ffff:192.168.0.106:52109 TIME_WAIT   
+tcp        0      0 ::ffff:192.168.0.103:80 ::ffff:192.168.0.106:52120 TIME_WAIT   
+tcp        0      0 ::ffff:192.168.0.103:80 ::ffff:192.168.0.106:52108 TIME_WAIT   
+tcp        0      0 ::ffff:192.168.0.103:80 ::ffff:192.168.0.106:52115 TIME_WAIT   
+tcp        0      0 ::ffff:192.168.0.103:8000 ::ffff:192.168.0.106:51068 ESTABLISHED 
+tcp        0      0 ::ffff:192.168.0.103:80 ::ffff:192.168.0.106:52119 TIME_WAIT   
+tcp        0  34104 ::ffff:192.168.0.103:8000 ::ffff:192.168.0.106:50705 ESTABLISHED 
+tcp        0      0 ::ffff:192.168.0.103:80 ::ffff:192.168.0.106:52117 TIME_WAIT   
+tcp        0      0 ::ffff:192.168.0.103:80 ::ffff:192.168.0.106:52127 TIME_WAIT   
+tcp        0      0 ::ffff:192.168.0.103:80 ::ffff:192.168.0.106:52122 TIME_WAIT   
+tcp        0     41 ::ffff:192.168.0.103:80 ::ffff:192.168.0.106:52126 ESTABLISHED 
+udp        0      0 239.255.255.250:37020   0.0.0.0:*                           
+udp        0      0 0.0.0.0:63906           0.0.0.0:*                           
+udp        0      0 0.0.0.0:5353            0.0.0.0:*                           
+udp        0      0 :::56015                :::*                                
+udp        0      0 :::5353                 :::*                                
+Active UNIX domain sockets (servers and established)
+Proto RefCnt Flags       Type       State         I-Node Path
+unix  2      [ ACC ]     STREAM     LISTENING       2353 /var/systemCmd.socket
+unix  2      [ ACC ]     STREAM     LISTENING       2357 /var/g_daemon_service
+unix  3      [ ]         STREAM     CONNECTED       2359 /var/net_worker_process
+unix  2      [ ACC ]     STREAM     LISTENING       2378 /var/mdk_server
+unix  2      [ ACC ]     STREAM     LISTENING       2381 /var/dsp_debug
+unix  3      [ ]         STREAM     CONNECTED       2385 /var/davinci_work_process
+unix  3      [ ]         STREAM     CONNECTED       2401 /var/davinci
+unix  2      [ ACC ]     STREAM     LISTENING       2436 /var/cmd_server
+unix  2      [ ]         DGRAM                       992 @/org/kernel/udev/udevd
+unix  3      [ ]         STREAM     CONNECTED       2396 /var/mdk_server
+unix  3      [ ]         STREAM     CONNECTED       2361 /var/g_daemon_service
+unix  3      [ ]         STREAM     CONNECTED       2387 /var/g_daemon_service
+
+ifconfig -a
+eth0      Link encap:Ethernet  HWaddr 04:03:12:87:50:55  
+          inet addr:192.168.0.103  Bcast:192.168.0.255  Mask:255.255.255.0
+          inet6 addr: fe80::603:12ff:fe87:5055/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:256825 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1325584 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:19528719 (18.6 MiB)  TX bytes:1908071028 (1.7 GiB)
+          Interrupt:60 Base address:0x8000 
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.255.255.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:13 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:13 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1 
+          RX bytes:1789 (1.7 KiB)  TX bytes:1789 (1.7 KiB)
+
+sit0      Link encap:IPv6-in-IPv4  
+          NOARP  MTU:1480  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+
+route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.0.1     0.0.0.0         UG    0      0        0 eth0
+192.168.0.0     0.0.0.0         255.255.255.0   U     0      0        0 eth0
+224.0.0.0       0.0.0.0         240.0.0.0       U     0      0        0 eth0
+
+cat /etc/resolv.conf
+nameserver 192.168.0.1
+nameserver 0.0.0.0
+
+iptables -L -n
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+taskShow
+ tid   pid   stat   name
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+   1     0     S    init
+lstat fail
+lstat fail
+   2     0     S    kthreadd
+lstat fail
+lstat fail
+   3     2     R    ksoftirqd/0
+lstat fail
+lstat fail
+   5     2     S    kworker/0:0H
+lstat fail
+lstat fail
+   7     2     S    lru-add-drain
+lstat fail
+lstat fail
+   8     2     S    kdevtmpfs
+lstat fail
+lstat fail
+   9     2     S    oom_reaper
+lstat fail
+lstat fail
+  10     2     S    writeback
+lstat fail
+lstat fail
+  11     2     S    kcompactd0
+lstat fail
+lstat fail
+  12     2     R    ksmd
+lstat fail
+lstat fail
+  13     2     S    crypto
+lstat fail
+lstat fail
+  14     2     S    bioset
+lstat fail
+lstat fail
+  15     2     S    kblockd
+lstat fail
+lstat fail
+  16     2     R    kworker/0:1
+lstat fail
+lstat fail
+  17     2     S    kswapd0
+lstat fail
+lstat fail
+  36     2     S    bioset
+lstat fail
+lstat fail
+  37     2     S    bioset
+lstat fail
+lstat fail
+  38     2     S    bioset
+lstat fail
+lstat fail
+  39     2     S    bioset
+lstat fail
+lstat fail
+  40     2     S    bioset
+lstat fail
+lstat fail
+  41     2     S    bioset
+lstat fail
+lstat fail
+  42     2     S    bioset
+lstat fail
+lstat fail
+  43     2     S    bioset
+lstat fail
+lstat fail
+  44     2     S    bioset
+lstat fail
+lstat fail
+  45     2     R    spi0
+lstat fail
+lstat fail
+  46     2     D    mtd_flash_quali
+lstat fail
+lstat fail
+  49     2     S    bioset
+lstat fail
+lstat fail
+  50     2     S    bioset
+lstat fail
+lstat fail
+  51     2     S    bioset
+lstat fail
+lstat fail
+  52     2     S    bioset
+lstat fail
+lstat fail
+  53     2     S    bioset
+lstat fail
+lstat fail
+  54     2     S    bioset
+lstat fail
+lstat fail
+  55     2     S    bioset
+lstat fail
+lstat fail
+  56     2     S    spi1
+lstat fail
+lstat fail
+  89     2     S    irq/58-sdio-0
+lstat fail
+lstat fail
+  90     2     S    irq/59-sdio-1
+lstat fail
+lstat fail
+  91     2     S    fh_aes.0
+lstat fail
+lstat fail
+ 105     2     S    ipv6_addrconf
+lstat fail
+lstat fail
+ 115     1     S    udevd
+lstat fail
+lstat fail
+ 235     2     S    jffs2_gcd_mtd6
+lstat fail
+lstat fail
+ 239     2     S    kworker/0:1H
+lstat fail
+lstat fail
+ 248     2     R    mark_mergeable
+lstat fail
+lstat fail
+ 355     2     D    xbus-rx
+lstat fail
+lstat fail
+ 405     2     D    motor
+lstat fail
+lstat fail
+ 437     1     S    execSystemCmd
+lstat fail
+lstat fail
+ 439     1     S    daemon
+lstat fail
+lstat fail
+ 445     1     S    daemon_unix_bus
+lstat fail
+ 446     1     S    net_process
+lstat fail
+lstat fail
+ 450     1     S    446_service_net
+lstat fail
+ 451     1     S    pid446_recv_net
+lstat fail
+ 452     1     S    pid446_send_net
+lstat fail
+ 507     1     S    ipc_eth0_dhcp_c
+lstat fail
+ 529     1     S    netprocess_tran
+lstat fail
+ 530     1     S    ipc_zeroConfig
+lstat fail
+ 447     1     S    davinci
+lstat fail
+lstat fail
+ 456     1     S    447_service_dav
+lstat fail
+ 458     1     S    pid447_recv_dav
+lstat fail
+ 459     1     S    pid447_send_dav
+lstat fail
+ 464     1     S    ipc_watchdog
+lstat fail
+ 465     1     S    ipc_reboot
+lstat fail
+ 466     1     S    davinci_447_eve
+lstat fail
+ 467     1     S    mdk_cli_conn
+lstat fail
+ 504     1     S    ipc_usrSucurty
+lstat fail
+ 508     1     S    ipc_backup_cfg
+lstat fail
+ 509     1     S    ipc_cmd_server
+lstat fail
+ 510     1     S    logMsgRecvTask
+lstat fail
+ 511     1     R    logSyncTask
+lstat fail
+ 512     1     S    ipc_syslog_send
+lstat fail
+ 513     1     S    ipc_recschdule
+lstat fail
+ 514     1     S    rtspoverhttp_ma
+lstat fail
+ 516     1     S    ipc_appweb
+lstat fail
+ 517     1     S    ipc_SdEmCrl
+lstat fail
+ 518     1     S    ipc_exception
+lstat fail
+ 519     1     S    auto_defense_Ct
+lstat fail
+ 520     1     S    ipc_alarmInCtrl
+lstat fail
+ 521     1     S    ipc_smd_motion
+lstat fail
+ 522     1     S    motdect_modectl
+lstat fail
+ 523     1     S    ipc_net_check
+lstat fail
+ 524     1     R    streamRecv
+lstat fail
+ 525     1     S    ipc_SdEmsrictl
+lstat fail
+ 526     1     S    events
+lstat fail
+ 531     1     S    user_onlinetask
+lstat fail
+ 532     1     R    ipc_rtcp_timer
+lstat fail
+ 534     1     S    ipc_dvrNetServ
+lstat fail
+ 535     1     S    isapi_Authentic
+lstat fail
+ 537     1     S    ipc_timeCtrl
+lstat fail
+ 538     1     S    davinci
+lstat fail
+ 539     1     S    ipc_arptask
+lstat fail
+ 540     1     S    ipc_nei_sol
+lstat fail
+ 541     1     S    ipc_sntptask
+lstat fail
+ 544     1     S    ipc_ContiCommd
+lstat fail
+ 545     1     S    ipc_upnp
+lstat fail
+ 548     1     R    ipc_bonjour
+lstat fail
+ 549     1     S    OnvifServCtl
+lstat fail
+ 550     1     R    ezviz_daemon
+lstat fail
+ 551     1     S    ezviz_online_ck
+lstat fail
+ 552     1     S    ezAlarmHandler
+lstat fail
+ 553     1     S    ezPoolWork
+lstat fail
+ 554     1     S    ezPoolMain
+lstat fail
+ 555     1     S    ezlanIOTdaemon
+lstat fail
+ 556     1     S    ipc_svchandler
+lstat fail
+ 557     1     R    ezlanDoActTsk
+lstat fail
+ 558     1     R    ezdevMsg2Svr
+lstat fail
+ 559     1     R    EzAsyLstManager
+lstat fail
+ 560     1     S    is_dis_start
+lstat fail
+ 563     1     S    equipment_maint
+lstat fail
+ 564     1     S    ipc_flash_log
+lstat fail
+ 565     1     R    ipc_maintain_lo
+lstat fail
+ 567     1     S    daynight_ctrl_0
+lstat fail
+ 568     1     S    is_multi
+lstat fail
+ 569     1     S    ipc_wdr_ctrl_0
+lstat fail
+ 570     1     S    mul_frot_para_s
+lstat fail
+ 575     1     R    ipc_evttrigcap
+lstat fail
+ 576     1     R    ipc_timetrigcap
+lstat fail
+1181     1     S    privtcp27_send
+lstat fail
+1182     1     S    ipc_PrevCtrl
+lstat fail
+1189     1     S    ipc_AlarmUp301
+lstat fail
+1482     1     S    worker.0000000c
+lstat fail
+1489     1     S    ISA02gnosedData
+lstat fail
+1502     1     S    worker.0000000f
+lstat fail
+1503     1     S    worker.00000010
+lstat fail
+1504     1     S    worker.00000011
+lstat fail
+ 448     1     S    Dsp_Main
+lstat fail
+lstat fail
+ 453     1     R    dsp_print
+lstat fail
+ 454     1     S    mdk_svr_acpt_0
+lstat fail
+ 455     1     S    dbg_server
+lstat fail
+ 468     1     S    mdk_svr_0_0
+lstat fail
+ 469     1     R    update_app_shar
+lstat fail
+ 476     1     R    gme_n0
+lstat fail
+ 477     1     R    gme_n1
+lstat fail
+ 478     1     R    gme_n2
+lstat fail
+ 479     1     R    gme_n3
+lstat fail
+ 480     1     R    gme_n4
+lstat fail
+ 481     1     R    gme_n5
+lstat fail
+ 482     1     R    gme_n6
+lstat fail
+ 483     1     R    gme_n7
+lstat fail
+ 484     1     S    isp_server
+lstat fail
+ 485     1     R    pipe2.vi1_drv
+lstat fail
+ 486     1     R    pipe2.vi1_sig
+lstat fail
+ 487     1     S    vpssdzoom
+lstat fail
+ 488     1     S    pipe2.vps1
+lstat fail
+ 489     1     S    pipe2.enc1_roi
+lstat fail
+ 490     1     S    pipe2.enc2_roi
+lstat fail
+ 491     1     S    pipe2.venc_str
+lstat fail
+ 492     1     S    pipe2.jpeg1
+lstat fail
+ 493     1     R    Dsp_Main
+lstat fail
+ 494     1     R    pipe2.osd1
+lstat fail
+ 495     1     R    pipe2.osd2
+lstat fail
+ 496     1     R    pipe2.smdl1
+lstat fail
+ 497     1     R    pipe2.scd1
+lstat fail
+ 498     1     S    pipe2.talk
+lstat fail
+ 499     1     S    pipe2.aenc0
+lstat fail
+ 500     1     S    pipe2.aenc1
+lstat fail
+ 501     1     S    pipe2.adec
+lstat fail
+ 502     1     D    pipe2.aio_ai
+lstat fail
+ 503     1     S    pipe2.aio_ao
+lstat fail
+ 457     1     S    psh
+lstat fail
+lstat fail
+ 460     1     S    init
+lstat fail
+lstat fail
+ 470     2     S    jpeg_kick
+lstat fail
+lstat fail
+ 471     2     S    bgm_kick
+lstat fail
+lstat fail
+ 472     2     S    bgm_sw
+lstat fail
+lstat fail
+ 473     2     S    bgm_conf
+lstat fail
+lstat fail
+ 474     2     S    vpu_task
+lstat fail
+lstat fail
+ 475     2     S    hhe_manage
+lstat fail
+lstat fail
+ 792     2     S    kworker/0:0
+lstat fail
+lstat fail
+1339     2     S    kworker/u2:0
+lstat fail
+lstat fail
+1398     2     S    kworker/u2:1
+lstat fail
+lstat fail
+1456     2     S    kworker/u2:2
+lstat fail
+lstat fail
+1534   447     R    taskShow
+lstat fail
+dev_pthread total num = 169,davinci_pthread num = 67
+
+ps
+  PID USER       VSZ STAT COMMAND
+    1 admin     1296 S    init
+    2 admin        0 SW   [kthreadd]
+    3 admin        0 RW   [ksoftirqd/0]
+    5 admin        0 SW<  [kworker/0:0H]
+    7 admin        0 SW<  [lru-add-drain]
+    8 admin        0 SW   [kdevtmpfs]
+    9 admin        0 SW   [oom_reaper]
+   10 admin        0 SW<  [writeback]
+   11 admin        0 SW   [kcompactd0]
+   12 admin        0 RWN  [ksmd]
+   13 admin        0 SW<  [crypto]
+   14 admin        0 SW<  [bioset]
+   15 admin        0 SW<  [kblockd]
+   16 admin        0 RW   [kworker/0:1]
+   17 admin        0 RW   [kswapd0]
+   36 admin        0 SW<  [bioset]
+   37 admin        0 SW<  [bioset]
+   38 admin        0 SW<  [bioset]
+   39 admin        0 SW<  [bioset]
+   40 admin        0 SW<  [bioset]
+   41 admin        0 SW<  [bioset]
+   42 admin        0 SW<  [bioset]
+   43 admin        0 SW<  [bioset]
+   44 admin        0 SW<  [bioset]
+   45 admin        0 RW   [spi0]
+   46 admin        0 DW   [mtd_flash_quali]
+   49 admin        0 SW<  [bioset]
+   50 admin        0 SW<  [bioset]
+   51 admin        0 SW<  [bioset]
+   52 admin        0 SW<  [bioset]
+   53 admin        0 SW<  [bioset]
+   54 admin        0 SW<  [bioset]
+   55 admin        0 SW<  [bioset]
+   56 admin        0 SW   [spi1]
+   89 admin        0 SW   [irq/58-sdio-0]
+   90 admin        0 SW   [irq/59-sdio-1]
+   91 admin        0 SW<  [fh_aes.0]
+  105 admin        0 SW<  [ipv6_addrconf]
+  115 admin      752 S<   /usr/bin/udevd -d
+  235 admin        0 SWN  [jffs2_gcd_mtd6]
+  239 admin        0 SW<  [kworker/0:1H]
+  248 admin        0 RW   [mark_mergeable]
+  355 admin        0 DW   [xbus-rx]
+  405 admin        0 DW   [motor]
+  437 admin      900 S    /bin/execSystemCmd
+  439 admin     4964 S    /home/process/daemon_fsp_app
+  446 admin    15460 S    /home/process/net_process
+  447 admin     200m S<   /home/process/davinci
+  448 admin     158m R    {Dsp_Main} /home/hikdsp
+  457 admin     1060 S    -/bin/psh
+  460 admin     1296 S    init
+  470 admin        0 SW   [jpeg_kick]
+  471 admin        0 SW   [bgm_kick]
+  472 admin        0 SW   [bgm_sw]
+  473 admin        0 SW   [bgm_conf]
+  474 admin        0 SW   [vpu_task]
+  475 admin        0 SW   [hhe_manage]
+  792 admin        0 SW   [kworker/0:0]
+ 1339 admin        0 SW   [kworker/u2:0]
+ 1398 admin        0 SW   [kworker/u2:1]
+ 1456 admin        0 SW   [kworker/u2:2]
+ 1535 admin     1288 R    ps
+
+***module_appweb***
+
+getAppwebStatus
+
+Webserver lib version is: V3.2.3 [14:03:13-Dec 13 2023]
+Webserver lib name is: Embedthis Appweb
+Min thread num:0 Max thread num:6
+Busy thread num: 1 Idle thread num: 4
+Current num thread pool: 5
+
+No.       PID       USER      STATUS    STACKSIZE       PRIORITY       COMMAND   
+1         447       root      Busy        64Kb             80   worker.0000000e
+2         447       root      Sleep       64Kb             80   worker.00000010
+3         447       root      Sleep       64Kb             80   worker.00000011
+4         447       root      Sleep       64Kb             80   worker.0000000c
+5         447       root      Sleep       64Kb             80   worker.0000000f
+
+
+***module_wifi***
+
+***module_adjustTime***
+
+getIp
+IP address : 192.168.0.103
+Subnet mask: 255.255.255.0
+IPv6 address: fe80::603:12ff:fe87:5055
+IPv6 Subnet mask: ffff:ffff:ffff:ffff::
+
+Now AdjSource is  ADJUSTTIME_MODE_NTP, autoRTC = 0!
+Now  adjtimexParam tick= 10000, freq = 0!
+
+User(,  ADJUSTTIME_MODE_WITHOUTRTC) adjtime when 2024 10-01 11:53:35 , and it's 2024 10-01 11:53:35 now!
+
+User(,  ADJUSTTIME_MODE_WEB_DST) adjtime when 2024 10-01 13:04:40 , and it's 2024 10-01 13:04:41 now!
+
+User(192.168.0.106,  ADJUSTTIME_MODE_WITHOUTRTC) adjtime when 2024 10-01 11:55:24 , and it's 2024 10-01 11:55:24 now!
+
+User(192.168.0.106,  ADJUSTTIME_MODE_NTP) adjtime when 2024 10-01 12:05:42  from Server(py.pool.ntp.org), and it's 2024 10-01 12:05:42 now!
+
+
+***module_storage***
+
+mount
+rootfs on / type rootfs (rw)
+proc on /proc type proc (rw,relatime)
+sysfs on /sys type sysfs (rw,relatime)
+ramfs on /home type ramfs (rw,relatime)
+devpts on /dev/pts type devpts (rw,relatime,mode=600,ptmxmode=000)
+/dev/part/app0blk on /dav type squashfs (ro,relatime)
+/dev/part/cfg0blk on /davinci type jffs2 (rw,relatime)
+none on /sys/kernel/debug type debugfs (rw,relatime)
+
+***module_preview***
+
+getPreviewStatus
+
+RTSP lib version is: 1.0.2 [14:02:55-Dec 13 2023]
+Preview lib version is: 1.0.0 [14:02:49-Dec 13 2023]
+
+max preview link:6 max playback link:0
+chan_1 preview link ch1:1 ch2:0 ch3:0
+       playback link:0
+       record status:not record
+
+chain  client_IP      play_type   stream_type  proto_type  date/time
+chan1  192.168.0.106  preview     main stream  TCP(P)      2024-10-01 12:35:43 
+
+********ANR INFO:********
+Channel-No  Stream-No  ANR-ID  ANR-Client-IP    Start-time
+
+
+************************************** DSP status ************************************
+*** ENC Chan info.
+----------------------------------------------------------------------------------------------------------------
+Chan	Enc	EncV	EncA	EncV	EncA	VI	Signal	Video
+Num	Bps	Bps	Bps	Fps	Fps	Fps	Status	Standard
+  0:	3323	3323	  0	 24	  0	 25	TURE	VS_NON
+  1:	  0	  0	  0	  0	  0	  0	FALSE	VS_NON
+----------------------------------------------------------------------------------------
+Chan	VI	EncV	EncA	Sub	Pre0	Pre1	Pre2	Data	VIP	CD	FD
+Num	Lost	Lost	Lost	Lost	Lost	Lost	Lost	Lost	Reset	Status	Status
+  0:	  0	  0	  0	  0	  0	  0	  0	  0	  0	FALSE	FALSE
+  1:	  0	  0	  0	  0	  0	  0	  0	  0	  0	FALSE	FALSE
+
+************************************** DSP status ************************************
+*** ENC Chan info.
+----------------------------------------------------------------------------------------------------------------
+Chan	Enc	EncV	EncA	EncV	EncA	VI	Signal	Video
+Num	Bps	Bps	Bps	Fps	Fps	Fps	Status	Standard
+  0:	3323	3323	  0	 24	  0	 25	TURE	VS_NON
+  1:	  0	  0	  0	  0	  0	  0	FALSE	VS_NON
+----------------------------------------------------------------------------------------
+Chan	VI	EncV	EncA	Sub	Pre0	Pre1	Pre2	Data	VIP	CD	FD
+Num	Lost	Lost	Lost	Lost	Lost	Lost	Lost	Lost	Reset	Status	Status
+  0:	  0	  0	  0	  0	  0	  0	  0	  0	  0	FALSE	FALSE
+  1:	  0	  0	  0	  0	  0	  0	  0	  0	  0	FALSE	FALSE
+
+************************************** DSP status ************************************
+*** ENC Chan info.
+----------------------------------------------------------------------------------------------------------------
+Chan	Enc	EncV	EncA	EncV	EncA	VI	Signal	Video
+Num	Bps	Bps	Bps	Fps	Fps	Fps	Status	Standard
+  0:	3323	3323	  0	 24	  0	 25	TURE	VS_NON
+  1:	  0	  0	  0	  0	  0	  0	FALSE	VS_NON
+----------------------------------------------------------------------------------------
+Chan	VI	EncV	EncA	Sub	Pre0	Pre1	Pre2	Data	VIP	CD	FD
+Num	Lost	Lost	Lost	Lost	Lost	Lost	Lost	Lost	Reset	Status	Status
+  0:	  0	  0	  0	  0	  0	  0	  0	  0	  0	FALSE	FALSE
+  1:	  0	  0	  0	  0	  0	  0	  0	  0	  0	FALSE	FALSE
+
+***module_sqlite***
+
+cat /davinci/db_op_info.log
+***DB_LOG_INFO***
+LOG_TOTAL_LEN:0
+LOG_LAST_WRITE_POS:652
+
+            [1970-01-01 00:00:13] [/davinci/ipc_db]not exist[2]
+[1970-01-01 00:00:13] Main Db is broken
+[1970-01-01 00:00:13] [/davinci/ipc_db_backup]not exist[2]
+[1970-01-01 00:00:13] db_restore failed
+[1970-01-01 00:00:13] Db version is -1,Read from cfg
+[2024-03-29 13:02:34] Going to reset cfg(1)!
+[2024-03-29 13:02:38] Reset cfg(1) retval = 0!
+[1970-01-01 00:00:12] [/davinci/ipc_db]key data empty
+[1970-01-01 00:00:12] Main Db is broken
+[1970-01-01 00:00:12] [/davinci/ipc_db_backup]not exist[2]
+[1970-01-01 00:00:12] db_restore failed
+[1970-01-01 00:00:12] Db version is -1,Read from cfg
+
+***module_flash_log***
+
+cat /davinci/DS-2CD1023G0E-I20240329AAWRFC2484411.log
+
+*****g_flash_log_count=1*****other*****
+[ISAPI] Active IP:192.168.1.11, time:Thu Jan  1 00:02:33 1970
+
+*****g_flash_log_count=2****normal reboot*****
+
+*****g_flash_log_count=3*****time = 2024-10-01-11-41-59*****
+
+*****g_flash_log_count=4*****version = V5.7.21*****
+
+*****g_flash_log_count=5*****p_cam_lib_version = 
+*****g_flash_log_count=6*****cat /proc/interrupts*****
+           CPU0       
+ 18:          0         -   2 Level     wdt
+ 19:    1479845         -   3 Level     timer0
+ 20:      46996         -   4 Level     enc
+ 21:          0         -   5 Level     fh_perf
+ 23:      37200         -   7 Level     ispp
+ 24:      61871         -   8 Level     ispf
+ 25:      24797         -   9 Level     vpu
+ 27:       2475         -  11 Level     i2c-0
+ 28:          0         -  12 Level     i2c-1
+ 29:          0         -  13 Level     jpeg
+ 30:          0         -  14 Level     bgm
+ 31:          0         -  15 Level     veu_loop
+ 32:          4         -  16 Level     fh-aes
+ 36:          1         -  20 Level     sadc
+ 37:          0         -  21 Level     spi-1
+ 38:          0         -  22 Level     jpg_loop
+ 39:          0         -  23 Level     fh-axi-dmac
+ 44:          0         -  28 Level     spi-0
+ 46:       3997         -  30 Level     ttyS-0
+ 48:      36446         -  32 Level     xbus
+ 49:          0         -  33 Level     fh_rtc
+ 52:          0         -  36 Level     pwm
+ 58:          0         -  42 Level     sdio-0
+ 59:          0         -  43 Level     sdio-1
+ 60:      35236         -  44 Level     eth0
+ 62:          0         -  46 Level     i2c-2
+107:          0  FH_GPIO_INTC  27 Edge      wps
+Err:          0
+
+*****g_flash_log_count=7*****cat /proc/debug/emac_link*****
+
+*****g_flash_log_count=8*****cat /proc/meminfo*****
+MemTotal:          36596 kB
+MemFree:            2008 kB
+MemAvailable:      10984 kB
+Buffers:            2772 kB
+Cached:            15280 kB
+SwapCached:            0 kB
+Active:            14556 kB
+Inactive:           5624 kB
+Active(anon):       6820 kB
+Inactive(anon):     1132 kB
+Active(file):       7736 kB
+Inactive(file):     4492 kB
+Unevictable:        4684 kB
+Mlocked:               0 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+Dirty:                 0 kB
+Writeback:             0 kB
+AnonPages:          6820 kB
+Mapped:            11348 kB
+Shmem:              1132 kB
+Slab:               4800 kB
+SReclaimable:       1944 kB
+SUnreclaim:         2856 kB
+KernelStack:        1336 kB
+PageTables:          700 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:       18296 kB
+Committed_AS:     309812 kB
+VmallocTotal:     991232 kB
+VmallocUsed:           0 kB
+VmallocChunk:          0 kB
+
+*****g_flash_log_count=9*****taskshow*****
+ tid   pid   stat   name
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+lstat fail
+   1     0     S    init
+lstat fail
+lstat fail
+   2     0     S    kthreadd
+lstat fail
+lstat fail
+   3     2     R    ksoftirqd/0
+lstat fail
+lstat fail
+   5     2     S    kworker/0:0H
+lstat fail
+lstat fail
+   6     2     S    kworker/u2:0
+lstat fail
+lstat fail
+   7     2     S    lru-add-drain
+lstat fail
+lstat fail
+   8     2     S    kdevtmpfs
+lstat fail
+lstat fail
+   9     2     S    oom_reaper
+lstat fail
+lstat fail
+  10     2     S    writeback
+lstat fail
+lstat fail
+  11     2     S    kcompactd0
+lstat fail
+lstat fail
+  12     2     S    ksmd
+lstat fail
+lstat fail
+  13     2     S    crypto
+lstat fail
+lstat fail
+  14     2     S    bioset
+lstat fail
+lstat fail
+  15     2     S    kblockd
+lstat fail
+lstat fail
+  16     2     R    kworker/0:1
+lstat fail
+lstat fail
+  17     2     S    kswapd0
+lstat fail
+lstat fail
+  36     2     S    bioset
+lstat fail
+lstat fail
+  37     2     S    bioset
+lstat fail
+lstat fail
+  38     2     S    bioset
+lstat fail
+lstat fail
+  39     2     S    bioset
+lstat fail
+lstat fail
+  40     2     S    bioset
+lstat fail
+lstat fail
+  41     2     S    bioset
+lstat fail
+lstat fail
+  42     2     S    bioset
+lstat fail
+lstat fail
+  43     2     S    bioset
+lstat fail
+lstat fail
+  44     2     S    bioset
+lstat fail
+lstat fail
+  45     2     R    spi0
+lstat fail
+lstat fail
+  46     2     D    mtd_flash_quali
+lstat fail
+lstat fail
+  49     2     S    bioset
+lstat fail
+lstat fail
+  50     2     S    bioset
+lstat fail
+lstat fail
+  51     2     S    bioset
+lstat fail
+lstat fail
+  52     2     S    bioset
+lstat fail
+lstat fail
+  53     2     S    bioset
+lstat fail
+lstat fail
+  54     2     S    bioset
+lstat fail
+lstat fail
+  55     2     S    bioset
+lstat fail
+lstat fail
+  56     2     S    spi1
+lstat fail
+lstat fail
+  89     2     S    irq/58-sdio-0
+lstat fail
+lstat fail
+  90     2     S    irq/59-sdio-1
+lstat fail
+lstat fail
+  91     2     S    fh_aes.0
+lstat fail
+lstat fail
+ 105     2     S    ipv6_addrconf
+lstat fail
+lstat fail
+ 106     2     S    kworker/0:2
+lstat fail
+lstat fail
+ 115     1     S    udevd
+lstat fail
+lstat fail
+ 235     2     S    jffs2_gcd_mtd6
+lstat fail
+lstat fail
+ 239     2     S    kworker/0:1H
+lstat fail
+lstat fail
+ 248     2     D    mark_mergeable
+lstat fail
+lstat fail
+ 355     2     D    xbus-rx
+lstat fail
+lstat fail
+ 405     2     D    motor
+lstat fail
+lstat fail
+ 437     1     S    execSystemCmd
+lstat fail
+lstat fail
+ 439     1     S    daemon
+lstat fail
+lstat fail
+ 445     1     S    daemon_unix_bus
+lstat fail
+ 446     1     S    net_process
+lstat fail
+lstat fail
+ 450     1     S    446_service_net
+lstat fail
+ 451     1     S    pid446_recv_net
+lstat fail
+ 452     1     S    pid446_send_net
+lstat fail
+ 514     1     S    netprocess_tran
+lstat fail
+ 515     1     S    ipc_zeroConfig
+lstat fail
+ 682     1     S    pid446_recv_net
+lstat fail
+ 447     1     S    davinci
+lstat fail
+lstat fail
+ 456     1     S    447_service_dav
+lstat fail
+ 458     1     S    pid447_recv_dav
+lstat fail
+ 459     1     S    pid447_send_dav
+lstat fail
+ 464     1     S    ipc_watchdog
+lstat fail
+ 465     1     S    ipc_reboot
+lstat fail
+ 466     1     S    davinci_447_eve
+lstat fail
+ 467     1     S    mdk_cli_conn
+lstat fail
+ 504     1     S    ipc_usrSucurty
+lstat fail
+ 506     1     S    ipc_backup_cfg
+lstat fail
+ 507     1     S    ipc_cmd_server
+lstat fail
+ 508     1     S    logMsgRecvTask
+lstat fail
+ 509     1     R    logSyncTask
+lstat fail
+ 510     1     S    ipc_syslog_send
+lstat fail
+ 511     1     S    ipc_recschdule
+lstat fail
+ 516     1     S    rtspoverhttp_ma
+lstat fail
+ 517     1     S    ipc_appweb
+lstat fail
+ 518     1     S    ipc_SdEmCrl
+lstat fail
+ 519     1     S    ipc_exception
+lstat fail
+ 520     1     S    auto_defense_Ct
+lstat fail
+ 521     1     S    ipc_alarmInCtrl
+lstat fail
+ 522     1     S    ipc_smd_motion
+lstat fail
+ 523     1     S    motdect_modectl
+lstat fail
+ 524     1     S    ipc_net_check
+lstat fail
+ 525     1     R    streamRecv
+lstat fail
+ 526     1     S    events
+lstat fail
+ 527     1     S    ipc_SdEmsrictl
+lstat fail
+ 529     1     S    user_onlinetask
+lstat fail
+ 530     1     R    ipc_rtcp_timer
+lstat fail
+ 532     1     S    ipc_dvrNetServ
+lstat fail
+ 533     1     S    isapi_Authentic
+lstat fail
+ 535     1     S    ipc_timeCtrl
+lstat fail
+ 536     1     S    davinci
+lstat fail
+ 537     1     S    ipc_ContiCommd
+lstat fail
+ 538     1     S    ipc_arptask
+lstat fail
+ 540     1     S    ipc_nei_sol
+lstat fail
+ 541     1     S    ipc_sntptask
+lstat fail
+ 543     1     S    ipc_upnp
+lstat fail
+ 546     1     S    ipc_bonjour
+lstat fail
+ 547     1     S    OnvifServCtl
+lstat fail
+ 548     1     S    ezviz_daemon
+lstat fail
+ 549     1     S    ezviz_online_ck
+lstat fail
+ 550     1     S    ezAlarmHandler
+lstat fail
+ 551     1     S    ezPoolWork
+lstat fail
+ 552     1     S    ezPoolMain
+lstat fail
+ 553     1     R    ezlanIOTdaemon
+lstat fail
+ 554     1     R    ezlanDoActTsk
+lstat fail
+ 555     1     R    ezdevMsg2Svr
+lstat fail
+ 556     1     S    EzAsyLstManager
+lstat fail
+ 557     1     S    is_dis_start
+lstat fail
+ 560     1     S    equipment_maint
+lstat fail
+ 561     1     R    ipc_flash_log
+lstat fail
+ 562     1     S    ipc_maintain_lo
+lstat fail
+ 564     1     S    ipc_svchandler
+lstat fail
+ 565     1     R    is_multi
+lstat fail
+ 566     1     S    daynight_ctrl_0
+lstat fail
+ 567     1     S    ipc_wdr_ctrl_0
+lstat fail
+ 568     1     S    mul_frot_para_s
+lstat fail
+ 575     1     R    ipc_evttrigcap
+lstat fail
+ 576     1     S    ipc_timetrigcap
+lstat fail
+ 581     1     S    ISA20tem/reboot
+lstat fail
+ 582     1     S    worker.00000003
+lstat fail
+ 593     1     S    worker.00000006
+lstat fail
+ 594     1     S    worker.00000007
+lstat fail
+ 597     1     S    worker.00000008
+lstat fail
+ 650     1     R    ipc_AlarmUp301
+lstat fail
+ 665     1     S    ipc_PrevCtrl
+lstat fail
+ 448     1     S    Dsp_Main
+lstat fail
+lstat fail
+ 453     1     R    dsp_print
+lstat fail
+ 454     1     S    mdk_svr_acpt_0
+lstat fail
+ 455     1     S    dbg_server
+lstat fail
+ 468     1     S    mdk_svr_0_0
+lstat fail
+ 469     1     R    update_app_shar
+lstat fail
+ 476     1     R    gme_n0
+lstat fail
+ 477     1     R    gme_n1
+lstat fail
+ 478     1     R    gme_n2
+lstat fail
+ 479     1     R    gme_n3
+lstat fail
+ 480     1     R    gme_n4
+lstat fail
+ 481     1     R    gme_n5
+lstat fail
+ 482     1     R    gme_n6
+lstat fail
+ 483     1     R    gme_n7
+lstat fail
+ 484     1     S    isp_server
+lstat fail
+ 485     1     R    pipe2.vi1_drv
+lstat fail
+ 486     1     R    pipe2.vi1_sig
+lstat fail
+ 487     1     S    vpssdzoom
+lstat fail
+ 488     1     S    pipe2.vps1
+lstat fail
+ 489     1     S    pipe2.enc1_roi
+lstat fail
+ 490     1     S    pipe2.enc2_roi
+lstat fail
+ 491     1     S    pipe2.venc_str
+lstat fail
+ 492     1     S    pipe2.jpeg1
+lstat fail
+ 493     1     R    Dsp_Main
+lstat fail
+ 494     1     R    pipe2.osd1
+lstat fail
+ 495     1     R    pipe2.osd2
+lstat fail
+ 496     1     R    pipe2.smdl1
+lstat fail
+ 497     1     R    pipe2.scd1
+lstat fail
+ 498     1     S    pipe2.talk
+lstat fail
+ 499     1     S    pipe2.aenc0
+lstat fail
+ 500     1     S    pipe2.aenc1
+lstat fail
+ 501     1     S    pipe2.adec
+lstat fail
+ 502     1     S    pipe2.aio_ai
+lstat fail
+ 503     1     S    pipe2.aio_ao
+lstat fail
+ 457     1     S    psh
+lstat fail
+lstat fail
+ 460     1     S    init
+lstat fail
+lstat fail
+ 470     2     S    jpeg_kick
+lstat fail
+lstat fail
+ 471     2     S    bgm_kick
+lstat fail
+lstat fail
+ 472     2     S    bgm_sw
+lstat fail
+lstat fail
+ 473     2     S    bgm_conf
+lstat fail
+lstat fail
+ 474     2     S    vpu_task
+lstat fail
+lstat fail
+ 475     2     D    hhe_manage
+lstat fail
+lstat fail
+ 571     2     S    kworker/u2:2
+lstat fail
+lstat fail
+ 629     2     S    kworker/u2:1
+lstat fail
+dev_pthread total num = 167,davinci_pthread num = 66
+
+*****g_flash_log_count=10*****dsp*****
+
+************************************** DSP status ************************************
+*** ENC Chan info.
+----------------------------------------------------------------------------------------------------------------
+Chan	Enc	EncV	EncA	EncV	EncA	VI	Signal	Video
+Num	Bps	Bps	Bps	Fps	Fps	Fps	Status	Standard
+  0:	3028	3028	  0	 25	  0	 25	TURE	VS_NON
+  1:	  0	  0	  0	  0	  0	  0	FALSE	VS_NON
+----------------------------------------------------------------------------------------
+Chan	VI	EncV	EncA	Sub	Pre0	Pre1	Pre2	Data	VIP	CD	FD
+Num	Lost	Lost	Lost	Lost	Lost	Lost	Lost	Lost	Reset	Status	Status
+  0:	  0	  0	  0	  0	  0	  0	  0	  0	  0	FALSE	FALSE
+  1:	  0	  0	  0	  0	  0	  0	  0	  0	  0	FALSE	FALSE
+
+***module_4g_log***
+
+***module_4g5g_cellular_log***
+
+***module_4g5g_cellular_runlog***
+
+***SIM Temperature***
+Temperature = [0]
+heater = [OFF]
+
+***module_sec_log***
+shieldSupport: 0
+sdcardSupport: 0
+photosensitive: 0
+hard_type: 1
+defVideoStandard: 0
+audioInSupport: 0
+videoinType: 111
+IRSupport: 1
+wifiSupport: 0
+eZoomLensSupport: 0
+
+***maintain_end***

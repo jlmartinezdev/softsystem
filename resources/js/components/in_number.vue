@@ -7,14 +7,15 @@ const defaultClasses ={
 }
 export default {
     name: "inNumber",
-    props: ["value","placeholder","clases","id","tabindex","enabled"],
+    props: ["value","placeholder","clases","id","tabindex","enabled","moneda"],
     data() {
         return {
             text: "",
             Classes: {
             ...defaultClasses,
             ...this.clases
-            }
+            },
+            monedas: ['GS ','USD ','$a ','R$ ','€ ']
         }
     },
     watch: {
@@ -33,7 +34,7 @@ export default {
             while (rgx.test(x1)) {
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
-            return x1 + x2;
+            return this.monedas[this.moneda]+x1 + x2;
         },
         isNumber: function (evt) {
             evt = (evt) ? evt : window.event;

@@ -8,7 +8,7 @@
     <title>Recibo de Dinero</title>
     <style>
         .cabecera{
-            height: 115px;
+            height: 125px;
         }
     </style>
 </head>
@@ -21,15 +21,15 @@
                 </div>
             </div>
             <div class="col-5">
-               <div class="m-2 border border-dark p-2 d-flex flex-column text-center cabecera">
-                   <span><strong>{{$empresa->emp_nombre}}</strong></span>
+               <div class="m-2 border border-dark rounded p-2 d-flex flex-column text-center cabecera">
+                   <span class="upper"><strong>{{$empresa->emp_nombre}}</strong></span>
                    <span>Cel: {{$empresa->emp_celular}}</span>
                    <span>Direc: {{$empresa->emp_direccion}}</span>
                    <span>RUC: {{$empresa->emp_ruc}}</span>
                </div>
             </div>
             <div class="col-4">
-                <div class="m-2 border border-dark p-2 d-flex flex-column text-center cabecera">
+                <div class="m-2 border border-dark rounded p-2 d-flex flex-column text-center cabecera">
                     <span>
                         <h4><strong>RECIBO DE DINERO</strong></h4>
                     </span>

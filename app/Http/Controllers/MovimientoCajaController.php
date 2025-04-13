@@ -17,7 +17,7 @@ class MovimientoCajaController extends Controller
     	return view('movimiento');
     }
     public function getAll($nro_operacion){
-    	return MovimientoCaja::select(DB::raw('DATE_FORMAT(mov_fecha,"%d/%m/%Y %H:%i") AS mov_fecha'),'mov_concepto','mov_tipo','mov_monto')
+    	return MovimientoCaja::select(DB::raw('DATE_FORMAT(mov_fecha,"%d/%m/%Y %H:%i") AS mov_fecha'),'nro_operacion','mov_concepto','mov_tipo','mov_monto')
     	->where('nro_operacion','=',$nro_operacion)->get();
     }
     public function store(Request $request){
@@ -32,4 +32,8 @@ class MovimientoCajaController extends Controller
     	$movimiento->save();
     	return $this->getAll($request->data['nro_operacion']);
     }
+	public function informe($nro_operacion){
+		$movimiento= $this->getAll($nro_operacion);
+		return view('informes.apertura', compact('movimiento'));
+	}
 }

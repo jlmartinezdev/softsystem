@@ -16,13 +16,19 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('excel/articulos_costo/','ArticuloController@export_costo');
     Route::get('resumen','ResumenController@index')->name('resumen');
     Route::get('resumen/datos','ResumenController@resumen');
+    //Caja
+    Route::get('caja/movimiento/{id}','MovimientoCajaController@informe')->name('caja.informe');
 });
     //Articulos
+    
     Route::get('inf/articulo', 'ArticuloController@informe')->name('articulo@informe');
     Route::get('articulo', 'ArticuloController@index')->name('articulo');
+    Route::get('articulo/cm', 'ArticuloController@cm')->name('articulo.cm');
+    Route::get('articulo/cm/{id}', 'ArticuloController@cmupdate')->name('articulo.cmupdate');
     Route::get('articulo/buscar', 'ArticuloController@getArticulo')->name('articulo@buscar');
     Route::get('articulo/ultimo', 'ArticuloController@getUltimo')->name('articulo@ultimo');
     Route::get('articulo/precios/{id}','ArticuloController@getPrecios');
+    Route::put('articulo/id/', 'ArticuloController@getById');
     Route::put('articulo', 'ArticuloController@getByCodigo');
     Route::post('articulo', 'ArticuloController@store');
     Route::put('articulo/{id}', 'ArticuloController@update')->name('articulo.update');
@@ -126,7 +132,7 @@ Route::group(['middleware' => ['administrador']], function () {
     // DOCUMENTO A IMPRIMIR 
     Route::get('documento/recibocobro/{id}','CtaCobrarController@printRecibo');
     Route::get('documento/extractocuenta/{id}','CtaCobrarController@printExtracto');
-
+    Route::get('documento/recibocobro/d/{id}','CtaCobrarController@printReciboD');
     Route::get('/clear-cache', 'AperturaController@comando');
     //TICKET
     Route::get('ticket/factura/{id}', 'FacturarController@ticket');

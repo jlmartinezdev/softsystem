@@ -27,6 +27,16 @@ class ArticuloController extends Controller
         $unidades = Unidad::All();
         return view('articulo',compact('secciones','unidades'));
     }
+    public function cm(){
+        $secciones= Seccion::All();
+        $unidades = Unidad::All();
+        return view('articulo.cm',compact('secciones','unidades'));
+    }
+    public function cmupdate($id){
+        $secciones= Seccion::All();
+        $unidades = Unidad::All();
+        return view('articulo.cm',compact('secciones','unidades'))->with('id',$id);
+    }
     public function getArticulo(Request $request){
         $criterios = ["producto_nombre","producto_c_barra"];
         $columnas= ["articulos.producto_nombre","articulos.articulos_cod", "articulos.pre_venta1"];
@@ -63,6 +73,15 @@ class ArticuloController extends Controller
             ->join('unidad','articulos.uni_codigo','=','unidad.uni_codigo')
             ->select(  'articulos.*','presentacion.present_descripcion',DB::raw('SUM(stock.cantidad) AS cantidad'),'unidad.uni_nombre','unidad.uni_abreviatura')
             ->where('articulos.producto_c_barra','=',$request->codigo)
+            ->groupBy('articulos.articulos_cod')
+            ->first();
+    }
+    public function getById(Request $request){
+        return Articulo::join('stock', 'articulos.articulos_cod', '=', 'stock.articulos_cod')
+            ->join('presentacion','articulos.present_cod','=','presentacion.present_cod')
+            ->join('unidad','articulos.uni_codigo','=','unidad.uni_codigo')
+            ->select(  'articulos.*','presentacion.present_descripcion',DB::raw('SUM(stock.cantidad) AS cantidad'),'unidad.uni_nombre','unidad.uni_abreviatura')
+            ->where('articulos.articulos_cod','=',$request->codigo)
             ->groupBy('articulos.articulos_cod')
             ->first();
     }
@@ -189,6 +208,7 @@ class ArticuloController extends Controller
      */
     public function update(Request $request, $id)
     {
+       // return $request;
         
         $ok= Articulo::where('articulos_cod',$id)->update([
             'uni_codigo'=>$request->articulo['unidad'], 
@@ -220,7 +240,7 @@ class ArticuloController extends Controller
         ]);
         if( Auth::user()->roles()->first()->nom_rol=='Administrador'){
             for ($i=0; $i < count($request->stock) ; $i++) { 
-                if($request->stock[$i]['id'] > 5){
+                if($request->stock[$i]['id'] > 0){
                     Stock::where('id_stock',$request->stock[$i]['id'])->update([
                         'cantidad' =>$request->stock[$i]['cantidad'], 
                         'stock_fech_venc' => $this->setVencimiento($request->stock[$i]['vencimiento']),

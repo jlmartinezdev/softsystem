@@ -48,10 +48,7 @@
                     <div class="content-header">
                         <div class="row">
                             <div class="col-6">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="#">Inicio</a></li>
-                                    <li class="breadcrumb-item active">Venta</li>
-                                </ol>
+                                <div class="py-2"  ><span class="font-weight-bold" style="font-size: 18pt;">Vender</span></div>
                             </div>
                             <div class="col-6">
                                 <div class="text-secondary float-sm-right">
@@ -65,27 +62,55 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!--div class="input-group">
-                                                            <input type="text" v-model="txtbuscar" @keyup.enter="showBuscar()" class="form-control"
-                                                                placeholder="Buscar...." autofocus />
-                                                            <div class="input-group-append">
-                                                                <button class="btn btn-secondary" @click="showBuscar()">
-                                                                    <template v-if="requestSend">
-                                                                        <span class="spinner-border spinner-border-sm" role="status"></span><span
-                                                                            class="sr-only">Buscando...</span> Cargando...
-                                                                    </template>
-                                                                    <template v-else>
-                                                                        <span class="fa fa-search"></span> Buscar
-                                                                    </template>
-                                                                </button>
-                                                            </div>
-                                                        </div -->
-                    <Searcharticulo url="{{ env('APP_APIDB') }}" :idsucursal="ventaCabecera.idSucursal"
-                        @articulo="addCarrito" validar-lote="false" ref="Searcharticulo" route-articulo="{{ route('articulo')}}">
-                    </Searcharticulo>
-
-
+                    <div class="card shadow-sm">
+                        
+                            <div class="row">
+                                
+                                <div class="col-sm-12 col-md-12">
+                                    <nav class="navbar navbar-expand navbar-light bg-white">
+                                        <ul class="navbar-nav w-100">
+                                            <li class="nav-item w-100">
+                                                <Searcharticulo url="{{ env('APP_APIDB') }}" :idsucursal="ventaCabecera.idSucursal"
+                                    @articulo="addCarrito" validar-lote="false" ref="Searcharticulo" route-articulo="{{ route('articulo.cm')}}">
+                                </Searcharticulo>
+                                            </li>
+                                        </ul>
+                                        <ul class="navbar-nav">
+                                        <li class="nav-item">
+                                            <a href="#" class="nav-link"><i class="fa-regular fa-filter-list"></i></a>
+                                            
+                                        </li>
+                                        <li class="nav-item dropdown" >
+                                            <a href="#" class="nav-link" title="Articulo Rapido" data-toggle="dropdown"><i class="fa-regular fa-bolt"></i></a>
+                                            
+                                            <!-- div class="dropdown-menu dropdown-menu-lg dropdown-menu-right"  id="fastDropdown">
+                                                <h3 class="dropdown-header">Agregar item rapido</h3>
+                                                <form class="px-4 py-3">
+                                                    <div class="form-group">
+                                                      <label for="fastItemPrecio">Precio</label>
+                                                      <input type="number" class="form-control"v-model="fastItem.precio" id="fastItemPrecio" placeholder="Gs.">
+                                                    </div>
+                                                    <div class="form-group">
+                                                      <label for="fastItemDescripcion">Descripcion</label>
+                                                      <input type="text" class="form-control" v-model="fastItem.descripcion" id="fastItemDescripcion" placeholder="Descripcion">
+                                                    </div>
+                                                    <hr>
+                                                  <button type="button" class="btn btn-info btn-block" @click="addFastItem" ><i class="fa-regular fa-plus"></i> Agregar</button>
+                                                    
+                                                  </form>
+                                                  
+                                            </div -->
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="#" class="nav-link"><i class="fa-regular fa-list-ul"></i></a>
+                                        </li>
+                                    </ul>
+                                    </nav>
+                                    
+                                </div>
+                            </div>
+                        
+                    </div>
                     <!-- TABLA ......................... -->
                     <div class="card mt-2">
                         <div class="table-responsive-sm">
@@ -232,6 +257,15 @@
     <script src="{{ asset(mix('js/venta.js')) }}"></script>
     <script src="{{ asset('js/separator.js') }}"></script>
     <script type="text/javascript">
+    $(document).on('show.bs.dropdown', function (event) {
+        // Check if the dropdown being shown is the one for "Agregar item rapido"
+        const dropdown = $(event.target).find('#fastItemPrecio');
+        if (dropdown.length) {
+            setTimeout(() => {
+                dropdown.focus(); 
+            }, 200); 
+        }
+    });
         var app = new Vue({
             el: '#app',
             data: {
@@ -288,6 +322,10 @@
                 requestLote: false,
                 cuotas: [],
                 enfocar: false,
+                fastItem: {
+                    precio: 0,
+                    descripcion: ''
+                }
             },
             methods: {
                 search: function(input) {
@@ -610,6 +648,38 @@
                         this.ventaCabecera.documento = config.tipo_comprobante;
                     }
 
+                },
+                addFastItem: function(){
+                    if(this.fastItem.precio>0 && this.fastItem.descripcion.length>0){
+                        let art = {
+                            codigo: 1,
+                            idstock: 0,
+                            descripcion: this.fastItem.descripcion,
+                            cantidad: 1,
+                            stock: 1,
+                            precio: this.fastItem.precio,
+                            p1: parseInt(this.fastItem.precio),
+                            p2: 0,
+                            p3: 0,
+                            p4: 0,
+                            p5: 0,
+                            m1: 0,
+                            m2: 0,
+                            m3: 0,
+                            m4: 0,
+                            m5: 0,
+                            costo: 0,
+                            iPrecio: 'CO1',
+                        }
+                        this.carro.push(art);
+                        this.saveDatos();
+                        this.fastItem.precio = 0;
+                        this.fastItem.descripcion = '';
+                        
+
+                    }
+                    //ocultar dropdown
+                    
                 }
             },
             computed: {
