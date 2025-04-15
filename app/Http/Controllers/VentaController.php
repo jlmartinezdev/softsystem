@@ -124,7 +124,9 @@ class VentaController extends Controller
         foreach ($request->detalle as $detalle) {
            // $lote = empty($detalle['aux_lote']) ? " AND lote_nro is null": " AND lote_nro='".trim($detalle['aux_lote'])."'");
             DB::insert('INSERT INTO detalle_venta (ARTICULOS_cod, nro_fact_ventas, venta_precio, venta_cantidad, precio_compra) VALUES (?, ?, ?, ?,?)',[$detalle['codigo'],$venta->nro_fact_ventas,$detalle['precio'],$detalle['cantidad'],$detalle['costo']]);
-           DB::update('update stock set cantidad = (cantidad - ?) where id_stock=?',[$detalle['cantidad'],$detalle['idstock']]);
+            if($request->ventaCabecera['descontar_stock']==1){
+                DB::update('update stock set cantidad = (cantidad - ?) where id_stock=?',[$detalle['cantidad'],$detalle['idstock']]);
+            }
         }
         return $venta->nro_fact_ventas;
         

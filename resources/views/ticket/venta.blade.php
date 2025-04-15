@@ -60,7 +60,7 @@
                     <tr>
                         <td class="cantidad">{{ number_format($v->venta_cantidad, 2, ',', '.') }}</td>
                         <td class="precio" colspan="2" align="right">
-                            {{ number_format($v->venta_precio, 0, ',', '.') }}</td>
+                            {{ number_format($v->venta_precio * $v->venta_cantidad, 0, ',', '.') }}</td>
                     </tr>
                 @endforeach
 

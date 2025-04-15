@@ -37,16 +37,33 @@
                         <div class="card">
                             <div class="card-header"><span class="text-muted"><strong>Venta</strong></span></div>
                             <div class="card-body">
-                                <label>Prederminado Compobante</label>
-                                <select v-model="venta.tipo_comprobante" class="form-control form-control-sm">
-                                    <option value="Ticket">Ticket</option>
-                                    <option value="Comprobante">Comprabante</option>
-                                    <option value="Factura">Factura</option>
-                                </select>
+                                <div class="form-group">
+                                    <label>Prederminado Compobante</label>
+                                    <select v-model="venta.tipo_comprobante" class="form-control form-control-sm">
+                                        <option value="Ticket">Ticket</option>
+                                        <option value="Comprobante">Comprobante</option>
+                                        <option value="Factura">Factura</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Descontar Stock</label>
+                                    <select v-model="venta.descontar_stock" class="form-control form-control-sm">
+                                        <option value="1">Si</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Vender articulos sin stock</label>
+                                    <select v-model="venta.vender_sin_stock" class="form-control form-control-sm">
+                                        <option value="1">Si</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                
             </div>
             <div class="card-footer">
                 <button class="btn btn-success btn-flat" @click="update"><span class="fa fa-save"></span> Guardar</button>
@@ -73,7 +90,9 @@
                     value: {{ $ajuste[1]->value}}
                 }],
                 venta: {
-                    tipo_comprobante: "Ticket"
+                    tipo_comprobante: "Ticket",
+                    descontar_stock: 1,
+                    vender_sin_stock: 1
                 }
             },
             methods: {

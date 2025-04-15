@@ -35,6 +35,11 @@
             background-color: #454d55 !important;
             color: #fff !important;
         }
+        .input-number-precio{
+            width: 100px; 
+            border: none; 
+            background-color: transparent;
+        }
     </style>
 @endsection
 @section('main')
@@ -134,7 +139,7 @@
                                             <td> <input type="number"
                                                     style="width: 50px; border: none; background-color: transparent;"
                                                     min="1" :max="item.stock" v-model="item.cantidad"> </td>
-                                            <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio) }}</td>
+                                            <td><in-number v-model="item.precio" :clases="inputNumberClassesPrecio" placeholder="Precio"></in-number></td>
                                             <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio * item.cantidad) }}</td>
 
 
@@ -227,7 +232,8 @@
                                 </div>
                             </div>
 
-                            
+                         
+
                         </div>
                         <div class="card-footer">
                             <button class="btn btn-success" @click="showFinalizar">
@@ -247,6 +253,51 @@
         @include('venta.finalizar')
         @include('cliente.buscar')
         @include('venta.selprecio')
+
+        <!-- Modal Vuelto -->
+        <div class="modal fade" id="modalVuelto" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Calcular Vuelto</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group text-center">
+                            <div class="d-flex justify-content-center">
+                                <i class="fas fa-money-bill text-success" style="font-size: 2rem;"></i>
+                            </div>
+                            <label>Total a Pagar</label>
+                            <h1 class="display-5">Gs. @{{ format(ventaCabecera.total) }}</h1>
+                        </div>
+                        <div class="form-group">
+
+                            <label> <i class="fas fa-arrow-right text-success"></i> Monto Recibido</label>
+                            <in-number  v-model="efectivoRecibido" :clases="inputNumberClasses" placeholder="Ingrese el monto recibido" @change="calcularVuelto"></in-number>
+                            
+                        </div>
+                        <div class="form-group text-center" v-if="vuelto > 0">
+                            <div class="d-flex justify-content-center">
+                                <i class="fas fa-arrow-left text-danger" style="font-size: 2rem;"></i>
+                            </div>
+                            <label>Vuelto</label>
+                            <h1 class="display-5 text-danger">Gs. @{{ format(vuelto) }}</h1>
+                        </div>
+                        <div class="alert alert-danger" v-if="vuelto < 0">
+                            <i class="fas fa-exclamation-triangle"></i> Monto insuficiente
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"> <span class="fa fa-times"></span> Cerrar</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" v-if="vuelto >= 0">
+                            <span class="fa fa-check"></span> Aceptar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div><!-- end app -->
 @endsection
 @section('footer')
@@ -257,6 +308,7 @@
     <script src="{{ asset(mix('js/venta.js')) }}"></script>
     <script src="{{ asset('js/separator.js') }}"></script>
     <script type="text/javascript">
+
     $(document).on('show.bs.dropdown', function (event) {
         // Check if the dropdown being shown is the one for "Agregar item rapido"
         const dropdown = $(event.target).find('#fastItemPrecio');
@@ -269,10 +321,17 @@
         var app = new Vue({
             el: '#app',
             data: {
+                inputNumberClasses: {
+                    input: "form-control form-control-lg text-success"
+                },
+                inputNumberClassesPrecio: {
+                    input: "input-number-precio"
+                },
                 requestSend: false,
                 requestFinalizar: false,
                 currentPage: 1,
-
+                efectivoRecibido: 0,
+                vuelto: 0,
                 ventaCabecera: {
                     fecha: '2020-01-01',
                     clienteId: '1',
@@ -284,7 +343,9 @@
                     total: 0,
                     descuento: 0,
                     nro_operacion: 0,
-                    generarcuota: true
+                    generarcuota: true,
+                    vender_sin_stock: 0,
+                    descontar_stock: 1
                 },
                 carro: [],
                 caja: '...',
@@ -345,7 +406,7 @@
                         timer: 3000,
                     });
                     //Buscar articulo si no esta en la lista
-                    if (a.cantidad == 0) {
+                    if (a.cantidad == 0 && this.ventaCabecera.vender_sin_stock == 0) {
                         console.log("No se puede agregar")
                         Toast.fire({
                             title: 'No se puede agregar articulo con stock 0!',
@@ -377,13 +438,18 @@
                         }
                         this.carro.push(art);
                     } else {
-                        if ((this.carro[i].cantidad + 1) <= a.cantidad) {
+                        //vender sin stock
+                        if(this.ventaCabecera.vender_sin_stock==1){
                             this.carro[i].cantidad = parseInt(this.carro[i].cantidad) + 1;
-                        } else {
-                            Toast.fire({
-                                title: `Cantidad supera stock disponible: ${a.cantidad} ...`,
-                                icon: 'error'
-                            });
+                        }else{
+                            if ((this.carro[i].cantidad + 1) <= a.cantidad) {
+                                this.carro[i].cantidad = parseInt(this.carro[i].cantidad) + 1;
+                            } else {
+                                Toast.fire({
+                                    title: `Cantidad supera stock disponible: ${a.cantidad} ...`,
+                                    icon: 'error'
+                                });
+                            }
                         }
                         //Actualizar cantidad
                     }
@@ -646,6 +712,8 @@
                     if (config != null) {
                         config = JSON.parse(config);
                         this.ventaCabecera.documento = config.tipo_comprobante;
+                        this.ventaCabecera.vender_sin_stock = config.vender_sin_stock;
+                        this.ventaCabecera.descontar_stock = config.descontar_stock;
                     }
 
                 },
@@ -680,6 +748,13 @@
                     }
                     //ocultar dropdown
                     
+                },
+                calcularVuelto: function() {
+                    if (this.efectivoRecibido > 0 && this.ventaCabecera.total > 0) {
+                        this.vuelto = this.efectivoRecibido - this.ventaCabecera.total;
+                    } else {
+                        this.vuelto = 0;
+                    }
                 }
             },
             computed: {

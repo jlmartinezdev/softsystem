@@ -54,8 +54,8 @@
 							</div>
 							<div class="col">
 								<div class="form-group">
-							      <strong><label for="unidad">Unidad *</label></strong>
-							      <select name="unidad" v-model="articulo.unidad" class="form-control form-control-sm">
+							      <strong><label for="unidad_principal">Unidad Principal *</label></strong>
+							      <select name="unidad_principal" v-model="articulo.unidad_principal" class="form-control form-control-sm">
 							      	<option value="0">Seleccionar</option>
 							      	@foreach($unidades as $unidad)
 							      		<option value="{{$unidad['uni_codigo']}}">{{ $unidad['uni_nombre'] }}</option>
@@ -68,6 +68,55 @@
 							      <strong><label for="factor">Factor</label></strong>
 							      <input type="text" v-model="articulo.factor" class="form-control form-control-sm" name="factor" placeholder="Factor">
 							    </div>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="col">
+								<div class="form-group">
+									<strong><label>Unidades de Venta</label></strong>
+									<button type="button" class="btn btn-sm btn-primary" @click="agregarUnidadVenta">
+										<i class="fa fa-plus"></i> Agregar Unidad
+									</button>
+								</div>
+							</div>
+						</div>
+						<div v-for="(unidad, index) in unidades_venta" :key="index" class="form-row">
+							<div class="col">
+								<div class="form-group">
+									<label>Unidad</label>
+									<select v-model="unidad.unidad_id" class="form-control form-control-sm">
+										<option value="0">Seleccionar</option>
+										@foreach($unidades as $unidad)
+											<option value="{{$unidad['uni_codigo']}}">{{ $unidad['uni_nombre'] }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+							<div class="col">
+								<div class="form-group">
+									<label>Factor de Conversión</label>
+									<input type="number" v-model="unidad.factor_conversion" class="form-control form-control-sm" step="0.01">
+								</div>
+							</div>
+							<div class="col">
+								<div class="form-group">
+									<label>Precio de Venta</label>
+									<input type="number" v-model="unidad.precio_venta" class="form-control form-control-sm" step="0.01">
+								</div>
+							</div>
+							<div class="col">
+								<div class="form-group">
+									<label>Principal</label>
+									<input type="checkbox" v-model="unidad.es_principal" class="form-control form-control-sm">
+								</div>
+							</div>
+							<div class="col">
+								<div class="form-group">
+									<label>&nbsp;</label>
+									<button type="button" class="btn btn-sm btn-danger" @click="eliminarUnidadVenta(index)">
+										<i class="fa fa-trash"></i>
+									</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -251,3 +300,38 @@
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<script>
+export default {
+	data() {
+		return {
+			unidades_venta: [],
+		}
+	},
+	methods: {
+		agregarUnidadVenta() {
+			this.unidades_venta.push({
+				unidad_id: 0,
+				factor_conversion: 1,
+				precio_venta: 0,
+				es_principal: false
+			});
+		},
+		eliminarUnidadVenta(index) {
+			this.unidades_venta.splice(index, 1);
+		},
+		saveArticulo() {
+			if (this.articulo.descripcion && this.articulo.costo && this.articulo.p1) {
+				// Validar que al menos una unidad sea principal
+				const tienePrincipal = this.unidades_venta.some(u => u.es_principal);
+				if (!tienePrincipal) {
+					Swal.fire('Atención', 'Debe seleccionar una unidad principal', 'warning');
+					return;
+				}
+
+				// ... rest of the save logic ...
+			}
+		}
+	}
+}
+</script>

@@ -12,6 +12,7 @@ use App\Exports\ArticulosExport;
 use App\Exports\articulosPreciosExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Auth;
+use App\ArticuloUnidad;
 
 class ArticuloController extends Controller
 {
@@ -187,6 +188,17 @@ class ArticuloController extends Controller
         if($suma > 0 ){
             for($i=2;$i<=18;$i++){
                 DB::insert('INSERT INTO precios VALUES (?,?,?,?,?,?)',[$i,$articulo->ARTICULOS_cod,$request->precios[$i-2]["p"],$request->precios[$i-2]["m"],$i,$request->precios[$i-2]["c"]]);
+            }
+        }
+        if (isset($request->unidades_venta)) {
+            foreach ($request->unidades_venta as $unidad) {
+                $articuloUnidad = new ArticuloUnidad();
+                $articuloUnidad->articulo_id = $articulo->articulos_cod;
+                $articuloUnidad->unidad_id = $unidad['unidad_id'];
+                $articuloUnidad->factor_conversion = $unidad['factor_conversion'];
+                $articuloUnidad->precio_venta = $unidad['precio_venta'];
+                $articuloUnidad->es_principal = $unidad['es_principal'] ?? false;
+                $articuloUnidad->save();
             }
         }
         return $articulo->ARTICULOS_cod;

@@ -39,7 +39,7 @@
 							</div>
 						</div>
 						<hr>
-						<div class="text-center">
+						<div class="text-center" id="total">
 							<p class="text-muted">Total a Pagar</p>
 							<h2>@{{totalVenta}}</h2>
 							<p>@{{ numeroaletra(ventaCabecera.total) }}</p>
@@ -57,6 +57,9 @@
 				<template v-if="requestFinalizar">
 					<span class="spinner-border spinner-border-sm" role="status"></span><span class="sr-only">Finalizando...</span> Finalizando...
 				</template>
+				<button class="btn btn-info" data-toggle="modal" data-target="#modalVuelto">
+                    <i class="fas fa-calculator"></i>CALCULAR VUELTO
+                </button>
 				<button class="btn btn-success" @click="finalizar(true)">
 					<span class="fa fa-print"></span> FINALIZAR E IMPRIMIR
 				</button>
