@@ -77,6 +77,12 @@
                                 <p>Ciudad</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('unidades.index') }}" id="m_unidades" class="nav-link">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Unidad</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li class="nav-item">

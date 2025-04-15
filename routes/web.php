@@ -158,6 +158,14 @@ Route::get('reffactura/all', 'ReffacturaController@getAll');
 Route::post('reffactura', 'ReffacturaController@store');
 Route::post('reffactura', 'ReffacturaController@update');
 
+Route::get('unidades', 'UnidadController@index')->name('unidades.index');
+Route::get('unidades/create', 'UnidadController@create')->name('unidades.create');
+Route::post('unidades', 'UnidadController@store')->name('unidades.store');
+Route::get('unidades/{unidad}/edit', 'UnidadController@edit')->name('unidades.edit');
+Route::put('unidades/{unidad}', 'UnidadController@update')->name('unidades.update');
+Route::delete('unidades/{unidad}', 'UnidadController@destroy')->name('unidades.destroy');
+
+
 
 
 /*
