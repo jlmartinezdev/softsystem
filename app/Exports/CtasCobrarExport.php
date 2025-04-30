@@ -6,6 +6,7 @@ use DB;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\Exportable;
+use PhpOffice\PhpSpreadsheet\Style;
 class CtasCobrarExport implements FromView
 {
     use Exportable;

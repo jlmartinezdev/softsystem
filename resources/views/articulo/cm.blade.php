@@ -132,6 +132,16 @@
                                     </label></span>
                             </div>
                         </div>
+                        <!--div class="col-md-2 text-nowrap">
+                            <div class="input-group">
+                                <span class="text-secondary mx-2"><i class="fa-regular fa-user-tie"></i> Mayorista <label
+                                        class="switch-sm">
+                                        <input type="checkbox" v-model="isMayorista" @change="_saveSettingPreferences()"
+                                            class="info">
+                                        <span class="slider-sm round"></span>   
+                                    </label></span>
+                            </div>
+                        </div -->
 
 
                         <div class="col-sm-12 col-md-2 ml-auto">
