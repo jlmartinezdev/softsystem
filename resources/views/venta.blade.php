@@ -75,8 +75,8 @@
                                     <nav class="navbar navbar-expand navbar-light bg-white">
                                         <ul class="navbar-nav w-100">
                                             <li class="nav-item w-100">
-                                                <Searcharticulo url="{{ env('APP_APIDB') }}" :idsucursal="ventaCabecera.idSucursal"
-                                    @articulo="addCarrito" validar-lote="false" ref="Searcharticulo" route-articulo="{{ route('articulo.cm')}}">
+                                                <Searcharticulo url="{{ env('APP_APIDB') }}" :idsucursal="ventaCabecera.idSucursal" @peso="setPeso"
+                                    @articulo="addCarrito" validar-lote="false" is-ready-balance="true"  ref="Searcharticulo" route-articulo="{{ route('articulo.cm')}}">
                                 </Searcharticulo>
                                             </li>
                                         </ul>
@@ -131,13 +131,13 @@
 
                                 </tr>
                                 <template v-if="carro.length>0">
-                                    <template v-for="(item,index) in carro">
+                                    <template v-for="(item,index) in carroOrdenado">
                                         <tr>
 
                                             <td>@{{ item.codigo }}</td>
                                             <td>@{{ item.descripcion }}</td>
                                             <td> <input type="number"
-                                                    style="width: 50px; border: none; background-color: transparent;"
+                                                    style="width: 57px; border: none; background-color: transparent;"
                                                     min="1" :max="item.stock" v-model="item.cantidad"> </td>
                                             <td><in-number v-model="item.precio" :clases="inputNumberClassesPrecio" placeholder="Precio"></in-number></td>
                                             <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio * item.cantidad) }}</td>
@@ -377,6 +377,8 @@
                     m5: 0,
                     articulo: ''
                 },
+                peso: "",
+                cantidad: 0,
                 preciosCredito: [],
                 articulo: null,
                 clientes: [],
@@ -396,7 +398,14 @@
                 setCuotas: function(cuotas) {
                     this.cuotas = cuotas;
                 },
-
+                setPeso: function(peso){
+                    this.peso = peso;
+                    const parteEntera = parseInt(peso.slice(0, 2), 10); 
+                    const parteDecimal = parseInt(peso.slice(2, 4), 10);
+                    const resultado = parteEntera + parteDecimal / 100;
+                    this.cantidad = resultado;
+                   
+                },
                 addCarrito: function(a) {
 
                     var Toast = Swal.mixin({
@@ -420,7 +429,7 @@
                             codigo: a.ARTICULOS_cod,
                             idstock: a.id_stock,
                             descripcion: a.producto_nombre,
-                            cantidad: 1,
+                            cantidad: this.peso.length > 0 ? this.cantidad : 1,
                             stock: a.cantidad,
                             precio: a.pre_venta1,
                             p1: parseInt(a.pre_venta1),
@@ -435,15 +444,20 @@
                             m5: a.pre_margen5,
                             costo: a.producto_costo_compra,
                             iPrecio: 'CO1',
+                            
                         }
+                        
+
                         this.carro.push(art);
+                        this.peso = '';
+                        this.cantidad = 0;
                     } else {
                         //vender sin stock
                         if(this.ventaCabecera.vender_sin_stock==1){
-                            this.carro[i].cantidad = parseInt(this.carro[i].cantidad) + 1;
+                            this.carro[i].cantidad = this.peso.length > 0 ? +(this.carro[i].cantidad+ this.cantidad).toFixed(2) : parseInt(this.carro[i].cantidad) + 1;
                         }else{
                             if ((this.carro[i].cantidad + 1) <= a.cantidad) {
-                                this.carro[i].cantidad = parseInt(this.carro[i].cantidad) + 1;
+                                this.carro[i].cantidad = this.peso.length > 0 ? +(this.carro[i].cantidad+ this.cantidad).toFixed(2)  : parseInt(this.carro[i].cantidad) + 1;
                             } else {
                                 Toast.fire({
                                     title: `Cantidad supera stock disponible: ${a.cantidad} ...`,
@@ -758,6 +772,12 @@
                 }
             },
             computed: {
+                carroOrdenado: function() {
+                    return this.carro.slice().sort((a, b) => {
+                        // Ordenar por índice descendente (últimos agregados primero)
+                        return this.carro.indexOf(b) - this.carro.indexOf(a);
+                    });
+                },
                 totalVenta: function() {
                     this.ventaCabecera.total = 0;
                     for (var i = 0; i < this.carro.length; i++) {

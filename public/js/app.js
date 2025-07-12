@@ -1843,8 +1843,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       searchTerm: {},
       requestSend: false,
       articulos: [],
+      peso: "",
       noresult: false,
-      timeout: null
+      timeout: null,
+      isCodeBalence: false,
+      isReadyBalance: true,
+      flagBalance: "20"
     };
   },
   props: ["url", "idsucursal", "validarLote", "routeArticulo"],
@@ -1899,6 +1903,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.requestSend = true;
 
       if (isBarcode) {
+        if (textSearch.substring(0, 2) == "20") {
+          if (textSearch.length > 10) {
+            this.isCodeBalence = true;
+            this.peso = textSearch.substring(7, 11);
+            textSearch = textSearch.substring(2, 7).padStart(7, "0");
+          }
+        } else {
+          this.isCodeBalence = false;
+        }
+
         axios.get(this.url, {
           params: {
             cbarra: textSearch,
@@ -1959,6 +1973,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     returnData: function returnData() {
       this.searchQuery = "";
+
+      if (this.isReadyBalance) {
+        this.$emit("peso", this.peso);
+        this.peso = "";
+      }
+
       this.$emit("articulo", this.searchTerm);
       this.showResults = false;
       this.results = []; //this.noresult = false;
@@ -2109,7 +2129,14 @@ var defaultClasses = {
 };
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "inNumber",
-  props: ["value", "placeholder", "clases", "id", "tabindex", "enabled"],
+  props: {
+    value: {},
+    placeholder: {},
+    clases: {},
+    id: {},
+    tabindex: {},
+    enabled: {}
+  },
   data: function data() {
     return {
       text: "",
