@@ -391,7 +391,7 @@ export default {
 }
 .autocomplete-result .left {
   float: left;
-  width: 80%;
+  width: 72%;
 }
 .autocomplete-result .right {
   float: right;

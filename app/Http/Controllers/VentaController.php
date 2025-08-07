@@ -161,7 +161,11 @@ class VentaController extends Controller
     }
     private function storeCobro($ventaCabecera,$idventa,$cuota){
         $ultimo= Cobro::orderBy('cc_numero','DESC')->first();
-        $recibo= $this->reciboUp([$ultimo->recibon1,$ultimo->recibon2,$ultimo->nro_recibo]);
+        if ($ultimo) {
+            $recibo= $this->reciboUp([$ultimo->recibon1,$ultimo->recibon2,$ultimo->nro_recibo]);
+        } else {
+            $recibo= $this->reciboUp([1,1,1]);
+        }
         $cobro = new Cobro();
         $cobro->nro_operacion = $ventaCabecera['nro_operacion'];
         $cobro->suc_cod = $ventaCabecera['idSucursal'];

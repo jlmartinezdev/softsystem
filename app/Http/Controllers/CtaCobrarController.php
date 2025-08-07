@@ -225,7 +225,16 @@ class CtaCobrarController extends Controller
             return $cobro->cc_numero;
         }
         $ultimo= Cobro::orderBy('cc_numero', 'DESC')->first();
-        $recibo= $this->reciboUp([$ultimo->recibon1,$ultimo->recibon2,$ultimo->nro_recibo]);
+        if (!$ultimo) {
+            // Si no hay registros previos, asigna valores por defecto
+            $recibo = $this->reciboUp([1, 1, 1]);
+        } else {
+            $recibo = $this->reciboUp([
+                $ultimo->recibon1 ?? 1,
+                $ultimo->recibon2 ?? 1,
+                $ultimo->nro_recibo ?? 1
+            ]);
+        }
         $cobro = new Cobro();
         $cobro->nro_operacion = $request->cobro['nro_operacion'];
         $cobro->suc_cod = $request->cobro['idSucursal'];
@@ -371,6 +380,8 @@ class CtaCobrarController extends Controller
                     ->get();
           if (env('PRINT_RECIBO_V',1)==1){
             return view('documento.recibocobro', compact('empresa', 'cobro', 'cuotas', 'articulos','cantidad_cuotas'));
+          }else if (env('PRINT_RECIBO_V',1)==3){
+            return view('documento.reciboecomueble', compact('empresa', 'cobro', 'cuotas', 'articulos','cantidad_cuotas'));
           }else{
             $saldo= DB::table('ctas_cobrar as cc')
             ->join('ventas as v', 'cc.nro_fact_ventas','v.nro_fact_ventas')
