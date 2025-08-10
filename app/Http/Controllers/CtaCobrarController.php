@@ -382,6 +382,8 @@ class CtaCobrarController extends Controller
             return view('documento.recibocobro', compact('empresa', 'cobro', 'cuotas', 'articulos','cantidad_cuotas'));
           }else if (env('PRINT_RECIBO_V',1)==3){
             return view('documento.reciboecomueble', compact('empresa', 'cobro', 'cuotas', 'articulos','cantidad_cuotas'));
+          }else if (env('PRINT_RECIBO_V',1)==4){
+            return view('documento.recibomellis', compact('empresa', 'cobro', 'cuotas', 'articulos','cantidad_cuotas'));
           }else{
             $saldo= DB::table('ctas_cobrar as cc')
             ->join('ventas as v', 'cc.nro_fact_ventas','v.nro_fact_ventas')

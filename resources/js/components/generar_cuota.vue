@@ -122,6 +122,7 @@ export default {
             let i_plus=0;
             let indexcuota=0;
             
+            
             Importe = this.saldo;
             cantidad = this.cant_cuota;
             
@@ -139,7 +140,11 @@ export default {
                 if(this.entrega > 0){
                      monto_cuota = Number.parseInt(Importe / cantidad);
                 }else{
-                    monto_cuota= this.datoscuota.monto_cuota;
+                    if(!this.datoscuota.is_multiple){
+                        monto_cuota= this.datoscuota.monto_cuota;
+                    }else{
+                        monto_cuota= Number.parseInt(Importe / cantidad);
+                    }
                 }
                 
             }

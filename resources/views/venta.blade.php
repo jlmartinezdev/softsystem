@@ -155,7 +155,7 @@
                                                     </button>
                                                     <div class="dropdown-menu dropdown-menu-right">
                                                         <button class="dropdown-item"
-                                                            @click="setCantidad(index,item.cantidad,item.stock)">
+                                                            @click="setCantidad(item)">
                                                             <span class="fa fa-cubes text-primary"
                                                                 style="width: 13pt"></span>
                                                             Cantidad
@@ -353,7 +353,8 @@
                 tmpIndexPrecio: {
                     iPrecio: 'CO1',
                     iArticulo: 0,
-                    monto_cuota: 0
+                    monto_cuota: 0,
+                    is_multiple: false
                 },
                 txtbuscar: '',
                 txtcliente: '',
@@ -478,7 +479,7 @@
                         dia.toString().padStart(2, "0");
                     //this.filtrovalue= this.meses[mes];
                 },
-                setCantidad: async function(index, cantidad, stock) {
+                setCantidad: async function(articulo) {
                     const swalBootstrap = Swal.mixin({
                         customClass: {
                             confirmButton: 'btn btn-primary mr-2',
@@ -491,31 +492,38 @@
                     } = await swalBootstrap.fire({
                         title: 'Escriba cantidad a Vender...',
                         input: 'number',
-                        inputValue: cantidad,
+                        inputValue: articulo.cantidad,
                         inputAttributes: {
                             min: 0,
-                            max: stock
+                            max: articulo.stock
                         },
                         showCancelButton: true,
                         confirmButtonText: 'Aceptar',
                         cancelButtonText: 'Cancelar'
                     })
                     if (cant) {
-                        this.carro[index].cantidad = cant;
+                        // Buscar el artículo en el carro original por código
+                        let realIndex = this.carro.findIndex(item => item.codigo === articulo.codigo);
+                        if (realIndex !== -1) {
+                            this.carro[realIndex].cantidad = cant;
+                        }
                         this.saveDatos();
                     }
                     this.$refs.Searcharticulo.focusSearchInput();
                 },
                 showModalPrecio: function(index, articulo) {
-
+                    
                     this.articulo = articulo;
-                    this.tmpIndexPrecio.iArticulo = index;
+                    // Mapear el índice de carroOrdenado al índice real en carro
+                    let realIndex = this.carro.findIndex(item => item.codigo === articulo.codigo);
+                    this.tmpIndexPrecio.iArticulo = realIndex;
                     for (i = 1; i < 6; i++) {
                         this.preciosContado['m' + i] = parseInt(articulo['m' + i]);
                         this.preciosContado['p' + i] = parseInt(articulo['p' + i]);
                     }
                     this.preciosContado.articulo = articulo.descripcion;
                     $('#selPrecio').modal('show');
+                    this.preciosCredito = [];
                     axios.get('articulo/precios/' + articulo.codigo).then(response => {
                         if (response.data.length > 0)
                             this.preciosCredito = [];
@@ -548,8 +556,10 @@
                         this.ventaCabecera.generarcuota = false;
                         let newPrecio = this.preciosCredito[x].p;
                         if (newPrecio > 0) {
+                            
                             this.carro[index].precio = newPrecio;
                             this.tmpIndexPrecio.monto_cuota = this.preciosCredito[x].c;
+                            this.tmpIndexPrecio.is_multiple = this.carro.length > 1;
                         }
 
                     }
