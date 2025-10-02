@@ -85,7 +85,7 @@
 @php
     $ruc = $cobro->cliente_ruc;
     $ruc_parts = explode('-', $ruc);
-    $ruc_num = isset($ruc_parts[0]) ? number_format($ruc_parts[0], 0, '', '.') : '';
+    $ruc_num = isset($ruc_parts[0]) ? number_format((int)$ruc_parts[0], 0, '', '.') : '';
     $ruc_dv = isset($ruc_parts[1]) ? $ruc_parts[1] : '';
 @endphp
            <span>Recibimos del/la Sr./a <strong>{{$cobro->cliente_nombre}}</strong>  con documento y/o R.U.C. número  <strong>{{ $ruc_num }}{{ $ruc_dv !== '' ? '-' . $ruc_dv : '' }}</strong> <br> en la fecha <strong>{{ date('d-m-Y')}}</strong> </span>

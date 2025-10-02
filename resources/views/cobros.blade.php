@@ -54,6 +54,60 @@
             font-size: 14pt;
             font-weight: bold;
         }
+
+        /* Estilos para el modal de cobro parcial */
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .modal-header.bg-gradient-primary {
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-footer.bg-light {
+            border-radius: 0 0 15px 15px;
+        }
+
+        .card.border-0 {
+            border-radius: 10px;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card.border-0:hover {
+            transform: translateY(-2px);
+        }
+
+        .input-group-lg .form-control {
+            border-radius: 0 10px 10px 0;
+        }
+
+        .input-group-prepend .input-group-text {
+            border-radius: 10px 0 0 10px;
+        }
+
+        .btn-lg {
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-lg:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .alert {
+            border-radius: 10px;
+        }
+
+        .shadow-lg {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+        }
     </style>
 
 @endsection
@@ -109,7 +163,7 @@
                         </div>
                     </div>
                     <div class="col-sm-3 col-6">
-                        <div class="description-block">
+                        <div class="description-block border-right">
                             <div class="descripcion-percentage text-muted">
                                 <i class="fa fa-user"></i> NOMBRE CLIENTE
                             </div>
@@ -119,12 +173,12 @@
                         </div>
                     </div>
                     <div class="col-sm-3 col-6">
-                        <div class="description-block">
+                        <div class="description-block border-right">
                             <div class="descripcion-percentage text-muted">
                                 <i class="fa fa-money-bill"></i> TOTAL COBRADO
                             </div>
                             <div class="description-header">
-                                <template>@{{ format(cobro.cobrado) }}</template>
+                                <template>@{{ format(totalCobradoFiltrado) }}</template>
                             </div>
                         </div>
                     </div>
@@ -134,9 +188,22 @@
                                 <i class="fa fa-money-bill"></i> SALDO
                             </div>
                             <div class="description-header text-danger">
-                                <template>@{{ format(cobro.saldo) }}</template>
+                                <template>@{{ format(totalSaldoFiltrado) }}</template>
                             </div>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Checkbox para mostrar cuentas canceladas -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                    <div class="icheck-primary d-inline">
+                        <input type="checkbox" v-model="mostrarCuentasCanceladas" id="mostrarCanceladas" >
+                        <label for="mostrarCanceladas" class="text-muted">
+                         Mostrar cuentas canceladas
+                        </label>
+                      </div>
+          
                     </div>
                 </div>
 
@@ -145,7 +212,7 @@
                     <!-- End Buscador -->
 
                     <div class="table-responsive-sm">
-                        <table class="table table-sm table-hover table-bordered" style="overflow-x: initial; heigh: 100px">
+                        <table class="table table-sm table-hover table-bordered" style="overflow-x: initial; heigh: 100px" id="estado_cuenta">
                             <tr class="bg-light">
                                 <th>N de Venta</th>
                                 <th>Fecha</th>
@@ -156,54 +223,50 @@
                                 <th>Estado</th>
                                 <th><span class="fa fa-cog"></span></th>
                             </tr>
-                            <template v-if="ctas.length==0">
+                            <template v-if="ctasFiltradas.length==0">
                                 <tr>
                                     <td colspan="8" class="text-muted">NO HAY CUENTA PARA MOSTRAR...</td>
                                 </tr>
                             </template>
-                            <template v-for="(c,index) in ctas">
-                                <tr>
-                                    <td>@{{ c.nro_fact_ventas }}</td>
-                                    <td>@{{ c.venta_fecha }}</td>
-                                    <td>@{{ format(c.total) }}</td>
-                                    <td>@{{ checkCantidad(c.pagada, c.nro_fact_ventas) + " de " + checkCantidad(c.cuotas, c.nro_fact_ventas) }}</td>
-                                    <td>@{{ format(c.cobrado) }}</td>
-                                    <td class="text-danger font-weight-bold">@{{ format(c.saldo) }}</td>
-                                    <td>
-                                        <template v-if="c.saldo==0">
-                                            <span class="badge badge-succes"> CANCELADO</span>
-                                        </template>
-                                        <template>
-                                            <span class="badge badge-danger"> PENDIENTE</span>
-                                        </template>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <button class="btn btn-link dropdown-toggle" data-toggle="dropdown"
-                                                aria-haspopup="true" aria-expanded="false">
-                                                <span class="fa fa-bars"></span>
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <button class='dropdown-item text-primary' @click="showDetalle(index)"><span
-                                                        class="fa fa-edit"></span> Detalle de Venta</button>
-                                                <div class="dropdown-divider"></div>
-                                                <button class='dropdown-item text-primary'
-                                                    @click="showCuotas(c.nro_fact_ventas)"><span class="fa fa-list"></span>
-                                                    Seleccionar Cuota</button>
-                                                <div class="dropdown-divider"></div>
-                                                <a :href="'documento/extractocuenta/' + c.nro_fact_ventas"
-                                                    class="dropdown-item text-primary">
-                                                    <span class="fa fa-print"> </span> Estado de Cuenta
-                                                </a>
-
-                                            </div>
-                                        </div>
-
-                                    </td>
-                                </tr>
-
-
-                            </template>
+                            <template v-for="(c,index) in ctasFiltradas">
+    <tr>
+        <td>@{{ c.nro_fact_ventas }}</td>
+        <td>@{{ c.venta_fecha }}</td>
+        <td class="text-right">@{{ format(c.total) }}</td>
+        <td>@{{ checkCantidad(c.pagada, c.nro_fact_ventas) + " de " + checkCantidad(c.cuotas, c.nro_fact_ventas) }}</td>
+        <td class="text-right">@{{ format(c.cobrado) }}</td>
+        <td class="text-right text-danger font-weight-bold">@{{ format(c.saldo) }}</td>
+        <td>
+            <template v-if="c.saldo==0">
+                <span class="badge badge-succes"> CANCELADO</span>
+            </template>
+            <template v-else>
+                <span class="badge badge-danger"> PENDIENTE</span>
+            </template>
+        </td>
+        <td>
+            <div class="btn-group">
+                <button class="btn btn-link dropdown-toggle" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    <span class="fa fa-bars"></span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <button class='dropdown-item text-primary' @click="showDetalle(index)"><span
+                            class="fa fa-edit"></span> Detalle de Venta</button>
+                    <div class="dropdown-divider"></div>
+                    <button class='dropdown-item text-primary'
+                        @click="showCuotas(c.nro_fact_ventas)"><span class="fa fa-list"></span>
+                        Seleccionar Cuota</button>
+                    <div class="dropdown-divider"></div>
+                    <a :href="'documento/extractocuenta/' + c.nro_fact_ventas"
+                        class="dropdown-item text-primary">
+                        <span class="fa fa-print"> </span> Estado de Cuenta
+                    </a>
+                </div>
+            </div>
+        </td>
+    </tr>
+</template>
                         </table>
 
 
@@ -463,7 +526,10 @@
                 clientes: [],
                 allCuota: [],
                 venta: {},
-                onlyInteres: false,
+                 onlyInteres: false,
+                 idVenta: 0,
+                 cobroParcialAllCtas: false,
+                 mostrarCuentasCanceladas: false,
             },
             methods: {
                 buscar: function(parm) {
@@ -677,34 +743,58 @@
                     }
                     this.cuotasAcobrar.push(c);
                 },
+                abrirCobroParcialDesdeCuotas() {
+                    this.cobroParcialAllCtas = false;
+                    $('#selCuotas').modal('hide');
+                    // Abrir modal de cobro parcial
+                    $('#cobroParcial').modal('show');
+                },
                 cobroParcial: function() {
                     $('#cobroParcial').modal('hide');
                     $('#txtbuscar').focus();
                     if (this.montoParcial > 0) {
-                        if (this.montoParcial > this.cobro.saldo) {
+                        if (this.montoParcial > this.totalSaldoFiltrado) {
                             this.montoParcial = 0;
                             Swal.fire('Datos incorrecto...', 'Monto ingresado es mayor al saldo!', 'error');
                             return false;
                         }
-                        if (this.ctas.length > 1) {
-                            //ordenar allcuota por fecha de vencimiento
-                            this.allCuota.sort(function(a, b) {
+                        
+                        // Determinar qué cuotas usar según cobroParcialAllCtas
+                        let cuotasAUsar = [];
+                        if (this.cobroParcialAllCtas) {
+                            // Usar todas las cuotas (allCuota)
+                            cuotasAUsar = this.allCuota;
+                            if (this.ctas.length > 1) {
+                                //ordenar allcuota por fecha de vencimiento
+                                cuotasAUsar.sort(function(a, b) {
+                                    return app.convertToDate(a.fecha_venc) > app.convertToDate(b
+                                        .fecha_venc) ? 1 : app.convertToDate(a.fecha_venc) < app
+                                        .convertToDate(b.fecha_venc) ? -1 : 0;
+                                });
+                            }
+                        } else {
+                            // Usar solo las cuotas del idVenta específico
+                            cuotasAUsar = this.allCuota.filter(function(cuota) {
+                                return cuota.nro_fact_ventas == app.idVenta;
+                            });
+                            // Ordenar por fecha de vencimiento
+                            cuotasAUsar.sort(function(a, b) {
                                 return app.convertToDate(a.fecha_venc) > app.convertToDate(b
                                     .fecha_venc) ? 1 : app.convertToDate(a.fecha_venc) < app
                                     .convertToDate(b.fecha_venc) ? -1 : 0;
                             });
-
                         }
+                        
                         let iCuotasAcobrar = [];
                         let sumatoria = 0;
 
-                        for (i = 0; i < this.allCuota
+                        for (i = 0; i < cuotasAUsar
                             .length; i++) { //mientras cuotas seleccionada sea menor a monto a cobrar
 
                             if (sumatoria < this.montoParcial) {
-                                if (this.allCuota[i].monto_saldo > 0) { //Verifica si cuota ya se cobro
+                                if (cuotasAUsar[i].monto_saldo > 0) { //Verifica si cuota ya se cobro
                                     iCuotasAcobrar[i] = true // Marcar posicion en array como agregado (TRUE)
-                                    sumatoria += parseInt(this.allCuota[i].monto_saldo)
+                                    sumatoria += parseInt(cuotasAUsar[i].monto_saldo)
                                 } else {
                                     iCuotasAcobrar[i] = false
                                 }
@@ -715,7 +805,7 @@
 
                         for (i = 0; i < iCuotasAcobrar.length; i++) {
                             if (iCuotasAcobrar[i]) {
-                                this.pushCuota(this.allCuota[i]);
+                                this.pushCuota(cuotasAUsar[i]);
                             }
                         }
 
@@ -740,8 +830,8 @@
                 },
 
                 modalCobroParcial: function() {
-
-                    if (this.cobro.saldo > 0 && this.cuotasAcobrar.length == 0) {
+                    this.cobroParcialAllCtas = true;
+                    if (this.totalSaldoFiltrado > 0 && this.cuotasAcobrar.length == 0) {
                         $('#cobroParcial').modal('show');
                         $('#txtparcial').focus();
                     }
@@ -811,9 +901,10 @@
                     }
                     this.cuotas[index].check = check;
                 },
-                showCuotas: function(id) {
+                showCuotas: function(idVenta) {
+                    this.idVenta = idVenta;
                     $('#selCuotas').modal('show');
-                    this.getCuotas(id);
+                    this.getCuotas(idVenta);
                 },
                 showDetalle: function(i) {
                     this.venta = this.ctas[i];
@@ -901,33 +992,61 @@
                     this.finalizar();
                 }
             },
-            computed: {
-                totalCobrar: function() {
-                    let total = 0;
-                    let interes = 0;
-                    let saldo = 0;
+             computed: {
+                 totalCobrar: function() {
+                     let total = 0;
+                     let interes = 0;
+                     let saldo = 0;
 
-                    if (this.cuotasAcobrar.length > 0) {
-                        for (i = 0; i < this.cuotasAcobrar.length; i++) {
-                            total += parseInt(this.cuotasAcobrar[i].acobrar) + parseInt(this.cuotasAcobrar[i]
-                                .interes);
-                            interes += this.cuotasAcobrar[i].interes;
-                        }
-                        saldo = this.cobro.saldo - (total - interes);
-                    }
-                    if (this.cobro.isInteresFija && this.cobro.cobrarInteres) { //Si interes es fija
-                        total -= interes;
-                        interes = this.cobro.interesFija;
-                        total += interes;
-                        //saldo += this.montoParcial > 0 ? 0 : interes;
-                    }
+                     if (this.cuotasAcobrar.length > 0) {
+                         for (i = 0; i < this.cuotasAcobrar.length; i++) {
+                             total += parseInt(this.cuotasAcobrar[i].acobrar) + parseInt(this.cuotasAcobrar[i]
+                                 .interes);
+                             interes += this.cuotasAcobrar[i].interes;
+                         }
+                         saldo = this.cobro.saldo - (total - interes);
+                     }
+                     if (this.cobro.isInteresFija && this.cobro.cobrarInteres) { //Si interes es fija
+                         total -= interes;
+                         interes = this.cobro.interesFija;
+                         total += interes;
+                         //saldo += this.montoParcial > 0 ? 0 : interes;
+                     }
 
-                    this.cobro.total = total;
-                    this.cobro.totalInteres = interes;
-                    this.cobro.saldonuevo = saldo;
-                    //this.changeMontoInteres();
-                    return this.format(total);
-                },
+                     this.cobro.total = total;
+                     this.cobro.totalInteres = interes;
+                     this.cobro.saldonuevo = saldo;
+                     //this.changeMontoInteres();
+                     return this.format(total);
+                 },
+                 cuentasConSaldoPendiente: function() {
+                     return this.ctas.filter(function(cuenta) {
+                         return parseInt(cuenta.saldo) > 0;
+                     }).length;
+                 },
+                 ctasFiltradas: function() {
+                     if (this.mostrarCuentasCanceladas) {
+                         return this.ctas; // Mostrar todas las cuentas
+                     } else {
+                         return this.ctas.filter(function(cuenta) {
+                             return parseInt(cuenta.saldo) > 0; // Solo cuentas con saldo pendiente
+                         });
+                     }
+                 },
+                 totalCobradoFiltrado: function() {
+                     let total = 0;
+                     for (let i = 0; i < this.ctasFiltradas.length; i++) {
+                         total += parseInt(this.ctasFiltradas[i].cobrado);
+                     }
+                     return total;
+                 },
+                 totalSaldoFiltrado: function() {
+                     let total = 0;
+                     for (let i = 0; i < this.ctasFiltradas.length; i++) {
+                         total += parseInt(this.ctasFiltradas[i].saldo);
+                     }
+                     return total;
+                 },
                 totalCuota: function() {
                     let total = 0;
                     if (this.montoParcial > 0 && this.cobro.isInteresFija) {
