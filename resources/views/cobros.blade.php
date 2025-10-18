@@ -744,10 +744,12 @@
                     this.cuotasAcobrar.push(c);
                 },
                 abrirCobroParcialDesdeCuotas() {
+                    if(this.cuotasAcobrar.length == 0){
                     this.cobroParcialAllCtas = false;
                     $('#selCuotas').modal('hide');
                     // Abrir modal de cobro parcial
                     $('#cobroParcial').modal('show');
+                    }
                 },
                 cobroParcial: function() {
                     $('#cobroParcial').modal('hide');

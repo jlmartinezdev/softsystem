@@ -13,9 +13,55 @@ use App\Exports\articulosPreciosExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Auth;
 use App\ArticuloUnidad;
+use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Storage;
+
+
+
 
 class ArticuloController extends Controller
 {
+    public function capturarImagen(Request $request)
+    {
+        $ip   = $request->input('ip');      // ej: 192.168.1.150
+        $user = $request->input('user');    // ej: admin
+        $pass = $request->input('pass');    // ej: contraseña
+        $canal = $request->input('canal', '102'); // opcional: 101 o 102
+
+        $url = "http://{$ip}/ISAPI/Streaming/channels/{$canal}/picture";
+        $nombre = 'articulo_' . time() . '.jpg';
+
+        try {
+            // Cliente HTTP nativo de Guzzle (ya incluido en Laravel 5.8)
+            $client = new Client([
+                'auth' => [$user, $pass, 'digest'], // Hikvision usa autenticación Digest
+                'verify' => false,                  // ignorar certificados HTTPS propios
+                'timeout' => 10,                    // evita bloqueos
+            ]);
+
+            $response = $client->get($url);
+
+            if ($response->getStatusCode() === 200) {
+                Storage::disk('public')->put('articulos/' . $nombre, $response->getBody());
+                return response()->json([
+                    'success' => true,
+                    'path' => asset('storage/articulos/' . $nombre),
+                    'filename' => $nombre
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al capturar imagen. Código HTTP: ' . $response->getStatusCode()
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Excepción: ' . $e->getMessage()
+            ]);
+        }
+    }
     public $request= '';
     public function __construct()
     {
@@ -119,7 +165,7 @@ class ArticuloController extends Controller
         $articulo->producto_nombre = $request->articulo['descripcion'];
         $articulo->producto_costo_compra = $request->articulo['costo'];
         $articulo->producto_costo_venta = $request->articulo['p1'];
-        $articulo->foto= '';
+        $articulo->foto= $request->input('imagen', '');
         $articulo->producto_fecHab = '0';
         $articulo->producto_vencimiento = '2030-01-01';
         $articulo->pre_venta1 = $request->articulo['p1'];
@@ -229,7 +275,7 @@ class ArticuloController extends Controller
             'producto_nombre' => $request->articulo['descripcion'],
             'producto_costo_compra' => $request->articulo['costo'],
             'producto_costo_venta' => $request->articulo['p1'],
-            'foto'=> '',
+            'foto'=> $request->input('imagen', ''),
             'producto_fecHab' => '0',
             'producto_vencimiento' => '2030-01-01',
             'pre_venta1' => $request->articulo['p1'],

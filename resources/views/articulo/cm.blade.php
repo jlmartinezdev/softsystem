@@ -160,8 +160,14 @@
             <!-- Panel descripcion  -->
             <div class="col-md-6">
                 <div class="card shadow-sm">
-                    <div class="d-flex justify-content-center bg-light">
-                        <img src="{{ asset('img/sinimagen.png') }}" height="130" alt="...">
+                    <div class="d-flex justify-content-center bg-light position-relative">
+                        <div v-if="imagen">
+                            <img :src="imagen" style="max-width: 300px;">
+                        </div>
+                        <div v-else>
+                            <img src="{{ asset('img/sinimagen.png') }}" height="130" alt="...">
+                        </div>
+                        <button @click="capturarImagen" class="btn btn-primary position-absolute" style="bottom: 10px; right: 10px; border-radius: 50%; width: 50px; height: 50px; padding: 0; font-size: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">📸</button>
                     </div>
 
                     <div class="card-body">
@@ -1051,6 +1057,11 @@
                     suc: 0,
                     cant: 0
                 },
+                ip: '192.168.1.101',
+                user: 'admin',
+                pass: 'Majlpchot28',
+                imagen: null,
+                imagenFilename: null
             },
             watch: {
                 chprecio: function(newVal, oldVal) {
@@ -1066,6 +1077,25 @@
 
             },
             methods: {
+                async capturarImagen() {
+                try {
+                    const res = await axios.post('{{ env('APP_URL') }}' + 'articulo/capturar', {
+                    ip: this.ip,
+                    user: this.user,
+                    pass: this.pass
+                    });
+                    if (res.data.success) {
+                    this.imagen = res.data.path;
+                    this.imagenFilename = res.data.filename;
+                    } else {
+                    alert(res.data.message);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Error al capturar imagen');
+                }
+                },
+                
 
                 setMargen: function(index) {
                     if (this.viewPrecio) {
@@ -1479,7 +1509,8 @@
                             axios.post('{{ env('APP_URL') }}' + 'articulo', {
                                     articulo: this.articulo,
                                     stock: this.stocks,
-                                    precios: this.precios
+                                    precios: this.precios,
+                                    imagen: this.imagenFilename
                                 })
                                 .then(r => {
 
@@ -1494,7 +1525,8 @@
                             axios.put('{{ env('APP_URL') }}' + 'articulo/' + this.articulo.codigo, {
                                     articulo: this.articulo,
                                     stock: this.stocks,
-                                    precios: this.precios
+                                    precios: this.precios,
+                                    imagen: this.imagenFilename
                                 })
                                 .then(r => {
                                     window.location.assign('{{ url()->previous() }}');

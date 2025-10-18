@@ -34,6 +34,9 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::put('articulo/{id}', 'ArticuloController@update')->name('articulo.update');
     Route::delete('articulo/res/{id}', 'ArticuloController@destroy')->name('articulo.destroy');
     Route::get('articulo/validar/cbarra/{cbarra}','ArticuloController@validarCbarra');
+    Route::post('articulo/capturar', 'ArticuloController@capturarImagen');
+    
+
     
     
     
