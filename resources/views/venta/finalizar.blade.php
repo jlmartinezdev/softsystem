@@ -54,7 +54,7 @@
 									<div class="input-group-prepend">
 										<span class="input-group-text bg-white font-weight-bold text-success">Monto recibido Gs.</span>
 									</div>
-									<in-number v-model="efectivoRecibido" :clases="form-control" placeholder="0" @change="calcularVuelto"></in-number>
+									<in-number v-model="efectivoRecibido" :clases="'form-control form-control-sm'" placeholder="0" @change="calcularVuelto"></in-number>
 								</div>
 								<template v-if="opcionesEfectivo.length">
 									<div class="mt-3 d-flex flex-wrap">

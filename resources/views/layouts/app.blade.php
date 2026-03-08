@@ -99,9 +99,7 @@
                 </div>
             </section>
         </div>
-        <footer class="main-footer">
-            @yield('footer')
-        </footer>
+        
     </div>
     <script src="{{ asset(mix('js/app.js')) }}"></script>
     <script src="{{ asset('js/jquery.overlayScrollbars.min.js') }}"></script>

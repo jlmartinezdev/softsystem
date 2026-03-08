@@ -53,7 +53,21 @@
                     <div class="content-header">
                         <div class="row">
                             <div class="col-6">
-                                <div class="py-2"  ><span class="font-weight-bold" style="font-size: 18pt;">Vender</span></div>
+                                
+                                <template v-for="(cr, idx) in carritos">
+                                    <div class="btn-group mr-1 mb-1" role="group">
+                                        <button type="button" class="btn btn-sm" :class="indiceCarroActivo === idx ? 'btn-primary' : 'btn-outline-secondary'" @click="cambiarCarro(idx)" :title="'Carro ' + (idx + 1) + (cr.carro.length ? ' (' + cr.carro.length + ' ítem(s))' : '')">
+                                            Venta @{{ idx + 1 }}
+                                            <span v-if="cr.carro.length" class="badge badge-light ml-1">@{{ cr.carro.length }}</span>
+                                        </button>
+                                        <button v-if="carritos.length > 1" type="button" class="btn btn-sm" :class="indiceCarroActivo === idx ? 'btn-primary' : 'btn-outline-secondary'" @click.stop="eliminarCarro(idx)" title="Eliminar carro">
+                                            <span class="fa fa-times"></span>
+                                        </button>
+                                    </div>
+                                </template>
+                                <button type="button" class="btn btn-sm btn-outline-success mb-1" @click="nuevoCarro()" title="Nuevo carro de venta">
+                                    <span class="fa fa-plus"></span>
+                                </button>
                             </div>
                             <div class="col-6">
                                 <div class="text-secondary float-sm-right">
@@ -118,6 +132,7 @@
                     </div>
                     <!-- TABLA ......................... -->
                     <div class="card mt-2">
+                        
                         <div class="table-responsive-sm">
                             <table class="table table-striped">
                                 <tr>
@@ -298,11 +313,8 @@
                 </div>
             </div>
         </div>
+       
     </div><!-- end app -->
-@endsection
-@section('footer')
-    <span class="fa fa-user"></span> Usuario: {{ Auth::user()->nom_usuarios }}
-    <span class="ml-3">{{ date('d-m-Y') }}</span>
 @endsection
 @section('script')
     <script src="{{ asset(mix('js/venta.js')) }}"></script>
@@ -330,25 +342,10 @@
                 requestSend: false,
                 requestFinalizar: false,
                 currentPage: 1,
-                efectivoRecibido: 0,
-                vuelto: 0,
                 opcionesEfectivo: [],
-                ventaCabecera: {
-                    fecha: '2020-01-01',
-                    clienteId: '1',
-                    clienteNombre: 'Cliente Ocasional',
-                    documento: 'Ticket',
-                    idSucursal: 1,
-                    formacobro: 1,
-                    condicionventa: 1,
-                    total: 0,
-                    descuento: 0,
-                    nro_operacion: 0,
-                    generarcuota: true,
-                    vender_sin_stock: 0,
-                    descontar_stock: 1
-                },
-                carro: [],
+                carritos: [],
+                indiceCarroActivo: 0,
+                nextCarroId: 1,
                 caja: '...',
                 nrooperacion: '...',
                 tmpIndexPrecio: {
@@ -385,8 +382,22 @@
                 articulo: null,
                 clientes: [],
                 requestLote: false,
-                cuotas: [],
                 enfocar: false,
+                _defaultVentaCabecera: {
+                    fecha: '2020-01-01',
+                    clienteId: '1',
+                    clienteNombre: 'Cliente Ocasional',
+                    documento: 'Ticket',
+                    idSucursal: 1,
+                    formacobro: 1,
+                    condicionventa: 1,
+                    total: 0,
+                    descuento: 0,
+                    nro_operacion: 0,
+                    generarcuota: true,
+                    vender_sin_stock: 0,
+                    descontar_stock: 1
+                },
                 fastItem: {
                     precio: 0,
                     descripcion: ''
@@ -625,24 +636,26 @@
                         })
                         .then(response => {
                             this.requestFinalizar = false;
-                            this.carro = [];
-                            localStorage.removeItem('carro_venta');
-                            localStorage.removeItem('ventaCabecera');
+                            var docParaPrint = this.ventaCabecera.documento;
+                            this.carritos.splice(this.indiceCarroActivo, 1);
+                            if (this.carritos.length === 0) {
+                                this.carritos.push(this.getDefaultCarrito());
+                            }
+                            if (this.indiceCarroActivo >= this.carritos.length) {
+                                this.indiceCarroActivo = this.carritos.length - 1;
+                            }
+                            this.saveDatos();
                             if (print) {
-                                if (this.ventaCabecera.documento == 'Ticket') {
-
+                                if (docParaPrint == 'Ticket') {
                                     window.location.assign('{{ env('APP_URL') }}' + 'ticket/venta/' +
                                         response.data);
                                 } else {
                                     window.location.assign('{{ env('APP_URL') }}' + 'pdf/boletaventa/' +
                                         response.data);
                                 }
-
                             } else {
                                 $('#finalizarventa').modal('hide');
-                                window.location.reload();
                             }
-
                         })
                         .catch(error => {
                             this.requestFinalizar = false;
@@ -652,22 +665,64 @@
                 numeroaletra: function(n) {
                     return NumeroALetras.NumeroALetras(parseInt(n));
                 },
+                getDefaultCarrito: function() {
+                    var id = this.nextCarroId++;
+                    var def = this._defaultVentaCabecera;
+                    var vc = (def && typeof def === 'object') ? JSON.parse(JSON.stringify(def)) : {
+                        fecha: '2020-01-01', clienteId: '1', clienteNombre: 'Cliente Ocasional', documento: 'Ticket',
+                        idSucursal: this.ventaCabecera.idSucursal, formacobro: 1, condicionventa: 1, total: 0, descuento: 0, nro_operacion: this.nrooperacion,
+                        generarcuota: true, vender_sin_stock: 0, descontar_stock: 1
+                    };
+                    return { id: id, carro: [], ventaCabecera: vc, efectivoRecibido: 0, vuelto: 0, cuotas: [] };
+                },
                 saveDatos: function() {
-                    localStorage.setItem('carro_venta', JSON.stringify(this.carro));
-                    localStorage.setItem('ventaCabecera', JSON.stringify(this.ventaCabecera));
+                    localStorage.setItem('carritos_venta', JSON.stringify(this.carritos));
+                    localStorage.setItem('indice_carro_activo', String(this.indiceCarroActivo));
                 },
                 recuperarDatos: function() {
-                    var carro = localStorage.getItem('carro_venta');
-                    if (carro != null) {
-                        this.carro = JSON.parse(carro);
+                    var saved = localStorage.getItem('carritos_venta');
+                    var idx = localStorage.getItem('indice_carro_activo');
+                    if (saved != null && saved !== '' && saved !== 'undefined') {
+                        try {
+                            var arr = JSON.parse(saved);
+                            if (Array.isArray(arr) && arr.length > 0) {
+                                arr.forEach(function(c) {
+                                    if (!c.cuotas) c.cuotas = [];
+                                    if (typeof c.efectivoRecibido === 'undefined') c.efectivoRecibido = 0;
+                                    if (typeof c.vuelto === 'undefined') c.vuelto = 0;
+                                });
+                                this.carritos = arr;
+                                this.indiceCarroActivo = idx != null ? Math.min(parseInt(idx, 10) || 0, arr.length - 1) : 0;
+                                if (this.nextCarroId <= Math.max.apply(null, this.carritos.map(function(c) { return c.id || 0; }))) {
+                                    this.nextCarroId = Math.max.apply(null, this.carritos.map(function(c) { return c.id || 0; })) + 1;
+                                }
+                                return;
+                            }
+                        } catch (e) {}
                     }
-                    var cab = localStorage.getItem('ventaCabecera');
-                    if (cab != null) {
-                        this.ventaCabecera = JSON.parse(cab);
+                    var carroAntiguo = localStorage.getItem('carro_venta');
+                    var cabAntigua = localStorage.getItem('ventaCabecera');
+                    var carroValido = carroAntiguo != null && carroAntiguo !== '' && carroAntiguo !== 'undefined';
+                    var cabValida = cabAntigua != null && cabAntigua !== '' && cabAntigua !== 'undefined';
+                    if (carroValido || cabValida) {
+                        var c = this.getDefaultCarrito();
+                        if (carroValido) {
+                            try { c.carro = JSON.parse(carroAntiguo); } catch (e) {}
+                        }
+                        if (cabValida) {
+                            try {
+                                var cab = JSON.parse(cabAntigua);
+                                if (cab && typeof cab.total !== 'undefined') c.ventaCabecera = cab;
+                            } catch (e) {}
+                        }
+                        c.ventaCabecera.condicionventa = 1;
+                        c.ventaCabecera.generarcuota = true;
+                        this.carritos = [c];
+                        this.saveDatos();
+                    } else {
+                        this.carritos = [this.getDefaultCarrito()];
                     }
-                    this.ventaCabecera.condicionventa = 1;
-                    this.ventaCabecera.generarcuota = true;
-
+                    this.indiceCarroActivo = 0;
                 },
                 showBuscarCliente: function() {
                     $('#busquedaCliente').modal('show');
@@ -727,21 +782,60 @@
                     }
                 },
                 cancelar: function() {
-                    this.carro = [];
-                    localStorage.removeItem('carro_venta');
-                    localStorage.removeItem('ventaCabecera');
+                    var act = this.carritos[this.indiceCarroActivo];
+                    if (act) {
+                        act.carro = [];
+                        act.ventaCabecera.total = 0;
+                        act.ventaCabecera.descuento = 0;
+                        act.ventaCabecera.condicionventa = 1;
+                        act.ventaCabecera.generarcuota = true;
+                        act.efectivoRecibido = 0;
+                        act.vuelto = 0;
+                        act.cuotas = [];
+                    }
                     this.getFecha();
-                    window.location.reload();
+                    this.saveDatos();
+                },
+                irAVentaPrincipal: function() {
+                    this.cambiarCarro(0);
+                    var el = document.getElementById('main') || document.getElementById('app');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                },
+                nuevoCarro: function() {
+                    this.carritos.push(this.getDefaultCarrito());
+                    this.indiceCarroActivo = this.carritos.length - 1;
+                    this.getFecha();
+                    this.getConfigVenta();
+                    this.saveDatos();
+                },
+                cambiarCarro: function(index) {
+                    if (index >= 0 && index < this.carritos.length) {
+                        this.indiceCarroActivo = index;
+                        this.saveDatos();
+                    }
+                },
+                eliminarCarro: function(index) {
+                    if (this.carritos.length <= 1) return;
+                    this.carritos.splice(index, 1);
+                    if (this.indiceCarroActivo >= this.carritos.length) {
+                        this.indiceCarroActivo = this.carritos.length - 1;
+                    } else if (index < this.indiceCarroActivo) {
+                        this.indiceCarroActivo--;
+                    }
+                    this.saveDatos();
                 },
                 getConfigVenta() {
                     var config = localStorage.getItem('config_venta');
-                    if (config != null) {
-                        config = JSON.parse(config);
-                        this.ventaCabecera.documento = config.tipo_comprobante;
-                        this.ventaCabecera.vender_sin_stock = config.vender_sin_stock;
-                        this.ventaCabecera.descontar_stock = config.descontar_stock;
+                    if (config != null && config !== '' && config !== 'undefined') {
+                        try {
+                            config = JSON.parse(config);
+                            if (config && typeof config.tipo_comprobante !== 'undefined') {
+                                this.ventaCabecera.documento = config.tipo_comprobante;
+                                this.ventaCabecera.vender_sin_stock = config.vender_sin_stock;
+                                this.ventaCabecera.descontar_stock = config.descontar_stock;
+                            }
+                        } catch (e) {}
                     }
-
                 },
                 addFastItem: function(){
                     if(this.fastItem.precio>0 && this.fastItem.descripcion.length>0){
@@ -839,21 +933,69 @@
                 }
             },
             computed: {
+                carro: {
+                    get: function() {
+                        return this.carritos.length && this.carritos[this.indiceCarroActivo] ? this.carritos[this.indiceCarroActivo].carro : [];
+                    },
+                    set: function(v) {
+                        if (this.carritos.length && this.carritos[this.indiceCarroActivo]) {
+                            this.$set(this.carritos[this.indiceCarroActivo], 'carro', v);
+                        }
+                    }
+                },
+                ventaCabecera: {
+                    get: function() {
+                        return this.carritos.length && this.carritos[this.indiceCarroActivo] ? this.carritos[this.indiceCarroActivo].ventaCabecera : {};
+                    }
+                },
+                efectivoRecibido: {
+                    get: function() {
+                        return this.carritos.length && this.carritos[this.indiceCarroActivo] ? this.carritos[this.indiceCarroActivo].efectivoRecibido : 0;
+                    },
+                    set: function(v) {
+                        if (this.carritos.length && this.carritos[this.indiceCarroActivo]) {
+                            this.$set(this.carritos[this.indiceCarroActivo], 'efectivoRecibido', v);
+                        }
+                    }
+                },
+                vuelto: {
+                    get: function() {
+                        return this.carritos.length && this.carritos[this.indiceCarroActivo] ? this.carritos[this.indiceCarroActivo].vuelto : 0;
+                    },
+                    set: function(v) {
+                        if (this.carritos.length && this.carritos[this.indiceCarroActivo]) {
+                            this.$set(this.carritos[this.indiceCarroActivo], 'vuelto', v);
+                        }
+                    }
+                },
+                cuotas: {
+                    get: function() {
+                        return this.carritos.length && this.carritos[this.indiceCarroActivo] ? this.carritos[this.indiceCarroActivo].cuotas : [];
+                    },
+                    set: function(v) {
+                        if (this.carritos.length && this.carritos[this.indiceCarroActivo]) {
+                            this.$set(this.carritos[this.indiceCarroActivo], 'cuotas', v);
+                        }
+                    }
+                },
                 carroOrdenado: function() {
-                    return this.carro.slice().sort((a, b) => {
-                        // Ordenar por índice descendente (últimos agregados primero)
-                        return this.carro.indexOf(b) - this.carro.indexOf(a);
+                    var c = this.carro;
+                    return c.slice().sort((a, b) => {
+                        return c.indexOf(b) - c.indexOf(a);
                     });
                 },
                 totalVenta: function() {
-                    this.ventaCabecera.total = 0;
-                    for (var i = 0; i < this.carro.length; i++) {
-                        this.ventaCabecera.total += (this.carro[i].precio * this.carro[i].cantidad);
+                    var vc = this.ventaCabecera;
+                    var c = this.carro;
+                    if (!vc || typeof vc.total === 'undefined') return '0';
+                    vc.total = 0;
+                    for (var i = 0; i < c.length; i++) {
+                        vc.total += (c[i].precio * c[i].cantidad);
                     }
-                    if (this.ventaCabecera.descuento > 0 && this.ventaCabecera.total > 0) {
-                        this.ventaCabecera.total -= this.ventaCabecera.descuento;
+                    if (vc.descuento > 0 && vc.total > 0) {
+                        vc.total -= vc.descuento;
                     }
-                    return this.format(this.ventaCabecera.total);
+                    return this.format(vc.total);
                 }
             },
             mounted() {
@@ -865,6 +1007,7 @@
                 this.getConfigVenta();
             }
         });
+        window.ventaApp = app;
         activarMenu('m_venta', '');
     </script>
 @endsection
