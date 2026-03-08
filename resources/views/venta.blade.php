@@ -332,6 +332,7 @@
                 currentPage: 1,
                 efectivoRecibido: 0,
                 vuelto: 0,
+                opcionesEfectivo: [],
                 ventaCabecera: {
                     fecha: '2020-01-01',
                     clienteId: '1',
@@ -600,6 +601,7 @@
                 showFinalizar: function() {
                     if (this.caja == 'ABIERTA') {
                         if (this.ventaCabecera.total > 0) {
+                            this.sugerirEfectivoRecibido();
                             $('#finalizarventa').modal('show');
                         }
                     } else {
@@ -779,6 +781,61 @@
                     } else {
                         this.vuelto = 0;
                     }
+                },
+                sugerirEfectivoRecibido: function() {
+                    var billetes = [5000, 10000, 20000, 50000, 100000];
+                    var total = this.ventaCabecera.total;
+                    var opciones = [];
+                    var minCombinacion = this.minimoConBilletes(total, billetes);
+                    if (minCombinacion.monto > 0) {
+                        opciones.push({ monto: minCombinacion.monto, label: this.format(minCombinacion.monto) });
+                    }
+                    if (50000 > total && opciones.every(function(o) { return o.monto !== 50000; })) {
+                        opciones.push({ monto: 50000, label: this.format(50000) });
+                    }
+                    if (100000 > total && opciones.every(function(o) { return o.monto !== 100000; })) {
+                        opciones.push({ monto: 100000, label: this.format(100000) });
+                    }
+                    this.opcionesEfectivo = opciones.slice(0, 3);
+                },
+                minimoConBilletes: function(total, billetes) {
+                    var maxBill = Math.max.apply(null, billetes);
+                    var maxAmount = total + maxBill;
+                    var canMake = { 0: true };
+                    for (var a = 1; a <= maxAmount; a++) {
+                        canMake[a] = false;
+                        for (var i = 0; i < billetes.length; i++) {
+                            if (a >= billetes[i] && canMake[a - billetes[i]]) {
+                                canMake[a] = true;
+                                break;
+                            }
+                        }
+                    }
+                    var monto = 0;
+                    for (var j = total + 1; j <= maxAmount; j++) {
+                        if (canMake[j]) {
+                            monto = j;
+                            break;
+                        }
+                    }
+                    var label = monto ? this.formarLabelBilletes(monto, billetes) : '';
+                    return { monto: monto, label: label };
+                },
+                formarLabelBilletes: function(monto, billetes) {
+                    var ordenados = billetes.slice().sort(function(a, b) { return b - a; });
+                    var usados = [];
+                    var restante = monto;
+                    for (var i = 0; i < ordenados.length && restante > 0; i++) {
+                        while (restante >= ordenados[i]) {
+                            usados.push(ordenados[i]);
+                            restante -= ordenados[i];
+                        }
+                    }
+                    return usados.map(function(u) { return u.toLocaleString('es-PY'); }).join(' + ');
+                },
+                aplicarOpcionEfectivo: function(monto) {
+                    this.efectivoRecibido = monto;
+                    this.calcularVuelto();
                 }
             },
             computed: {
