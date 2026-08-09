@@ -20,13 +20,43 @@ class ClienteController extends Controller
     }
     public function buscar(Request $request)
     {
-        $cliente= Cliente::select('clientes_cod','cliente_ci','cliente_nombre','cliente_direccion','cliente_cel','cliente_correo','ciudad_cod')
-        ->nombre(strtoupper($request->nombre))
-        ->documento($request->documento)
-        ->orderBy('cliente_nombre','ASC')
-        ->limit(100)
-        ->get();
-        return $cliente;
+        $q = trim((string) $request->get('q', ''));
+        $limit = (int) $request->get('limit', 50);
+        if ($limit < 1) {
+            $limit = 50;
+        }
+        if ($limit > 100) {
+            $limit = 100;
+        }
+
+        $query = Cliente::select(
+            'clientes_cod',
+            'cliente_ci',
+            'cliente_nombre',
+            'cliente_direccion',
+            'cliente_cel',
+            'cliente_correo',
+            'ciudad_cod',
+            'cliente_ruc'
+        );
+
+        if ($q !== '') {
+            $likeNombre = '%' . strtoupper($q) . '%';
+            $likeDoc = '%' . $q . '%';
+
+            $query->where(function ($builder) use ($likeNombre, $likeDoc) {
+                $builder->whereRaw('UPPER(clientes.cliente_nombre) LIKE ?', [$likeNombre])
+                    ->orWhere('clientes.cliente_ci', 'LIKE', $likeDoc)
+                    ->orWhere('clientes.cliente_ruc', 'LIKE', $likeDoc);
+            });
+        } elseif ($request->filled('nombre') || $request->filled('documento')) {
+            $query->nombre(strtoupper((string) $request->nombre))
+                ->documento($request->documento);
+        }
+
+        return $query->orderBy('cliente_nombre', 'ASC')
+            ->limit($limit)
+            ->get();
     }
     /**
      * Show the form for creating a new resource.

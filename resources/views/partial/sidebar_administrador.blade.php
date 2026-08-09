@@ -60,6 +60,18 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ route('sifen.index') }}" id="m_sifen" class="nav-link">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Configuración SIFEN</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('sifen.laboratorio') }}" id="m_sifen_lab" class="nav-link">
+                                <i class="fa fa-chevron-right nav-icon"></i>
+                                <p>Laboratorio SIFEN</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('proveedor.index') }}" id="m_proveedor" class="nav-link">
                                 <i class="fa fa-chevron-right nav-icon"></i>
                                 <p>Proveedor</p>

@@ -14,6 +14,7 @@ use App\Stock;
 use DB;
 use Auth;
 use PDF;
+use App\Support\ArticuloLibre;
 class VentaController extends Controller
 {
     /**
@@ -30,7 +31,8 @@ class VentaController extends Controller
        // return view('venta.generar');
         $apertura=Apertura::join('sucursales','apert_cierres_caja.suc_cod','=','sucursales.suc_cod')->join('caja','apert_cierres_caja.caja_cod','=','caja.caja_cod')
         ->where('apert_cierres_caja.apert_fecha','=',date('Y-m-d'))->get();
-        return view('venta',compact('apertura'));
+        $articuloLibreId = ArticuloLibre::id();
+        return view('venta',compact('apertura', 'articuloLibreId'));
     }
     public function indexanular(){
         return view('anularventa');
@@ -64,7 +66,17 @@ class VentaController extends Controller
          return DB::select("SELECT SUM(dv.venta_cantidad) AS vendida, dv.ARTICULOS_cod, a.producto_c_barra, a.producto_nombre, s.cantidad, p.present_descripcion FROM detalle_venta dv INNER JOIN ventas v ON dv.nro_fact_ventas=v.nro_fact_ventas INNER JOIN articulos a ON dv.ARTICULOS_cod=a.ARTICULOS_cod INNER JOIN stock s ON a.ARTICULOS_cod= s.ARTICULOS_cod INNER JOIN presentacion p ON a.present_cod=p.present_cod WHERE ".$suc." DATE(v.venta_fecha) BETWEEN '".$request->artd."' AND '".$request->arth."' GROUP BY dv.ARTICULOS_cod ORDER BY vendida DESC");
     }
     public function getDetalle($nro_venta){
-        return DB::select('SELECT dv.*,a.producto_nombre,a.producto_c_barra,p.iva FROM detalle_venta dv INNER JOIN articulos a ON dv.ARTICULOS_cod=a.ARTICULOS_cod inner join presentacion p on a.present_cod=p.present_cod where dv.nro_fact_ventas=?',[$nro_venta]);
+        return DB::select(
+            'SELECT dv.*,
+                    COALESCE(NULLIF(TRIM(dv.descripcion_libre), \'\'), a.producto_nombre) AS producto_nombre,
+                    a.producto_c_barra,
+                    p.iva
+             FROM detalle_venta dv
+             INNER JOIN articulos a ON dv.ARTICULOS_cod = a.ARTICULOS_cod
+             INNER JOIN presentacion p ON a.present_cod = p.present_cod
+             WHERE dv.nro_fact_ventas = ?',
+            [$nro_venta]
+        );
     }
     public function getCabecera($nro_venta){
         $cabecera= DB::select('SELECT v.*, c.cliente_ci,c.cliente_nombre FROM ventas v INNER JOIN clientes c ON v.CLIENTES_cod= c.CLIENTES_cod WHERE v.nro_fact_ventas= ?',[$nro_venta]);
@@ -89,43 +101,78 @@ class VentaController extends Controller
      */
     public function store(Request $request)
     {
-        
+        $cab = $request->input('ventaCabecera', []);
+        if (!is_array($cab) || empty($cab['idSucursal'])) {
+            return response()->json([
+                'message' => 'Sucursal no definida. Seleccioná una sucursal e intentá de nuevo.',
+            ], 422);
+        }
+
         $venta = new Venta();
-        $venta->clientes_cod= $request->ventaCabecera['clienteId'];
+        $venta->clientes_cod= $cab['clienteId'] ?? 1;
         $venta->cod_usuarios= Auth::user()->cod_usuarios;
-        $venta->suc_cod= $request->ventaCabecera['idSucursal'];
-        $venta->venta_total= $request->ventaCabecera['total'];
-        $venta->venta_fecha = $request->ventaCabecera['fecha'].date(' H:i');
-        $venta->tipo_factura = $request->ventaCabecera['condicionventa'];
+        $venta->suc_cod= $cab['idSucursal'];
+        $venta->venta_total= $cab['total'] ?? 0;
+        $venta->venta_fecha = ($cab['fecha'] ?? date('Y-m-d')).date(' H:i');
+        $venta->tipo_factura = $cab['condicionventa'] ?? 1;
         $venta->cant_cuotas =0;
         $venta->intervalo_venc='2030-01-01'; 
         $venta->venta_estado='2'; 
-        $venta->venta_descuento=$request->ventaCabecera['descuento'] ; 
-        $venta->forma_cobro= $request->ventaCabecera['formacobro']; 
-        $venta->documento= $request->ventaCabecera['documento']; 
+        $venta->venta_descuento=$cab['descuento'] ?? 0; 
+        $venta->forma_cobro= $cab['formacobro'] ?? 1; 
+        $venta->documento= $cab['documento'] ?? 'Ticket'; 
+        $venta->venta_recibido = (float) $request->input('venta_recibido', 0);
+        $venta->venta_vuelto = (float) $request->input('venta_vuelto', 0);
         $venta->save();
-        if($request->ventaCabecera['condicionventa']=='1'){
+        if(($cab['condicionventa'] ?? 1)=='1' || ($cab['condicionventa'] ?? 1)==1){
             if(Auth::user()->cod_usuarios!= 1){
-                $this->storeMovimiento($request->ventaCabecera['idSucursal'],$request->ventaCabecera['nro_operacion'],[$venta->nro_fact_ventas, $venta->venta_total]);
+                $this->storeMovimiento($cab['idSucursal'],$cab['nro_operacion'] ?? 0,[$venta->nro_fact_ventas, $venta->venta_total]);
             }
         }else{
             foreach($request->cuotas as $cuota){
                 
                 $this->storeCtaCobrar($venta->nro_fact_ventas,$cuota);
                 if($cuota['tipo']=='Entrega'){
-                    $this->storeCobro($request->ventaCabecera,$venta->nro_fact_ventas, $cuota);
+                    $this->storeCobro($cab,$venta->nro_fact_ventas, $cuota);
                     if(Auth::user()->cod_usuarios!= 1){
-                        $this->storeMovimiento($request->ventaCabecera['idSucursal'],$request->ventaCabecera['nro_operacion'],[$venta->nro_fact_ventas,$cuota['monto']]);
+                        $this->storeMovimiento($cab['idSucursal'],$cab['nro_operacion'] ?? 0,[$venta->nro_fact_ventas,$cuota['monto']]);
                     }
                 }
             }
         }
         
         foreach ($request->detalle as $detalle) {
-           // $lote = empty($detalle['aux_lote']) ? " AND lote_nro is null": " AND lote_nro='".trim($detalle['aux_lote'])."'");
-            DB::insert('INSERT INTO detalle_venta (ARTICULOS_cod, nro_fact_ventas, venta_precio, venta_cantidad, precio_compra) VALUES (?, ?, ?, ?,?)',[$detalle['codigo'],$venta->nro_fact_ventas,$detalle['precio'],$detalle['cantidad'],$detalle['costo']]);
-            if($request->ventaCabecera['descontar_stock']==1){
-                DB::update('update stock set cantidad = (cantidad - ?) where id_stock=?',[$detalle['cantidad'],$detalle['idstock']]);
+            $esLibre = !empty($detalle['es_libre']);
+            $codigo = $esLibre ? ArticuloLibre::id() : $detalle['codigo'];
+            $descripcionLibre = $esLibre
+                ? trim((string) ($detalle['descripcion_libre'] ?? $detalle['descripcion'] ?? ''))
+                : null;
+
+            if ($esLibre && $descripcionLibre === '') {
+                continue;
+            }
+
+            DB::insert(
+                'INSERT INTO detalle_venta (ARTICULOS_cod, nro_fact_ventas, venta_precio, venta_cantidad, precio_compra, descripcion_libre) VALUES (?, ?, ?, ?, ?, ?)',
+                [
+                    $codigo,
+                    $venta->nro_fact_ventas,
+                    $detalle['precio'],
+                    $detalle['cantidad'],
+                    $esLibre ? 0 : ($detalle['costo'] ?? 0),
+                    $descripcionLibre,
+                ]
+            );
+
+            if (
+                ($cab['descontar_stock'] ?? 1) == 1
+                && !$esLibre
+                && !empty($detalle['idstock'])
+            ) {
+                DB::update(
+                    'update stock set cantidad = (cantidad - ?) where id_stock=?',
+                    [$detalle['cantidad'], $detalle['idstock']]
+                );
             }
         }
         return $venta->nro_fact_ventas;
@@ -133,9 +180,17 @@ class VentaController extends Controller
     }
     public function destroy(Request $request){
         foreach ($request->articulos as $articulo) {
-            Stock::where('ARTICULOS_cod',$articulo['id'])
-            ->first()
-            ->increment('cantidad',$articulo['cantidad']);
+            if (ArticuloLibre::esLibre($articulo['id'])) {
+                continue;
+            }
+            try {
+                $stock = Stock::where('ARTICULOS_cod', $articulo['id'])->first();
+                if ($stock) {
+                    $stock->increment('cantidad', $articulo['cantidad']);
+                }
+            } catch (\Throwable $error) {
+                // ignore stock restore errors
+            }
         }
         DB::table('cobranza_detalle')->where('nro_fact_ventas',$request->id)->delete();
         DB::table('cobranzas as c')->join('cobranza_detalle as cd','c.cc_numero','=','cd.cc_numero')
@@ -239,7 +294,8 @@ class VentaController extends Controller
     return view('ticket.venta',compact('venta','empresa'));
    }
    public function imprimir(){
-       return view('venta.imprimir');
+       $sifenActivo = app(\App\Services\SifenService::class)->isActivo();
+       return view('venta.imprimir', compact('sifenActivo'));
    }
    
 }

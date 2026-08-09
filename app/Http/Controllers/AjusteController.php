@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Ajuste;
+use App\Support\MailSettings;
 use Illuminate\Http\Request;
+use Mail;
 
 class AjusteController extends Controller
 {
@@ -11,58 +13,74 @@ class AjusteController extends Controller
     {
         $this->middleware('auth');
     }
-    public function index(){
-        $ajuste= Ajuste::all();
-        return view('configuracion',compact('ajuste'));
+
+    public function index()
+    {
+        $ajuste = Ajuste::where('categoria', 'caja')->orderBy('id')->get();
+        $mail = MailSettings::all();
+        $mail['password'] = '';
+
+        return view('configuracion', compact('ajuste', 'mail'));
     }
-    public function update( Request $request){
-        foreach($request->caja as $caja){
-            Ajuste::where('name',$caja['name'])->update(['value'=>$caja['value']]);
+
+    public function update(Request $request)
+    {
+        if ($request->has('caja')) {
+            foreach ($request->caja as $caja) {
+                Ajuste::where('name', $caja['name'])->update(['value' => $caja['value']]);
+            }
         }
-        return "ok";
-        
+
+        if ($request->has('mail')) {
+            MailSettings::save($request->mail);
+        }
+
+        return response()->json(['ok' => true, 'message' => 'Ajustes actualizados']);
     }
-    public function escribe_ini($matriz, $archivo, $multi_secciones = true, $modo = 'w') {
-        $salida = '';
-    
-        # saltos de línea (usar "\r\n" para Windows)
-        define('SALTO', "\n");
-    
-        if (!is_array(current($matriz))) {
-            $tmp = $matriz;
-            $matriz['tmp'] = $tmp; # no importa el nombre de la sección, no se usará
-            unset($tmp);
+
+    public function testMail(Request $request)
+    {
+        if ($request->has('mail')) {
+            MailSettings::save($request->mail);
         }
-    
-        foreach($matriz as $clave => $matriz_interior) {
-            if ($multi_secciones) {
-                $salida .= '['.$clave.']'.SALTO;
-            }
-    
-            foreach($matriz_interior as $clave2 => $valor)
-                $salida .= $clave2.' = "'.$valor.'"'.SALTO;
-    
-            if ($multi_secciones) {
-                $salida .= SALTO;
-            }
+
+        $cfg = MailSettings::all();
+        $recipients = MailSettings::recipients();
+
+        if ($cfg['host'] === '' || $cfg['username'] === '') {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Completá host y usuario SMTP.',
+            ], 422);
         }
-    
-        $puntero_archivo = fopen($archivo, $modo);
-    
-        if ($puntero_archivo !== false) {
-            $escribo = fwrite($puntero_archivo, $salida);
-    
-            if ($escribo === false) {
-                $devolver = -2;
-            } else {
-                $devolver = $escribo;
-            }
-    
-            fclose($puntero_archivo);
-        } else {
-            $devolver = -1;
+
+        if (!count($recipients)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Indicá al menos un destinatario válido en “Enviar a”.',
+            ], 422);
         }
-    
-        return $devolver;
+
+        try {
+            MailSettings::apply();
+
+            Mail::raw(
+                "Prueba de correo SoftSystem\n\nSi recibís este mensaje, la configuración SMTP es correcta.\nFecha: " . date('d/m/Y H:i:s'),
+                function ($message) use ($recipients, $cfg) {
+                    $message->to($recipients)
+                        ->subject('Prueba de correo — SoftSystem');
+                }
+            );
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'Correo de prueba enviado a: ' . implode(', ', $recipients),
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'No se pudo enviar: ' . $e->getMessage(),
+            ], 422);
+        }
     }
 }

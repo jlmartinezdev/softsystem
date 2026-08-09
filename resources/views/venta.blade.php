@@ -99,26 +99,12 @@
                                             <a href="#" class="nav-link"><i class="fa-regular fa-filter-list"></i></a>
                                             
                                         </li>
-                                        <li class="nav-item dropdown" >
-                                            <a href="#" class="nav-link" title="Articulo Rapido" data-toggle="dropdown"><i class="fa-regular fa-bolt"></i></a>
-                                            
-                                            <!-- div class="dropdown-menu dropdown-menu-lg dropdown-menu-right"  id="fastDropdown">
-                                                <h3 class="dropdown-header">Agregar item rapido</h3>
-                                                <form class="px-4 py-3">
-                                                    <div class="form-group">
-                                                      <label for="fastItemPrecio">Precio</label>
-                                                      <input type="number" class="form-control"v-model="fastItem.precio" id="fastItemPrecio" placeholder="Gs.">
-                                                    </div>
-                                                    <div class="form-group">
-                                                      <label for="fastItemDescripcion">Descripcion</label>
-                                                      <input type="text" class="form-control" v-model="fastItem.descripcion" id="fastItemDescripcion" placeholder="Descripcion">
-                                                    </div>
-                                                    <hr>
-                                                  <button type="button" class="btn btn-info btn-block" @click="addFastItem" ><i class="fa-regular fa-plus"></i> Agregar</button>
-                                                    
-                                                  </form>
-                                                  
-                                            </div -->
+                                        <li class="nav-item">
+                                            <a href="#" class="nav-link" title="Ítem libre (sin catálogo)"
+                                                data-toggle="modal" data-target="#modalItemLibre"
+                                                @click.prevent="abrirItemLibre">
+                                                <i class="fa fa-bolt text-warning"></i>
+                                            </a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="#" class="nav-link"><i class="fa-regular fa-list-ul"></i></a>
@@ -147,13 +133,17 @@
                                 </tr>
                                 <template v-if="carro.length>0">
                                     <template v-for="(item,index) in carroOrdenado">
-                                        <tr>
+                                        <tr :key="item.linea_uid || (item.codigo + '-' + item.idstock + '-' + index)">
 
-                                            <td>@{{ item.codigo }}</td>
+                                            <td>
+                                                <span v-if="item.es_libre" class="badge badge-warning">LIBRE</span>
+                                                <span v-else>@{{ item.codigo }}</span>
+                                            </td>
                                             <td>@{{ item.descripcion }}</td>
                                             <td> <input type="number"
                                                     style="width: 57px; border: none; background-color: transparent;"
-                                                    min="1" :max="item.stock" v-model="item.cantidad"> </td>
+                                                    min="1" :max="item.es_libre ? 999999 : item.stock" v-model="item.cantidad"
+                                                    @change="saveDatos"> </td>
                                             <td><in-number v-model="item.precio" :clases="inputNumberClassesPrecio" placeholder="Precio"></in-number></td>
                                             <td>@{{ new Intl.NumberFormat("de-DE").format(item.precio * item.cantidad) }}</td>
 
@@ -313,7 +303,63 @@
                 </div>
             </div>
         </div>
-       
+        <!-- Modal Ítem libre -->
+        <div class="modal fade" id="modalItemLibre" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title mb-0">
+                            <span class="fa fa-bolt"></span> Ítem libre (sin catálogo)
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="small text-muted">
+                            Para vender algo no registrado: cargá descripción y precio. No descuenta stock.
+                        </p>
+                        <div class="form-group">
+                            <label for="fastItemDescripcion">Descripción</label>
+                            <input type="text" class="form-control" v-model.trim="fastItem.descripcion"
+                                id="fastItemDescripcion" placeholder="Ej: Servicio técnico, repuesto varios..."
+                                maxlength="255" @keyup.enter="focusFastPrecio">
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group mb-0">
+                                    <label for="fastItemCantidad">Cantidad</label>
+                                    <input type="number" class="form-control" v-model.number="fastItem.cantidad"
+                                        id="fastItemCantidad" min="1" step="1">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group mb-0">
+                                    <label for="fastItemPrecio">Precio unitario</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Gs.</span>
+                                        </div>
+                                        <input type="number" class="form-control" v-model.number="fastItem.precio"
+                                            id="fastItemPrecio" placeholder="0" min="1" step="1"
+                                            @keyup.enter="addFastItem">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <span class="fa fa-times"></span> Cerrar
+                        </button>
+                        <button type="button" class="btn btn-warning" @click="addFastItem">
+                            <span class="fa fa-plus"></span> Agregar al carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div><!-- end app -->
 @endsection
 @section('script')
@@ -321,18 +367,14 @@
     <script src="{{ asset('js/separator.js') }}"></script>
     <script type="text/javascript">
 
-    $(document).on('show.bs.dropdown', function (event) {
-        // Check if the dropdown being shown is the one for "Agregar item rapido"
-        const dropdown = $(event.target).find('#fastItemPrecio');
-        if (dropdown.length) {
-            setTimeout(() => {
-                dropdown.focus(); 
-            }, 200); 
-        }
+    $('#modalItemLibre').on('shown.bs.modal', function () {
+        var el = document.getElementById('fastItemDescripcion');
+        if (el) el.focus();
     });
         var app = new Vue({
             el: '#app',
             data: {
+                articuloLibreId: {{ (int) ($articuloLibreId ?? 0) }},
                 inputNumberClasses: {
                     input: "form-control form-control-lg text-success"
                 },
@@ -356,6 +398,10 @@
                 },
                 txtbuscar: '',
                 txtcliente: '',
+                clienteBuscando: false,
+                clienteBusquedaTimer: null,
+                clienteBusquedaSeq: 0,
+                clienteIndexActivo: 0,
                 filtro: {
                     seccion: 0,
                     columna: 0,
@@ -383,7 +429,7 @@
                 clientes: [],
                 requestLote: false,
                 enfocar: false,
-                _defaultVentaCabecera: {
+                defaultVentaCabecera: {
                     fecha: '2020-01-01',
                     clienteId: '1',
                     clienteNombre: 'Cliente Ocasional',
@@ -400,7 +446,8 @@
                 },
                 fastItem: {
                     precio: 0,
-                    descripcion: ''
+                    descripcion: '',
+                    cantidad: 1
                 }
             },
             methods: {
@@ -514,8 +561,7 @@
                         cancelButtonText: 'Cancelar'
                     })
                     if (cant) {
-                        // Buscar el artículo en el carro original por código
-                        let realIndex = this.carro.findIndex(item => item.codigo === articulo.codigo);
+                        let realIndex = this.findCarroIndex(articulo);
                         if (realIndex !== -1) {
                             this.carro[realIndex].cantidad = cant;
                         }
@@ -526,8 +572,7 @@
                 showModalPrecio: function(index, articulo) {
                     
                     this.articulo = articulo;
-                    // Mapear el índice de carroOrdenado al índice real en carro
-                    let realIndex = this.carro.findIndex(item => item.codigo === articulo.codigo);
+                    let realIndex = this.findCarroIndex(articulo);
                     this.tmpIndexPrecio.iArticulo = realIndex;
                     for (i = 1; i < 6; i++) {
                         this.preciosContado['m' + i] = parseInt(articulo['m' + i]);
@@ -578,9 +623,21 @@
                     this.$refs.Searcharticulo.focusSearchInput();
                     this.saveDatos();
                 },
+                findCarroIndex: function(a) {
+                    if (a && a.linea_uid) {
+                        return this.carro.findIndex(x => x.linea_uid === a.linea_uid);
+                    }
+                    if (a && a.es_libre) {
+                        return this.carro.findIndex(x => x.es_libre
+                            && x.descripcion === a.descripcion
+                            && x.precio == a.precio
+                            && x.cantidad == a.cantidad);
+                    }
+                    return this.carro.findIndex(x => x.codigo == a.codigo && x.idstock == a.idstock);
+                },
                 delArticulo: function(a) {
                     this.$refs.Searcharticulo.focusSearchInput();
-                    let validar = this.carro.findIndex(x => x.codigo == a.codigo)
+                    let validar = this.findCarroIndex(a);
                     if (validar > -1) {
                         this.carro.splice(validar, 1);
                     }
@@ -613,6 +670,18 @@
                     if (this.caja == 'ABIERTA') {
                         if (this.ventaCabecera.total > 0) {
                             this.sugerirEfectivoRecibido();
+                            var self = this;
+                            $('#finalizarventa').one('shown.bs.modal', function() {
+                                self.$nextTick(function() {
+                                    var el = document.getElementById('efectivo-recibido-modal');
+                                    if (el) {
+                                        el.focus();
+                                        if (typeof el.select === 'function') {
+                                            el.select();
+                                        }
+                                    }
+                                });
+                            });
                             $('#finalizarventa').modal('show');
                         }
                     } else {
@@ -624,19 +693,27 @@
                     if (this.requestFinalizar) {
                         return false;
                     }
-                    if (this.ventaCabecera.condicionventa == 2 && this.cuotas.length < 1) {
+                    var cabecera = this.ensureVentaCabecera();
+                    if (!cabecera.idSucursal) {
+                        Swal.fire('Sucursal requerida', 'Seleccioná una sucursal antes de finalizar la venta.', 'warning');
+                        return false;
+                    }
+                    if (cabecera.condicionventa == 2 && this.cuotas.length < 1) {
                         Swal.fire('Error', 'Por favor genere las cuotas', 'error');
                         return false;
                     }
+                    this.calcularVuelto();
                     this.requestFinalizar = true;
                     axios.post('venta', {
-                            ventaCabecera: this.ventaCabecera,
+                            ventaCabecera: cabecera,
                             detalle: this.carro,
-                            cuotas: this.cuotas
+                            cuotas: this.cuotas,
+                            venta_recibido: Number(this.efectivoRecibido) || 0,
+                            venta_vuelto: Number(this.vuelto) || 0
                         })
                         .then(response => {
                             this.requestFinalizar = false;
-                            var docParaPrint = this.ventaCabecera.documento;
+                            var docParaPrint = cabecera.documento;
                             this.carritos.splice(this.indiceCarroActivo, 1);
                             if (this.carritos.length === 0) {
                                 this.carritos.push(this.getDefaultCarrito());
@@ -659,7 +736,13 @@
                         })
                         .catch(error => {
                             this.requestFinalizar = false;
-                            Swal.fire('Error', error.message, 'error');
+                            var msg = 'No se pudo guardar la venta.';
+                            if (error.response && error.response.data && error.response.data.message) {
+                                msg = error.response.data.message;
+                            } else if (error.message) {
+                                msg = error.message;
+                            }
+                            Swal.fire('Error', msg, 'error');
                         })
                 },
                 numeroaletra: function(n) {
@@ -667,7 +750,7 @@
                 },
                 getDefaultCarrito: function() {
                     var id = this.nextCarroId++;
-                    var def = this._defaultVentaCabecera;
+                    var def = this.defaultVentaCabecera;
                     var vc = (def && typeof def === 'object') ? JSON.parse(JSON.stringify(def)) : {
                         fecha: '2020-01-01', clienteId: '1', clienteNombre: 'Cliente Ocasional', documento: 'Ticket',
                         idSucursal: this.ventaCabecera.idSucursal, formacobro: 1, condicionventa: 1, total: 0, descuento: 0, nro_operacion: this.nrooperacion,
@@ -686,11 +769,24 @@
                         try {
                             var arr = JSON.parse(saved);
                             if (Array.isArray(arr) && arr.length > 0) {
-                                arr.forEach(function(c) {
+                arr.forEach(function(c) {
                                     if (!c.cuotas) c.cuotas = [];
                                     if (typeof c.efectivoRecibido === 'undefined') c.efectivoRecibido = 0;
                                     if (typeof c.vuelto === 'undefined') c.vuelto = 0;
-                                });
+                                    if (!c.ventaCabecera || typeof c.ventaCabecera !== 'object') {
+                                        c.ventaCabecera = JSON.parse(JSON.stringify(this.defaultVentaCabecera));
+                                    } else {
+                                        var base = JSON.parse(JSON.stringify(this.defaultVentaCabecera));
+                                        c.ventaCabecera = Object.assign(base, c.ventaCabecera);
+                                    }
+                                    if (Array.isArray(c.carro)) {
+                                        c.carro.forEach(function(item, i) {
+                                            if (item && item.es_libre && !item.linea_uid) {
+                                                item.linea_uid = 'libre-rec-' + (c.id || 0) + '-' + i + '-' + Date.now();
+                                            }
+                                        });
+                                    }
+                                }.bind(this));
                                 this.carritos = arr;
                                 this.indiceCarroActivo = idx != null ? Math.min(parseInt(idx, 10) || 0, arr.length - 1) : 0;
                                 if (this.nextCarroId <= Math.max.apply(null, this.carritos.map(function(c) { return c.id || 0; }))) {
@@ -712,7 +808,10 @@
                         if (cabValida) {
                             try {
                                 var cab = JSON.parse(cabAntigua);
-                                if (cab && typeof cab.total !== 'undefined') c.ventaCabecera = cab;
+                                if (cab && typeof cab.total !== 'undefined') {
+                                    var base = JSON.parse(JSON.stringify(this.defaultVentaCabecera));
+                                    c.ventaCabecera = Object.assign(base, cab);
+                                }
                             } catch (e) {}
                         }
                         c.ventaCabecera.condicionventa = 1;
@@ -725,41 +824,155 @@
                     this.indiceCarroActivo = 0;
                 },
                 showBuscarCliente: function() {
+                    this.txtcliente = '';
+                    this.clienteIndexActivo = 0;
+                    if (this.clienteBusquedaTimer) {
+                        clearTimeout(this.clienteBusquedaTimer);
+                    }
                     $('#busquedaCliente').modal('show');
+                    this.buscarCliente();
+                    this.$nextTick(function () {
+                        var el = document.getElementById('txtclienteVenta');
+                        if (el) {
+                            el.focus();
+                        }
+                    });
+                },
+                onBuscarClienteInput: function () {
+                    var self = this;
+                    if (this.clienteBusquedaTimer) {
+                        clearTimeout(this.clienteBusquedaTimer);
+                    }
+                    this.clienteIndexActivo = 0;
+                    var q = (this.txtcliente || '').trim();
+                    var delay = q.length >= 2 ? 300 : 150;
+                    this.clienteBusquedaTimer = setTimeout(function () {
+                        self.buscarCliente();
+                    }, delay);
+                },
+                limpiarBusquedaCliente: function () {
+                    if (this.clienteBusquedaTimer) {
+                        clearTimeout(this.clienteBusquedaTimer);
+                    }
+                    this.txtcliente = '';
+                    this.clienteIndexActivo = 0;
+                    this.buscarCliente();
+                    this.$nextTick(function () {
+                        var el = document.getElementById('txtclienteVenta');
+                        if (el) el.focus();
+                    });
+                },
+                moverSeleccionCliente: function (dir) {
+                    if (!this.clientes.length) return;
+                    var next = this.clienteIndexActivo + dir;
+                    if (next < 0) next = this.clientes.length - 1;
+                    if (next >= this.clientes.length) next = 0;
+                    this.clienteIndexActivo = next;
+                },
+                seleccionarPrimerCliente: function () {
+                    if (!this.clientes.length) {
+                        this.buscarCliente();
+                        return;
+                    }
+                    var idx = this.clienteIndexActivo >= 0 ? this.clienteIndexActivo : 0;
+                    var c = this.clientes[idx];
+                    if (c) {
+                        this.selectCliente(c.clientes_cod, c.cliente_nombre);
+                    }
                 },
                 buscarCliente: function() {
-                    if (this.txtcliente.length > 0) {
-                        var doc = '';
-                        var nom = '';
-                        if (isNaN(parseFloat(this.txtcliente))) {
-                            nom = this.txtcliente;
-                        } else {
-                            doc = this.txtcliente;
-                        }
-                        axios.get('cliente/buscar', {
-                                params: {
-                                    documento: doc,
-                                    nombre: nom
-                                }
-                            })
-                            .then(response => {
-                                this.clientes = response.data;
-                            })
-                            .catch(error => {
-                                console.log(error.message);
-                            })
-                    }
+                    var q = (this.txtcliente || '').trim();
+                    var params = q.length >= 2
+                        ? { q: q, limit: 50 }
+                        : { limit: 10 };
+
+                    var seq = ++this.clienteBusquedaSeq;
+                    this.clienteBuscando = true;
+
+                    axios.get('{{ url('cliente/buscar') }}', { params: params })
+                        .then(response => {
+                            if (seq !== this.clienteBusquedaSeq) return;
+                            this.clientes = response.data || [];
+                            this.clienteIndexActivo = 0;
+                            this.clienteBuscando = false;
+                        })
+                        .catch(error => {
+                            if (seq !== this.clienteBusquedaSeq) return;
+                            this.clienteBuscando = false;
+                            console.log(error.message);
+                        });
                 },
 
                 selectCliente: function(id, cliente) {
                     this.ventaCabecera.clienteId = id;
                     this.ventaCabecera.clienteNombre = cliente;
+                    this.txtcliente = '';
+                    this.clientes = [];
+                    this.clienteIndexActivo = 0;
                     $('#busquedaCliente').modal('hide');
+                    this.saveDatos && this.saveDatos();
                 },
                 getSucursal: function() {
                     var obj = document.getElementById("sucursal");
-                    if (obj.getAttribute('data-id') != null)
-                        this.ventaCabecera.idSucursal = obj.getAttribute('data-id');
+                    var id = (obj && obj.getAttribute('data-id') != null) ? obj.getAttribute('data-id') : null;
+                    if (!this.carritos.length) {
+                        this.carritos.push(this.getDefaultCarrito());
+                    }
+                    if (!this.carritos[this.indiceCarroActivo].ventaCabecera) {
+                        this.$set(this.carritos[this.indiceCarroActivo], 'ventaCabecera', JSON.parse(JSON.stringify(this.defaultVentaCabecera)));
+                    }
+                    if (id != null) {
+                        this.$set(this.carritos[this.indiceCarroActivo].ventaCabecera, 'idSucursal', id);
+                    } else if (!this.carritos[this.indiceCarroActivo].ventaCabecera.idSucursal) {
+                        this.$set(this.carritos[this.indiceCarroActivo].ventaCabecera, 'idSucursal', this.defaultVentaCabecera.idSucursal);
+                    }
+                },
+                ensureVentaCabecera: function() {
+                    if (!this.carritos.length) {
+                        this.carritos.push(this.getDefaultCarrito());
+                    }
+                    var act = this.carritos[this.indiceCarroActivo];
+                    var defaults = this.defaultVentaCabecera;
+                    if (!defaults || typeof defaults !== 'object') {
+                        defaults = {
+                            fecha: '2020-01-01',
+                            clienteId: '1',
+                            clienteNombre: 'Cliente Ocasional',
+                            documento: 'Ticket',
+                            idSucursal: 1,
+                            formacobro: 1,
+                            condicionventa: 1,
+                            total: 0,
+                            descuento: 0,
+                            nro_operacion: 0,
+                            generarcuota: true,
+                            vender_sin_stock: 0,
+                            descontar_stock: 1
+                        };
+                    }
+                    if (!act.ventaCabecera || typeof act.ventaCabecera !== 'object') {
+                        this.$set(act, 'ventaCabecera', JSON.parse(JSON.stringify(defaults)));
+                    }
+                    var vc = act.ventaCabecera;
+                    var sid = $('#sucursal').attr('data-id');
+                    Object.keys(defaults).forEach(function (k) {
+                        if (typeof vc[k] === 'undefined' || vc[k] === null || vc[k] === '') {
+                            if (k === 'idSucursal' && sid != null && sid !== '') {
+                                vc[k] = sid;
+                            } else if (k === 'nro_operacion' && this.nrooperacion && this.nrooperacion !== '...') {
+                                vc[k] = this.nrooperacion;
+                            } else {
+                                vc[k] = defaults[k];
+                            }
+                        }
+                    }.bind(this));
+                    if (sid != null && sid !== '') {
+                        vc.idSucursal = sid;
+                    }
+                    if (this.nrooperacion && this.nrooperacion !== '...') {
+                        vc.nro_operacion = this.nrooperacion;
+                    }
+                    return vc;
                 },
                 validarLote: async function(articulo, lotes) {
                     var values = {};
@@ -825,49 +1038,86 @@
                     this.saveDatos();
                 },
                 getConfigVenta() {
+                    this.ensureVentaCabecera();
                     var config = localStorage.getItem('config_venta');
                     if (config != null && config !== '' && config !== 'undefined') {
                         try {
                             config = JSON.parse(config);
                             if (config && typeof config.tipo_comprobante !== 'undefined') {
-                                this.ventaCabecera.documento = config.tipo_comprobante;
-                                this.ventaCabecera.vender_sin_stock = config.vender_sin_stock;
-                                this.ventaCabecera.descontar_stock = config.descontar_stock;
+                                var vc = this.carritos[this.indiceCarroActivo].ventaCabecera;
+                                this.$set(vc, 'documento', config.tipo_comprobante);
+                                this.$set(vc, 'vender_sin_stock', config.vender_sin_stock);
+                                this.$set(vc, 'descontar_stock', config.descontar_stock);
                             }
                         } catch (e) {}
                     }
                 },
-                addFastItem: function(){
-                    if(this.fastItem.precio>0 && this.fastItem.descripcion.length>0){
-                        let art = {
-                            codigo: 1,
-                            idstock: 0,
-                            descripcion: this.fastItem.descripcion,
-                            cantidad: 1,
-                            stock: 1,
-                            precio: this.fastItem.precio,
-                            p1: parseInt(this.fastItem.precio),
-                            p2: 0,
-                            p3: 0,
-                            p4: 0,
-                            p5: 0,
-                            m1: 0,
-                            m2: 0,
-                            m3: 0,
-                            m4: 0,
-                            m5: 0,
-                            costo: 0,
-                            iPrecio: 'CO1',
-                        }
-                        this.carro.push(art);
-                        this.saveDatos();
-                        this.fastItem.precio = 0;
-                        this.fastItem.descripcion = '';
-                        
+                abrirItemLibre: function () {
+                    this.fastItem = { precio: '', descripcion: '', cantidad: 1 };
+                    $('#modalItemLibre').modal('show');
+                },
+                focusFastPrecio: function () {
+                    var el = document.getElementById('fastItemPrecio');
+                    if (el) el.focus();
+                },
+                addFastItem: function () {
+                    var desc = (this.fastItem.descripcion || '').trim();
+                    var precio = parseFloat(this.fastItem.precio);
+                    var cantidad = parseFloat(this.fastItem.cantidad) || 1;
 
+                    if (!desc) {
+                        Swal.fire('Falta descripción', 'Ingresá la descripción del ítem.', 'warning');
+                        return;
                     }
-                    //ocultar dropdown
-                    
+                    if (!(precio > 0)) {
+                        Swal.fire('Falta precio', 'Ingresá un precio mayor a cero.', 'warning');
+                        return;
+                    }
+                    if (!(cantidad > 0)) {
+                        cantidad = 1;
+                    }
+
+                    this.ensureVentaCabecera();
+
+                    var art = {
+                        codigo: this.articuloLibreId || 'VARIOS',
+                        idstock: 0,
+                        descripcion: desc,
+                        descripcion_libre: desc,
+                        es_libre: true,
+                        linea_uid: 'libre-' + Date.now() + '-' + Math.floor(Math.random() * 100000),
+                        cantidad: cantidad,
+                        stock: 999999,
+                        precio: precio,
+                        p1: parseInt(precio, 10),
+                        p2: 0,
+                        p3: 0,
+                        p4: 0,
+                        p5: 0,
+                        m1: 0,
+                        m2: 0,
+                        m3: 0,
+                        m4: 0,
+                        m5: 0,
+                        costo: 0,
+                        iPrecio: 'CO1'
+                    };
+
+                    var lista = this.carro.slice();
+                    lista.push(art);
+                    this.carro = lista;
+                    this.saveDatos();
+                    this.fastItem = { precio: '', descripcion: '', cantidad: 1 };
+                    $('#modalItemLibre').modal('hide');
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Ítem libre agregado',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
                 },
                 calcularVuelto: function() {
                     if (this.efectivoRecibido > 0 && this.ventaCabecera.total > 0) {
@@ -1000,10 +1250,11 @@
             },
             mounted() {
                 // this.getFecha();
-                this.getApertura();
                 this.recuperarDatos();
-                this.getFecha();
                 this.getSucursal();
+                this.ensureVentaCabecera();
+                this.getApertura();
+                this.getFecha();
                 this.getConfigVenta();
             }
         });

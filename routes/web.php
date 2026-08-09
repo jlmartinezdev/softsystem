@@ -58,7 +58,7 @@ Route::group(['middleware' => ['administrador']], function () {
    
     Route::post('venta', 'VentaController@store');
     Route::get('venta/imprimir', 'VentaController@imprimir')->name('infventa.imprimir');
-    Route::get('venta/facturar/{id}', 'FacturarController@index');
+    Route::get('venta/facturar/{id}', 'FacturarController@index')->name('venta.facturar');
     Route::post('venta/facturar', 'FacturarController@store');
     Route::delete('venta/facturar/{id}', 'FacturarController@destroy');
     
@@ -109,6 +109,7 @@ Route::group(['middleware' => ['administrador']], function () {
     //CONFIGURACION
     Route::get('ajustes','AjusteController@index')->name('ajuste.index');
     Route::post('ajustes','AjusteController@update');
+    Route::post('ajustes/mail/test','AjusteController@testMail')->name('ajuste.mail.test');
     
     //SUCURSAL
     Route::get('sucursal/all', 'SucursalController@All');
@@ -118,6 +119,14 @@ Route::group(['middleware' => ['administrador']], function () {
     //EMPRESA
     Route::get('empresa','EmpresaController@index')->name('empresa.index');
     Route::post('empresa','EmpresaController@update');
+    //SIFEN
+    Route::get('sifen', 'SifenConfigController@index')->name('sifen.index');
+    Route::post('sifen', 'SifenConfigController@update')->name('sifen.update');
+    Route::get('sifen/all', 'SifenConfigController@getAll');
+    Route::get('sifen/documentos', 'SifenConfigController@getDocumentos')->name('sifen.documentos');
+    Route::post('sifen/sync', 'SifenConfigController@sincronizarEmpresa')->name('sifen.sync');
+    Route::get('sifen/laboratorio', 'SifenLaboratorioController@index')->name('sifen.laboratorio');
+    Route::post('sifen/laboratorio/ejecutar', 'SifenLaboratorioController@ejecutar')->name('sifen.laboratorio.ejecutar');
     //CIUDAD
     Route::get('ciudad','CiudadController@index')->name('ciudad.index');
     Route::post('ciudad', 'CiudadController@store');
@@ -139,6 +148,7 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('/clear-cache', 'AperturaController@comando');
     //TICKET
     Route::get('ticket/factura/{id}', 'FacturarController@ticket');
+    Route::get('pdf/kude/{id}', 'FacturarController@kudePdf')->name('pdf.kude');
     Route::get('ticket/venta/{id}','VentaController@ticket');
 
 Route::get('usuario/all', 'UserController@showAll')->name('showalluser');

@@ -94,17 +94,28 @@ VALUES (?, ?, ?, ?, ?, ?, ?);',[$detalle['codigo'],$compra->compra_cod,$detalle[
 
     }
     public function getCompraByFecha(Request $request){
-        return Compra::select('compra.compra_cod',DB::raw('SUM(dc.compra_precio*dc.compra_cantidad) AS total'),DB::raw('DATE_FORMAT(compra.compra_fecha,"%d/%m/%Y %H:%i") AS compra_fecha'),'p.proveedor_nombre', 'p.proveedor_direc', 'p.proveedor_ruc','s.suc_desc','compra.compra_tipo_factura')
-        ->join('proveedor as p','compra.PROVEEDOR_cod','=','p.PROVEEDOR_cod')
-        ->join('detalle_compra as dc','dc.compra_cod','=','compra.compra_cod')
-        ->join('sucursales as s','compra.suc_cod','=','s.suc_cod')
-        ->filtrofecha($request->alld,$request->allh)
-        ->filtrosuc($request->alls)
-        ->filtroproveedor($request->proveedor)
-        ->orderBy('compra.compra_cod','desc')
-        ->groupBy('compra.compra_cod')
-        ->get();
-
+        return Compra::select(
+                'compra.compra_cod',
+                'compra.compra_factura',
+                'compra.compra_descuento',
+                'compra.compra_formacobro',
+                DB::raw('SUM(dc.compra_precio*dc.compra_cantidad) AS total'),
+                DB::raw('DATE_FORMAT(compra.compra_fecha,"%d/%m/%Y %H:%i") AS compra_fecha'),
+                'p.proveedor_nombre',
+                'p.proveedor_direc',
+                'p.proveedor_ruc',
+                's.suc_desc',
+                'compra.compra_tipo_factura'
+            )
+            ->join('proveedor as p', 'compra.PROVEEDOR_cod', '=', 'p.PROVEEDOR_cod')
+            ->join('detalle_compra as dc', 'dc.compra_cod', '=', 'compra.compra_cod')
+            ->join('sucursales as s', 'compra.suc_cod', '=', 's.suc_cod')
+            ->filtrofecha($request->alld, $request->allh)
+            ->filtrosuc($request->alls)
+            ->filtroproveedor($request->proveedor)
+            ->orderBy('compra.compra_cod', 'desc')
+            ->groupBy('compra.compra_cod')
+            ->get();
     }
     public function pdfboleta($id){
         $compra =  Compra::select('compra.compra_cod','compra_fecha',DB::raw('SUM(dc.compra_precio*dc.compra_cantidad) AS total'),'proveedor.proveedor_nombre','proveedor_ruc')

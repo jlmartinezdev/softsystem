@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <div class="ticket">
+    <div class="ticket" id="ticket-container">
 
         <p class="centrado">
             <strong>{{ $empresa->emp_nombre }}</strong>
@@ -28,19 +28,26 @@
             Timbrado: {{ $factura[0]->timbrado}}
             <br>
             Valido desde: {{ date('d/m/Y', strtotime($factura[0]->fecha_factura)) }}
+            @if(!empty($factura[0]->fecha_venc))
             <br>
-            Valido hasta: {{ date('d/m/Y', strtotime($factura[0]->fecha_venc ))}}
+            Valido hasta: {{ date('d/m/Y', strtotime($factura[0]->fecha_venc)) }}
+            @endif
         </p>
         <p class="centrado">
-            <strong> FACTURA CONTADO</strong>
+            <strong> FACTURA ELECTRÓNICA</strong>
             <br>
             <strong>{{$factura[0]->nivel1.'-'.$factura[0]->nivel2.'-'.str_pad($factura[0]->nro_factura,7,'0',STR_PAD_LEFT)}}</strong>
         </p>
-        Fecha: {{ date('d/m/Y H:i')}}
+        @if(!empty($documento) && !empty($documento->cdc))
+            <p class="centrado small">
+                CDC: {{ $documento->cdc }}
+            </p>
+        @endif
+        Fecha: {{ date('d/m/Y H:i', strtotime($cabecera->venta_fecha ?? 'now')) }}
         <br>
-        Cliente: {{ $venta[0]->cliente_nombre}}
+        Cliente: {{ $cabecera->cliente_nombre }}
         <br>
-        C.I. / RUC: {{$venta[0]->cliente_ruc}}
+        C.I. / RUC: {{ $cabecera->cliente_ruc ?: $cabecera->cliente_ci }}
         <br>
         <br>
         <table>
@@ -65,9 +72,9 @@
             </tbody>
         </table>
         <br>
-        <strong>Total a Pagar:</strong> {{ number_format($venta[0]->venta_total,0,',','.')}}
+        <strong>Total a Pagar:</strong> {{ number_format($cabecera->venta_total,0,',','.')}}
         <br>
-        {{ NumeroALetras::convertir($venta[0]->venta_total,"GUARANIES")}}
+        {{ NumeroALetras::convertir($cabecera->venta_total,"GUARANIES")}}
         <br>
         <br>
         <strong>Liq. IVA. (5%):</strong> {{ number_format($iva[0]->iva5 * 0.05 ,0,',','.')}}
@@ -76,8 +83,34 @@
         <br>
         <strong>Total IVA:</strong> {{ number_format(($iva[0]->iva10 * 0.090909) + ($iva[0]->iva5 * 0.05),0,',','.') }}
         <br>
+        @if(!empty($qrImage))
+            <div class="ticket-qr centrado">
+                <img src="data:image/png;base64,{{ $qrImage }}" alt="Código QR e-Kuatia" class="ticket-qr-img">
+                <p class="ticket-qr-hint">Consulte su comprobante en e-Kuatia</p>
+            </div>
+        @endif
         <p class="centrado">¡GRACIAS POR SU PREFERENCIA!</p> 
     </div>
+    <script>
+        window.onload = function() {
+            try {
+                var cfgRaw = localStorage.getItem('config_venta');
+                if (cfgRaw != null && cfgRaw !== '') {
+                    var cfg = JSON.parse(cfgRaw);
+                    var tam = cfg.tamano_ticket;
+                    var ticketEl = document.getElementById('ticket-container');
+                    if (ticketEl && (tam === '80mm' || tam === '56mm' || tam === 80 || tam === 56 || tam === '80' || tam === '56')) {
+                        if (tam === 80 || tam === '80') tam = '80mm';
+                        if (tam === 56 || tam === '56') tam = '56mm';
+                        ticketEl.classList.remove('ticket--80', 'ticket--56');
+                        ticketEl.style.width = tam;
+                        ticketEl.style.maxWidth = tam;
+                        ticketEl.classList.add(tam === '56mm' ? 'ticket--56' : 'ticket--80');
+                    }
+                }
+            } catch (e) {}
+        };
+    </script>
 </body>
 
 </html>

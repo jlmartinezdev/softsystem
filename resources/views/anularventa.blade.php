@@ -142,6 +142,10 @@
                 if(this.ventaCabecera.clienteId.length > 0 ){
                     let arts= [];
                     for(i=0;i<this.articulos.length; i++){
+                        // Ítems libres (VARIOS) no reponen stock
+                        if (this.articulos[i].descripcion_libre) {
+                            continue;
+                        }
                         arts.push({id : this.articulos[i].ARTICULOS_cod, cantidad: parseInt(this.articulos[i].venta_cantidad)});
                     }
                     Swal.fire({
