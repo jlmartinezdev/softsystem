@@ -20,24 +20,73 @@
 
 				<div class="tab-content">
 					<div class="tab-pane fade active show" id="fin" role="tabpanel">
-						<div class="row mb-3">
-							<div class="col-md-6">
-								<label class="small text-muted mb-1">Forma de pago</label>
-								<select class="form-control form-control-sm" @change="saveDatos" v-model="ventaCabecera.formacobro">
-									<option value="1">Efectivo</option>
-									<option value="2">Tarjeta</option>
-									<option value="3">Transferencia</option>
-									<option value="4">QR</option>
-								</select>
-							</div>
-							<div class="col-md-6">
-								<label class="small text-muted mb-1">Condición de venta</label>
-								<select class="form-control form-control-sm" @change="saveDatos" v-model="ventaCabecera.condicionventa">
-									<option value="1">Contado</option>
-									<option value="2">Crédito</option>
-								</select>
+						<div class="mb-3">
+							<label class="small text-muted mb-2 d-block">Forma de pago y condición</label>
+							<div class="pago-fila">
+								<div class="pago-metodos">
+									<button type="button" class="pago-metodo"
+										:class="{ selected: String(ventaCabecera.formacobro) === '1' }"
+										@click="seleccionarFormaPago(1)">
+										<span class="pago-check" v-if="String(ventaCabecera.formacobro) === '1'">
+											<i class="fa fa-check"></i>
+										</span>
+										<span class="pago-icon"><i class="fa fa-money-bill-wave"></i></span>
+										<span class="pago-label">Efectivo</span>
+									</button>
+									<button type="button" class="pago-metodo"
+										:class="{ selected: String(ventaCabecera.formacobro) === '2' }"
+										@click="seleccionarFormaPago(2)">
+										<span class="pago-check" v-if="String(ventaCabecera.formacobro) === '2'">
+											<i class="fa fa-check"></i>
+										</span>
+										<span class="pago-icon"><i class="fa fa-credit-card"></i></span>
+										<span class="pago-label">Tarjeta</span>
+									</button>
+									<button type="button" class="pago-metodo"
+										:class="{ selected: String(ventaCabecera.formacobro) === '3' }"
+										@click="seleccionarFormaPago(3)">
+										<span class="pago-check" v-if="String(ventaCabecera.formacobro) === '3'">
+											<i class="fa fa-check"></i>
+										</span>
+										<span class="pago-icon"><i class="fa fa-university"></i></span>
+										<span class="pago-label">Transferencia</span>
+									</button>
+									<button type="button" class="pago-metodo"
+										:class="{ selected: String(ventaCabecera.formacobro) === '4' }"
+										@click="seleccionarFormaPago(4)">
+										<span class="pago-check" v-if="String(ventaCabecera.formacobro) === '4'">
+											<i class="fa fa-check"></i>
+										</span>
+										<span class="pago-icon"><i class="fa fa-qrcode"></i></span>
+										<span class="pago-label">QR</span>
+									</button>
+								</div>
+
+								<div class="pago-separador" aria-hidden="true"></div>
+
+								<div class="pago-condiciones">
+									<button type="button" class="pago-metodo"
+										:class="{ selected: String(ventaCabecera.condicionventa) === '1' }"
+										@click="seleccionarCondicionVenta(1)">
+										<span class="pago-check" v-if="String(ventaCabecera.condicionventa) === '1'">
+											<i class="fa fa-check"></i>
+										</span>
+										<span class="pago-icon"><i class="fa fa-hand-holding-usd"></i></span>
+										<span class="pago-label">Contado</span>
+									</button>
+									<button type="button" class="pago-metodo"
+										:class="{ selected: String(ventaCabecera.condicionventa) === '2' }"
+										@click="seleccionarCondicionVenta(2)">
+										<span class="pago-check" v-if="String(ventaCabecera.condicionventa) === '2'">
+											<i class="fa fa-check"></i>
+										</span>
+										<span class="pago-icon"><i class="fa fa-calendar-alt"></i></span>
+										<span class="pago-label">Crédito</span>
+									</button>
+								</div>
 							</div>
 						</div>
+
 						<div class="row">
 						<div class="bg-light rounded-lg border p-4 mb-4 text-center col-6">
 							<p class="small text-uppercase text-muted mb-1">Total a pagar</p>
@@ -46,10 +95,7 @@
 						</div>
 
 						<div class="col-6 align-items-end">
-							<!-- Espacio y-3 -->
 							<div class="mb-3">
-								
-								
 								<div class="input-group input-group-sm">
 									<div class="input-group-prepend">
 										<span class="input-group-text bg-white font-weight-bold text-success">Monto recibido Gs.</span>
@@ -61,10 +107,8 @@
 										<button type="button" v-for="(op, i) in opcionesEfectivo" :key="i" @click="aplicarOpcionEfectivo(op.monto)" class="btn btn-sm btn-outline-primary mr-1 mb-2">@{{ op.label }}</button>
 									</div>
 								</template>
-								
 							</div>
 							<div class="mt-3">
-								
 								<div class="input-group input-group-sm">
 									<div class="input-group-prepend">
 										<span class="input-group-text bg-white font-weight-bold text-success">Vuelto Gs.</span>

@@ -12,6 +12,7 @@ class SifenDocumento extends Model
 
     protected $fillable = [
         'nro_fact_ventas',
+        'api_documento_id',
         'cdc',
         'timbrado',
         'establecimiento',

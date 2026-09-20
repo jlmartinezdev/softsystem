@@ -15,6 +15,7 @@ use DB;
 use Auth;
 use PDF;
 use App\Support\ArticuloLibre;
+use App\Support\ArticuloCombo;
 class VentaController extends Controller
 {
     /**
@@ -143,12 +144,15 @@ class VentaController extends Controller
         
         foreach ($request->detalle as $detalle) {
             $esLibre = !empty($detalle['es_libre']);
-            $codigo = $esLibre ? ArticuloLibre::id() : $detalle['codigo'];
-            $descripcionLibre = $esLibre
+            $esCombo = !empty($detalle['es_combo']);
+            $codigo = $esLibre || $esCombo
+                ? ($esCombo ? ArticuloCombo::id() : ArticuloLibre::id())
+                : $detalle['codigo'];
+            $descripcionLibre = ($esLibre || $esCombo)
                 ? trim((string) ($detalle['descripcion_libre'] ?? $detalle['descripcion'] ?? ''))
                 : null;
 
-            if ($esLibre && $descripcionLibre === '') {
+            if (($esLibre || $esCombo) && $descripcionLibre === '') {
                 continue;
             }
 
@@ -159,20 +163,30 @@ class VentaController extends Controller
                     $venta->nro_fact_ventas,
                     $detalle['precio'],
                     $detalle['cantidad'],
-                    $esLibre ? 0 : ($detalle['costo'] ?? 0),
+                    ($esLibre || $esCombo) ? 0 : ($detalle['costo'] ?? 0),
                     $descripcionLibre,
                 ]
             );
 
-            if (
-                ($cab['descontar_stock'] ?? 1) == 1
-                && !$esLibre
-                && !empty($detalle['idstock'])
-            ) {
-                DB::update(
-                    'update stock set cantidad = (cantidad - ?) where id_stock=?',
-                    [$detalle['cantidad'], $detalle['idstock']]
-                );
+            if (($cab['descontar_stock'] ?? 1) == 1) {
+                if ($esCombo && !empty($detalle['componentes']) && is_array($detalle['componentes'])) {
+                    $cantCombo = (float) ($detalle['cantidad'] || 1);
+                    foreach ($detalle['componentes'] as $comp) {
+                        if (empty($comp['id_stock'])) {
+                            continue;
+                        }
+                        $cantComp = ((float) ($comp['cantidad'] ?? 1)) * $cantCombo;
+                        DB::update(
+                            'update stock set cantidad = (cantidad - ?) where id_stock=?',
+                            [$cantComp, $comp['id_stock']]
+                        );
+                    }
+                } elseif (!$esLibre && !$esCombo && !empty($detalle['idstock'])) {
+                    DB::update(
+                        'update stock set cantidad = (cantidad - ?) where id_stock=?',
+                        [$detalle['cantidad'], $detalle['idstock']]
+                    );
+                }
             }
         }
         return $venta->nro_fact_ventas;

@@ -4,23 +4,176 @@
     <style type="text/css" media="all">
         table td {
             font-size: 10pt;
-            padding: 0px;
-            /**/
         }
 
         .mystriped {
             background-color: #f2f2f2 !important;
         }
 
-        .trsimple {
-            line-height: 0.8em;
+        .cta-list-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0.25rem 0 0.85rem;
         }
 
-        body {
-            background-color: white;
-            -webkit-print-color-adjust: exact;
+        .cta-card {
+            border: 1px solid #cfd8e3;
+            border-radius: 0.55rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            background: #fff;
         }
 
+        .cta-card-header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem 1.35rem;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: #f4f7fb;
+            border-bottom: 1px solid #dbe4f0;
+            color: #0d6efd;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .cta-card-header .cta-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            min-width: 0;
+        }
+
+        .cta-card-header .cta-meta .fa {
+            color: #6c757d;
+            width: 1rem;
+            text-align: center;
+        }
+
+        .cta-card-header .cta-nombre {
+            flex: 1 1 200px;
+        }
+
+        .cta-card-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 0.55rem 0.75rem;
+            padding: 0.8rem 1rem;
+        }
+
+        .cta-stat-label {
+            display: block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #6c757d;
+            margin-bottom: 0.28rem;
+        }
+
+        .cta-stat-value {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .cta-stat-importe .cta-stat-value,
+        .cta-detalle-table .cta-importe {
+            color: #0f766e;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .cta-stat-saldo .cta-stat-value {
+            color: #c82333;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .cta-card-detalle {
+            padding: 0 1rem 0.95rem;
+        }
+
+        .cta-detalle-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #495057;
+            padding: 0.55rem 0 0.55rem;
+            border-top: 1px solid #e9ecef;
+            margin-bottom: 0.2rem;
+        }
+
+        .cta-detalle-title span {
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        .cta-detalle-table {
+            margin: 0;
+            background: #fcfdff;
+            border: 1px solid #e9ecef;
+            border-radius: 0.35rem;
+            overflow: hidden;
+        }
+
+        .cta-detalle-table thead th {
+            background: #eef2f6;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            padding: 0.55rem 0.75rem !important;
+            border-bottom: 1px solid #dee2e6;
+            white-space: nowrap;
+        }
+
+        .cta-detalle-table td {
+            padding: 0.55rem 0.75rem !important;
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+
+        .cta-detalle-table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .dark-mode .cta-card {
+            background: #343a40;
+            border-color: #6c757d;
+        }
+
+        .dark-mode .cta-card-header {
+            background: #3d444b;
+            border-bottom-color: #6c757d;
+            color: #9ec5fe;
+        }
+
+        .dark-mode .cta-card-header .cta-meta .fa,
+        .dark-mode .cta-stat-label,
+        .dark-mode .cta-detalle-title span {
+            color: #adb5bd;
+        }
+
+        .dark-mode .cta-detalle-title {
+            color: #ced4da;
+            border-top-color: #6c757d;
+        }
+
+        .dark-mode .cta-detalle-table {
+            background: #3d444b;
+            border-color: #6c757d;
+        }
+
+        .dark-mode .cta-detalle-table thead th {
+            background: #454d55;
+            color: #fff;
+            border-bottom-color: #6c757d;
+        }
+
+        .dark-mode .cta-stat-importe .cta-stat-value,
+        .dark-mode .cta-detalle-table .cta-importe {
+            color: #3ddc97;
+        }
 
         @media print {
             .mystriped {
@@ -33,6 +186,16 @@
 
             .content-wrapper {
                 background-color: white;
+            }
+
+            .cta-card {
+                break-inside: avoid;
+                box-shadow: none;
+            }
+
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
         }
 
@@ -127,81 +290,17 @@
                                 <template v-if="ctas.length > 0  && filtro.tipo=='fecha'">
                                     <template v-if="filtro.presentacion==1">
                                         <hr>
-                                        <table class="table table-sm table-borderless ">
-                                            <tr>
-                                                <th>
-                                                    Cuentas a Cobrar : @{{ formatFecha(filtro.desde) }} - @{{ formatFecha(filtro.hasta) }}
-                                                </th>
-                                            </tr>
-                                            <template v-for="(c,index) in ctas">
-                                                <tr>
-                                                    <!-- :class="{'mystriped': index % 2==0}" -->
-                                                    <td>
-                                                        <table class="table table-sm border border-top">
-
-                                                            <tr class="mb-4 font-weight-bold text-primary">
-                                                                <td width="150"><span
-                                                                        class="fa fa-address-card text-secondary"></span>
-                                                                    @{{ c.cliente_ruc }}</td>
-                                                                <td width="350" colspan="2"><span
-                                                                        class="fa fa-user text-secondary"></span>
-                                                                    @{{ c.cliente_nombre }}</td>
-                                                                <td width="330" colspan="2"><span
-                                                                        class="fa fa-map-marker-alt text-secondary"></span>
-                                                                    @{{ c.cliente_direccion }}</td>
-                                                                <td><span class="fa fa-phone-alt text-secondary"></span>
-                                                                    @{{ c.cliente_cel }}</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <th>Nro. Venta</th>
-                                                                <th>Fecha Venta</th>
-                                                                <th>Total Venta</th>
-                                                                <th>Vencimiento</th>
-                                                                <th>Monto Cuota</th>
-                                                                <th>Atraso</th>
-                                                            </tr>
-                                                            <tr class="trsimple">
-                                                                <td>@{{ c.nro_fact_ventas }}</td>
-                                                                <td>@{{ c.venta_fecha }}</td>
-                                                                <td>@{{ format(c.venta_total) }}</td>
-                                                                <td>@{{ formatFecha(c.fecha_v) }}</td>
-                                                                <td class="text-danger font-weight-bold">
-                                                                    @{{ format(c.saldo) }}
-                                                                </td>
-                                                                <td>@{{ diferenciaFecha(c.fecha_v, c.pagada) + " dias" }}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td colspan="7" class="border-bottom"><strong>Detalle de
-                                                                        Venta</strong>
-                                                                    -
-                                                                    Descuento: @{{ format(c.venta_descuento) }} </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td><strong>Codigo</strong></td>
-                                                                <td colspan="2"><strong>Descripcion</strong></td>
-                                                                <td><strong>Cantidad</strong></td>
-                                                                <td class="text-right"><strong>Precio</strong></td>
-                                                                <td class="text-right" colspan="2">
-                                                                    <strong>Importe</strong>
-                                                                </td>
-                                                            </tr>
-                                                            <template v-for="dv in detalleVenta(c.nro_fact_ventas)">
-                                                                <tr>
-                                                                    <td>@{{ dv.producto_c_barra }}</td>
-                                                                    <td colspan="2">@{{ dv.producto_nombre }}</td>
-                                                                    <td>@{{ parseInt(dv.venta_cantidad) }}</td>
-                                                                    <td class="text-right">@{{ format(dv.venta_precio) }}</td>
-                                                                    <td class="text-right" colspan="2">
-                                                                        @{{ format(dv.venta_cantidad * dv.venta_precio) }}</td>
-                                                                </tr>
-                                                            </template>
-
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                            </template>
-                                        </table>
+                                        <div class="cta-list-title">
+                                            Cuentas a Cobrar : @{{ formatFecha(filtro.desde) }} - @{{ formatFecha(filtro.hasta) }}
+                                        </div>
+                                        <cta-cuenta-card
+                                            v-for="(c,index) in ctas"
+                                            :key="'fecha-' + index + '-' + c.nro_fact_ventas"
+                                            :c="c"
+                                            :articulos="articulos"
+                                            variante="fecha"
+                                            tipo="fecha"
+                                        ></cta-cuenta-card>
                                     </template>
                                     <template v-else>
                                         <table class="table table-sm table-striped">
@@ -307,84 +406,17 @@
                                 <template v-if="ctas.length > 0  && filtro.tipo=='cliente'">
                                     <template v-if="filtro.presentacion==1">
                                         <hr>
-                                        <table class="table table-sm table-borderless ">
-                                            <tr>
-                                                <th>
-                                                    Cuentas a Cobrar - Busqueda por Cliente
-                                                </th>
-                                            </tr>
-                                            <template v-for="(c,index) in ctas">
-                                                <tr>
-                                                    <!-- :class="{'mystriped': index % 2==0}" -->
-                                                    <td>
-                                                        <table class="table table-sm border border-top">
-
-                                                            <tr class="mb-4 font-weight-bold text-primary">
-                                                                <td width="150"><span class="fa fa-address-card text-secondary"></span>
-                                                                    @{{ c.cliente_ruc }}</td>
-                                                                <td width="330" colspan="2"><span
-                                                                        class="fa fa-user text-secondary"></span>
-                                                                    @{{ c.cliente_nombre }}</td>
-                                                                <td colspan="2"><span
-                                                                        class="fa fa-map-marker-alt text-secondary"></span>
-                                                                    @{{ c.cliente_direccion }}</td>
-                                                                <td colspan="2"><span
-                                                                        class="fa fa-phone-alt text-secondary"></span>
-                                                                    @{{ c.cliente_cel }}</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <th>Nro. Venta</th>
-                                                                <th>Fecha Venta</th>
-                                                                <th>Importe</th>
-                                                                <th>Cobrado/ Cuota</th>
-                                                                <th>Entrega + Cuota Cobrado</th>
-                                                                <th>Saldo</th>
-                                                                <th>Atraso</th>
-                                                            </tr>
-                                                            <tr class="trsimple">
-                                                                <td>@{{ c.nro_fact_ventas }}</td>
-                                                                <td>@{{ c.venta_fecha }}</td>
-                                                                <td>@{{ format(c.total) }}</td>
-                                                                <td>@{{ (c.pagada) + " de " + (c.cuotas) }}</td>
-                                                                <td>@{{ format(c.cobrado) }}</td>
-                                                                <td class="text-danger font-weight-bold">
-                                                                    @{{ format(c.saldo) }}
-                                                                </td>
-                                                                <!-- td>{ diferenciaFecha(c.fecha_v, c.pagada) + " dias" }}</td-->
-                                                                <td>-</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td colspan="7" class="border-bottom"><strong>Detalle de
-                                                                        Venta</strong>
-                                                                    -
-                                                                    Descuento: @{{ format(c.venta_descuento) }} </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td><strong>Codigo</strong></td>
-                                                                <td colspan="2"><strong>Descripcion</strong></td>
-                                                                <td><strong>Cantidad</strong></td>
-                                                                <td class="text-right"><strong>Precio</strong></td>
-                                                                <td class="text-right" colspan="2">
-                                                                    <strong>Importe</strong>
-                                                                </td>
-                                                            </tr>
-                                                            <template v-for="dv in detalleVenta(c.nro_fact_ventas)">
-                                                                <tr>
-                                                                    <td>@{{ dv.producto_c_barra }}</td>
-                                                                    <td colspan="2">@{{ dv.producto_nombre }}</td>
-                                                                    <td>@{{ parseInt(dv.venta_cantidad) }}</td>
-                                                                    <td class="text-right">@{{ format(dv.venta_precio) }}</td>
-                                                                    <td class="text-right" colspan="2">
-                                                                        @{{ format(dv.venta_cantidad * dv.venta_precio) }}</td>
-                                                                </tr>
-                                                            </template>
-
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                            </template>
-                                        </table>
+                                        <div class="cta-list-title">
+                                            Cuentas a Cobrar - Busqueda por Cliente
+                                        </div>
+                                        <cta-cuenta-card
+                                            v-for="(c,index) in ctas"
+                                            :key="'cliente-' + index + '-' + c.nro_fact_ventas"
+                                            :c="c"
+                                            :articulos="articulos"
+                                            variante="cliente"
+                                            tipo="cliente"
+                                        ></cta-cuenta-card>
                                     </template>
                                     <template v-else>
                                         <table class="table table-sm table-striped">
@@ -487,83 +519,17 @@
                                 <template v-if="ctas.length > 0  && filtro.tipo=='direccion'">
                                     <template v-if="filtro.presentacion==1">
                                         <hr>
-                                        <table class="table table-sm table-borderless ">
-                                            <tr>
-                                                <th>
-                                                    Cuentas a Cobrar - Busqueda por zona
-                                                </th>
-                                            </tr>
-                                            <template v-for="(c,index) in ctas">
-                                                <tr>
-                                                    <!-- :class="{'mystriped': index % 2==0}" -->
-                                                    <td>
-                                                        <table class="table table-sm border border-top">
-
-                                                            <tr class="mb-4 font-weight-bold text-primary">
-                                                                <td width="150"><span class="fa fa-address-card text-secondary"></span>
-                                                                    @{{ c.cliente_ruc }}</td>
-                                                                <td width="330" colspan="2"><span
-                                                                        class="fa fa-user text-secondary"></span>
-                                                                    @{{ c.cliente_nombre }}</td>
-                                                                <td colspan="2"><span
-                                                                        class="fa fa-map-marker-alt text-secondary"></span>
-                                                                    @{{ c.cliente_direccion }}</td>
-                                                                <td colspan="2"><span
-                                                                        class="fa fa-phone-alt text-secondary"></span>
-                                                                    @{{ c.cliente_cel }}</td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <th>Nro. Venta</th>
-                                                                <th>Fecha Venta</th>
-                                                                <th>Importe</th>
-                                                                <th>Cobrado/ Cuota</th>
-                                                                <th>Entrega + Cuota Cobrado</th>
-                                                                <th>Saldo</th>
-                                                                <th>Atraso</th>
-                                                            </tr>
-                                                            <tr class="trsimple">
-                                                                <td>@{{ c.nro_fact_ventas }}</td>
-                                                                <td>@{{ c.venta_fecha }}</td>
-                                                                <td>@{{ format(c.total) }}</td>
-                                                                <td>@{{ (c.pagada) + " de " + (c.cuotas) }}</td>
-                                                                <td>@{{ format(c.cobrado) }}</td>
-                                                                <td class="text-danger font-weight-bold">
-                                                                    @{{ format(c.saldo) }}
-                                                                </td>
-                                                                <td>@{{ diferenciaFecha(c.fecha_v, c.pagada) + " dias" }}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td colspan="7" class="border-bottom"><strong>Detalle de
-                                                                        Venta</strong>
-                                                                    -
-                                                                    Descuento: @{{ format(c.venta_descuento) }} </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td><strong>Codigo</strong></td>
-                                                                <td colspan="2"><strong>Descripcion</strong></td>
-                                                                <td><strong>Cantidad</strong></td>
-                                                                <td class="text-right"><strong>Precio</strong></td>
-                                                                <td class="text-right" colspan="2">
-                                                                    <strong>Importe</strong>
-                                                                </td>
-                                                            </tr>
-                                                            <template v-for="dv in detalleVenta(c.nro_fact_ventas)">
-                                                                <tr>
-                                                                    <td>@{{ dv.producto_c_barra }}</td>
-                                                                    <td colspan="2">@{{ dv.producto_nombre }}</td>
-                                                                    <td>@{{ parseInt(dv.venta_cantidad) }}</td>
-                                                                    <td class="text-right">@{{ format(dv.venta_precio) }}</td>
-                                                                    <td class="text-right" colspan="2">
-                                                                        @{{ format(dv.venta_cantidad * dv.venta_precio) }}</td>
-                                                                </tr>
-                                                            </template>
-
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                            </template>
-                                        </table>
+                                        <div class="cta-list-title">
+                                            Cuentas a Cobrar - Busqueda por zona
+                                        </div>
+                                        <cta-cuenta-card
+                                            v-for="(c,index) in ctas"
+                                            :key="'zona-' + index + '-' + c.nro_fact_ventas"
+                                            :c="c"
+                                            :articulos="articulos"
+                                            variante="zona"
+                                            tipo="direccion"
+                                        ></cta-cuenta-card>
                                     </template>
                                     <template v-else>
                                         <table class="table table-sm table-striped">
@@ -638,9 +604,158 @@
             </div><!-- /.modal-dialog -->
         </div><!-- /.modal -->
     </div>
+
+    <script type="text/x-template" id="cta-cuenta-card-tpl">
+            <div class="cta-card">
+                <div class="cta-card-header">
+                    <span class="cta-meta">
+                        <span class="fa fa-address-card"></span> @{{ c.cliente_ruc }}
+                    </span>
+                    <span class="cta-meta cta-nombre">
+                        <span class="fa fa-user"></span> @{{ c.cliente_nombre }}
+                    </span>
+                    <span class="cta-meta">
+                        <span class="fa fa-map-marker-alt"></span> @{{ c.cliente_direccion }}
+                    </span>
+                    <span class="cta-meta">
+                        <span class="fa fa-phone-alt"></span> @{{ c.cliente_cel }}
+                    </span>
+                </div>
+
+                <div class="cta-card-summary">
+                    <div class="cta-stat">
+                        <span class="cta-stat-label">Nro. Venta</span>
+                        <span class="cta-stat-value">@{{ c.nro_fact_ventas }}</span>
+                    </div>
+                    <div class="cta-stat">
+                        <span class="cta-stat-label">Fecha Venta</span>
+                        <span class="cta-stat-value">@{{ c.venta_fecha }}</span>
+                    </div>
+
+                    <template v-if="variante === 'fecha'">
+                        <div class="cta-stat cta-stat-importe">
+                            <span class="cta-stat-label">Total Venta</span>
+                            <span class="cta-stat-value">@{{ format(c.venta_total) }}</span>
+                        </div>
+                        <div class="cta-stat">
+                            <span class="cta-stat-label">Vencimiento</span>
+                            <span class="cta-stat-value">@{{ formatFecha(c.fecha_v) }}</span>
+                        </div>
+                        <div class="cta-stat cta-stat-saldo">
+                            <span class="cta-stat-label">Monto Cuota</span>
+                            <span class="cta-stat-value">@{{ format(c.saldo) }}</span>
+                        </div>
+                        <div class="cta-stat">
+                            <span class="cta-stat-label">Atraso</span>
+                            <span class="cta-stat-value">@{{ diferenciaFecha(c.fecha_v, c.pagada) }} dias</span>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div class="cta-stat cta-stat-importe">
+                            <span class="cta-stat-label">Importe</span>
+                            <span class="cta-stat-value">@{{ format(c.total) }}</span>
+                        </div>
+                        <div class="cta-stat">
+                            <span class="cta-stat-label">Cobrado / Cuota</span>
+                            <span class="cta-stat-value">@{{ c.pagada }} de @{{ c.cuotas }}</span>
+                        </div>
+                        <div class="cta-stat cta-stat-importe">
+                            <span class="cta-stat-label">Entrega + Cuota Cobrado</span>
+                            <span class="cta-stat-value">@{{ format(c.cobrado) }}</span>
+                        </div>
+                        <div class="cta-stat cta-stat-saldo">
+                            <span class="cta-stat-label">Saldo</span>
+                            <span class="cta-stat-value">@{{ format(c.saldo) }}</span>
+                        </div>
+                        <div class="cta-stat">
+                            <span class="cta-stat-label">Atraso</span>
+                            <span class="cta-stat-value" v-if="variante === 'cliente'">-</span>
+                            <span class="cta-stat-value" v-else>@{{ diferenciaFecha(c.fecha_v, c.pagada) }} dias</span>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="cta-card-detalle">
+                    <div class="cta-detalle-title">
+                        Detalle de Venta
+                        <span> · Descuento: @{{ format(c.venta_descuento) }}</span>
+                    </div>
+                    <table class="table table-sm mb-0 cta-detalle-table">
+                        <thead>
+                            <tr>
+                                <th>Codigo</th>
+                                <th>Descripcion</th>
+                                <th class="text-center">Cantidad</th>
+                                <th class="text-right">Precio</th>
+                                <th class="text-right">Importe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(dv, i) in detalles" :key="i">
+                                <td>@{{ dv.producto_c_barra }}</td>
+                                <td>@{{ dv.producto_nombre }}</td>
+                                <td class="text-center">@{{ parseInt(dv.venta_cantidad) }}</td>
+                                <td class="text-right">@{{ format(dv.venta_precio) }}</td>
+                                <td class="text-right cta-importe">@{{ format(dv.venta_cantidad * dv.venta_precio) }}</td>
+                            </tr>
+                            <tr v-if="!detalles.length">
+                                <td colspan="5" class="text-muted">Sin artículos para esta venta.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </script>
 @endsection
 @section('script')
     <script>
+        Vue.component('cta-cuenta-card', {
+            props: {
+                c: { type: Object, required: true },
+                articulos: { type: Array, default: function () { return []; } },
+                variante: { type: String, default: 'fecha' },
+                tipo: { type: String, default: 'fecha' }
+            },
+            template: '#cta-cuenta-card-tpl',
+            computed: {
+                detalles: function () {
+                    var nro = this.c.nro_fact_ventas;
+                    return (this.articulos || []).filter(function (venta) {
+                        return venta.nro_fact_ventas == nro;
+                    });
+                }
+            },
+            methods: {
+                format: function (numero) {
+                    return new Intl.NumberFormat("de-DE").format(numero);
+                },
+                formatFecha: function (fecha) {
+                    if (!fecha) return '';
+                    var f = String(fecha).split("-");
+                    if (f.length < 3) return fecha;
+                    return f[2] + "/" + f[1] + "/" + f[0];
+                },
+                diferenciaFecha: function (fecha_vent, pagada) {
+                    var fechaInicio = new Date(fecha_vent).getTime();
+                    var fechaFin = new Date().getTime();
+                    var diff = fechaFin - fechaInicio;
+                    if (diff < 0) {
+                        return "-";
+                    }
+                    var dia = parseInt(diff / (1000 * 60 * 60 * 24));
+                    if (this.tipo == 'fecha') {
+                        return dia;
+                    }
+                    if (pagada == 0) {
+                        if ((dia - 30) > 30) {
+                            return dia - 30;
+                        }
+                        return "-";
+                    }
+                    return dia;
+                }
+            }
+        });
         var app = new Vue({
             el: '#app',
             data: {

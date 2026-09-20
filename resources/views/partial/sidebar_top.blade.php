@@ -5,7 +5,7 @@
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars mx-1"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="{{ route('home') }}" class="nav-link"><span class="fas fa-home"></span> INICIO</a>
+            <a href="{{ route('home') }}" class="nav-link"><span class="fas fa-home" aria-hidden="true"></span> Inicio</a>
         </li>
         @if(request()->routeIs("venta"))
         <li class="nav-item">
@@ -47,23 +47,24 @@
       
         <!-- Notifications Dropdown Menu -->
         <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                <i class="far fa-bell"></i>
+            <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-expanded="false" aria-label="Notificaciones">
+                <i class="far fa-bell" aria-hidden="true"></i>
                 <!-- AGREGAR AQUI NOTIFICACION -->
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <span class="dropdown-item dropdown-header">No hay Notificacion</span>
+                <span class="dropdown-item dropdown-header">No hay notificaciones</span>
 
             </div>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-                <i class="fas fa-expand-arrows-alt"></i>
+            <a class="nav-link" data-widget="fullscreen" href="#" role="button" aria-label="Pantalla completa">
+                <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
             </a>
         </li>
         <li class="nav-item">
             <div class="theme-switch-wrapper nav-link">
                 <label class="theme-switch" for="checkbox">
+                    <span class="sr-only">Tema claro u oscuro</span>
                     <input type="checkbox" id="checkbox">
                     <span class="slider round"></span>
                 </label>
@@ -78,7 +79,7 @@
                 <span class="dropdown-item dropdown-header">{{ Auth::user()->nom_usuarios }}</span>
                 <a href="{{ route('logout') }}" class="dropdown-item dropdown-header"
                     onclick="event.preventDefault();document.getElementById('logout-form').submit();">
-                    Cerrar Sesion
+                    Cerrar sesión
                 </a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                     @csrf

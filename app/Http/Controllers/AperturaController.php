@@ -13,6 +13,7 @@ use App\Mail\CierreCajaResumen;
 use App\Support\MailSettings;
 use Auth;
 use DB;
+use Log;
 use Mail;
 
 class AperturaController extends Controller
@@ -206,7 +207,8 @@ class AperturaController extends Controller
         try {
             $mailMsg = $this->enviarResumenCierreMail($request->nro_operacion, $contado, $esperado, $diferencia, $entradas, $salidas);
         } catch (\Throwable $e) {
-            $mailMsg = ' El correo de resumen no se pudo enviar: ' . $e->getMessage();
+            Log::warning('Cierre caja: no se pudo preparar el correo de resumen: ' . $e->getMessage());
+            $mailMsg = '';
         }
 
         return redirect()->route('apertura')->with(
@@ -278,12 +280,22 @@ class AperturaController extends Controller
             'cerrado_por' => Auth::check() ? Auth::user()->nom_usuarios : '',
         ];
 
-        MailSettings::apply();
         $recipients = MailSettings::recipients();
+        if (empty($recipients)) {
+            return '';
+        }
 
-        Mail::to($recipients)->send(new CierreCajaResumen($resumen));
+        // Envía el correo después de devolver la respuesta al navegador (no bloquea el cierre).
+        app()->terminating(function () use ($recipients, $resumen) {
+            try {
+                MailSettings::apply();
+                Mail::to($recipients)->send(new CierreCajaResumen($resumen));
+            } catch (\Throwable $e) {
+                Log::warning('Cierre caja: fallo al enviar resumen por correo: ' . $e->getMessage());
+            }
+        });
 
-        return ' Resumen enviado por correo a ' . implode(', ', $recipients) . '.';
+        return ' Resumen de cierre se enviará por correo a ' . implode(', ', $recipients) . '.';
     }
 
     public function getStatu($id)

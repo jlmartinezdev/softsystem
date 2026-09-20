@@ -73,8 +73,17 @@ class UserController extends Controller
     {
         //
     }
-    public function showAll(){
-       return  User::select('cod_usuarios','cod_rol','cod_cargo',DB::raw('TRIM(user_usuarios) as user_usuarios'),DB::raw('trim(nom_usuarios) as nom_usuarios'))->get();
+    public function showAll()
+    {
+        return User::select(
+            DB::raw('TRIM(user_usuarios) as user_usuarios'),
+            DB::raw('TRIM(nom_usuarios) as nom_usuarios')
+        )->get()->sortBy(function ($user) {
+            $nombre = strtoupper(trim($user->nom_usuarios . ' ' . $user->user_usuarios));
+            $sistema = (strpos($nombre, 'ADMIN') !== false || strpos($nombre, 'SISTEMA') !== false || strpos($nombre, 'ROOT') !== false) ? '1' : '0';
+
+            return $sistema . '-' . $user->nom_usuarios;
+        })->values();
     }
     /**
      * Show the form for editing the specified resource.

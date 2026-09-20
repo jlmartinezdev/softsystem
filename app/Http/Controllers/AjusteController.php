@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Ajuste;
+use App\Support\CameraSettings;
 use App\Support\MailSettings;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Mail;
 
@@ -19,8 +21,9 @@ class AjusteController extends Controller
         $ajuste = Ajuste::where('categoria', 'caja')->orderBy('id')->get();
         $mail = MailSettings::all();
         $mail['password'] = '';
+        $camara = CameraSettings::publicConfig();
 
-        return view('configuracion', compact('ajuste', 'mail'));
+        return view('configuracion', compact('ajuste', 'mail', 'camara'));
     }
 
     public function update(Request $request)
@@ -33,6 +36,10 @@ class AjusteController extends Controller
 
         if ($request->has('mail')) {
             MailSettings::save($request->mail);
+        }
+
+        if ($request->has('camara')) {
+            CameraSettings::save($request->camara);
         }
 
         return response()->json(['ok' => true, 'message' => 'Ajustes actualizados']);
@@ -80,6 +87,62 @@ class AjusteController extends Controller
             return response()->json([
                 'ok' => false,
                 'message' => 'No se pudo enviar: ' . $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    public function testCamara(Request $request)
+    {
+        if ($request->has('camara')) {
+            CameraSettings::save($request->camara);
+        }
+
+        $cfg = CameraSettings::all();
+        $url = CameraSettings::snapshotUrl($cfg);
+
+        if ($url === '') {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Indicá la URL o IP de la cámara.',
+            ], 422);
+        }
+
+        try {
+            $options = [
+                'verify' => false,
+                'timeout' => 10,
+            ];
+
+            if ($cfg['user'] !== '') {
+                $options['auth'] = [$cfg['user'], $cfg['password'], 'digest'];
+            }
+
+            $client = new Client($options);
+            $response = $client->get($url);
+            $body = (string) $response->getBody();
+            $ctype = $response->getHeaderLine('Content-Type');
+
+            if ($response->getStatusCode() !== 200 || strlen($body) < 100) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'La cámara respondió pero no se recibió una imagen válida.',
+                ], 422);
+            }
+
+            $mime = $ctype !== '' ? explode(';', $ctype)[0] : 'image/jpeg';
+            if (stripos($mime, 'image/') !== 0) {
+                $mime = 'image/jpeg';
+            }
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'Captura OK desde ' . $url,
+                'preview' => 'data:' . $mime . ';base64,' . base64_encode($body),
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'No se pudo conectar: ' . $e->getMessage(),
             ], 422);
         }
     }

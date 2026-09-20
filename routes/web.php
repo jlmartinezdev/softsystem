@@ -26,6 +26,7 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('articulo/cm', 'ArticuloController@cm')->name('articulo.cm');
     Route::get('articulo/cm/{id}', 'ArticuloController@cmupdate')->name('articulo.cmupdate');
     Route::get('articulo/buscar', 'ArticuloController@getArticulo')->name('articulo@buscar');
+    Route::get('articulo/promo/{id}', 'ArticuloController@promoDetalle')->name('articulo.promo');
     Route::get('articulo/ultimo', 'ArticuloController@getUltimo')->name('articulo@ultimo');
     Route::get('articulo/precios/{id}','ArticuloController@getPrecios');
     Route::put('articulo/id/', 'ArticuloController@getById');
@@ -35,6 +36,26 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::delete('articulo/res/{id}', 'ArticuloController@destroy')->name('articulo.destroy');
     Route::get('articulo/validar/cbarra/{cbarra}','ArticuloController@validarCbarra');
     Route::post('articulo/capturar', 'ArticuloController@capturarImagen');
+    Route::post('articulo/imagen', 'ArticuloController@subirImagen');
+
+    // COMBOS
+    Route::get('combo', 'ComboController@index')->name('combo.index');
+    Route::post('combo', 'ComboController@store');
+    Route::put('combo/{id}', 'ComboController@update');
+    Route::delete('combo/{id}', 'ComboController@destroy');
+    Route::get('combo/articulos', 'ComboController@buscarArticulos');
+    Route::get('combo/activos', 'ComboController@listActivos')->name('combo.activos');
+    Route::post('combo/redondear', 'ComboController@redondear');
+    Route::get('combo/validar-codigo', 'ComboController@validarCodigo');
+
+    // OFERTAS
+    Route::get('oferta', 'OfertaController@index')->name('oferta.index');
+    Route::post('oferta', 'OfertaController@store');
+    Route::put('oferta/{id}', 'OfertaController@update');
+    Route::delete('oferta/{id}', 'OfertaController@destroy');
+    Route::get('oferta/articulos', 'OfertaController@buscarArticulos');
+    Route::get('oferta/activas', 'OfertaController@activas')->name('oferta.activas');
+    Route::get('oferta/validar-codigo', 'OfertaController@validarCodigo');
     
 
     
@@ -110,6 +131,7 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('ajustes','AjusteController@index')->name('ajuste.index');
     Route::post('ajustes','AjusteController@update');
     Route::post('ajustes/mail/test','AjusteController@testMail')->name('ajuste.mail.test');
+    Route::post('ajustes/camara/test','AjusteController@testCamara')->name('ajuste.camara.test');
     
     //SUCURSAL
     Route::get('sucursal/all', 'SucursalController@All');
@@ -125,6 +147,8 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('sifen/all', 'SifenConfigController@getAll');
     Route::get('sifen/documentos', 'SifenConfigController@getDocumentos')->name('sifen.documentos');
     Route::post('sifen/sync', 'SifenConfigController@sincronizarEmpresa')->name('sifen.sync');
+    Route::post('sifen/api/probar', 'SifenConfigController@probarApi')->name('sifen.api.probar');
+    Route::post('sifen/api/token', 'SifenConfigController@obtenerTokenApi')->name('sifen.api.token');
     Route::get('sifen/laboratorio', 'SifenLaboratorioController@index')->name('sifen.laboratorio');
     Route::post('sifen/laboratorio/ejecutar', 'SifenLaboratorioController@ejecutar')->name('sifen.laboratorio.ejecutar');
     //CIUDAD

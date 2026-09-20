@@ -77,6 +77,45 @@
         .table {
             margin-bottom: 0;
         }
+        .main-sidebar .brand-link {
+            display: flex;
+            align-items: center;
+            min-height: 57px;
+            padding-left: 1rem;
+        }
+        .main-sidebar .brand-text {
+            margin-left: 0;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+        aside.main-sidebar .nav-sidebar > .nav-item.nav-work > .nav-link > p {
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        aside.main-sidebar .nav-sidebar > .nav-item.nav-more > .nav-link {
+            color: rgba(255, 255, 255, 0.72);
+        }
+        aside.main-sidebar .nav-sidebar > .nav-item.nav-more > .nav-link > p {
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+        aside.main-sidebar .nav-sidebar > .nav-item > .nav-link.active,
+        aside.main-sidebar .nav-sidebar .nav-treeview > .nav-item > .nav-link.active {
+            background-color: #0a4d36;
+            color: #ffffff;
+        }
+        aside.main-sidebar .nav-sidebar .nav-link.active p,
+        aside.main-sidebar .nav-sidebar .nav-link.active i {
+            color: #ffffff;
+        }
+        :focus-visible {
+            outline: 2px solid #b8860b;
+            outline-offset: 2px;
+        }
+        ::selection {
+            background: #cde4d8;
+            color: #10241c;
+        }
     </style>
     @yield('style')
 </head>
@@ -86,7 +125,7 @@
         @guest
         @else
             @include('partial.sidebar_top')
-            @if (Auth::user()->cod_rol == 4)
+            @if (Auth::user()->esAdministrador())
                 @include('partial.sidebar_administrador')
             @else
                 @include('partial.sidebar_vendedor')
@@ -108,27 +147,31 @@
     <script src="{{ asset('js/vue-good-table.min.js') }}"></script>
 
     <script type="text/javascript">
-        function activarMenu(nivel1, subnivel) {
-            let menu_nivel1 = document.getElementById(nivel1);
-            menu_nivel1.className += " active";
-
-
-            if (subnivel.length > 0) {
-                let menu_subnivel = document.getElementById(subnivel);
-                menu_subnivel.className += " active";
-                setTimeout(() => {
-                    hacerClick(nivel1);
-                }, 500);
-
+        function abrirAncestrosMenu(el) {
+            var node = el ? el.parentElement : null;
+            while (node) {
+                if (node.classList && node.classList.contains('nav-item') && node.querySelector(':scope > ul.nav-treeview')) {
+                    node.classList.add('menu-open');
+                }
+                node = node.parentElement;
             }
-            // menu_nivel1.click();
-
-
         }
 
-        function hacerClick(n) {
-            let menu = document.getElementById(n);
-            menu.click();
+        function activarMenu(nivel1, subnivel) {
+            var menu_nivel1 = document.getElementById(nivel1);
+            if (!menu_nivel1) {
+                return;
+            }
+            menu_nivel1.className += " active";
+            abrirAncestrosMenu(menu_nivel1);
+
+            if (subnivel && subnivel.length > 0) {
+                var menu_subnivel = document.getElementById(subnivel);
+                if (menu_subnivel) {
+                    menu_subnivel.className += " active";
+                    abrirAncestrosMenu(menu_subnivel);
+                }
+            }
         }
 
         function soloNumero(event) {

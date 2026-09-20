@@ -121,6 +121,24 @@ class FacturarController extends Controller
 
     public function kudePdf($id)
     {
+        $documento = $this->sifen->documentoPorVenta($id);
+        if ($documento
+            && $documento->estado === SifenService::ESTADO_APROBADO
+            && $this->sifen->isModoApi()
+            && !empty($documento->api_documento_id)
+        ) {
+            try {
+                $bin = $this->sifen->descargarKudeApi($documento);
+                $nombre = 'KuDE-' . $id . '.pdf';
+                return response($bin['body'], 200, [
+                    'Content-Type' => $bin['content_type'] ?: 'application/pdf',
+                    'Content-Disposition' => 'inline; filename="' . $nombre . '"',
+                ]);
+            } catch (\Throwable $e) {
+                // Fallback al KuDE local si la API no responde
+            }
+        }
+
         try {
             $kude = $this->sifen->datosKuDe($id);
         } catch (\Throwable $e) {

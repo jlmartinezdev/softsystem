@@ -1,5 +1,32 @@
 @extends('layouts.app')
 @section('title','Gestionar Compra')
+@section('style')
+<style>
+    .compra-buscador .navbar {
+        border: 1px solid #e3e6ea !important;
+        border-radius: 0.5rem !important;
+    }
+    .dark-mode .compra-buscador .navbar,
+    .dark-mode .compra-buscador .buscador-navbar {
+        background-color: #343a40 !important;
+        border-color: #6c757d !important;
+    }
+    .dark-mode .autocomplete-result-list {
+        background: #343a40;
+        color: #fff;
+        border-color: #6c757d;
+    }
+    .dark-mode .autocomplete-result,
+    .dark-mode .autocomplete-result .left,
+    .dark-mode .autocomplete-result .precio {
+        color: #fff;
+    }
+    .dark-mode .autocomplete-result:hover,
+    .dark-mode .autocomplete-result[aria-selected="true"] {
+        background-color: #454d55;
+    }
+</style>
+@endsection
 @section('main')
 <div id="app">
     <div class="container">
@@ -7,23 +34,29 @@
             <div class="col-lg-8">
                 <div class="card shadow-sm mb-3">
                     <div class="card-header bg-white py-3">
-                        <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between">
-                            <div>
-                                <h5 class="mb-1">Buscar articulos</h5>
-                                <small class="text-muted">Agrega productos y gestiona cantidades desde el carrito.</small>
-                            </div>
-                            <button class="btn btn-outline-primary btn-sm mt-2 mt-sm-0" @click="showBuscar">
-                                <span class="fa fa-search mr-2"></span>
-                                Abrir buscador
-                            </button>
+                        <div>
+                            <h5 class="mb-1">Buscar artículos</h5>
+                            <small class="text-muted">Escribí para buscar o abrí el catálogo con imágenes.</small>
                         </div>
                     </div>
-                    <div class="card-body bg-light">
-                        <Searcharticulo url="{{ env('APP_APIDB') }}" :idsucursal="compraCabecera.idSucursal" @articulo="addCarrito"
-                            validar-lote="false">
-                        </Searcharticulo>
+                    <div class="card-body bg-light compra-buscador">
+                        <buscador-catalogo
+                            ref="buscador"
+                            url="{{ env('APP_APIDB') }}"
+                            :idsucursal="compraCabecera.idSucursal"
+                            url-buscar="{{ url('articulo/buscar') }}"
+                            url-foto-base="{{ asset('storage/articulos') }}"
+                            img-fallback="{{ asset('img/sinimagen.png') }}"
+                            route-articulo="{{ route('articulo.cm') }}"
+                            validar-lote="false"
+                            precio-field="producto_costo_compra"
+                            titulo="Catálogo para compra"
+                            modal-id="modalCatalogoCompra"
+                            @articulo="addCarrito"
+                            @seleccion="agregarDesdeCatalogo"
+                        ></buscador-catalogo>
                         <p class="text-muted small mb-0 mt-3">
-                            Tambien podes presionar <strong>Enter</strong> desde el campo de busqueda para agregar rapidamente.
+                            Enter en el buscador agrega rápido; el ícono de grilla abre el catálogo.
                         </p>
                     </div>
                 </div>
@@ -82,7 +115,6 @@
                                         </td>
                                     </tr>
                                 </tbody>
-                              
                             </table>
                         </div>
                     </div>
@@ -150,7 +182,6 @@
             </div>
         </div>
     </div>
-    <busqueda @articulo_sel="validarArticulo" url="{{env('APP_APIDB')}}" :txt_buscar="txtbuscar" ref="busqueda"></busqueda>
     <busquedaproveedor @set_proveedor="setProveedor"></busquedaproveedor>
     @include('compra.finalizar')
     @include('compra.precio')
@@ -158,7 +189,6 @@
 </div>
 @endsection
 @section('script')
-<script src="{{ asset(mix('js/busqueda.js'))}}"></script>
 <script src="{{ asset(mix('js/component/proveedor.js'))}}"></script>
 <script type="text/javascript">
     const defaulPrecio = [{p: 50,m: 5,c: 2}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}, {p: 0,m: 0,c: 0}];
@@ -181,7 +211,6 @@
         articulo: {},
         pos_edit: 0,
         stocks: [],
-        requestLote: false,
         compraCabecera: {fecha: '2021-01-01',idproveedor:1,proveedor:'',pro:'aa',idSucursal: 1,factura_n1:'',factura_n2:'',factura_n3:'',total:0,descuento:0,nro_operacion:0,condicioncompra:1,formacobro:1},
         caja : '...',
         nrooperacion: '...',
@@ -233,7 +262,7 @@
             if (this.chprecio)
                 this.precios[index].p = this.redondear(retornar);
             else
-                this.precios[index].p = retornar; //parseInt(retornar)
+                this.precios[index].p = retornar;
 
         },
         setCuota: function(index) {
@@ -264,13 +293,6 @@
         format: function(numero){
             return new Intl.NumberFormat("de-DE").format(numero);
         },
-        showBuscar: function(){
-            if( this.txtbuscar.length>0) {
-                this.$refs.busqueda.setBuscar();
-            }
-            $('#busquedaArticulo').modal('show');
-            //this.buscar(false);
-        },
         showBuscarProveedor: function(){
             $('#busquedaProveedor').modal('show');
         },
@@ -280,46 +302,33 @@
             $('#busquedaProveedor').modal('hide');
             this.saveDatos();
         },
-        validarArticulo: function(a){
-              this.requestLote= true;
-                if(this.compraCabecera.idSucursal=== undefined){
-                    Swal.fire('Por favor seleccione una sucursal!','warning');
-                }
-              //Traer lotes
-              axios.get('{{env("APP_APIDB")}}',{params:{ lotecompra : a.ARTICULOS_cod, bus_suc : this.compraCabecera.idSucursal}})
-                .then(response =>{
-                    const stocks= response.data;
-                    this.requestLote= false;
-                    if(stocks.length>1){ //Si hay mas de un lote
-                        $('#busquedaArticulo').modal('hide');
-                        this.validarLote(a,stocks);
-                    }else{
-                        this.addCarrito(a,stocks[0].id_stock);
-                        $('#busquedaArticulo').modal('hide');
-                        this.txtbuscar= "";
-                    }
-                })
-
-        },
-        validarLote:async function(articulo,lotes){
-            var values= {};
-            for (var i = 0; i < lotes.length; i++) {
-                values[i]=lotes[i].lote_nro;
-            }
-            const { value: lote } = await Swal.fire({
-                title: 'Seleccione Lote',
-                input: 'select',
-                inputOptions: values,
-                inputPlaceholder: 'Seleccione lote',
-                showCancelButton: true,
-                confirmButtonText: 'Aceptar',
-                cancelButtonText: 'Cancelar'
-                })
-            if(lote){
-                this.addCarrito(articulo,lotes[lote].id_stock);
+        agregarDesdeCatalogo: function(arts) {
+            var self = this;
+            var n = 0;
+            (arts || []).forEach(function (a) {
+                self.addCarrito(a);
+                n++;
+            });
+            if (n) {
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: n + ' artículo(s) agregado(s)'
+                });
             }
         },
-        addCarrito: function(a){
+        addCarrito: function(a, idstock){
+            if (idstock !== undefined && idstock !== null) {
+                a.id_stock = idstock;
+            }
+            if (!a.id_stock && a.idstock) {
+                a.id_stock = a.idstock;
+            }
             let i=this.carro.findIndex(x=> x.codigo == a.ARTICULOS_cod &&  x.idstock==a.id_stock);
             if(i == -1){
                 let art= {
@@ -343,9 +352,12 @@
                 this.carro.push(art);
                 this.getPreciosCredito(a.ARTICULOS_cod);
             }else{
-                this.carro[i].cantidad= parseInt(this.carro[i].cantidad) + 1;//Actualizar cantidad
+                this.carro[i].cantidad= parseInt(this.carro[i].cantidad) + 1;
+                this.saveDatos();
             }
-            //this.saveDatos(); // Llamar despues del request
+            if (this.$refs.buscador && this.$refs.buscador.focusSearchInput) {
+                this.$refs.buscador.focusSearchInput();
+            }
         },
         setCantidad: async function(index,cantidad,stock){
             const swalBootstrap = Swal.mixin({
@@ -393,7 +405,6 @@
         getPreciosCredito: function(id){
             axios.get('articulo/precios/'+id).then(response =>{
                 if(response.data.length> 0){
-                    //this.preciosCreditos=[];
                     let tmpPrecios= [];
                     for(i=0;i<response.data.length; i++){
                         let precios={p:response.data[i].p,c: response.data[i].c, m:response.data[i].m}
@@ -528,11 +539,6 @@
         getFecha: function() {
             var f = new Date();
             this.compraCabecera.fecha= f.format("yyyy-mm-dd");
-            //var dia =  f.getDate();
-            //var mes = (f.getMonth() + 1);
-            //this.compraCabecera.fecha= f.getFullYear() + "-" + mes.toString().padStart(2, "0") + "-" + dia.toString().padStart(2, "0");
-            //this.filtrovalue= this.meses[mes];
-
         },
         rellenarCero: function(obj,cantidad){
 

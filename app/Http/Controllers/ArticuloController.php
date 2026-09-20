@@ -13,6 +13,9 @@ use App\Exports\articulosPreciosExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Auth;
 use App\ArticuloUnidad;
+use App\Support\CameraSettings;
+use App\Oferta;
+use App\Combo;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 
@@ -23,45 +26,83 @@ class ArticuloController extends Controller
 {
     public function capturarImagen(Request $request)
     {
-        $ip   = $request->input('ip');      // ej: 192.168.1.150
-        $user = $request->input('user');    // ej: admin
-        $pass = $request->input('pass');    // ej: contraseña
-        $canal = $request->input('canal', '102'); // opcional: 101 o 102
+        $cfg = CameraSettings::all();
+        $url = CameraSettings::snapshotUrl($cfg);
 
-        $url = "http://{$ip}/ISAPI/Streaming/channels/{$canal}/picture";
-        $nombre = 'articulo_' . time() . '.jpg';
+        if ($url === '') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Configurá la URL/IP de la cámara en Ajustes.',
+            ], 422);
+        }
+
+        $nombre = 'articulo_' . time() . '_' . mt_rand(1000, 9999) . '.jpg';
 
         try {
-            // Cliente HTTP nativo de Guzzle (ya incluido en Laravel 5.8)
-            $client = new Client([
-                'auth' => [$user, $pass, 'digest'], // Hikvision usa autenticación Digest
-                'verify' => false,                  // ignorar certificados HTTPS propios
-                'timeout' => 10,                    // evita bloqueos
-            ]);
+            $options = [
+                'verify' => false,
+                'timeout' => 12,
+            ];
 
+            if ($cfg['user'] !== '') {
+                $options['auth'] = [$cfg['user'], $cfg['password'], 'digest'];
+            }
+
+            $client = new Client($options);
             $response = $client->get($url);
 
             if ($response->getStatusCode() === 200) {
-                Storage::disk('public')->put('articulos/' . $nombre, $response->getBody());
+                $body = (string) $response->getBody();
+                if (strlen($body) < 100) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'La cámara no devolvió una imagen válida.',
+                    ], 422);
+                }
+
+                Storage::disk('public')->put('articulos/' . $nombre, $body);
+
                 return response()->json([
                     'success' => true,
                     'path' => asset('storage/articulos/' . $nombre),
-                    'filename' => $nombre
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error al capturar imagen. Código HTTP: ' . $response->getStatusCode()
+                    'filename' => $nombre,
                 ]);
             }
 
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al capturar imagen. Código HTTP: ' . $response->getStatusCode(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Excepción: ' . $e->getMessage()
-            ]);
+                'message' => 'No se pudo capturar: ' . $e->getMessage(),
+            ], 422);
         }
     }
+
+    public function subirImagen(Request $request)
+    {
+        $request->validate([
+            'imagen' => 'required|file|mimes:jpeg,jpg,png,webp|max:5120',
+        ], [
+            'imagen.required' => 'Seleccioná un archivo de imagen.',
+            'imagen.mimes' => 'Solo se permiten JPG, PNG o WEBP.',
+            'imagen.max' => 'La imagen no puede superar 5 MB.',
+        ]);
+
+        $file = $request->file('imagen');
+        $ext = strtolower($file->getClientOriginalExtension() ?: 'jpg');
+        $nombre = 'articulo_' . time() . '_' . mt_rand(1000, 9999) . '.' . $ext;
+        Storage::disk('public')->putFileAs('articulos', $file, $nombre);
+
+        return response()->json([
+            'success' => true,
+            'path' => asset('storage/articulos/' . $nombre),
+            'filename' => $nombre,
+        ]);
+    }
+
     public $request= '';
     public function __construct()
     {
@@ -77,18 +118,20 @@ class ArticuloController extends Controller
     public function cm(){
         $secciones= Seccion::All();
         $unidades = Unidad::All();
-        return view('articulo.cm',compact('secciones','unidades'));
+        $camara = CameraSettings::publicConfig();
+        return view('articulo.cm',compact('secciones','unidades','camara'));
     }
     public function cmupdate($id){
         $secciones= Seccion::All();
         $unidades = Unidad::All();
-        return view('articulo.cm',compact('secciones','unidades'))->with('id',$id);
+        $camara = CameraSettings::publicConfig();
+        return view('articulo.cm',compact('secciones','unidades','camara'))->with('id',$id);
     }
     public function getArticulo(Request $request){
         $criterios = ["producto_nombre","producto_c_barra"];
         $columnas= ["articulos.producto_nombre","articulos.articulos_cod", "articulos.pre_venta1"];
-        $columna=$columnas[$request->col];
-        $criterio=$criterios[$request->criterio];
+        $columna=$columnas[$request->col ?? 0];
+        $criterio=$criterios[$request->criterio ?? 0];
         $seccion= $request->seccion;
         $buscar = $request->buscar;
         $idsucursal= isset($request->suc) ? $request->suc : null;
@@ -96,16 +139,98 @@ class ArticuloController extends Controller
             $articulos = Articulo::join('stock', 'articulos.articulos_cod', '=', 'stock.articulos_cod')
             ->join('presentacion','articulos.present_cod','=','presentacion.present_cod')
             ->join('unidad','articulos.uni_codigo','=','unidad.uni_codigo')
-            ->select(  'articulos.*','presentacion.present_descripcion',DB::raw('SUM(stock.cantidad) AS cantidad'),'unidad.uni_nombre','unidad.uni_abreviatura')
+            ->select(
+                'articulos.*',
+                'presentacion.present_descripcion',
+                DB::raw('SUM(stock.cantidad) AS cantidad'),
+                DB::raw('MIN(stock.id_stock) AS id_stock'),
+                'unidad.uni_nombre',
+                'unidad.uni_abreviatura',
+                DB::raw('(SELECT COUNT(*) FROM ofertas o WHERE o.articulos_cod = articulos.ARTICULOS_cod AND o.activo = 1) AS tiene_oferta'),
+                DB::raw('(SELECT COUNT(*) FROM combo_items ci INNER JOIN combos c ON c.id = ci.combo_id AND c.activo = 1 WHERE ci.articulos_cod = articulos.ARTICULOS_cod) AS en_combo')
+            )
             ->descripcion($buscar)
             ->seccion($seccion)
             ->bysucursal($idsucursal)
             ->groupBy('articulos.articulos_cod')
-            ->orderBy($columna, $request->ord)
+            ->orderBy($columna, $request->ord ?? 'ASC')
             ->get();
         
         return $articulos;
     }
+
+    /**
+     * Ofertas y combos vinculados a un artículo (detalle desde listado).
+     */
+    public function promoDetalle($id)
+    {
+        $articulo = Articulo::find($id);
+        if (!$articulo) {
+            return response()->json(['ok' => false, 'message' => 'Artículo no encontrado'], 404);
+        }
+
+        $ofertas = Oferta::where('articulos_cod', $id)
+            ->orderBy('activo', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->get()
+            ->map(function ($o) use ($articulo) {
+                $precioBase = (float) $articulo->pre_venta1;
+                return [
+                    'id' => $o->id,
+                    'nombre' => $o->nombre,
+                    'codigo' => $o->codigo,
+                    'tipo' => $o->tipo,
+                    'cantidad_min' => $o->cantidad_min !== null ? (float) $o->cantidad_min : null,
+                    'fecha_desde' => $o->fecha_desde,
+                    'fecha_hasta' => $o->fecha_hasta,
+                    'descuento_tipo' => $o->descuento_tipo,
+                    'descuento_valor' => (float) $o->descuento_valor,
+                    'precio_final' => $o->precioFinal($precioBase),
+                    'activo' => (int) $o->activo,
+                    'observacion' => $o->observacion,
+                ];
+            });
+
+        $combos = Combo::with(['items.articulo'])
+            ->whereHas('items', function ($q) use ($id) {
+                $q->where('articulos_cod', $id);
+            })
+            ->orderBy('activo', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->get()
+            ->map(function ($c) {
+                return [
+                    'id' => $c->id,
+                    'nombre' => $c->nombre,
+                    'codigo' => $c->codigo,
+                    'precio' => (float) $c->precio,
+                    'precio_lista' => (float) $c->precio_lista,
+                    'activo' => (int) $c->activo,
+                    'observacion' => $c->observacion,
+                    'items' => $c->items->map(function ($it) {
+                        return [
+                            'articulos_cod' => (int) $it->articulos_cod,
+                            'cantidad' => (float) $it->cantidad,
+                            'precio_ref' => (float) $it->precio_ref,
+                            'nombre' => optional($it->articulo)->producto_nombre,
+                        ];
+                    })->values(),
+                ];
+            });
+
+        return response()->json([
+            'ok' => true,
+            'articulo' => [
+                'cod' => $articulo->ARTICULOS_cod,
+                'nombre' => $articulo->producto_nombre,
+                'c_barra' => $articulo->producto_c_barra,
+                'precio' => (float) $articulo->pre_venta1,
+            ],
+            'ofertas' => $ofertas->values(),
+            'combos' => $combos->values(),
+        ]);
+    }
+
     public function getInventario(Request $request){
         $articulos= DB::select('SELECT a.producto_c_barra,a.producto_nombre,a.pre_venta1,p.present_descripcion, SUM(s.cantidad) AS cantidad, SUM(dv.venta_cantidad) AS salida, SUM(dc.compra_cantidad) AS entrada FROM articulos a INNER JOIN presentacion p ON a.present_cod= p.present_cod INNER JOIN stock s ON a.ARTICULOS_cod=s.ARTICULOS_cod LEFT JOIN detalle_venta dv ON a.ARTICULOS_cod= dv.ARTICULOS_cod LEFT JOIN detalle_compra dc ON a.ARTICULOS_cod= dc.ARTICULOS_cod LEFT JOIN ventas v ON dv.nro_fact_ventas= v.nro_fact_ventas WHERE DATE(v.venta_fecha) BETWEEN ? AND ? GROUP BY a.ARTICULOS_cod',[$request->desde,$request->hasta]);
             
@@ -165,7 +290,7 @@ class ArticuloController extends Controller
         $articulo->producto_nombre = $request->articulo['descripcion'];
         $articulo->producto_costo_compra = $request->articulo['costo'];
         $articulo->producto_costo_venta = $request->articulo['p1'];
-        $articulo->foto= $request->input('imagen', '');
+        $articulo->foto = $request->filled('imagen') ? $request->input('imagen') : '';
         $articulo->producto_fecHab = '0';
         $articulo->producto_vencimiento = '2030-01-01';
         $articulo->pre_venta1 = $request->articulo['p1'];
@@ -268,14 +393,13 @@ class ArticuloController extends Controller
     {
        // return $request;
         
-        $ok= Articulo::where('articulos_cod',$id)->update([
+        $data = [
             'uni_codigo'=>$request->articulo['unidad'], 
             'producto_c_barra'=>$request->articulo['c_barra'],
             'present_cod' =>  $request->articulo['seccion'],
             'producto_nombre' => $request->articulo['descripcion'],
             'producto_costo_compra' => $request->articulo['costo'],
             'producto_costo_venta' => $request->articulo['p1'],
-            'foto'=> $request->input('imagen', ''),
             'producto_fecHab' => '0',
             'producto_vencimiento' => '2030-01-01',
             'pre_venta1' => $request->articulo['p1'],
@@ -295,7 +419,13 @@ class ArticuloController extends Controller
             'producto_dosis'=> is_null($request->articulo['modouso']) ? '' :$request->articulo['modouso'] ,
             'producto_formula'=> '',
             'producto_dimagen'=> ''
-        ]);
+        ];
+
+        if ($request->exists('imagen')) {
+            $data['foto'] = (string) ($request->input('imagen') ?? '');
+        }
+
+        $ok= Articulo::where('articulos_cod',$id)->update($data);
         if( Auth::user()->roles()->first()->nom_rol=='Administrador'){
             for ($i=0; $i < count($request->stock) ; $i++) { 
                 if($request->stock[$i]['id'] > 0){

@@ -6,7 +6,7 @@
         <div class="row mb-2">
             <div class="col-md-8">
                 <h4 class="m-0">Ajustes del sistema</h4>
-                <p class="text-muted mb-0 small">Caja, venta y servidor de correo.</p>
+                <p class="text-muted mb-0 small">Caja, venta, cámara IP y servidor de correo.</p>
             </div>
         </div>
     </div>
@@ -66,6 +66,59 @@
                             <option value="0">No</option>
                         </select>
                     </div>
+                </div>
+            </div>
+
+            <div class="card card-outline card-secondary">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong><span class="fa fa-video"></span> Cámara IP (CCTV)</strong>
+                    <span class="badge" :class="camara.url ? 'badge-success' : 'badge-secondary'">
+                        @{{ camara.url ? 'Configurada' : 'Sin configurar' }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>URL / IP de la cámara</label>
+                        <input type="text" class="form-control form-control-sm" v-model.trim="camara.url"
+                            placeholder="192.168.1.101 o http://192.168.1.101/ISAPI/.../picture">
+                        <small class="text-muted">
+                            Si indicás solo la IP, se usa el snapshot Hikvision ISAPI con el canal.
+                            También podés pegar la URL completa del snapshot.
+                        </small>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Usuario</label>
+                            <input type="text" class="form-control form-control-sm" v-model.trim="camara.user"
+                                placeholder="admin" autocomplete="off">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Contraseña</label>
+                            <input type="password" class="form-control form-control-sm" v-model="camara.password"
+                                placeholder="Dejar vacío para no cambiar" autocomplete="new-password">
+                        </div>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label>Canal (Hikvision)</label>
+                        <select class="form-control form-control-sm" v-model="camara.canal">
+                            <option value="101">101 — Main stream</option>
+                            <option value="102">102 — Sub stream (recomendado)</option>
+                            <option value="201">201</option>
+                            <option value="202">202</option>
+                        </select>
+                    </div>
+
+                    <div v-if="camaraPreview" class="mt-3 text-center">
+                        <img :src="camaraPreview" alt="Vista previa" class="img-fluid rounded border"
+                            style="max-height: 180px;">
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" @click="testCamara"
+                        :disabled="camaraTesting">
+                        <span class="fa" :class="camaraTesting ? 'fa-spinner fa-spin' : 'fa-camera'"></span>
+                        @{{ camaraTesting ? 'Probando...' : 'Probar captura' }}
+                    </button>
                 </div>
             </div>
         </div>
@@ -177,6 +230,8 @@
         data: {
             guardando: false,
             mailTesting: false,
+            camaraTesting: false,
+            camaraPreview: null,
             caja: [{
                 name: 'validez',
                 value: '{{ $ajuste[0]->value ?? 1 }}',
@@ -189,6 +244,12 @@
                 descontar_stock: 1,
                 vender_sin_stock: 1,
                 tamano_ticket: '80mm',
+            },
+            camara: {
+                url: @json($camara['url'] ?? ''),
+                user: @json($camara['user'] ?? 'admin'),
+                password: '',
+                canal: @json($camara['canal'] ?? '102')
             },
             mail: {
                 activo: {{ !empty($mail['activo']) ? 'true' : 'false' }},
@@ -211,10 +272,18 @@
                 }
                 return payload;
             },
+            camaraPayload: function () {
+                var payload = Object.assign({}, this.camara);
+                if (!payload.password) {
+                    delete payload.password;
+                }
+                return payload;
+            },
             updateCaja: function () {
                 return axios.post('{{ url('ajustes') }}', {
                     caja: this.caja,
-                    mail: this.mailPayload()
+                    mail: this.mailPayload(),
+                    camara: this.camaraPayload()
                 });
             },
             updateVenta: function () {
@@ -239,6 +308,7 @@
                     .then(function () {
                         self.guardando = false;
                         self.mail.password = '';
+                        self.camara.password = '';
                         Toast.fire({ title: 'Ajustes actualizados', icon: 'success' });
                     })
                     .catch(function (error) {
@@ -264,6 +334,25 @@
                             ? error.response.data.message
                             : 'No se pudo enviar el correo de prueba';
                         Swal.fire('Error SMTP', msg, 'error');
+                    });
+            },
+            testCamara: function () {
+                var self = this;
+                this.camaraTesting = true;
+                this.camaraPreview = null;
+                axios.post('{{ route('ajuste.camara.test') }}', { camara: this.camaraPayload() })
+                    .then(function (response) {
+                        self.camaraTesting = false;
+                        self.camara.password = '';
+                        self.camaraPreview = response.data.preview || null;
+                        Toast.fire({ title: response.data.message || 'Captura OK', icon: 'success' });
+                    })
+                    .catch(function (error) {
+                        self.camaraTesting = false;
+                        var msg = (error.response && error.response.data && error.response.data.message)
+                            ? error.response.data.message
+                            : 'No se pudo capturar desde la cámara';
+                        Swal.fire('Error cámara', msg, 'error');
                     });
             }
         },

@@ -15,6 +15,19 @@
             font-family: 'Sofia';
         }
 
+        .articulo-img-wrap {
+            min-height: 180px;
+            background: #f4f6f9;
+        }
+        .articulo-img-wrap img {
+            max-height: 220px;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        .articulo-img-actions .btn {
+            min-width: 42px;
+        }
+
 
         /* The switch - the box around the slider */
         .switch-sm {
@@ -160,16 +173,6 @@
             <!-- Panel descripcion  -->
             <div class="col-md-6">
                 <div class="card shadow-sm">
-                    <div class="d-flex justify-content-center bg-light position-relative">
-                        <div v-if="imagen">
-                            <img :src="imagen" style="max-width: 300px;">
-                        </div>
-                        <div v-else>
-                            <img src="{{ asset('img/sinimagen.png') }}" height="130" alt="...">
-                        </div>
-                        <button @click="capturarImagen" class="btn btn-primary position-absolute" style="bottom: 10px; right: 10px; border-radius: 50%; width: 50px; height: 50px; padding: 0; font-size: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">📸</button>
-                    </div>
-
                     <div class="card-body">
                         <div class="form-row">
                             <div class="col">
@@ -230,6 +233,44 @@
                                         name="factor" placeholder="Factor">
                                 </div>
                             </div>
+                        </div>
+
+                        <hr class="my-3">
+                        <strong class="d-block mb-2"><span class="fa fa-image"></span> Imagen del artículo</strong>
+                        <div class="d-flex justify-content-center align-items-center articulo-img-wrap position-relative p-2 border rounded">
+                            <div v-if="imagen" class="text-center w-100">
+                                <img :src="imagen" alt="Imagen del artículo">
+                            </div>
+                            <div v-else class="text-center text-muted py-4">
+                                <img src="{{ asset('img/sinimagen.png') }}" height="110" alt="Sin imagen">
+                                <div class="small mt-2">Sin imagen</div>
+                            </div>
+                        </div>
+                        <div class="py-2 articulo-img-actions">
+                            <div class="d-flex flex-wrap align-items-center">
+                                <button type="button" class="btn btn-primary btn-sm mr-2 mb-1"
+                                    @click="capturarImagen" :disabled="capturando || subiendo">
+                                    <span class="fa" :class="capturando ? 'fa-spinner fa-spin' : 'fa-camera'"></span>
+                                    @{{ capturando ? 'Capturando...' : 'Cámara IP' }}
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm mr-2 mb-1"
+                                    @click="abrirArchivo" :disabled="capturando || subiendo">
+                                    <span class="fa" :class="subiendo ? 'fa-spinner fa-spin' : 'fa-upload'"></span>
+                                    @{{ subiendo ? 'Subiendo...' : 'Archivo' }}
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-sm mb-1"
+                                    v-if="imagen" @click="quitarImagen" :disabled="capturando || subiendo">
+                                    <span class="fa fa-trash"></span>
+                                </button>
+                                <input type="file" ref="inputImagen" class="d-none"
+                                    accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                                    @change="subirImagenArchivo">
+                            </div>
+                            <small class="text-muted d-block mt-1" v-if="!camaraConfigured">
+                                Configurá la cámara en
+                                <a href="{{ route('ajuste.index') }}">Ajustes</a>
+                                para usar captura CCTV.
+                            </small>
                         </div>
                     </div>
 
@@ -1057,9 +1098,12 @@
                     suc: 0,
                     cant: 0
                 },
-                ip: '192.168.1.101',
-                user: 'admin',
-                pass: 'Majlpchot28',
+                ip: '',
+                user: '',
+                pass: '',
+                camaraConfigured: {{ !empty($camara['configured']) ? 'true' : 'false' }},
+                capturando: false,
+                subiendo: false,
                 imagen: null,
                 imagenFilename: null
             },
@@ -1077,25 +1121,88 @@
 
             },
             methods: {
-                async capturarImagen() {
-                try {
-                    const res = await axios.post('{{ env('APP_URL') }}' + 'articulo/capturar', {
-                    ip: this.ip,
-                    user: this.user,
-                    pass: this.pass
-                    });
-                    if (res.data.success) {
-                    this.imagen = res.data.path;
-                    this.imagenFilename = res.data.filename;
-                    } else {
-                    alert(res.data.message);
+                setImagenFromFilename: function (filename) {
+                    if (!filename) {
+                        this.imagen = null;
+                        this.imagenFilename = null;
+                        return;
                     }
-                } catch (err) {
-                    console.error(err);
-                    alert('Error al capturar imagen');
-                }
+                    this.imagenFilename = filename;
+                    if (String(filename).indexOf('http') === 0 || String(filename).indexOf('/') === 0) {
+                        this.imagen = filename;
+                    } else {
+                        this.imagen = '{{ asset('storage/articulos') }}/' + filename;
+                    }
                 },
-                
+                async capturarImagen() {
+                    if (!this.camaraConfigured) {
+                        Swal.fire('Cámara no configurada', 'Andá a Ajustes y cargá la URL/IP de la cámara CCTV.', 'info');
+                        return;
+                    }
+                    this.capturando = true;
+                    try {
+                        const res = await axios.post('{{ url('articulo/capturar') }}');
+                        if (res.data.success) {
+                            this.imagen = res.data.path;
+                            this.imagenFilename = res.data.filename;
+                        } else {
+                            Swal.fire('Error', res.data.message || 'No se pudo capturar', 'error');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        var msg = (err.response && err.response.data && err.response.data.message)
+                            ? err.response.data.message
+                            : 'Error al capturar imagen';
+                        Swal.fire('Error', msg, 'error');
+                    } finally {
+                        this.capturando = false;
+                    }
+                },
+                abrirArchivo: function () {
+                    if (this.$refs.inputImagen) {
+                        this.$refs.inputImagen.click();
+                    }
+                },
+                async subirImagenArchivo(event) {
+                    var file = event.target.files && event.target.files[0];
+                    if (!file) {
+                        return;
+                    }
+                    var form = new FormData();
+                    form.append('imagen', file);
+                    this.subiendo = true;
+                    try {
+                        const res = await axios.post('{{ url('articulo/imagen') }}', form, {
+                            headers: { 'Content-Type': 'multipart/form-data' }
+                        });
+                        if (res.data.success) {
+                            this.imagen = res.data.path;
+                            this.imagenFilename = res.data.filename;
+                        } else {
+                            Swal.fire('Error', res.data.message || 'No se pudo subir', 'error');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        var msg = 'Error al subir imagen';
+                        if (err.response && err.response.data) {
+                            if (err.response.data.message) {
+                                msg = err.response.data.message;
+                            } else if (err.response.data.errors && err.response.data.errors.imagen) {
+                                msg = err.response.data.errors.imagen[0];
+                            }
+                        }
+                        Swal.fire('Error', msg, 'error');
+                    } finally {
+                        this.subiendo = false;
+                        if (this.$refs.inputImagen) {
+                            this.$refs.inputImagen.value = '';
+                        }
+                    }
+                },
+                quitarImagen: function () {
+                    this.imagen = null;
+                    this.imagenFilename = '';
+                },
 
                 setMargen: function(index) {
                     if (this.viewPrecio) {
@@ -1289,7 +1396,8 @@
                         'm5': parseInt(a.pre_margen5, 10),
                         'svenc': '0',
                         existePrecios: false
-                    }
+                    };
+                    this.setImagenFromFilename(a.foto || '');
                 },
                 duplicar: function(id) {
                     const articulo = this.articulos[this.articulos.findIndex(e => e.ARTICULOS_cod == id)];
@@ -1298,6 +1406,8 @@
                     this.setArticulo(articulo);
                     this.articulo.codigo = '';
                     this.articulo.c_barra = '';
+                    this.imagen = null;
+                    this.imagenFilename = null;
                     $('#addArticulo').modal('show');
                     $('#tabadd a:first-child').tab('show')
                     //this.getUltimo();

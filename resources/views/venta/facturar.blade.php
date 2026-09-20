@@ -92,6 +92,9 @@
                         <p class="mb-2">
                             <span class="text-muted d-block small">Ambiente</span>
                             <strong>@{{ ambienteLabel }}</strong>
+                            <span class="badge badge-pill ml-1" :class="modoEmision === 'api' ? 'badge-primary' : 'badge-secondary'">
+                                @{{ modoEmision === 'api' ? 'API remota' : 'Local' }}
+                            </span>
                         </p>
                         <p class="mb-2" v-if="documento.numero">
                             <span class="text-muted d-block small">Número factura</span>
@@ -133,7 +136,13 @@
                 <div class="card card-outline card-info mt-3">
                     <div class="card-body small">
                         <p class="mb-1"><strong>Próximo número:</strong> {{ str_pad($config->establecimiento, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($config->punto_expedicion, 3, '0', STR_PAD_LEFT) }}-{{ str_pad($config->ultimo_numero + 1, 7, '0', STR_PAD_LEFT) }}</p>
-                        <p class="mb-0 text-muted">El DE se construye, firma con certificado digital y se envía a SIFEN vía SOAP.</p>
+                        <p class="mb-0 text-muted" v-if="modoEmision === 'api'">
+                            Emisión vía API remota (<a href="https://github.com/jlmartinezdev/api_sifen" target="_blank">api_sifen</a>):
+                            borrador → preparar → emitir. El KuDE se descarga desde la API cuando esté disponible.
+                        </p>
+                        <p class="mb-0 text-muted" v-else>
+                            El DE se construye, firma con certificado digital y se envía a SIFEN vía SOAP.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -149,6 +158,7 @@
                 procesando: false,
                 configActiva: {{ $config->activo ? 'true' : 'false' }},
                 ambiente: @json($config->ambiente),
+                modoEmision: @json($config->modo_emision ?: 'local'),
                 documento: @json($documento ? $documento : ['id' => null, 'estado' => null]),
                 faltantes: @json($faltantes),
             },

@@ -35,9 +35,13 @@ class ClienteController extends Controller
             'cliente_nombre',
             'cliente_direccion',
             'cliente_cel',
+            'cliente_telef',
             'cliente_correo',
-            'ciudad_cod',
-            'cliente_ruc'
+            'CIUDAD_cod',
+            'cliente_ruc',
+            'cliente_referente_nombre',
+            'cliente_profesion',
+            'cliente_referencia_laboral'
         );
 
         if ($q !== '') {
@@ -126,8 +130,33 @@ class ClienteController extends Controller
      */
     public function update(Request $request)
     {
-        $cliente = Cliente::where('clientes_cod','=',$request->cliente['id'])->update(['CIUDAD_cod' =>$request->cliente['idciudad'],'cliente_ci' =>$request->cliente['doc'], 'cliente_nombre' =>$request->cliente['nombre'], 'cliente_ruc' => $request->cliente['doc'], 'cliente_direccion' =>$request->cliente['direccion'], 'cliente_telef' =>$request->cliente['celular'], 'cliente_cel' =>$request->cliente['celular'], 'cliente_correo' =>$request->cliente['correo']]);
-        return 'OK';
+        $data = $request->input('cliente', []);
+        // Permitir CLIENTES_cod = 0 (no usar !$id: en PHP 0 es falsy)
+        if (!array_key_exists('id', $data) || $data['id'] === null || $data['id'] === '') {
+            return response()->json(['ok' => false, 'message' => 'Cliente no válido'], 422);
+        }
+        $id = (int) $data['id'];
+
+        $existe = Cliente::where('CLIENTES_cod', $id)->exists();
+        if (!$existe) {
+            return response()->json(['ok' => false, 'message' => 'Cliente no encontrado'], 404);
+        }
+
+        Cliente::where('CLIENTES_cod', $id)->update([
+            'CIUDAD_cod' => $data['idciudad'] ?? 1,
+            'cliente_ci' => $data['doc'] ?? '',
+            'cliente_nombre' => $data['nombre'] ?? '',
+            'cliente_ruc' => $data['doc'] ?? '',
+            'cliente_direccion' => $data['direccion'] ?? '',
+            'cliente_telef' => $data['telefono'] ?? '',
+            'cliente_cel' => $data['celular'] ?? '',
+            'cliente_correo' => $data['correo'] ?? '',
+            'cliente_referente_nombre' => $data['celfamiliar'] ?? '',
+            'cliente_profesion' => $data['ocupacion'] ?? '',
+            'cliente_referencia_laboral' => $data['reflaboral'] ?? '',
+        ]);
+
+        return response()->json(['ok' => true, 'message' => 'OK']);
     }
 
     /**

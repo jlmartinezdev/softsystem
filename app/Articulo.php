@@ -25,8 +25,12 @@ class Articulo extends Model
     }
 
     public function scopeDescripcion($query, $descripcion){
-    	if($descripcion)
-    		return $query->where('articulos.producto_nombre','LIKE',"%$descripcion%");
+    	if($descripcion) {
+    		return $query->where(function ($q) use ($descripcion) {
+                $q->where('articulos.producto_nombre', 'LIKE', "%{$descripcion}%")
+                    ->orWhere('articulos.producto_c_barra', 'LIKE', "%{$descripcion}%");
+            });
+        }
     }
     public function scopeSeccion($query,$seccion){
     	if($seccion)

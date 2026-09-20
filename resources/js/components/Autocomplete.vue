@@ -30,13 +30,14 @@
           <span class="left">
             {{ result.producto_nombre }}
           </span>
-          <span class="right font-weight-bold">
-            <span v-show="result.cantidad > 0" class="badge badge-info">{{
-              result.cantidad
-            }}</span>
-            Gs
-            {{ new Intl.NumberFormat("de-DE").format(result.pre_venta1) }}</span
-          >
+          <span class="right">
+            <span
+              class="catalogo-stock"
+              :class="{ agotado: Number(result.cantidad) <= 0 }"
+            >{{ Math.floor(Number(result.cantidad) || 0) }}
+              {{ Number(result.cantidad) == 1 ? 'disponible' : 'disponibles' }}</span>
+            <span class="precio">Gs {{ new Intl.NumberFormat("de-DE").format(result.pre_venta1) }}</span>
+          </span>
         </li>
         <li v-if="noresult" class="autocomplete-result">
           <span class="left"> No hay resultado para <i>{{ searchQuery }}</i> </span>
@@ -63,11 +64,10 @@ export default {
       noresult: false,
       timeout: null,
       isCodeBalence: false,
-      isReadyBalance: true,
       flagBalance: "20"
     };
   },
-  props: ["url", "idsucursal", "validarLote", "routeArticulo"],
+  props: ["url", "idsucursal", "validarLote", "routeArticulo", "isReadyBalance"],
   watch: {
     searchQuery: function () {
       if (this.searchQuery === "") {
@@ -184,7 +184,7 @@ export default {
     },
     returnData() {
       this.searchQuery = "";
-      if(this.isReadyBalance){
+      if (this.isReadyBalance === true || this.isReadyBalance === 'true') {
         this.$emit("peso", this.peso);
         this.peso = "";
       }
@@ -322,9 +322,19 @@ export default {
   /* box-shadow: 0 2px 2px rgba(0, 0, 0, .16)*/
 }
 .dark-mode .autocomplete-input {
-  border-color: rgba(0, 0, 0, 0.12);
-  color: white;
+  border-color: #6c757d;
+  color: #fff;
   background-color: #343a40;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYWRiNWJkIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMSIgcj0iOCIvPjxwYXRoIGQ9Ik0yMSAyMWwtNC00Ii8+PC9zdmc+");
+}
+.dark-mode .autocomplete-input:focus,
+.dark-mode .autocomplete-input[aria-expanded="true"] {
+  border-color: #adb5bd;
+  background-color: #343a40;
+  color: #fff;
+}
+.dark-mode .autocomplete-input::placeholder {
+  color: #adb5bd;
 }
 
 [data-position="below"] .autocomplete-input[aria-expanded="true"] {
@@ -365,6 +375,8 @@ export default {
 }
 .dark-mode .autocomplete-result-list {
   background: #343a40;
+  color: #fff;
+  border-color: #6c757d;
 }
 
 [data-position="below"] .autocomplete-result-list {
@@ -383,22 +395,75 @@ export default {
 
 .autocomplete-result {
   cursor: default;
-  padding: 7px 7px 7px 48px;
+  padding: 8px 10px 8px 48px;
   background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjY2NjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMSIgcj0iOCIvPjxwYXRoIGQ9Ik0yMSAyMWwtNC00Ii8+PC9zdmc+");
   background-repeat: no-repeat;
-  background-position: 12px;
+  background-position: 12px center;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 40px;
 }
 .autocomplete-result .left {
-  float: left;
-  width: 72%;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .autocomplete-result .right {
-  float: right;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  line-height: 1;
+}
+.autocomplete-result .right .precio {
+  font-weight: 700;
+  line-height: 1;
+}
+.autocomplete-result .catalogo-stock {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 50px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  background: #e8f5e9;
+  color: #2d5a4c;
+}
+.autocomplete-result .catalogo-stock.agotado {
+  background: #fdecea;
+  color: #9b2c2c;
 }
 .autocomplete-result:hover,
 .autocomplete-result[aria-selected="true"] {
   background-color: rgba(0, 0, 0, 0.12);
+}
+.dark-mode .autocomplete-result {
+  color: #fff;
+}
+.dark-mode .autocomplete-result .left,
+.dark-mode .autocomplete-result .precio {
+  color: #fff;
+}
+.dark-mode .autocomplete-result.text-maroon,
+.dark-mode .autocomplete-result.text-maroon .left,
+.dark-mode .autocomplete-result.text-maroon .precio {
+  color: #ff8a80;
+}
+.dark-mode .autocomplete-result:hover,
+.dark-mode .autocomplete-result[aria-selected="true"] {
+  background-color: #454d55;
+}
+.dark-mode .autocomplete-result .btn-link {
+  color: #9ec5fe;
 }
 
 @keyframes rotate {

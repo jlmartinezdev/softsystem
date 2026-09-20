@@ -17,6 +17,9 @@
                     <span class="badge badge-pill" :class="config.activo ? 'badge-success' : 'badge-secondary'">
                         @{{ config.activo ? 'Activo' : 'Inactivo' }}
                     </span>
+                    <span class="badge badge-pill" :class="config.modo_emision === 'api' ? 'badge-primary' : 'badge-secondary'">
+                        @{{ config.modo_emision === 'api' ? 'Modo API' : 'Modo local' }}
+                    </span>
                     <span class="badge badge-pill" :class="config.ambiente === 'prod' ? 'badge-danger' : 'badge-info'">
                         @{{ config.ambiente === 'prod' ? 'Producción' : 'Prueba' }}
                     </span>
@@ -47,7 +50,10 @@
                                 <a class="nav-link" data-toggle="tab" href="#tab-timbrado">Timbrado</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#tab-cert">Certificado / API</a>
+                                <a class="nav-link" data-toggle="tab" href="#tab-cert">Certificado / SET</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tab-api">API remota</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" data-toggle="tab" href="#tab-csc">CSC / QR</a>
@@ -61,6 +67,20 @@
                                     <input type="checkbox" class="custom-control-input" id="sifenActivo" v-model="config.activo">
                                     <label class="custom-control-label" for="sifenActivo">Habilitar facturación electrónica SIFEN</label>
                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Modo de emisión</label>
+                                <select class="form-control form-control-sm" v-model="config.modo_emision">
+                                    <option value="local">Local (firma + SOAP en SoftSystem)</option>
+                                    <option value="api">API remota (api_sifen)</option>
+                                </select>
+                                <small class="form-text text-muted" v-if="config.modo_emision === 'api'">
+                                    Emite vía <a href="https://github.com/jlmartinezdev/api_sifen" target="_blank">api_sifen</a>.
+                                    Certificado, CSC y timbrado se configuran en ese microservicio.
+                                </small>
+                                <small class="form-text text-muted" v-else>
+                                    SoftSystem construye, firma y envía el DE directamente a SET.
+                                </small>
                             </div>
                             <div class="form-group">
                                 <label>Ambiente</label>
@@ -356,27 +376,84 @@
                         </div>
 
                         <div class="tab-pane fade" id="tab-cert">
+                            <div class="alert alert-info small" v-if="config.modo_emision === 'api'">
+                                En modo API el certificado y las URLs SET se configuran en <strong>api_sifen</strong>.
+                                Esta pestaña solo aplica al modo local.
+                            </div>
                             <div class="form-group">
                                 <label>Ruta certificado digital (.p12 / .pfx)</label>
-                                <input type="text" class="form-control form-control-sm" v-model="config.cert_path" placeholder="Ej: C:\certificados\contribuyente.p12">
+                                <input type="text" class="form-control form-control-sm" v-model="config.cert_path" placeholder="Ej: C:\certificados\contribuyente.p12" :disabled="config.modo_emision === 'api'">
                             </div>
                             <div class="form-group">
                                 <label>Contraseña del certificado</label>
-                                <input type="password" class="form-control form-control-sm" v-model="config.cert_password" autocomplete="new-password">
+                                <input type="password" class="form-control form-control-sm" v-model="config.cert_password" autocomplete="new-password" :disabled="config.modo_emision === 'api'">
                             </div>
                             <div class="form-group">
                                 <label>URL servicio — Prueba</label>
-                                <input type="text" class="form-control form-control-sm" v-model="config.url_test" placeholder="https://sifen-test.set.gov.py/de/ws/sync/recibe">
+                                <input type="text" class="form-control form-control-sm" v-model="config.url_test" placeholder="https://sifen-test.set.gov.py/de/ws/sync/recibe" :disabled="config.modo_emision === 'api'">
                             </div>
                             <div class="form-group">
                                 <label>URL servicio — Producción</label>
-                                <input type="text" class="form-control form-control-sm" v-model="config.url_prod" placeholder="https://sifen.set.gov.py/de/ws/sync/recibe">
+                                <input type="text" class="form-control form-control-sm" v-model="config.url_prod" placeholder="https://sifen.set.gov.py/de/ws/sync/recibe" :disabled="config.modo_emision === 'api'">
                             </div>
                             <p class="small text-muted">
                                 URL activa según ambiente: <code>@{{ urlActiva }}</code><br>
                                 Use el endpoint <strong>/recibe</strong> (sin .wsdl). Requiere TLS 1.2 con certificado cliente (.p12).<br>
                                 En <strong>ambiente de prueba (test)</strong>, el certificado debe estar habilitado en el portal e-Kuatia (Marangatu) para <code>sifen-test.set.gov.py</code>. Si SET responde HTTP 302 hacia <code>hangup.php3</code>, el certificado aún no está autorizado en el ambiente test.
                             </p>
+                        </div>
+
+                        <div class="tab-pane fade" id="tab-api">
+                            <div class="alert alert-light border small">
+                                Microservicio <a href="https://github.com/jlmartinezdev/api_sifen" target="_blank">jlmartinezdev/api_sifen</a>.
+                                Flujo: crear borrador → preparar → emitir. SoftSystem envía la venta como <code>referencia_externa = VTA-{nro}</code>.
+                            </div>
+                            <div class="form-group">
+                                <label>URL base de la API</label>
+                                <input type="text" class="form-control form-control-sm" v-model="config.api_url"
+                                    placeholder="http://sifen-api.test:8080">
+                                <small class="form-text text-muted">Sin barra final. Se agregará <code>/api/v1</code> automáticamente si falta.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Token Bearer</label>
+                                <textarea class="form-control form-control-sm" rows="2" v-model="config.api_token"
+                                    placeholder="Pegá el token de /configuracion/tokens o login API"></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="custom-control custom-switch mb-2">
+                                        <input type="checkbox" class="custom-control-input" id="apiEnviarSifen" v-model="config.api_enviar_sifen">
+                                        <label class="custom-control-label" for="apiEnviarSifen">Enviar a SIFEN (SET) al emitir</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="custom-control custom-switch mb-2">
+                                        <input type="checkbox" class="custom-control-input" id="apiEnviarCorreo" v-model="config.api_enviar_correo">
+                                        <label class="custom-control-label" for="apiEnviarCorreo">Enviar XML/KuDE por correo (API)</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="btn-group mb-3">
+                                <button type="button" class="btn btn-outline-primary btn-sm" @click="probarApi" :disabled="probandoApi">
+                                    <span class="fa fa-plug"></span> Probar conexión
+                                </button>
+                            </div>
+                            <hr>
+                            <h6 class="mb-2">Obtener token (login API)</h6>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <input type="email" class="form-control form-control-sm mb-2" v-model="apiLogin.email" placeholder="admin@sifen-api.local">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="password" class="form-control form-control-sm mb-2" v-model="apiLogin.password" placeholder="password" autocomplete="new-password">
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm btn-block" @click="obtenerTokenApi" :disabled="obteniendoToken">
+                                        <span class="fa fa-key"></span> Obtener
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="small text-muted mb-0">No se guarda la contraseña; solo el token Bearer resultante.</p>
                         </div>
 
                         <div class="tab-pane fade" id="tab-csc">
@@ -477,6 +554,9 @@
             el: '#app',
             data: {
                 guardando: false,
+                probandoApi: false,
+                obteniendoToken: false,
+                apiLogin: { email: 'admin@sifen-api.local', password: '' },
                 config: @json($config),
                 catalogos: @json($catalogos),
                 documentos: @json($documentos),
@@ -544,6 +624,8 @@
                     self.guardando = true;
                     var payload = Object.assign({}, self.config, {
                         activo: self.config.activo ? 1 : 0,
+                        api_enviar_sifen: self.config.api_enviar_sifen ? 1 : 0,
+                        api_enviar_correo: self.config.api_enviar_correo ? 1 : 0,
                         vigencia_desde: self.normalizarFechaInput(self.config.vigencia_desde),
                         vigencia_hasta: self.normalizarFechaInput(self.config.vigencia_hasta),
                     });
@@ -556,6 +638,44 @@
                         .catch(function(err) {
                             self.guardando = false;
                             Swal.fire('Error', err.message, 'error');
+                        });
+                },
+                probarApi: function() {
+                    var self = this;
+                    self.probandoApi = true;
+                    axios.post('{{ route('sifen.api.probar') }}')
+                        .then(function(res) {
+                            self.probandoApi = false;
+                            Swal.fire('API OK', res.data.mensaje || 'Conexión correcta', 'success');
+                        })
+                        .catch(function(err) {
+                            self.probandoApi = false;
+                            var msg = (err.response && err.response.data && err.response.data.mensaje)
+                                ? err.response.data.mensaje
+                                : err.message;
+                            Swal.fire('Error API', msg, 'error');
+                        });
+                },
+                obtenerTokenApi: function() {
+                    var self = this;
+                    if (!self.apiLogin.email || !self.apiLogin.password) {
+                        Swal.fire('Faltan datos', 'Indicá email y contraseña del panel api_sifen', 'warning');
+                        return;
+                    }
+                    self.obteniendoToken = true;
+                    axios.post('{{ route('sifen.api.token') }}', self.apiLogin)
+                        .then(function(res) {
+                            self.obteniendoToken = false;
+                            self.config.api_token = res.data.token;
+                            self.apiLogin.password = '';
+                            Toast.fire({ icon: 'success', title: 'Token guardado' });
+                        })
+                        .catch(function(err) {
+                            self.obteniendoToken = false;
+                            var msg = (err.response && err.response.data && err.response.data.mensaje)
+                                ? err.response.data.mensaje
+                                : err.message;
+                            Swal.fire('Error', msg, 'error');
                         });
                 },
                 sincronizarEmpresa: function() {
