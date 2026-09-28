@@ -13,6 +13,10 @@ class ProveedorController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permiso:proveedor,open')->only(['index']);
+        $this->middleware('permiso:proveedor,add')->only(['store']);
+        $this->middleware('permiso:proveedor,edit')->only(['update']);
+        $this->middleware('permiso:proveedor,del')->only(['destroy']);
     }
 
     public function index()
@@ -29,8 +33,16 @@ class ProveedorController extends Controller
 
     public function buscar(Request $request)
     {
+        $term = trim($request->nombre);
         $proveedor = Proveedor::select('PROVEEDOR_cod', 'proveedor_ruc', 'proveedor_nombre', 'proveedor_direc', 'proveedor_telef')
-            ->nombre(strtoupper($request->nombre))
+            ->when($term, function($query) use ($term) {
+                $upper = strtoupper($term);
+                $query->where(function($q) use ($upper) {
+                    $q->whereRaw('upper(proveedor_nombre) like ?', ["%{$upper}%"])
+                      ->orWhereRaw('upper(proveedor_ruc) like ?', ["%{$upper}%"])
+                      ->orWhereRaw('upper(proveedor_telef) like ?', ["%{$upper}%"]);
+                });
+            })
             ->orderBy('proveedor_nombre', 'ASC')
             ->limit(100)
             ->get();

@@ -27,9 +27,20 @@ class LoginController extends Controller
         $meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'setiembre', 'octubre', 'noviembre', 'diciembre'];
         $fecha = date('d') . ' de ' . $meses[(int) date('n') - 1] . ' de ' . date('Y');
 
+        $usuarios = \App\User::select(
+            \DB::raw('TRIM(user_usuarios) as user_usuarios'),
+            \DB::raw('TRIM(nom_usuarios) as nom_usuarios')
+        )->get()->sortBy(function ($user) {
+            $nombre = strtoupper(trim($user->nom_usuarios . ' ' . $user->user_usuarios));
+            $sistema = (strpos($nombre, 'ADMIN') !== false || strpos($nombre, 'SISTEMA') !== false || strpos($nombre, 'ROOT') !== false) ? '1' : '0';
+
+            return $sistema . '-' . $user->nom_usuarios;
+        })->values();
+
         return view('auth.login', [
             'empresa' => $empresa,
             'fecha_turno' => $fecha,
+            'usuarios' => $usuarios,
         ]);
     }
 

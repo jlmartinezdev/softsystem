@@ -21,6 +21,9 @@ class AperturaController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permiso:apert_cierres_caja,open')->only(['index']);
+        $this->middleware('permiso:apert_cierres_caja,add')->only(['store']);
+        $this->middleware('permiso:apert_cierres_caja,edit')->only(['indexCierre', 'update']);
     }
 
     public function index(Request $request)

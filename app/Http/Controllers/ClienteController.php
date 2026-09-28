@@ -3,21 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Cliente;
-use Illuminate\Http\Request;
 use App\Ciudad;
+use App\Support\MapSettings;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ClienteController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permiso:clientes,open')->only(['index']);
+        $this->middleware('permiso:clientes,add')->only(['store', 'subirFotoDocumento']);
+        $this->middleware('permiso:clientes,edit')->only(['update', 'eliminarFotoDocumento']);
+        $this->middleware('permiso:clientes,del')->only(['destroy']);
+    }
+
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Muestra la vista principal del directorio de clientes.
      */
     public function index()
     {
-        $ciudades= Ciudad::select('CIUDAD_cod','ciudad_nombre')->get();
-        return view('cliente',compact('ciudades'));
+        $ciudades = Ciudad::select('CIUDAD_cod', 'ciudad_nombre')->orderBy('ciudad_nombre', 'ASC')->get();
+        $mapConfig = MapSettings::publicConfig();
+        return view('cliente', compact('ciudades', 'mapConfig'));
     }
+
+    /**
+     * Búsqueda dinámica de clientes con datos de contacto, GPS y documentos.
+     */
     public function buscar(Request $request)
     {
         $q = trim((string) $request->get('q', ''));
@@ -30,10 +45,16 @@ class ClienteController extends Controller
         }
 
         $query = Cliente::select(
-            'clientes.clientes_cod',
+            'clientes.CLIENTES_cod as clientes_cod',
+            'clientes.CLIENTES_cod',
             'clientes.cliente_ci',
             'clientes.cliente_nombre',
             'clientes.cliente_direccion',
+            'clientes.cliente_latitud',
+            'clientes.cliente_longitud',
+            'clientes.cliente_ubicacion_url',
+            'clientes.cliente_foto_ci_dorso',
+            'clientes.cliente_foto_ci_reverso',
             'clientes.cliente_cel',
             'clientes.cliente_telef',
             'clientes.cliente_correo',
@@ -64,116 +85,216 @@ class ClienteController extends Controller
             $query->where('clientes.CIUDAD_cod', (int)$request->ciudad);
         }
 
-        return $query->orderBy('clientes.cliente_nombre', 'ASC')
+        $clientes = $query->orderBy('clientes.cliente_nombre', 'ASC')
             ->limit($limit)
             ->get();
-    }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+
+        // Mapear URLs de fotos y datos GPS
+        $clientes->transform(function ($c) {
+            $c->foto_frente_url = !empty($c->cliente_foto_ci_dorso)
+                ? (filter_var($c->cliente_foto_ci_dorso, FILTER_VALIDATE_URL) ? $c->cliente_foto_ci_dorso : asset('storage/clientes/' . $c->cliente_foto_ci_dorso))
+                : null;
+            $c->foto_dorso_url = !empty($c->cliente_foto_ci_reverso)
+                ? (filter_var($c->cliente_foto_ci_reverso, FILTER_VALIDATE_URL) ? $c->cliente_foto_ci_reverso : asset('storage/clientes/' . $c->cliente_foto_ci_reverso))
+                : null;
+            $c->tiene_gps = !empty($c->cliente_latitud) && !empty($c->cliente_longitud);
+            $c->gps_url = $c->tiene_gps
+                ? "https://www.google.com/maps?q={$c->cliente_latitud},{$c->cliente_longitud}"
+                : ($c->cliente_ubicacion_url ?? null);
+            return $c;
+        });
+
+        return response()->json($clientes);
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * Guarda un nuevo cliente con soporte para GPS y fotos de documentos.
      */
     public function store(Request $request)
     {
-        $ultimo= Cliente::max('CLIENTES_cod');
-        
+        $cData = $request->input('cliente', []);
+
+        $request->validate([
+            'cliente.nombre' => 'required|string|max:70',
+            'cliente.doc'    => 'required|string|max:15',
+        ], [
+            'cliente.nombre.required' => 'El nombre del cliente es obligatorio.',
+            'cliente.doc.required'    => 'El documento/RUC es obligatorio.',
+        ]);
+
+        $ultimo = (int) Cliente::max('CLIENTES_cod');
+
         $cliente = new Cliente();
-        $cliente->CLIENTES_cod= $ultimo +1;
-        $cliente->CIUDAD_cod =$request->cliente['idciudad'];
-        $cliente->cliente_ci =$request->cliente['doc'];
-        $cliente->cliente_nombre =$request->cliente['nombre'];
-        $cliente->cliente_ruc =$request->cliente['doc'];
-        $cliente->cliente_direccion =$request->cliente['direccion'];
-        $cliente->cliente_telef =$request->cliente['telefono'];
-        $cliente->cliente_cel =$request->cliente['celular'];
-        $cliente->cliente_correo =$request->cliente['correo'];
-        $cliente->cliente_referente_nombre = $request->cliente['celfamiliar'];
-        $cliente->cliente_profesion = $request->cliente['ocupacion'];
-        $cliente->cliente_referencia_laboral = $request->cliente['reflaboral'];
+        $cliente->CLIENTES_cod = $ultimo + 1;
+        $cliente->CIUDAD_cod = $cData['idciudad'] ?? 1;
+        $cliente->cliente_ci = trim($cData['doc'] ?? '');
+        $cliente->cliente_nombre = trim($cData['nombre'] ?? '');
+        $cliente->cliente_ruc = trim($cData['doc'] ?? '');
+        $cliente->cliente_direccion = trim($cData['direccion'] ?? '');
+        $cliente->cliente_latitud = !empty($cData['latitud']) ? trim($cData['latitud']) : null;
+        $cliente->cliente_longitud = !empty($cData['longitud']) ? trim($cData['longitud']) : null;
+        $cliente->cliente_ubicacion_url = !empty($cData['ubicacion_url']) ? trim($cData['ubicacion_url']) : null;
+        $cliente->cliente_foto_ci_dorso = !empty($cData['foto_ci_dorso']) ? trim($cData['foto_ci_dorso']) : null;
+        $cliente->cliente_foto_ci_reverso = !empty($cData['foto_ci_reverso']) ? trim($cData['foto_ci_reverso']) : null;
+        $cliente->cliente_telef = trim($cData['telefono'] ?? '');
+        $cliente->cliente_cel = trim($cData['celular'] ?? '');
+        $cliente->cliente_correo = trim($cData['correo'] ?? '');
+        $cliente->cliente_referente_nombre = trim($cData['celfamiliar'] ?? '');
+        $cliente->cliente_profesion = trim($cData['ocupacion'] ?? '');
+        $cliente->cliente_referencia_laboral = trim($cData['reflaboral'] ?? '');
         $cliente->save();
-        return 'OK';
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Cliente registrado exitosamente.',
+            'id' => $cliente->CLIENTES_cod,
+            'cliente' => $cliente
+        ]);
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Cliente  $cliente
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Cliente $cliente)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Cliente  $cliente
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Cliente $cliente)
-    {
-        
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Cliente  $cliente
-     * @return \Illuminate\Http\Response
+     * Actualiza los datos del cliente incluyendo ubicación GPS y fotos de CI.
      */
     public function update(Request $request)
     {
         $data = $request->input('cliente', []);
-        // Permitir CLIENTES_cod = 0 (no usar !$id: en PHP 0 es falsy)
         if (!array_key_exists('id', $data) || $data['id'] === null || $data['id'] === '') {
-            return response()->json(['ok' => false, 'message' => 'Cliente no válido'], 422);
+            return response()->json(['ok' => false, 'message' => 'Identificador de cliente no válido.'], 422);
         }
         $id = (int) $data['id'];
 
-        $existe = Cliente::where('CLIENTES_cod', $id)->exists();
-        if (!$existe) {
-            return response()->json(['ok' => false, 'message' => 'Cliente no encontrado'], 404);
+        $cliente = Cliente::where('CLIENTES_cod', $id)->first();
+        if (!$cliente) {
+            return response()->json(['ok' => false, 'message' => 'Cliente no encontrado.'], 404);
         }
 
-        Cliente::where('CLIENTES_cod', $id)->update([
+        $updateData = [
             'CIUDAD_cod' => $data['idciudad'] ?? 1,
-            'cliente_ci' => $data['doc'] ?? '',
-            'cliente_nombre' => $data['nombre'] ?? '',
-            'cliente_ruc' => $data['doc'] ?? '',
-            'cliente_direccion' => $data['direccion'] ?? '',
-            'cliente_telef' => $data['telefono'] ?? '',
-            'cliente_cel' => $data['celular'] ?? '',
-            'cliente_correo' => $data['correo'] ?? '',
-            'cliente_referente_nombre' => $data['celfamiliar'] ?? '',
-            'cliente_profesion' => $data['ocupacion'] ?? '',
-            'cliente_referencia_laboral' => $data['reflaboral'] ?? '',
-        ]);
+            'cliente_ci' => trim($data['doc'] ?? ''),
+            'cliente_nombre' => trim($data['nombre'] ?? ''),
+            'cliente_ruc' => trim($data['doc'] ?? ''),
+            'cliente_direccion' => trim($data['direccion'] ?? ''),
+            'cliente_telef' => trim($data['telefono'] ?? ''),
+            'cliente_cel' => trim($data['celular'] ?? ''),
+            'cliente_correo' => trim($data['correo'] ?? ''),
+            'cliente_referente_nombre' => trim($data['celfamiliar'] ?? ''),
+            'cliente_profesion' => trim($data['ocupacion'] ?? ''),
+            'cliente_referencia_laboral' => trim($data['reflaboral'] ?? ''),
+        ];
 
-        return response()->json(['ok' => true, 'message' => 'OK']);
+        // Actualizar coordenadas GPS si se enviaron
+        if (array_key_exists('latitud', $data)) {
+            $updateData['cliente_latitud'] = !empty($data['latitud']) ? trim($data['latitud']) : null;
+        }
+        if (array_key_exists('longitud', $data)) {
+            $updateData['cliente_longitud'] = !empty($data['longitud']) ? trim($data['longitud']) : null;
+        }
+        if (array_key_exists('ubicacion_url', $data)) {
+            $updateData['cliente_ubicacion_url'] = !empty($data['ubicacion_url']) ? trim($data['ubicacion_url']) : null;
+        }
+
+        // Actualizar nombres de fotos si se enviaron explícitamente
+        if (array_key_exists('foto_ci_dorso', $data)) {
+            $updateData['cliente_foto_ci_dorso'] = !empty($data['foto_ci_dorso']) ? trim($data['foto_ci_dorso']) : null;
+        }
+        if (array_key_exists('foto_ci_reverso', $data)) {
+            $updateData['cliente_foto_ci_reverso'] = !empty($data['foto_ci_reverso']) ? trim($data['foto_ci_reverso']) : null;
+        }
+
+        Cliente::where('CLIENTES_cod', $id)->update($updateData);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Cliente actualizado correctamente.',
+            'id' => $id
+        ]);
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Cliente  $cliente
-     * @return \Illuminate\Http\Response
+     * Sube una foto de documento (frente o reverso / dorso) en almacenamiento público.
+     */
+    public function subirFotoDocumento(Request $request)
+    {
+        $request->validate([
+            'foto' => 'required|image|mimes:jpeg,png,jpg,webp|max:10240',
+            'tipo' => 'required|in:frente,dorso',
+            'id_cliente' => 'nullable|integer',
+        ], [
+            'foto.required' => 'Debe adjuntar una imagen válida del documento.',
+            'foto.image' => 'El archivo adjunto debe ser una imagen.',
+            'foto.mimes' => 'Formato permitido: JPG, PNG o WebP.',
+            'foto.max' => 'El tamaño máximo de imagen es 10MB.',
+            'tipo.in' => 'El tipo de foto debe ser "frente" o "dorso".',
+        ]);
+
+        $tipo = $request->tipo;
+        $file = $request->file('foto');
+        $ext = $file->getClientOriginalExtension();
+        $filename = 'ci_' . $tipo . '_' . time() . '_' . mt_rand(1000, 9999) . '.' . $ext;
+
+        // Guardar archivo en storage/app/public/clientes
+        $path = $file->storeAs('clientes', $filename, 'public');
+
+        // Si se envió ID del cliente, actualizar la columna en la BD de inmediato
+        if ($request->filled('id_cliente') && (int)$request->id_cliente > 0) {
+            $col = ($tipo === 'frente') ? 'cliente_foto_ci_dorso' : 'cliente_foto_ci_reverso';
+            
+            // Eliminar imagen anterior si existía
+            $fotoAnterior = Cliente::where('CLIENTES_cod', $request->id_cliente)->value($col);
+            if ($fotoAnterior && Storage::disk('public')->exists('clientes/' . $fotoAnterior)) {
+                Storage::disk('public')->delete('clientes/' . $fotoAnterior);
+            }
+
+            Cliente::where('CLIENTES_cod', $request->id_cliente)->update([$col => $filename]);
+        }
+
+        return response()->json([
+            'ok' => true,
+            'filename' => $filename,
+            'url' => asset('storage/clientes/' . $filename),
+            'message' => 'Foto ' . ($tipo === 'frente' ? 'frontal' : 'del reverso') . ' guardada con éxito.'
+        ]);
+    }
+
+    /**
+     * Elimina una foto de documento del almacenamiento y de la base de datos.
+     */
+    public function eliminarFotoDocumento(Request $request)
+    {
+        $request->validate([
+            'tipo' => 'required|in:frente,dorso',
+            'id_cliente' => 'nullable|integer',
+            'filename' => 'nullable|string',
+        ]);
+
+        $tipo = $request->tipo;
+        $col = ($tipo === 'frente') ? 'cliente_foto_ci_dorso' : 'cliente_foto_ci_reverso';
+        $filename = $request->filename;
+
+        if ($request->filled('id_cliente') && (int)$request->id_cliente > 0) {
+            $fotoBd = Cliente::where('CLIENTES_cod', $request->id_cliente)->value($col);
+            if ($fotoBd) {
+                $filename = $fotoBd;
+                Cliente::where('CLIENTES_cod', $request->id_cliente)->update([$col => null]);
+            }
+        }
+
+        if ($filename && Storage::disk('public')->exists('clientes/' . $filename)) {
+            Storage::disk('public')->delete('clientes/' . $filename);
+        }
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Foto eliminada correctamente.'
+        ]);
+    }
+
+    /**
+     * Elimina el registro del cliente si no posee movimientos comerciales asociados.
      */
     public function destroy($id)
     {
-        Cliente::where('clientes_cod','=',$id)->delete();
-        return 'OK';
+        Cliente::where('CLIENTES_cod', '=', $id)->delete();
+        return response()->json(['ok' => true, 'message' => 'Cliente eliminado']);
     }
 }

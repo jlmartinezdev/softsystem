@@ -8,6 +8,14 @@ use DB;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth')->except(['showAll']);
+        $this->middleware('permiso:usuarios,open')->only(['index']);
+        $this->middleware('permiso:usuarios,add')->only(['store']);
+        $this->middleware('permiso:usuarios,del')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      *

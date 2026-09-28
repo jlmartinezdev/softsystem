@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Articulo;
 
 class Unidad extends Model
 {
@@ -12,4 +13,10 @@ class Unidad extends Model
     protected $fillable = [
         'uni_nombre','uni_abreviatura'
     ];
+
+    public function articulos()
+    {
+        return $this->hasMany(Articulo::class, 'uni_codigo', 'uni_codigo');
+    }
 }
+

@@ -13,4 +13,9 @@ class Seccion extends Model
     protected $fillable = [
         'present_descripcion', 'iva'
     ];
+
+    public function articulos()
+    {
+        return $this->hasMany(Articulo::class, 'present_cod', 'present_cod');
+    }
 }

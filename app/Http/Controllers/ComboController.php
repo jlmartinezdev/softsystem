@@ -15,6 +15,10 @@ class ComboController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permiso:combos,open')->only(['index']);
+        $this->middleware('permiso:combos,add')->only(['store', 'redondear']);
+        $this->middleware('permiso:combos,edit')->only(['update']);
+        $this->middleware('permiso:combos,del')->only(['destroy']);
     }
 
     public function index()

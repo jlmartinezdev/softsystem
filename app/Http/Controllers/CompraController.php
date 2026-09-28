@@ -16,12 +16,38 @@ class CompraController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permiso:compra,open')->only(['index']);
+        $this->middleware('permiso:compra,add')->only(['store']);
+        $this->middleware('permiso:inf_compra,open')->only(['indexInf', 'getCompraByFecha', 'getHistorialPrecio', 'getDetalle']);
+        $this->middleware('permiso:inf_compra,export')->only(['pdfboleta']);
+        $this->middleware('permiso:anular_compra,open')->only(['indexanular', 'getComprasRecientes']);
+        $this->middleware('permiso:anular_compra,del')->only(['destroy']);
     }
     public function index(){
         return view('compra');
     }
     public function indexanular(){
-        return view('anularcompra');
+        $comprasRecientes = $this->getComprasRecientesData();
+        return view('anularcompra', compact('comprasRecientes'));
+    }
+    public function getComprasRecientes(){
+        return response()->json($this->getComprasRecientesData());
+    }
+    private function getComprasRecientesData(){
+        return Compra::join('proveedor as p', 'compra.PROVEEDOR_cod', '=', 'p.PROVEEDOR_cod')
+            ->select(
+                'compra.compra_cod',
+                'compra.compra_fecha',
+                'compra.compra_factura',
+                'compra.compra_tipo_factura',
+                'compra.suc_cod',
+                'p.proveedor_nombre',
+                'p.proveedor_ruc',
+                DB::raw('(SELECT COALESCE(SUM(dc.compra_precio * dc.compra_cantidad), 0) FROM detalle_compra dc WHERE dc.compra_cod = compra.compra_cod) as total')
+            )
+            ->orderBy('compra.compra_cod', 'DESC')
+            ->limit(15)
+            ->get();
     }
     public function store(Request $request)
     {
@@ -130,26 +156,84 @@ VALUES (?, ?, ?, ?, ?, ?, ?);',[$detalle['codigo'],$compra->compra_cod,$detalle[
         // return $pdf->stream();
         return view('pdf.compra',compact('compra','detalle','empresa'));
     }
-    public function getDetalle($nro_compra){
-        return DB::select('SELECT dc.*,a.producto_nombre,a.producto_c_barra,p.iva FROM detalle_compra dc INNER JOIN articulos a ON dc.ARTICULOS_cod=a.ARTICULOS_cod inner join presentacion p on a.present_cod=p.present_cod where dc.compra_cod=?',[$nro_compra]);
-    }
-    public function getCabecera($nro_compra){
-        $cabecera= DB::select('SELECT c.*, p.proveedor_ruc,p.proveedor_nombre FROM compra c INNER JOIN proveedor p ON c.proveedor_cod= p.proveedor_cod WHERE c.compra_cod= ?',[$nro_compra]);
-        return ["compra"=> $cabecera, "detalle" => $this->getDetalle($nro_compra)];
-    }
-    public function destroy(Request $request){
-        foreach ($request->articulos as $articulo) {
-           try{
-            Stock::where('ARTICULOS_cod',$articulo['id'])
-            ->first()
-            ->decrement('cantidad',$articulo['cantidad']);
-            }catch(\Throwable $error){
-               // echo ($error);
-            }
-        }
-        DB::table('detalle_compra')->where('compra_cod',$request->id)->delete();
-        DB::table('compra')->where('compra_cod',$request->id)->delete();
-        return "ok";
+    public function getDetalle($nro_compra, $sucCod = 1){
+        return DB::select('SELECT dc.*, a.producto_nombre, a.producto_c_barra, p.iva, COALESCE(s.cantidad, 0) as stock_actual 
+            FROM detalle_compra dc 
+            INNER JOIN articulos a ON dc.ARTICULOS_cod = a.ARTICULOS_cod 
+            INNER JOIN presentacion p ON a.present_cod = p.present_cod 
+            LEFT JOIN stock s ON (s.ARTICULOS_cod = dc.ARTICULOS_cod AND s.suc_cod = ?)
+            WHERE dc.compra_cod = ?', [$sucCod, $nro_compra]);
     }
 
+    public function getCabecera($nro_compra){
+        $cabecera = DB::select('SELECT c.*, p.proveedor_ruc, p.proveedor_nombre FROM compra c INNER JOIN proveedor p ON c.proveedor_cod = p.proveedor_cod WHERE c.compra_cod = ?', [$nro_compra]);
+        $sucCod = !empty($cabecera) ? $cabecera[0]->suc_cod : 1;
+        return ["compra" => $cabecera, "detalle" => $this->getDetalle($nro_compra, $sucCod)];
+    }
+
+    public function destroy(Request $request){
+        $id = $request->id;
+        if (!$id) {
+            return response()->json(['status' => 'ERROR', 'message' => 'No se especificó la compra a anular.'], 422);
+        }
+
+        $compra = Compra::find($id);
+        if (!$compra) {
+            return response()->json(['status' => 'ERROR', 'message' => 'La compra no existe o ya fue anulada.'], 404);
+        }
+
+        DB::beginTransaction();
+        try {
+            $detalles = DB::table('detalle_compra')->where('compra_cod', $id)->get();
+
+            // Revert stock in the branch where purchase occurred
+            foreach ($detalles as $d) {
+                $stockItem = Stock::where('ARTICULOS_cod', $d->ARTICULOS_cod)
+                    ->where('suc_cod', $compra->suc_cod)
+                    ->first();
+                if (!$stockItem) {
+                    $stockItem = Stock::where('ARTICULOS_cod', $d->ARTICULOS_cod)->first();
+                }
+                if ($stockItem) {
+                    $stockItem->decrement('cantidad', $d->compra_cantidad);
+                }
+            }
+
+            // If cash purchase, register cash register Entry
+            if ($compra->compra_tipo_factura == '1') {
+                $totalCompra = $detalles->sum(function($d) {
+                    return floatval($d->compra_precio) * floatval($d->compra_cantidad);
+                });
+                $nroOpe = $request->nrooperacion ?: 0;
+                if ($nroOpe || Auth::user()->cod_usuarios != 1) {
+                    $movimiento = new MovimientoCaja();
+                    $movimiento->nro_operacion = $nroOpe;
+                    $movimiento->mov_fecha = date('Y-m-d H:i');
+                    $movimiento->mov_concepto = 'Anulación Compra Nº: ' . $compra->compra_cod;
+                    $movimiento->mov_tipo = 'Entrada';
+                    $movimiento->mov_monto = $totalCompra;
+                    $movimiento->nro_fact_ventas = '-';
+                    $movimiento->suc_cod = $compra->suc_cod;
+                    $movimiento->save();
+                }
+            }
+
+            DB::table('detalle_compra')->where('compra_cod', $id)->delete();
+            DB::table('compra')->where('compra_cod', $id)->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'OK',
+                'message' => 'Compra anulada con éxito y stock revertido.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'ERROR',
+                'message' => 'Error al anular compra: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
+

@@ -1,56 +1,209 @@
 @extends('layouts.app')
+@section('title', 'Editar Unidad de Medida')
+
+@section('style')
+<style>
+    @font-face {
+        font-family: "Cairo";
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url({{ asset("webfonts/Cairo-Bold.ttf") }}) format("truetype");
+    }
+    .font-cairo {
+        font-family: 'Cairo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    :root {
+        --dash-primary: #0a4d36;
+        --dash-primary-dark: #073827;
+        --dash-primary-light: #eaf3ef;
+        --dash-primary-border: #c8dfd5;
+        --dash-text-main: #1c2430;
+        --dash-text-muted: #64748b;
+        --dash-card-bg: #ffffff;
+        --dash-panel-bg: #f8fafc;
+        --dash-border: #e2e8f0;
+    }
+    body.dark-mode {
+        --dash-primary: #10b981;
+        --dash-primary-dark: #059669;
+        --dash-primary-light: #064e3b;
+        --dash-primary-border: #047857;
+        --dash-text-main: #f1f5f9;
+        --dash-text-muted: #94a3b8;
+        --dash-card-bg: #1e293b;
+        --dash-panel-bg: #0f172a;
+        --dash-border: #334155;
+    }
+    .modern-form-card {
+        background: var(--dash-card-bg);
+        border: 1px solid var(--dash-border);
+        border-radius: 16px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+    .modern-form-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--dash-border);
+        background: var(--dash-card-bg);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .modern-form-header-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .modern-form-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: var(--dash-primary-light);
+        color: var(--dash-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+    .pos-label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--dash-text-main);
+        margin-bottom: 0.35rem;
+    }
+    .pos-input {
+        width: 100%;
+        padding: 0.6rem 0.9rem;
+        border-radius: 10px;
+        border: 1px solid var(--dash-border);
+        background: var(--dash-panel-bg);
+        color: var(--dash-text-main);
+        font-size: 0.92rem;
+        transition: all 0.15s ease;
+    }
+    .pos-input:focus {
+        outline: none;
+        border-color: var(--dash-primary);
+        background: var(--dash-card-bg);
+        box-shadow: 0 0 0 3px var(--dash-primary-light);
+    }
+    .btn-pos-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 1.35rem;
+        background: var(--dash-primary);
+        border: 1px solid var(--dash-primary);
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 0.9rem;
+        border-radius: 10px;
+        transition: all 0.15s;
+        cursor: pointer;
+    }
+    .btn-pos-primary:hover {
+        background: var(--dash-primary-dark);
+        border-color: var(--dash-primary-dark);
+    }
+    .btn-pos-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.55rem 1.2rem;
+        border-radius: 10px;
+        border: 1px solid var(--dash-border);
+        background: var(--dash-panel-bg);
+        color: var(--dash-text-main);
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none !important;
+    }
+    .btn-pos-secondary:hover {
+        background: var(--dash-card-bg);
+        color: var(--dash-primary);
+    }
+    .badge-id {
+        font-family: 'SFMono-Regular', Consolas, Menlo, Courier, monospace;
+        background: var(--dash-panel-bg);
+        color: var(--dash-text-muted);
+        border: 1px solid var(--dash-border);
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+</style>
+@endsection
 
 @section('main')
-<div class="container">
+<div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h3><i class="fas fa-edit"></i> Editar Unidad</h3>
+        <div class="col-lg-7 col-md-9 col-sm-12">
+            <div class="modern-form-card">
+                <div class="modern-form-header">
+                    <div class="modern-form-header-left">
+                        <div class="modern-form-icon">
+                            <i class="fa fa-edit"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-cairo mb-0 text-dark dark:text-white" style="font-weight: 700;">Editar Unidad de Medida</h4>
+                            <small class="text-muted">Actualice los datos de la unidad de medida</small>
+                        </div>
+                    </div>
+                    <span class="badge-id">#{{ $unidad->uni_codigo }}</span>
                 </div>
 
-                <div class="card-body">
+                <div class="p-4">
                     <form method="POST" action="{{ route('unidades.update', $unidad->uni_codigo) }}">
                         @csrf
                         @method('PUT')
 
-                        <div class="form-group row">
-                            <label for="uni_nombre" class="col-md-4 col-form-label text-md-right">
-                                <i class="fas fa-tag"></i> Nombre
+                        <div class="form-group mb-3">
+                            <label class="pos-label" for="uni_nombre">
+                                Nombre de la Unidad <span class="text-danger">*</span>
                             </label>
-                            <div class="col-md-6">
-                                <input id="uni_nombre" type="text" class="form-control @error('uni_nombre') is-invalid @enderror" name="uni_nombre" value="{{ old('uni_nombre', $unidad->uni_nombre) }}" required autocomplete="uni_nombre" autofocus>
-                                @error('uni_nombre')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                            <input id="uni_nombre"
+                                   type="text"
+                                   class="pos-input @error('uni_nombre') is-invalid @enderror"
+                                   name="uni_nombre"
+                                   value="{{ old('uni_nombre', trim($unidad->uni_nombre)) }}"
+                                   placeholder="Ej: KILOGRAMO, UNIDAD, LITRO, CAJA..."
+                                   required
+                                   autofocus>
+                            @error('uni_nombre')
+                                <span class="invalid-feedback d-block" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
 
-                        <div class="form-group row">
-                            <label for="uni_abreviatura" class="col-md-4 col-form-label text-md-right">
-                                <i class="fas fa-text-height"></i> Abreviatura
+                        <div class="form-group mb-4">
+                            <label class="pos-label" for="uni_abreviatura">
+                                Abreviatura / Símbolo <span class="text-danger">*</span>
                             </label>
-                            <div class="col-md-6">
-                                <input id="uni_abreviatura" type="text" class="form-control @error('uni_abreviatura') is-invalid @enderror" name="uni_abreviatura" value="{{ old('uni_abreviatura', $unidad->uni_abreviatura) }}" required autocomplete="uni_abreviatura">
-                                @error('uni_abreviatura')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                            <input id="uni_abreviatura"
+                                   type="text"
+                                   class="pos-input @error('uni_abreviatura') is-invalid @enderror"
+                                   name="uni_abreviatura"
+                                   value="{{ old('uni_abreviatura', trim($unidad->uni_abreviatura)) }}"
+                                   placeholder="Ej: KG, UN, L, CJ, DOC..."
+                                   maxlength="10"
+                                   required>
+                            @error('uni_abreviatura')
+                                <span class="invalid-feedback d-block" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
 
-                        <div class="form-group row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Actualizar
-                                </button>
-                                <a href="{{ route('unidades.index') }}" class="btn btn-secondary">
-                                    <i class="fas fa-times"></i> Cancelar
-                                </a>
-                            </div>
+                        <div class="d-flex align-items-center justify-content-between pt-2">
+                            <a href="{{ route('unidades.index') }}" class="btn-pos-secondary font-cairo">
+                                <i class="fa fa-arrow-left"></i> Volver a la lista
+                            </a>
+                            <button type="submit" class="btn-pos-primary font-cairo">
+                                <i class="fa fa-save"></i> Guardar Cambios
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -59,9 +212,9 @@
     </div>
 </div>
 @endsection 
+
 @section('script')
 <script>
     activarMenu('m_mantenimiento','m_unidades');
 </script>
 @endsection
-

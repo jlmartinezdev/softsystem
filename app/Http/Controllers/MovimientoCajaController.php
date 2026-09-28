@@ -14,6 +14,9 @@ class MovimientoCajaController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permiso:movimiento_caja,open')->only(['index', 'getAll', 'informe']);
+        $this->middleware('permiso:movimiento_caja,add')->only(['store']);
+        $this->middleware('accion:caja_movimientos_manuales')->only(['store']);
     }
 
     public function index()

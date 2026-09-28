@@ -34,9 +34,13 @@ class Compra extends Model
           return $query->where('s.suc_cod','=',$suc);
       }
   }
-  public function scopeFiltroproveedor($query,$proveedor){
+  public function scopeFiltroproveedor($query, $proveedor){
     if(!empty($proveedor)){
-        return $query->where('p.proveedor_nombre','LIKE',"%$proveedor%");
+        return $query->where(function($q) use ($proveedor) {
+            $q->where('p.proveedor_nombre', 'LIKE', "%$proveedor%")
+              ->orWhere('p.proveedor_ruc', 'LIKE', "%$proveedor%")
+              ->orWhere('compra.compra_factura', 'LIKE', "%$proveedor%");
+        });
     }
   }
   public function scopeWheresuc($query,$suc){

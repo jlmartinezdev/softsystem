@@ -21,6 +21,8 @@ class ResumenController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permiso:inf_resumen,open')->only(['index', 'resumen']);
+        $this->middleware('permiso:inf_resumen,export')->only(['enviarCorreo']);
     }
     public function index()
     {   

@@ -776,6 +776,28 @@
                 <div class="kpi-sub">@{{ camara.url ? ('Canal ' + camara.canal) : 'Monitoreo desactivado' }}</div>
             </div>
         </div>
+
+        <!-- KPI 5: Mapas & GPS -->
+        <div class="kpi-card" :class="{ 'active': activeTab === 'mapas' }" @click="activeTab = 'mapas'">
+            <div class="kpi-icon-box" :class="proveedorEfectivo === 'google' ? 'kpi-icon-blue' : 'kpi-icon-green'">
+                <i class="fa fa-map-marked-alt"></i>
+            </div>
+            <div>
+                <div class="kpi-label">Geolocalización GPS</div>
+                <div class="kpi-val font-cairo">
+                    <span v-if="proveedorEfectivo === 'google'" class="text-primary font-weight-bold">
+                        <i class="fa-brands fa-google mr-1"></i> Google Maps
+                    </span>
+                    <span v-else class="text-success font-weight-bold">
+                        <i class="fa fa-globe mr-1"></i> OpenStreetMap
+                    </span>
+                </div>
+                <div class="kpi-sub">
+                    <span v-if="mapas.google_maps_api_key">API Key configurada</span>
+                    <span v-else>Modo libre (Sin API Key)</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- MODERN NAVIGATION TABS -->
@@ -800,6 +822,13 @@
             <span>Cámara IP & Seguridad</span>
             <span class="tab-badge" :class="camara.url ? 'badge-info' : 'badge-secondary'">
                 @{{ camara.url ? 'Conectada' : 'Off' }}
+            </span>
+        </button>
+        <button class="settings-tab-btn" :class="{ 'active': activeTab === 'mapas' }" @click="activeTab = 'mapas'">
+            <i class="fa fa-map-marked-alt"></i>
+            <span>Geolocalización & Mapas</span>
+            <span class="tab-badge" :class="proveedorEfectivo === 'google' ? 'badge-primary' : 'badge-success'">
+                @{{ proveedorEfectivo === 'google' ? 'Google Maps' : 'OpenStreetMap' }}
             </span>
         </button>
     </div>
@@ -1210,6 +1239,173 @@
         </div>
     </div>
 
+    <!-- ========================================== -->
+    <!-- TAB 5: GEOLOCALIZACIÓN Y MAPAS (GPS)       -->
+    <!-- ========================================== -->
+    <div v-show="activeTab === 'mapas'">
+        <div class="settings-card">
+            <div class="card-section-title">
+                <div>
+                    <h5 class="font-cairo"><i class="fa fa-map-marked-alt text-success"></i> Proveedor de Mapas para Clientes y Entregas</h5>
+                    <p class="card-section-desc">Selecciona qué servicio de mapas se utilizará para geolocalizar clientes, fijar coordenadas y trazar rutas.</p>
+                </div>
+            </div>
+
+            <!-- Selector de Proveedor -->
+            <div class="options-grid">
+                <!-- Option 1: Auto -->
+                <div class="option-box" :class="{ 'selected': mapas.proveedor === 'auto' }" @click="mapas.proveedor = 'auto'">
+                    <div class="option-header">
+                        <div class="option-title">
+                            <i class="fa fa-wand-magic-sparkles text-primary"></i> Automático (Recomendado)
+                        </div>
+                        <div class="option-check"><i class="fa fa-check"></i></div>
+                    </div>
+                    <p class="option-desc">Usa <strong>Google Maps</strong> si la API Key está configurada; si no hay clave, conmuta automáticamente a <strong>OpenStreetMap</strong> sin errores.</p>
+                </div>
+
+                <!-- Option 2: Google Maps -->
+                <div class="option-box" :class="{ 'selected': mapas.proveedor === 'google' }" @click="mapas.proveedor = 'google'">
+                    <div class="option-header">
+                        <div class="option-title">
+                            <i class="fa-brands fa-google text-danger"></i> Google Maps Platform
+                        </div>
+                        <div class="option-check"><i class="fa fa-check"></i></div>
+                    </div>
+                    <p class="option-desc">Usa Google Maps con soporte para vista satelital y búsqueda de lugares. Si la clave falta o falla, usa OpenStreetMap como respaldo.</p>
+                </div>
+
+                <!-- Option 3: OpenStreetMap -->
+                <div class="option-box" :class="{ 'selected': mapas.proveedor === 'openstreet' }" @click="mapas.proveedor = 'openstreet'">
+                    <div class="option-header">
+                        <div class="option-title">
+                            <i class="fa fa-globe text-success"></i> OpenStreetMap (Leaflet)
+                        </div>
+                        <div class="option-check"><i class="fa fa-check"></i></div>
+                    </div>
+                    <p class="option-desc">Totalmente libre y gratuito. Funciona sin ninguna API Key, sin tarjeta de crédito y sin límites de peticiones.</p>
+                </div>
+            </div>
+
+            <!-- Callout Informativo -->
+            <div class="callout-box" :class="mapas.google_maps_api_key ? 'callout-info' : 'callout-warning'">
+                <i class="fa" :class="mapas.google_maps_api_key ? 'fa-circle-info' : 'fa-triangle-exclamation'"></i>
+                <div>
+                    <strong v-if="mapas.google_maps_api_key">Google Maps activo con API Key registrada:</strong>
+                    <strong v-else>Operando en modo libre (OpenStreetMap):</strong>
+                    <span v-if="mapas.google_maps_api_key">
+                        El sistema usará la API de Google Maps. Si la clave expira o excede cuota, el sistema continuará funcionando sin interrupción usando OpenStreetMap.
+                    </span>
+                    <span v-else>
+                        No has ingresado una API Key de Google Maps. El sistema utiliza OpenStreetMap de forma automática, sin costo y sin necesidad de configuración adicional.
+                    </span>
+                </div>
+            </div>
+
+            <!-- Clave de Google Maps -->
+            <div class="card-section-title mt-4">
+                <div>
+                    <h5 class="font-cairo"><i class="fa-brands fa-google text-danger"></i> Credenciales de Google Maps API</h5>
+                    <p class="card-section-desc">API Key de Google Cloud Platform con la librería "Maps JavaScript API" habilitada.</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label class="form-label-custom font-weight-bold">Google Maps API Key</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-key text-muted"></i></span>
+                        </div>
+                        <input :type="showMapApiKey ? 'text' : 'password'"
+                               class="form-control form-control-pos font-cairo"
+                               v-model="mapas.google_maps_api_key"
+                               placeholder="Ej: AIzaSyD-..." />
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" @click="showMapApiKey = !showMapApiKey" :title="showMapApiKey ? 'Ocultar clave' : 'Mostrar clave'">
+                                <i class="fa" :class="showMapApiKey ? 'fa-eye-slash' : 'fa-eye'"></i>
+                            </button>
+                            <button v-if="mapas.google_maps_api_key" class="btn btn-outline-danger" type="button" @click="mapas.google_maps_api_key = ''" title="Borrar clave">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <small class="text-muted mt-1 d-block">
+                        <i class="fa fa-info-circle mr-1 text-info"></i> Puedes generar una clave gratuita en
+                        <a href="https://console.cloud.google.com/google/maps-apis/credentials" target="_blank" class="text-primary font-weight-bold">
+                            Google Cloud Console <i class="fa fa-external-link-alt small"></i>
+                        </a>. Habilita <em>Maps JavaScript API</em>.
+                    </small>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label-custom font-weight-bold">Estado del Proveedor</label>
+                    <div class="p-2 rounded border" :style="{ background: 'var(--dash-panel-bg)' }">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="small text-muted">Proveedor activo:</span>
+                            <span class="badge" :class="proveedorEfectivo === 'google' ? 'badge-primary' : 'badge-success'">
+                                @{{ proveedorEfectivo === 'google' ? 'Google Maps' : 'OpenStreetMap' }}
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="small text-muted">API Key presente:</span>
+                            <span class="badge" :class="mapas.google_maps_api_key ? 'badge-success' : 'badge-secondary'">
+                                @{{ mapas.google_maps_api_key ? 'Sí' : 'No (Libre)' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coordenadas por defecto -->
+            <div class="card-section-title mt-3">
+                <div>
+                    <h5 class="font-cairo"><i class="fa fa-crosshairs text-info"></i> Centro y Zoom Predeterminado del Mapa</h5>
+                    <p class="card-section-desc">Ubicación geográfica inicial cuando se abre el mapa de un cliente nuevo sin coordenadas.</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label-custom">Latitud Inicial</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-arrows-up-down text-muted"></i></span>
+                        </div>
+                        <input type="text" class="form-control form-control-pos font-cairo" v-model="mapas.mapas_lat_default" placeholder="-25.263740" />
+                    </div>
+                    <small class="text-muted">Por defecto: Asunción (-25.263740)</small>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label-custom">Longitud Inicial</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-arrows-left-right text-muted"></i></span>
+                        </div>
+                        <input type="text" class="form-control form-control-pos font-cairo" v-model="mapas.mapas_lng_default" placeholder="-57.575920" />
+                    </div>
+                    <small class="text-muted">Por defecto: Asunción (-57.575920)</small>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label-custom">Nivel de Zoom (10 a 19)</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-magnifying-glass text-muted"></i></span>
+                        </div>
+                        <select class="form-control form-control-pos" v-model.number="mapas.mapas_zoom_default">
+                            <option :value="12">12 - Ciudad / Región</option>
+                            <option :value="14">14 - Barrio</option>
+                            <option :value="16">16 - Calles y Manzanas (Recomendado)</option>
+                            <option :value="18">18 - Detalle de Edificio</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- FLOATING BOTTOM SAVE BAR -->
     <div class="floating-save-bar">
         <div class="d-flex align-items-center gap-2">
@@ -1260,6 +1456,14 @@
             camaraTimestamp: null,
             showMailPassword: false,
             showCamPassword: false,
+            showMapApiKey: false,
+            mapas: {
+                proveedor: @json($mapas['proveedor'] ?? 'auto'),
+                google_maps_api_key: @json($mapas['google_maps_api_key'] ?? ''),
+                mapas_lat_default: @json($mapas['mapas_lat_default'] ?? '-25.263740'),
+                mapas_lng_default: @json($mapas['mapas_lng_default'] ?? '-57.575920'),
+                mapas_zoom_default: @json($mapas['mapas_zoom_default'] ?? 16)
+            },
             caja: [
                 {
                     name: 'validez',
@@ -1296,6 +1500,14 @@
             }
         },
         computed: {
+            proveedorEfectivo: function () {
+                var p = (this.mapas && this.mapas.proveedor) || 'auto';
+                var key = ((this.mapas && this.mapas.google_maps_api_key) || '').trim();
+                if (key === '' || p === 'openstreet') {
+                    return 'openstreet';
+                }
+                return 'google';
+            },
             labelValidez: function () {
                 var v = this.caja[0] ? this.caja[0].value : '1';
                 if (v == '1') return 'Día a día (Fecha)';
@@ -1311,6 +1523,15 @@
             }
         },
         methods: {
+            mapasPayload: function () {
+                return {
+                    proveedor: this.mapas.proveedor,
+                    google_maps_api_key: (this.mapas.google_maps_api_key || '').trim(),
+                    mapas_lat_default: this.mapas.mapas_lat_default,
+                    mapas_lng_default: this.mapas.mapas_lng_default,
+                    mapas_zoom_default: this.mapas.mapas_zoom_default
+                };
+            },
             mailPayload: function () {
                 var payload = Object.assign({}, this.mail);
                 if (!payload.password) {
@@ -1351,7 +1572,8 @@
                 return axios.post('{{ url('ajustes') }}', {
                     caja: cajaPayload,
                     mail: this.mailPayload(),
-                    camara: this.camaraPayload()
+                    camara: this.camaraPayload(),
+                    mapas: this.mapasPayload()
                 });
             },
             updateVenta: function () {

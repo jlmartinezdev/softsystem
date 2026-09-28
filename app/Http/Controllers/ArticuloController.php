@@ -107,6 +107,13 @@ class ArticuloController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permiso:articulos,open')->only(['index']);
+        $this->middleware('permiso:articulos,add')->only(['store', 'capturarImagen', 'subirImagen']);
+        $this->middleware('permiso:articulos,edit')->only(['update']);
+        $this->middleware('permiso:articulos,del')->only(['destroy']);
+        $this->middleware('permiso:articulos,export')->only(['export', 'exportPrecio', 'export_costo']);
+        $this->middleware('permiso:ajuste,open')->only(['cm', 'cmupdate']);
+        $this->middleware('accion:articulo_ver_costo')->only(['export_costo']);
     }
     public function index()
     {
@@ -232,10 +239,83 @@ class ArticuloController extends Controller
         ]);
     }
 
-    public function getInventario(Request $request){
-        $articulos= DB::select('SELECT a.producto_c_barra,a.producto_nombre,a.pre_venta1,p.present_descripcion, SUM(s.cantidad) AS cantidad, SUM(dv.venta_cantidad) AS salida, SUM(dc.compra_cantidad) AS entrada FROM articulos a INNER JOIN presentacion p ON a.present_cod= p.present_cod INNER JOIN stock s ON a.ARTICULOS_cod=s.ARTICULOS_cod LEFT JOIN detalle_venta dv ON a.ARTICULOS_cod= dv.ARTICULOS_cod LEFT JOIN detalle_compra dc ON a.ARTICULOS_cod= dc.ARTICULOS_cod LEFT JOIN ventas v ON dv.nro_fact_ventas= v.nro_fact_ventas WHERE DATE(v.venta_fecha) BETWEEN ? AND ? GROUP BY a.ARTICULOS_cod',[$request->desde,$request->hasta]);
-            
-        return $articulos;
+    public function getInventario(Request $request)
+    {
+        $desde = $request->desde ?: date('Y-m-01');
+        $hasta = $request->hasta ?: date('Y-m-d');
+        $seccion = (int) $request->seccion;
+        $sucursal = (int) $request->sucursal;
+        $buscar = trim($request->buscar);
+
+        $params = [
+            'desde_c' => $desde,
+            'hasta_c' => $hasta,
+            'desde_v' => $desde,
+            'hasta_v' => $hasta
+        ];
+
+        $stockWhere = '';
+        $compraWhere = '';
+        $ventaWhere = '';
+
+        if ($sucursal > 0) {
+            $stockWhere = " WHERE s.suc_cod = :suc_s ";
+            $compraWhere = " AND c.suc_cod = :suc_c ";
+            $ventaWhere = " AND v.suc_cod = :suc_v ";
+            $params['suc_s'] = $sucursal;
+            $params['suc_c'] = $sucursal;
+            $params['suc_v'] = $sucursal;
+        }
+
+        $whereExtra = " WHERE a.producto_nombre IS NOT NULL AND a.producto_nombre != '' ";
+        if ($seccion > 0) {
+            $whereExtra .= " AND a.present_cod = :seccion ";
+            $params['seccion'] = $seccion;
+        }
+        if (!empty($buscar)) {
+            $whereExtra .= " AND (a.producto_nombre LIKE :buscar OR a.producto_c_barra LIKE :buscar_c) ";
+            $params['buscar'] = "%{$buscar}%";
+            $params['buscar_c'] = "%{$buscar}%";
+        }
+
+        $sql = "SELECT 
+                    a.ARTICULOS_cod,
+                    a.producto_c_barra,
+                    a.producto_nombre,
+                    COALESCE(a.producto_costo_compra, 0) AS costo,
+                    COALESCE(a.pre_venta1, 0) AS pre_venta1,
+                    COALESCE(p.present_descripcion, 'General') AS present_descripcion,
+                    COALESCE(stk.cantidad, 0) AS cantidad,
+                    COALESCE(ent.entrada, 0) AS entrada,
+                    COALESCE(sal.salida, 0) AS salida
+                FROM articulos a
+                LEFT JOIN presentacion p ON a.present_cod = p.present_cod
+                LEFT JOIN (
+                    SELECT s.ARTICULOS_cod, SUM(s.cantidad) AS cantidad 
+                    FROM stock s 
+                    {$stockWhere}
+                    GROUP BY s.ARTICULOS_cod
+                ) stk ON a.ARTICULOS_cod = stk.ARTICULOS_cod
+                LEFT JOIN (
+                    SELECT dc.ARTICULOS_cod, SUM(dc.compra_cantidad) AS entrada 
+                    FROM detalle_compra dc 
+                    INNER JOIN compra c ON dc.compra_cod = c.compra_cod 
+                    WHERE DATE(c.compra_fecha) BETWEEN :desde_c AND :hasta_c
+                    {$compraWhere}
+                    GROUP BY dc.ARTICULOS_cod
+                ) ent ON a.ARTICULOS_cod = ent.ARTICULOS_cod
+                LEFT JOIN (
+                    SELECT dv.ARTICULOS_cod, SUM(dv.venta_cantidad) AS salida 
+                    FROM detalle_venta dv 
+                    INNER JOIN ventas v ON dv.nro_fact_ventas = v.nro_fact_ventas 
+                    WHERE DATE(v.venta_fecha) BETWEEN :desde_v AND :hasta_v
+                    {$ventaWhere}
+                    GROUP BY dv.ARTICULOS_cod
+                ) sal ON a.ARTICULOS_cod = sal.ARTICULOS_cod
+                {$whereExtra}
+                ORDER BY a.producto_nombre ASC";
+
+        return DB::select($sql, $params);
     }
     public function getPrecios($id){
         return DB::select("SELECT truncate(precio,0) as p, truncate(margen,0) as m, truncate(monto_cuota,0) as c FROM precios where ARTICULOS_cod=".$id);

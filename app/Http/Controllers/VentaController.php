@@ -27,6 +27,12 @@ class VentaController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permiso:ventas,open')->only(['index']);
+        $this->middleware('permiso:ventas,add')->only(['store']);
+        $this->middleware('permiso:inf_venta,open')->only(['indexInf', 'getVentaByFecha', 'getVentaByCliente', 'getVentaChart', 'getVentaArticulo']);
+        $this->middleware('permiso:inf_venta,export')->only(['imprimir', 'pdfboleta', 'pdfrecibo', 'ticket']);
+        $this->middleware('permiso:anular_venta,open')->only(['indexanular']);
+        $this->middleware('permiso:anular_venta,del')->only(['destroy']);
     }
     public function index()
     {
@@ -252,6 +258,38 @@ class VentaController extends Controller
             return response()->json([
                 'message' => $bloqueoFactura,
             ], 422);
+        }
+
+        // 1. Validar autorización para venta a crédito
+        $esCredito = isset($cab['condicionventa']) && (string)$cab['condicionventa'] !== '1';
+        if ($esCredito && !Auth::user()->tieneAccion('venta_autorizar_credito')) {
+            return response()->json([
+                'message' => 'No cuenta con autorización para realizar ventas a crédito.',
+            ], 403);
+        }
+
+        // 2. Validar autorización para otorgar descuentos
+        $montoDescuento = (float)($cab['descuento'] ?? 0);
+        if ($montoDescuento > 0 && !Auth::user()->tieneAccion('venta_descuento')) {
+            return response()->json([
+                'message' => 'No cuenta con autorización para aplicar descuentos en la venta.',
+            ], 403);
+        }
+
+        // 3. Validar autorización para venta sin stock suficiente
+        if (!Auth::user()->tieneAccion('venta_sin_stock') && is_array($request->detalle)) {
+            foreach ($request->detalle as $det) {
+                if (empty($det['es_libre']) && empty($det['es_combo']) && !empty($det['idstock'])) {
+                    $cantDisp = DB::table('stock')->where('id_stock', $det['idstock'])->value('cantidad');
+                    $cantPedida = (float)($det['cantidad'] ?? 1);
+                    if ($cantDisp !== null && (float)$cantDisp < $cantPedida) {
+                        $nombreArt = $det['descripcion'] ?? 'Artículo';
+                        return response()->json([
+                            'message' => "Stock insuficiente ({$cantDisp} disponible) para '{$nombreArt}'. Su rol no tiene autorización para vender sin stock.",
+                        ], 403);
+                    }
+                }
+            }
         }
 
         $venta = new Venta();

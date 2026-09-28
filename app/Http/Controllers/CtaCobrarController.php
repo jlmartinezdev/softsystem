@@ -22,6 +22,13 @@ class CtaCobrarController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permiso:cobranzas,open')->only(['index', 'getCobroById', 'getCuotas']);
+        $this->middleware('permiso:cobranzas,add')->only(['store']);
+        $this->middleware('permiso:ctas_cobrar,open')->only(['indexInf', 'getCtaCobrar']);
+        $this->middleware('permiso:inf_cobros,open')->only(['indexCobrado', 'getCobroFecha', 'getDetalleCobro']);
+        $this->middleware('permiso:ctas_cobrar,export')->only(['infToPdf', 'exportCtasAll', 'printRecibo', 'printExtracto', 'printReciboD']);
+        $this->middleware('permiso:anular_cobros,open')->only(['indexanular', 'getCobrosRecientes']);
+        $this->middleware('permiso:anular_cobros,del')->only(['destroy']);
     }
     public function index()
     {
@@ -29,7 +36,34 @@ class CtaCobrarController extends Controller
     }
     public function indexanular()
     {
-        return view('anularcobro');
+        $cobrosRecientes = $this->getCobrosRecientesData();
+        return view('anularcobro', compact('cobrosRecientes'));
+    }
+
+    public function getCobrosRecientes()
+    {
+        return response()->json($this->getCobrosRecientesData());
+    }
+
+    private function getCobrosRecientesData()
+    {
+        return Cobro::join('cobranza_detalle as dc', 'cobranzas.cc_numero', 'dc.cc_numero')
+            ->join('ventas as v', 'dc.nro_fact_ventas', 'v.nro_fact_ventas')
+            ->join('clientes as c', 'v.clientes_cod', 'c.clientes_cod')
+            ->select(
+                'cobranzas.cc_numero',
+                'cobranzas.cob_fecha',
+                'cobranzas.cob_importe',
+                'cobranzas.recibon1',
+                'cobranzas.recibon2',
+                'cobranzas.nro_recibo',
+                'c.cliente_nombre',
+                'c.cliente_ci'
+            )
+            ->groupBy('cobranzas.cc_numero')
+            ->orderBy('cobranzas.cc_numero', 'DESC')
+            ->limit(15)
+            ->get();
     }
     public function indexInf()
     {
@@ -78,25 +112,65 @@ class CtaCobrarController extends Controller
 
     public function getCobroById($id)
     {
-        $cobro=Cobro::join('cobranza_detalle as dc', 'cobranzas.cc_numero', 'dc.cc_numero')
+        $cobro = Cobro::join('cobranza_detalle as dc', 'cobranzas.cc_numero', 'dc.cc_numero')
                 ->join('ventas as v', 'dc.nro_fact_ventas', 'v.nro_fact_ventas')
                 ->join('clientes as c', 'v.clientes_cod', 'c.clientes_cod')
-                ->select('cobranzas.*', 'c.cliente_ci', 'c.cliente_nombre', 'c.cliente_direccion')
+                ->select(
+                    'cobranzas.*',
+                    'c.cliente_ci',
+                    'c.cliente_nombre',
+                    'c.cliente_direccion',
+                    'v.suc_cod as venta_suc_cod'
+                )
                 ->where('cobranzas.cc_numero', $id)
-                ->get();
-        $detalle= $this->getDetalleCobro($id);
-        return ["cobro" => $cobro,"detalle" =>$detalle];
+                ->first();
+
+        if (!$cobro) {
+            return response()->json([
+                'cobro' => [],
+                'detalle' => []
+            ]);
+        }
+
+        $detalle = DB::table('cobranza_detalle as cd')
+                    ->join('ctas_cobrar as cc', function ($join) {
+                        $join->on('cd.nro_fact_ventas', '=', 'cc.nro_fact_ventas')
+                             ->on('cd.nro_cuotas', '=', 'cc.nro_cuotas');
+                    })
+                    ->join('ventas as v', 'cd.nro_fact_ventas', '=', 'v.nro_fact_ventas')
+                    ->select(
+                        'cd.cc_numero',
+                        'cd.nro_fact_ventas',
+                        'cd.nro_cuotas',
+                        'cd.importe',
+                        'cd.cobrado',
+                        'cd.tipo',
+                        'cc.monto_cuota',
+                        'cc.monto_cobrado',
+                        'cc.monto_saldo',
+                        'cc.fecha_venc',
+                        'v.documento',
+                        'v.venta_fecha'
+                    )
+                    ->where('cd.cc_numero', $id)
+                    ->get();
+
+        return response()->json([
+            "cobro" => [$cobro],
+            "detalle" => $detalle
+        ]);
     }
     public function getCobroFecha(Request $request)
     {
         $cobro = Cobro::join('cobranza_detalle as dc', 'cobranzas.cc_numero', 'dc.cc_numero')
-        ->join('ventas as v', 'dc.nro_fact_ventas', 'v.nro_fact_ventas')
-        ->join('clientes as c', 'v.clientes_cod', 'c.clientes_cod')
-        ->select('cobranzas.*','c.cliente_nombre','dc.nro_fact_ventas')
-        ->clientes($request)
-        ->orderBy('cobranzas.cc_numero','DESC')
-        ->groupBy('cobranzas.cc_numero')
-        ->get();
+            ->join('ventas as v', 'dc.nro_fact_ventas', 'v.nro_fact_ventas')
+            ->join('clientes as c', 'v.clientes_cod', 'c.clientes_cod')
+            ->leftJoin('sucursales as s', 'v.suc_cod', 's.suc_cod')
+            ->select('cobranzas.*', 'c.cliente_nombre', 'c.cliente_ci', 'dc.nro_fact_ventas', 's.suc_desc')
+            ->clientes($request)
+            ->orderBy('cobranzas.cc_numero', 'DESC')
+            ->groupBy('cobranzas.cc_numero')
+            ->get();
         return $cobro;
     }
      
@@ -351,41 +425,80 @@ class CtaCobrarController extends Controller
     
     public function destroy(Request $request)
     {
-        DB::table('cobranza_detalle')->where('cc_numero', $request->id)->delete();
-        Cobro::where('cc_numero',$request->id)->delete();
-        foreach ($request->cuotas as $cuota) {
-            $cuenta = Ctacobrar::where('nro_cuotas', $cuota['nro_cuotas'])
-            ->where('nro_fact_ventas', $cuota['nro_fact_ventas']);
-            $cuentafila= $cuenta->first();
+        $id = $request->id;
+        $monto = $request->monto;
+        $idSucursal = $request->idSucursal ?: (Auth::user()->suc_cod ?? 1);
+        $nrooperacion = $request->nrooperacion;
+        $cuotas = $request->cuotas ?: [];
 
-            $cuenta->decrement('monto_cobrado',$cuota['cobrado']);
-            $newVal= intval($cuentafila->monto_saldo) + $cuota['cobrado'];
-            $cuenta->update([
-                'monto_saldo' => $newVal,
-                'interes' => '0',
-                'estado' => '1'
+        if (!$id) {
+            return response()->json([
+                'status' => 'ERROR',
+                'message' => 'No se especificó el número de cobro a anular.'
+            ], 422);
+        }
+
+        $cobro = Cobro::where('cc_numero', $id)->first();
+        if (!$cobro) {
+            return response()->json([
+                'status' => 'ERROR',
+                'message' => 'El cobro especificado no existe o ya fue anulado.'
+            ], 404);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Delete detail
+            DB::table('cobranza_detalle')->where('cc_numero', $id)->delete();
+            // Delete header
+            $cobro->delete();
+
+            // Restore quotas
+            foreach ($cuotas as $cuota) {
+                $cuenta = Ctacobrar::where('nro_cuotas', $cuota['nro_cuotas'])
+                    ->where('nro_fact_ventas', $cuota['nro_fact_ventas']);
+                $cuentafila = $cuenta->first();
+
+                if ($cuentafila) {
+                    $cobradoCuota = floatval($cuota['cobrado']);
+                    $cuenta->decrement('monto_cobrado', $cobradoCuota);
+                    $newVal = floatval($cuentafila->monto_saldo) + $cobradoCuota;
+                    $cuenta->update([
+                        'monto_saldo' => $newVal,
+                        'interes' => '0',
+                        'estado' => '1'
+                    ]);
+                }
+            }
+
+            // Register cash register exit
+            if (Auth::user()->cod_usuarios != 1 || $nrooperacion) {
+                $movimiento = new MovimientoCaja();
+                $movimiento->nro_operacion = $nrooperacion ?: 0;
+                $movimiento->mov_fecha = date('Y-m-d H:i');
+                $movimiento->mov_concepto = 'Anular Cobro Nº: ' . $id;
+                $movimiento->mov_tipo = 'Salida';
+                $movimiento->mov_monto = $monto ?: $cobro->cob_importe;
+                $movimiento->nro_fact_ventas = '-';
+                $movimiento->suc_cod = $idSucursal;
+                $movimiento->save();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'OK',
+                'message' => 'Cobro anulado exitosamente.'
             ]);
-           /*  ->update([
-                'monto_cobrado' => intval('monto_cobrado') -$cuota['cobrado'],
-                'monto_saldo'=> intval('monto_saldo') + $cuota['cobrado'],
-                'estado' => '1'
-            ]); */
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'ERROR',
+                'message' => 'Error al anular cobro: ' . $e->getMessage()
+            ], 500);
         }
-        if(Auth::user()->cod_usuarios!= 1){
-            $movimiento= new MovimientoCaja();
-            $movimiento->nro_operacion= $request->nrooperacion;
-            $movimiento->mov_fecha= date('Y-m-d H:i');
-            $movimiento->mov_concepto= 'Anular Cobro Nº: '.$request->id;
-            $movimiento->mov_tipo= 'Salida';
-            $movimiento->mov_monto= $request->monto;
-            $movimiento->nro_fact_ventas= '-';
-            $movimiento->suc_cod= $request->idSucursal;
-            $movimiento->save();
-            //Cobro::where('cc_numero',$request->id)->delete();
-        }
-        return "OK";
-
     }
+
     private function reciboUp($numeros)
     {
         $n1 = $numeros[0];

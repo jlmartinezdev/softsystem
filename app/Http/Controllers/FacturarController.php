@@ -15,6 +15,10 @@ class FacturarController extends Controller
     public function __construct(SifenService $sifen)
     {
         $this->middleware('auth');
+        $this->middleware('permiso:ventas,open')->only(['index']);
+        $this->middleware('permiso:ventas,add')->only(['store']);
+        $this->middleware('permiso:ventas,del')->only(['destroy']);
+        $this->middleware('permiso:ventas,export')->only(['ticket', 'kudePdf']);
         $this->sifen = $sifen;
     }
 

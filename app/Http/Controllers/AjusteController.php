@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Ajuste;
 use App\Support\CameraSettings;
 use App\Support\MailSettings;
+use App\Support\MapSettings;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Mail;
@@ -14,6 +15,8 @@ class AjusteController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permiso:ajuste_sistema,open')->only(['index']);
+        $this->middleware('permiso:ajuste_sistema,edit')->only(['update', 'testMail', 'testCamara']);
     }
 
     public function index()
@@ -22,8 +25,9 @@ class AjusteController extends Controller
         $mail = MailSettings::all();
         $mail['password'] = '';
         $camara = CameraSettings::publicConfig();
+        $mapas = MapSettings::publicConfig();
 
-        return view('configuracion', compact('ajuste', 'mail', 'camara'));
+        return view('configuracion', compact('ajuste', 'mail', 'camara', 'mapas'));
     }
 
     public function update(Request $request)
@@ -40,6 +44,10 @@ class AjusteController extends Controller
 
         if ($request->has('camara')) {
             CameraSettings::save($request->camara);
+        }
+
+        if ($request->has('mapas')) {
+            MapSettings::save($request->mapas);
         }
 
         return response()->json(['ok' => true, 'message' => 'Ajustes actualizados']);

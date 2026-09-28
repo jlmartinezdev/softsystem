@@ -13,6 +13,8 @@ class SifenConfigController extends Controller
     public function __construct(SifenService $sifen)
     {
         $this->middleware('auth');
+        $this->middleware('permiso:sifen,open')->only(['index', 'getAll', 'getDocumentos']);
+        $this->middleware('permiso:sifen,edit')->only(['update', 'sincronizarEmpresa', 'probarApi', 'obtenerTokenApi']);
         $this->sifen = $sifen;
     }
     public function index()

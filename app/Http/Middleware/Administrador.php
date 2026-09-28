@@ -15,10 +15,14 @@ class Administrador
      */
     public function handle($request, Closure $next)
     {
-        if(Auth::user()->roles->nom_rol=="Administrador")
+        if (Auth::check() && Auth::user()->esAdministrador()) {
             return $next($request);
-        else
-            return redirect('/');
-            
+        }
+
+        if ($request->ajax() || $request->expectsJson() || $request->wantsJson()) {
+            return response()->json(['error' => 'Acceso exclusivo para el Administrador del sistema.', 'success' => false], 403);
+        }
+
+        return redirect('/');
     }
 }

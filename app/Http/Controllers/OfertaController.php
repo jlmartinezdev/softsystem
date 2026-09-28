@@ -12,6 +12,10 @@ class OfertaController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permiso:ofertas,open')->only(['index']);
+        $this->middleware('permiso:ofertas,add')->only(['store']);
+        $this->middleware('permiso:ofertas,edit')->only(['update']);
+        $this->middleware('permiso:ofertas,del')->only(['destroy']);
     }
 
     public function index()

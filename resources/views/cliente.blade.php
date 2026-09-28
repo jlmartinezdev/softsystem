@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Directorio de Clientes')
 @section('style')
+<link rel="stylesheet" href="{{ asset('js/leaflet/leaflet.css') }}" />
 <style>
     @font-face {
         font-family: "Cairo";
@@ -669,6 +670,196 @@
         border-bottom-color: #374151;
         color: #34d399;
     }
+
+    /* Estilos de Mapa OpenStreetMap y Leaflet */
+    .map-leaflet-wrapper {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--dash-border);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        position: relative;
+    }
+    .map-container-pos {
+        height: 280px;
+        width: 100%;
+        background-color: #e5e7eb;
+        z-index: 1;
+    }
+    .map-preview-container {
+        height: 380px;
+        width: 100%;
+        background-color: #e5e7eb;
+        z-index: 1;
+    }
+    .map-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        background: var(--dash-card-bg);
+        border-bottom: 1px solid var(--dash-border);
+    }
+    .coord-display-box {
+        font-family: 'SFMono-Regular', Consolas, monospace;
+        font-size: 0.82rem;
+        background: var(--dash-primary-light);
+        color: var(--dash-primary);
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        border: 1px solid var(--dash-primary-border);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    /* Tarjetas de Carga de Cédula / Documento */
+    .doc-card-upload {
+        background: var(--dash-card-bg);
+        border: 1px solid var(--dash-border);
+        border-radius: 10px;
+        padding: 0.85rem;
+        transition: all 0.2s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .doc-card-upload:hover {
+        border-color: var(--dash-primary-border);
+        box-shadow: 0 4px 12px rgba(10, 77, 54, 0.08);
+    }
+    .doc-preview-wrapper {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px dashed var(--dash-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-bottom: 0.65rem;
+        transition: border-color 0.15s;
+    }
+    .doc-preview-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+    .doc-preview-img:hover {
+        transform: scale(1.02);
+    }
+    .doc-upload-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1.25rem;
+        text-align: center;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        color: var(--dash-text-muted);
+    }
+    .doc-upload-placeholder:hover {
+        background: var(--dash-primary-light);
+        color: var(--dash-primary);
+    }
+    .doc-upload-icon {
+        font-size: 2.2rem;
+        margin-bottom: 0.4rem;
+        color: var(--dash-primary);
+        opacity: 0.85;
+    }
+
+    /* Badges de Tabla para GPS y Cédula */
+    .badge-gps {
+        background: #ecfdf5;
+        color: #047857;
+        border: 1px solid #a7f3d0;
+        font-weight: 600;
+        padding: 0.25rem 0.55rem;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        cursor: pointer;
+        text-decoration: none !important;
+        transition: all 0.15s;
+    }
+    .badge-gps:hover {
+        background: #047857;
+        color: #ffffff !important;
+        border-color: #047857;
+    }
+    .badge-doc-foto {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        font-weight: 600;
+        padding: 0.25rem 0.55rem;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        cursor: pointer;
+        text-decoration: none !important;
+        transition: all 0.15s;
+    }
+    .badge-doc-foto:hover {
+        background: #1d4ed8;
+        color: #ffffff !important;
+        border-color: #1d4ed8;
+    }
+
+    /* Modo Oscuro Adicional */
+    body.dark-mode .map-leaflet-wrapper {
+        border-color: #374151;
+    }
+    body.dark-mode .map-toolbar {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    body.dark-mode .coord-display-box {
+        background: #064e3b;
+        color: #34d399;
+        border-color: #047857;
+    }
+    body.dark-mode .doc-card-upload {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    body.dark-mode .doc-preview-wrapper {
+        background: #111827;
+        border-color: #374151;
+    }
+    body.dark-mode .doc-upload-placeholder:hover {
+        background: rgba(16, 185, 129, 0.1);
+    }
+    body.dark-mode .badge-gps {
+        background: #064e3b;
+        color: #6ee7b7;
+        border-color: #047857;
+    }
+    body.dark-mode .badge-gps:hover {
+        background: #10b981;
+        color: #ffffff !important;
+    }
+    body.dark-mode .badge-doc-foto {
+        background: #1e3a8a;
+        color: #93c5fd;
+        border-color: #1d4ed8;
+    }
+    body.dark-mode .badge-doc-foto:hover {
+        background: #2563eb;
+        color: #ffffff !important;
+    }
 </style>
 @endsection
 
@@ -685,6 +876,12 @@
             </p>
         </div>
         <div class="dash-header-badges">
+            <span class="badge badge-light border py-2 px-3 text-secondary font-weight-bold" style="border-radius: 8px;">
+                <i class="fa-solid fa-location-dot text-success mr-1"></i> @{{ totalConGps }} con GPS
+            </span>
+            <span class="badge badge-light border py-2 px-3 text-secondary font-weight-bold" style="border-radius: 8px;">
+                <i class="fa-solid fa-id-card text-primary mr-1"></i> @{{ totalConDocFoto }} con Doc C.I.
+            </span>
             <button type="button" class="btn-pos-primary" @click="nuevoCliente">
                 <i class="fa fa-user-plus mr-1"></i> Nuevo Cliente
             </button>
@@ -797,10 +994,18 @@
                     </select>
                 </div>
 
-                <!-- Botones de Acción & Enlaces -->
+                <!-- Botones de Acción & Filtros Rápidos -->
                 <div class="col-12 col-sm-6 col-xl-4 text-left text-sm-right">
                     <div class="toolbar-actions-wrap">
-                        <button v-if="txtbuscar || filtroCiudad != 0" type="button" class="btn-pos-secondary" @click="limpiarFiltros" title="Restablecer filtros">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-sm" :class="filtroGps === 'con_gps' ? 'btn-success text-white' : 'btn-outline-secondary'" @click="toggleFiltroGps" title="Filtrar clientes con GPS">
+                                <i class="fa-solid fa-location-dot mr-1"></i> GPS
+                            </button>
+                            <button type="button" class="btn btn-sm" :class="filtroFotos === 'con_fotos' ? 'btn-primary text-white' : 'btn-outline-secondary'" @click="toggleFiltroFotos" title="Filtrar clientes con fotos de cédula">
+                                <i class="fa-solid fa-id-card mr-1"></i> Cédula
+                            </button>
+                        </div>
+                        <button v-if="txtbuscar || filtroCiudad != 0 || filtroGps !== 'todos' || filtroFotos !== 'todos'" type="button" class="btn-pos-secondary" @click="limpiarFiltros" title="Restablecer filtros">
                             <i class="fa fa-undo"></i> Limpiar
                         </button>
                         <button type="button" class="btn-pos-primary" @click="nuevoCliente">
@@ -827,6 +1032,12 @@
                 <span v-if="filtroCiudad != 0" class="badge badge-light border text-secondary ml-2 py-1 px-2">
                     Ciudad activa
                     <i class="fa fa-times text-danger ml-1 cursor-pointer" @click="filtroCiudad = 0; currentPage = 1" title="Quitar filtro de ciudad"></i>
+                </span>
+                <span v-if="filtroGps === 'con_gps'" class="badge badge-success ml-2 py-1 px-2 cursor-pointer" @click="filtroGps = 'todos'" title="Quitar filtro de GPS">
+                    Con GPS <i class="fa fa-times ml-1"></i>
+                </span>
+                <span v-if="filtroFotos === 'con_fotos'" class="badge badge-primary ml-2 py-1 px-2 cursor-pointer" @click="filtroFotos = 'todos'" title="Quitar filtro de cédula">
+                    Con Cédula <i class="fa fa-times ml-1"></i>
                 </span>
             </div>
             <div class="d-flex align-items-center">
@@ -890,6 +1101,14 @@
                                     <i class="fa fa-id-card mr-1 text-muted"></i>@{{ row.doc }}
                                 </span>
                                 <span v-else class="text-muted small">—</span>
+                                <!-- Badge de Fotos Cédula si existen -->
+                                <div v-if="row.foto_frente_url || row.foto_dorso_url" class="mt-1">
+                                    <button type="button" class="badge-doc-foto border-0" @click="verFotosDoc(row)" title="Ver fotos de documento de identidad">
+                                        <i class="fa-solid fa-id-card"></i> Doc C.I.
+                                        <span v-if="row.foto_frente_url && row.foto_dorso_url" class="ml-1 small font-weight-normal">(2)</span>
+                                        <span v-else class="ml-1 small font-weight-normal">(1)</span>
+                                    </button>
+                                </div>
                             </td>
 
                             <!-- Cliente y Correo -->
@@ -917,7 +1136,7 @@
                                        target="_blank"
                                        class="btn-wa mr-1"
                                        title="Chatear en WhatsApp">
-                                        <i class="fa-brands fa-whatsapp"></i>
+                                       <i class="fa-brands fa-whatsapp"></i>
                                     </a>
                                     <span class="font-weight-bold font-cairo">@{{ row.celular }}</span>
                                 </div>
@@ -934,10 +1153,22 @@
                                 </span>
                             </td>
 
-                            <!-- Dirección -->
+                            <!-- Dirección y GPS -->
                             <td class="align-middle" style="min-width: 180px;">
                                 <span class="small text-secondary" v-if="row.direccion">@{{ row.direccion }}</span>
                                 <span class="text-muted small" v-else>—</span>
+                                <!-- Botón/Badge de GPS si tiene coordenadas -->
+                                <div v-if="row.latitud && row.longitud" class="mt-1 d-flex align-items-center flex-wrap">
+                                    <button type="button" class="badge-gps mr-1 border-0" @click="verGpsModal(row)" title="Ver mapa interactivo">
+                                        <i class="fa-solid fa-location-dot"></i> GPS
+                                    </button>
+                                    <a :href="'https://www.openstreetmap.org/?mlat=' + row.latitud + '&mlon=' + row.longitud + '#map=18/' + row.latitud + '/' + row.longitud"
+                                       target="_blank"
+                                       class="text-muted small"
+                                       title="Abrir en OpenStreetMap externo">
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    </a>
+                                </div>
                             </td>
 
                             <!-- Acciones en 1 Clic -->
@@ -952,6 +1183,12 @@
                                     <div class="dropdown-menu dropdown-menu-right shadow-sm border-0" style="border-radius: 10px;">
                                         <button class="dropdown-item py-2" @click="editar(row)">
                                             <i class="fa fa-user-pen text-primary mr-2"></i> Editar Ficha
+                                        </button>
+                                        <button v-if="row.latitud && row.longitud" class="dropdown-item py-2" @click="verGpsModal(row)">
+                                            <i class="fa-solid fa-location-dot text-danger mr-2"></i> Ver Mapa GPS
+                                        </button>
+                                        <button v-if="row.foto_frente_url || row.foto_dorso_url" class="dropdown-item py-2" @click="verFotosDoc(row)">
+                                            <i class="fa-solid fa-id-card text-info mr-2"></i> Ver Fotos Documento
                                         </button>
                                         <a class="dropdown-item py-2" :href="'{{ url('documento/extractocuenta') }}/' + row.id" target="_blank">
                                             <i class="fa-solid fa-file-invoice text-info mr-2"></i> Extracto de Cuenta
@@ -1024,7 +1261,7 @@
 
     <!-- Modal Formulario de Cliente (Nuevo / Edición) -->
     <div class="modal fade" id="modalCliente" tabindex="-1" role="dialog" aria-labelledby="modalClienteLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title font-weight-bold font-cairo" id="modalClienteLabel">
@@ -1184,6 +1421,178 @@
                                 />
                             </div>
                         </div>
+
+                        <!-- Sección 4: Geolocalización y Ubicación GPS -->
+                        <div class="form-section-title mt-3 d-flex justify-content-between align-items-center">
+                            <span>
+                                <i class="fa-solid fa-map-location-dot"></i> 4. Geolocalización y Ubicación GPS
+                            </span>
+                            <span class="badge" :class="usarGoogleMaps ? 'badge-primary' : 'badge-success'" style="font-size: 0.72rem; font-weight: 700; text-transform: none;">
+                                <i :class="usarGoogleMaps ? 'fa-brands fa-google' : 'fa-solid fa-globe'" class="mr-1"></i>
+                                @{{ usarGoogleMaps ? 'Google Maps' : 'OpenStreetMap' }}
+                            </span>
+                        </div>
+
+                        <div class="row align-items-center mb-2">
+                            <div class="col-md-4 mb-2 mb-md-0">
+                                <label class="form-label-custom mb-1">Latitud</label>
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-arrows-up-down text-muted"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control form-control-pos font-cairo" v-model="form.latitud" @input="actualizarMarcadorDesdeInputs" placeholder="Ej: -25.263740">
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2 mb-md-0">
+                                <label class="form-label-custom mb-1">Longitud</label>
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-arrows-left-right text-muted"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control form-control-pos font-cairo" v-model="form.longitud" @input="actualizarMarcadorDesdeInputs" placeholder="Ej: -57.575920">
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-md-right pt-md-3">
+                                <button type="button" class="btn btn-sm btn-outline-success font-weight-bold mr-1" @click="obtenerUbicacionActual" title="Detectar coordenadas GPS usando el navegador">
+                                    <i class="fa-solid fa-location-crosshairs mr-1"></i> Mi Ubicación
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger mr-1" @click="limpiarGps" v-if="form.latitud && form.longitud" title="Quitar coordenadas GPS">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                                <a v-if="form.latitud && form.longitud" :href="'https://www.google.com/maps?q=' + form.latitud + ',' + form.longitud" target="_blank" class="btn btn-sm btn-outline-success mr-1" title="Ver en Google Maps">
+                                    <i class="fa-brands fa-google"></i>
+                                </a>
+                                <a v-if="form.latitud && form.longitud" :href="'https://www.openstreetmap.org/?mlat=' + form.latitud + '&mlon=' + form.longitud + '#map=17/' + form.latitud + '/' + form.longitud" target="_blank" class="btn btn-sm btn-outline-info" title="Ver en OpenStreetMap">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="map-leaflet-wrapper mb-2">
+                            <div class="map-toolbar">
+                                <div class="d-flex align-items-center">
+                                    <i :class="usarGoogleMaps ? 'fa-brands fa-google text-danger' : 'fa-solid fa-map-pin text-success'" class="mr-2"></i>
+                                    <span class="small font-weight-bold" style="color: var(--dash-text-main);">
+                                        Mapa Interactivo (@{{ usarGoogleMaps ? 'Google Maps' : 'OpenStreetMap' }})
+                                    </span>
+                                </div>
+                                <div>
+                                    <span v-if="form.latitud && form.longitud" class="coord-display-box">
+                                        <i class="fa-solid fa-satellite"></i> @{{ form.latitud }}, @{{ form.longitud }}
+                                    </span>
+                                    <span v-else class="text-muted small">
+                                        <i class="fa-solid fa-hand-pointer mr-1"></i> Haz clic en el mapa para marcar ubicación
+                                    </span>
+                                </div>
+                            </div>
+                            <div id="mapCliente" class="map-container-pos"></div>
+                        </div>
+                        <small class="text-muted d-block mb-3">
+                            <i class="fa-solid fa-circle-info text-info mr-1"></i> Haz clic en el mapa o arrastra el marcador para fijar la ubicación exacta del cliente.
+                            <span v-if="usarGoogleMaps" class="text-primary font-weight-bold ml-1">(Motor Google Maps activo)</span>
+                            <span v-else class="text-success font-weight-bold ml-1">(Motor OpenStreetMap activo)</span>
+                        </small>
+
+                        <!-- Sección 5: Fotos de Documento de Identidad (Cara y Reverso) -->
+                        <div class="form-section-title mt-3">
+                            <i class="fa-solid fa-id-card"></i> 5. Fotos de Documento de Identidad (C.I. / RUC)
+                        </div>
+
+                        <div class="row">
+                            <!-- Foto Frente / Cara -->
+                            <div class="col-md-6 mb-3">
+                                <div class="doc-card-upload">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label class="form-label-custom mb-0 font-weight-bold">
+                                            <i class="fa-solid fa-image text-primary mr-1"></i> Cara Frontal (Anverso)
+                                        </label>
+                                        <span v-if="form.foto_frente_url" class="badge badge-success">
+                                            <i class="fa-solid fa-check mr-1"></i> Cargada
+                                        </span>
+                                        <span v-else class="badge badge-secondary">Sin foto</span>
+                                    </div>
+
+                                    <div class="doc-preview-wrapper">
+                                        <template v-if="form.foto_frente_url">
+                                            <img :src="form.foto_frente_url" alt="Documento Frente" class="doc-preview-img" @click="ampliarFoto(form.foto_frente_url, 'Documento Frontal - ' + (form.nombre || 'Cliente'))" title="Clic para ampliar foto" />
+                                        </template>
+                                        <div v-else class="doc-upload-placeholder" @click="seleccionarFoto('frente')">
+                                            <div v-if="subiendoFotoFrente" class="text-center">
+                                                <div class="spinner-border text-success" role="status"></div>
+                                                <div class="small mt-2 font-weight-bold text-muted">Subiendo imagen...</div>
+                                            </div>
+                                            <div v-else>
+                                                <i class="fa-solid fa-id-card doc-upload-icon"></i>
+                                                <div class="font-weight-bold small">Cargar foto frontal</div>
+                                                <div class="text-muted" style="font-size: 0.75rem;">JPG, PNG, WebP (Máx. 10MB)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center justify-content-between gap-1 mt-auto">
+                                        <input type="file" ref="inputFotoFrente" accept="image/jpeg,image/png,image/jpg,image/webp" class="d-none" @change="subirFoto($event, 'frente')">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" @click="seleccionarFoto('frente')" :disabled="subiendoFotoFrente">
+                                            <i class="fa-solid fa-upload mr-1"></i> @{{ form.foto_frente_url ? 'Cambiar Foto' : 'Subir Foto' }}
+                                        </button>
+                                        <div v-if="form.foto_frente_url" class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-info" @click="ampliarFoto(form.foto_frente_url, 'Documento Frontal - ' + (form.nombre || 'Cliente'))" title="Ver foto ampliada">
+                                                <i class="fa-solid fa-magnifying-glass-plus"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" @click="eliminarFoto('frente')" title="Eliminar foto">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Foto Dorso / Reverso -->
+                            <div class="col-md-6 mb-3">
+                                <div class="doc-card-upload">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label class="form-label-custom mb-0 font-weight-bold">
+                                            <i class="fa-solid fa-image text-primary mr-1"></i> Reverso / Dorso
+                                        </label>
+                                        <span v-if="form.foto_dorso_url" class="badge badge-success">
+                                            <i class="fa-solid fa-check mr-1"></i> Cargada
+                                        </span>
+                                        <span v-else class="badge badge-secondary">Sin foto</span>
+                                    </div>
+
+                                    <div class="doc-preview-wrapper">
+                                        <template v-if="form.foto_dorso_url">
+                                            <img :src="form.foto_dorso_url" alt="Documento Dorso" class="doc-preview-img" @click="ampliarFoto(form.foto_dorso_url, 'Documento Posterior - ' + (form.nombre || 'Cliente'))" title="Clic para ampliar foto" />
+                                        </template>
+                                        <div v-else class="doc-upload-placeholder" @click="seleccionarFoto('dorso')">
+                                            <div v-if="subiendoFotoDorso" class="text-center">
+                                                <div class="spinner-border text-success" role="status"></div>
+                                                <div class="small mt-2 font-weight-bold text-muted">Subiendo imagen...</div>
+                                            </div>
+                                            <div v-else>
+                                                <i class="fa-regular fa-id-card doc-upload-icon"></i>
+                                                <div class="font-weight-bold small">Cargar foto posterior</div>
+                                                <div class="text-muted" style="font-size: 0.75rem;">JPG, PNG, WebP (Máx. 10MB)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center justify-content-between gap-1 mt-auto">
+                                        <input type="file" ref="inputFotoDorso" accept="image/jpeg,image/png,image/jpg,image/webp" class="d-none" @change="subirFoto($event, 'dorso')">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" @click="seleccionarFoto('dorso')" :disabled="subiendoFotoDorso">
+                                            <i class="fa-solid fa-upload mr-1"></i> @{{ form.foto_dorso_url ? 'Cambiar Foto' : 'Subir Foto' }}
+                                        </button>
+                                        <div v-if="form.foto_dorso_url" class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-info" @click="ampliarFoto(form.foto_dorso_url, 'Documento Posterior - ' + (form.nombre || 'Cliente'))" title="Ver foto ampliada">
+                                                <i class="fa-solid fa-magnifying-glass-plus"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" @click="eliminarFoto('dorso')" title="Eliminar foto">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -1199,11 +1608,205 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Visor Rápido de Ubicación GPS (OpenStreetMap) -->
+    <div class="modal fade" id="modalVerGps" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content" v-if="clienteGpsSeleccionado">
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title font-weight-bold font-cairo mb-0">
+                        <i class="fa-solid fa-location-dot text-danger mr-2"></i>
+                        Ubicación GPS: @{{ clienteGpsSeleccionado.nombre }}
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <span class="badge mr-2" :class="usarGoogleMaps ? 'badge-primary' : 'badge-success'" style="font-size: 0.72rem; font-weight: 700; text-transform: none;">
+                            <i :class="usarGoogleMaps ? 'fa-brands fa-google' : 'fa-solid fa-globe'" class="mr-1"></i>
+                            @{{ usarGoogleMaps ? 'Google Maps' : 'OpenStreetMap' }}
+                        </span>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body p-3">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between mb-2">
+                        <div>
+                            <div class="font-weight-bold" style="color: var(--dash-text-main);">
+                                <i class="fa-solid fa-house-chimney text-muted mr-1"></i> @{{ clienteGpsSeleccionado.direccion || 'Sin dirección descriptiva' }}
+                            </div>
+                            <div class="small text-muted">
+                                <i class="fa-solid fa-city mr-1"></i> @{{ clienteGpsSeleccionado.ciudad_nombre }} &bull; CI/RUC: @{{ clienteGpsSeleccionado.doc || '—' }}
+                            </div>
+                        </div>
+                        <div class="mt-2 mt-sm-0">
+                            <span class="coord-display-box">
+                                <i class="fa-solid fa-satellite"></i> @{{ clienteGpsSeleccionado.latitud }}, @{{ clienteGpsSeleccionado.longitud }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="map-leaflet-wrapper">
+                        <div id="mapPreviewViewer" class="map-preview-container"></div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <div>
+                        <a :href="'https://www.openstreetmap.org/?mlat=' + clienteGpsSeleccionado.latitud + '&mlon=' + clienteGpsSeleccionado.longitud + '#map=18/' + clienteGpsSeleccionado.latitud + '/' + clienteGpsSeleccionado.longitud"
+                           target="_blank" class="btn btn-sm btn-outline-primary mr-1">
+                            <i class="fa-solid fa-map mr-1"></i> Abrir OpenStreetMap
+                        </a>
+                        <a :href="'https://www.google.com/maps?q=' + clienteGpsSeleccionado.latitud + ',' + clienteGpsSeleccionado.longitud"
+                           target="_blank" class="btn btn-sm btn-outline-success">
+                            <i class="fa-brands fa-google mr-1"></i> Google Maps
+                        </a>
+                    </div>
+                    <button type="button" class="btn-pos-secondary" data-dismiss="modal">
+                        <i class="fa fa-times mr-1"></i> Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Visor de Documentos de Identidad (Cara y Reverso) -->
+    <div class="modal fade" id="modalFotoDocViewer" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content" v-if="docViewerCliente">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title font-weight-bold font-cairo mb-0">
+                            <i class="fa-solid fa-id-card text-primary mr-2"></i>
+                            Cédula / Documento: @{{ docViewerCliente.nombre }}
+                        </h5>
+                        <div class="small text-muted mt-1">
+                            Doc: @{{ docViewerCliente.doc || 'Sin Doc' }} &bull; Ciudad: @{{ docViewerCliente.ciudad_nombre }}
+                        </div>
+                    </div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-3 text-center">
+                    <!-- Pestañas para alternar Frente y Dorso -->
+                    <ul class="nav nav-pills justify-content-center mb-3">
+                        <li class="nav-item">
+                            <a class="nav-link cursor-pointer font-weight-bold"
+                               :class="{ 'active': docViewerTipo === 'frente', 'disabled': !docViewerCliente.foto_frente_url }"
+                               @click="docViewerCliente.foto_frente_url && (docViewerTipo = 'frente')">
+                                <i class="fa-solid fa-id-card mr-1"></i> Cara Frontal
+                                <span v-if="!docViewerCliente.foto_frente_url" class="badge badge-light ml-1">(Sin foto)</span>
+                            </a>
+                        </li>
+                        <li class="nav-item ml-2">
+                            <a class="nav-link cursor-pointer font-weight-bold"
+                               :class="{ 'active': docViewerTipo === 'dorso', 'disabled': !docViewerCliente.foto_dorso_url }"
+                               @click="docViewerCliente.foto_dorso_url && (docViewerTipo = 'dorso')">
+                                <i class="fa-regular fa-id-card mr-1"></i> Reverso / Dorso
+                                <span v-if="!docViewerCliente.foto_dorso_url" class="badge badge-light ml-1">(Sin foto)</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Contenedor de Imagen -->
+                    <div class="p-2 border rounded bg-light d-flex align-items-center justify-content-center" style="min-height: 380px; max-height: 520px; overflow: hidden;">
+                        <img v-if="docViewerTipo === 'frente' && docViewerCliente.foto_frente_url"
+                             :src="docViewerCliente.foto_frente_url"
+                             alt="C.I. Frente"
+                             class="img-fluid rounded"
+                             style="max-height: 480px; object-fit: contain; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />
+
+                        <img v-else-if="docViewerTipo === 'dorso' && docViewerCliente.foto_dorso_url"
+                             :src="docViewerCliente.foto_dorso_url"
+                             alt="C.I. Dorso"
+                             class="img-fluid rounded"
+                             style="max-height: 480px; object-fit: contain; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" />
+
+                        <div v-else class="text-muted py-5">
+                            <i class="fa-solid fa-image-slash fa-3x mb-3 text-muted"></i>
+                            <p class="mb-0">No se ha cargado la fotografía para este lado del documento.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <div>
+                        <a v-if="docViewerTipo === 'frente' && docViewerCliente.foto_frente_url"
+                           :href="docViewerCliente.foto_frente_url"
+                           target="_blank"
+                           download
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="fa-solid fa-download mr-1"></i> Descargar Foto
+                        </a>
+                        <a v-else-if="docViewerTipo === 'dorso' && docViewerCliente.foto_dorso_url"
+                           :href="docViewerCliente.foto_dorso_url"
+                           target="_blank"
+                           download
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="fa-solid fa-download mr-1"></i> Descargar Foto
+                        </a>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-pos-primary mr-1" @click="$('#modalFotoDocViewer').modal('hide'); editar(docViewerCliente)">
+                            <i class="fa fa-pen mr-1"></i> Editar Documentos en Ficha
+                        </button>
+                        <button type="button" class="btn-pos-secondary" data-dismiss="modal">
+                            <i class="fa fa-times mr-1"></i> Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Zoom Foto Individual -->
+    <div class="modal fade" id="modalFotoIndividual" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title font-weight-bold font-cairo mb-0">
+                        <i class="fa-solid fa-image mr-1 text-primary"></i> @{{ fotoAmpliadaTitulo }}
+                    </h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-2 text-center bg-dark">
+                    <img :src="fotoAmpliadaUrl" alt="Foto Ampliada" class="img-fluid rounded" style="max-height: 75vh; object-fit: contain;" />
+                </div>
+                <div class="modal-footer justify-content-between py-2">
+                    <a :href="fotoAmpliadaUrl" target="_blank" class="btn btn-sm btn-outline-secondary" download>
+                        <i class="fa-solid fa-download mr-1"></i> Descargar Original
+                    </a>
+                    <button type="button" class="btn btn-sm btn-pos-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
 @section('script')
+<script src="{{ asset('js/leaflet/leaflet.js') }}"></script>
+@if(!empty($mapConfig['google_maps_api_key']) && ($mapConfig['proveedor_efectivo'] ?? 'openstreet') === 'google')
 <script>
+    // Callback si Google Maps falla por autenticación (API key errónea o inválida)
+    window.gm_authFailure = function () {
+        console.warn('Google Maps: Fallo de autenticación en la clave API. Activando fallback a OpenStreetMap.');
+        if (window.app) {
+            window.app.onGoogleMapsError();
+        }
+    };
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ $mapConfig['google_maps_api_key'] }}"></script>
+@endif
+<script>
+    // Configuración de rutas de iconos de Leaflet para compatibilidad total
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+        iconRetinaUrl: '{{ asset("js/leaflet/images/marker-icon-2x.png") }}',
+        iconUrl: '{{ asset("js/leaflet/images/marker-icon.png") }}',
+        shadowUrl: '{{ asset("js/leaflet/images/marker-shadow.png") }}',
+    });
+
     var Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -1220,12 +1823,38 @@
             txtbuscar: '',
             buscarTimer: null,
             filtroCiudad: 0,
+            filtroGps: 'todos',
+            filtroFotos: 'todos',
             sortField: 'nombre',
             sortOrder: 'asc',
             currentPage: 1,
             perPage: 25,
             rows: [],
             ciudadesList: @json($ciudades),
+            mapConfig: {!! json_encode($mapConfig ?? [
+                'proveedor' => 'openstreet',
+                'proveedor_efectivo' => 'openstreet',
+                'google_maps_api_key' => '',
+                'lat_default' => -25.263740,
+                'lng_default' => -57.575920,
+                'zoom_default' => 14
+            ]) !!},
+            modoGoogleMapsFallo: false,
+            subiendoFotoFrente: false,
+            subiendoFotoDorso: false,
+            mapCliente: null,
+            markerCliente: null,
+            gMapCliente: null,
+            gMarkerCliente: null,
+            gpsViewerMap: null,
+            gpsViewerMarker: null,
+            gMapViewer: null,
+            gMarkerViewer: null,
+            clienteGpsSeleccionado: null,
+            docViewerCliente: null,
+            docViewerTipo: 'frente',
+            fotoAmpliadaUrl: '',
+            fotoAmpliadaTitulo: '',
             form: {
                 id: null,
                 doc: '',
@@ -1237,10 +1866,26 @@
                 idciudad: '{{ optional($ciudades->first())->CIUDAD_cod ?? 1 }}',
                 celfamiliar: '',
                 ocupacion: '',
-                reflaboral: ''
+                reflaboral: '',
+                latitud: null,
+                longitud: null,
+                ubicacion_url: null,
+                foto_ci_dorso: null,
+                foto_ci_reverso: null,
+                foto_frente_url: null,
+                foto_dorso_url: null
             }
         },
         computed: {
+            usarGoogleMaps: function () {
+                return !this.modoGoogleMapsFallo
+                    && ((this.mapConfig.proveedor_efectivo || '') === 'google')
+                    && typeof google !== 'undefined'
+                    && typeof google.maps !== 'undefined';
+            },
+            proveedorActivoLabel: function () {
+                return this.usarGoogleMaps ? 'Google Maps' : 'OpenStreetMap';
+            },
             esEdicion: function () {
                 return this.form.id !== null && this.form.id !== undefined && this.form.id !== '';
             },
@@ -1259,6 +1904,16 @@
                     return (c.correo || '').trim() !== '';
                 }).length;
             },
+            totalConGps: function () {
+                return this.rows.filter(function (c) {
+                    return c.latitud && c.longitud;
+                }).length;
+            },
+            totalConDocFoto: function () {
+                return this.rows.filter(function (c) {
+                    return c.foto_frente_url || c.foto_dorso_url || c.foto_ci_dorso || c.foto_ci_reverso;
+                }).length;
+            },
             filteredRows: function () {
                 var list = [...this.rows];
 
@@ -1267,6 +1922,20 @@
                     var cid = parseInt(this.filtroCiudad);
                     list = list.filter(function (r) {
                         return parseInt(r.idciudad) === cid;
+                    });
+                }
+
+                // Filtro rápido por GPS
+                if (this.filtroGps === 'con_gps') {
+                    list = list.filter(function (r) {
+                        return r.latitud && r.longitud;
+                    });
+                }
+
+                // Filtro rápido por Fotos C.I.
+                if (this.filtroFotos === 'con_fotos') {
+                    list = list.filter(function (r) {
+                        return r.foto_frente_url || r.foto_dorso_url;
                     });
                 }
 
@@ -1349,6 +2018,14 @@
                 if (p < 1 || p > this.totalPages) return;
                 this.currentPage = p;
             },
+            toggleFiltroGps: function () {
+                this.filtroGps = this.filtroGps === 'con_gps' ? 'todos' : 'con_gps';
+                this.currentPage = 1;
+            },
+            toggleFiltroFotos: function () {
+                this.filtroFotos = this.filtroFotos === 'con_fotos' ? 'todos' : 'con_fotos';
+                this.currentPage = 1;
+            },
             cleanPhone: function (phone) {
                 if (!phone) return '';
                 var p = phone.toString().replace(/\D/g, '');
@@ -1384,19 +2061,29 @@
                     idciudad: '{{ optional($ciudades->first())->CIUDAD_cod ?? 1 }}',
                     celfamiliar: '',
                     ocupacion: '',
-                    reflaboral: ''
+                    reflaboral: '',
+                    latitud: null,
+                    longitud: null,
+                    ubicacion_url: null,
+                    foto_ci_dorso: null,
+                    foto_ci_reverso: null,
+                    foto_frente_url: null,
+                    foto_dorso_url: null
                 };
             },
             nuevoCliente: function () {
+                var self = this;
                 this.form = this.blankForm();
                 $('#modalCliente').modal('show');
                 this.$nextTick(function () {
                     setTimeout(function () {
                         $('#txtClienteDoc').focus();
+                        self.initMapCliente(null, null);
                     }, 300);
                 });
             },
             editar: function (c) {
+                var self = this;
                 this.form = {
                     id: c.id,
                     doc: c.doc || '',
@@ -1408,18 +2095,28 @@
                     idciudad: c.idciudad || this.blankForm().idciudad,
                     celfamiliar: c.celfamiliar || '',
                     ocupacion: c.ocupacion || '',
-                    reflaboral: c.reflaboral || ''
+                    reflaboral: c.reflaboral || '',
+                    latitud: c.latitud || null,
+                    longitud: c.longitud || null,
+                    ubicacion_url: c.ubicacion_url || null,
+                    foto_ci_dorso: c.foto_ci_dorso || null,
+                    foto_ci_reverso: c.foto_ci_reverso || null,
+                    foto_frente_url: c.foto_frente_url || null,
+                    foto_dorso_url: c.foto_dorso_url || null
                 };
                 $('#modalCliente').modal('show');
                 this.$nextTick(function () {
                     setTimeout(function () {
                         $('#txtClienteDoc').focus().select();
+                        self.initMapCliente(c.latitud, c.longitud);
                     }, 300);
                 });
             },
             limpiarFiltros: function () {
                 this.txtbuscar = '';
                 this.filtroCiudad = 0;
+                this.filtroGps = 'todos';
+                this.filtroFotos = 'todos';
                 this.currentPage = 1;
                 this.buscar(false);
             },
@@ -1455,7 +2152,16 @@
                             ciudad_nombre: c.ciudad_nombre || self.getCiudadNombre(c.CIUDAD_cod || c.ciudad_cod),
                             celfamiliar: c.cliente_referente_nombre || '',
                             ocupacion: c.cliente_profesion || '',
-                            reflaboral: c.cliente_referencia_laboral || ''
+                            reflaboral: c.cliente_referencia_laboral || '',
+                            latitud: c.cliente_latitud || null,
+                            longitud: c.cliente_longitud || null,
+                            ubicacion_url: c.cliente_ubicacion_url || null,
+                            foto_ci_dorso: c.cliente_foto_ci_dorso || null,
+                            foto_ci_reverso: c.cliente_foto_ci_reverso || null,
+                            foto_frente_url: c.foto_frente_url || (c.cliente_foto_ci_dorso ? ('{{ asset("storage/clientes") }}/' + c.cliente_foto_ci_dorso) : null),
+                            foto_dorso_url: c.foto_dorso_url || (c.cliente_foto_ci_reverso ? ('{{ asset("storage/clientes") }}/' + c.cliente_foto_ci_reverso) : null),
+                            tiene_gps: !!(c.cliente_latitud && c.cliente_longitud),
+                            gps_url: c.gps_url || (c.cliente_latitud && c.cliente_longitud ? ('https://www.openstreetmap.org/?mlat=' + c.cliente_latitud + '&mlon=' + c.cliente_longitud + '#map=17/' + c.cliente_latitud + '/' + c.cliente_longitud) : null)
                         };
                     });
                     if (!keepPage) {
@@ -1480,7 +2186,12 @@
                         idciudad: this.form.idciudad || 1,
                         celfamiliar: this.form.celfamiliar || '',
                         ocupacion: this.form.ocupacion || '',
-                        reflaboral: this.form.reflaboral || ''
+                        reflaboral: this.form.reflaboral || '',
+                        latitud: this.form.latitud || null,
+                        longitud: this.form.longitud || null,
+                        ubicacion_url: this.form.ubicacion_url || null,
+                        foto_ci_dorso: this.form.foto_ci_dorso || null,
+                        foto_ci_reverso: this.form.foto_ci_reverso || null
                     }
                 };
             },
@@ -1536,10 +2247,543 @@
                             );
                         });
                 });
+            },
+
+            /* ============================================================
+             * FUNCIONES DE MAPA (GOOGLE MAPS & OPENSTREETMAP LEAFLET)
+             * ============================================================ */
+            onGoogleMapsError: function () {
+                var self = this;
+                this.modoGoogleMapsFallo = true;
+                Toast.fire({
+                    icon: 'warning',
+                    title: 'Fallo al autenticar Google Maps. Usando OpenStreetMap automáticamente.'
+                });
+                if ($('#modalCliente').is(':visible')) {
+                    setTimeout(function () {
+                        self.initLeafletMapCliente(self.form.latitud, self.form.longitud);
+                    }, 200);
+                }
+                if ($('#modalVerGps').is(':visible') && this.clienteGpsSeleccionado) {
+                    setTimeout(function () {
+                        self.initLeafletMapViewer(
+                            self.clienteGpsSeleccionado.latitud,
+                            self.clienteGpsSeleccionado.longitud,
+                            self.clienteGpsSeleccionado.nombre,
+                            self.clienteGpsSeleccionado.direccion
+                        );
+                    }, 200);
+                }
+            },
+
+            clearMapContainer: function (elementId) {
+                var el = document.getElementById(elementId);
+                if (el) {
+                    if (el._leaflet_id) {
+                        delete el._leaflet_id;
+                    }
+                    el.innerHTML = '';
+                }
+            },
+
+            initMapCliente: function (lat, lng) {
+                if (this.usarGoogleMaps) {
+                    this.initGoogleMapCliente(lat, lng);
+                } else {
+                    this.initLeafletMapCliente(lat, lng);
+                }
+            },
+
+            initGoogleMapCliente: function (lat, lng) {
+                var self = this;
+                var defaultLat = parseFloat(this.mapConfig.lat_default) || -25.263740;
+                var defaultLng = parseFloat(this.mapConfig.lng_default) || -57.575920;
+                var defaultZoom = parseInt(this.mapConfig.zoom_default) || 14;
+
+                var hasCoord = lat && lng && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng));
+                var curLat = hasCoord ? parseFloat(lat) : defaultLat;
+                var curLng = hasCoord ? parseFloat(lng) : defaultLng;
+                var zoom = hasCoord ? 16 : defaultZoom;
+
+                var mapEl = document.getElementById('mapCliente');
+                if (!mapEl) return;
+
+                // Si existía Leaflet previo, limpiarlo
+                if (self.mapCliente) {
+                    try { self.mapCliente.remove(); } catch(e){}
+                    self.mapCliente = null;
+                    self.markerCliente = null;
+                }
+
+                var center = { lat: curLat, lng: curLng };
+
+                if (!self.gMapCliente || !mapEl.hasChildNodes()) {
+                    self.clearMapContainer('mapCliente');
+                    self.gMapCliente = new google.maps.Map(mapEl, {
+                        center: center,
+                        zoom: zoom,
+                        mapTypeControl: true,
+                        streetViewControl: true,
+                        fullscreenControl: true
+                    });
+
+                    self.gMapCliente.addListener('click', function (e) {
+                        self.setUbicacionGps(e.latLng.lat(), e.latLng.lng());
+                    });
+                } else {
+                    self.gMapCliente.setCenter(center);
+                    self.gMapCliente.setZoom(zoom);
+                }
+
+                if (hasCoord) {
+                    if (!self.gMarkerCliente) {
+                        self.gMarkerCliente = new google.maps.Marker({
+                            position: center,
+                            map: self.gMapCliente,
+                            draggable: true,
+                            title: 'Ubicación del Cliente'
+                        });
+                        self.gMarkerCliente.addListener('dragend', function (e) {
+                            self.setUbicacionGps(e.latLng.lat(), e.latLng.lng());
+                        });
+                    } else {
+                        self.gMarkerCliente.setPosition(center);
+                        self.gMarkerCliente.setMap(self.gMapCliente);
+                    }
+                } else {
+                    if (self.gMarkerCliente) {
+                        self.gMarkerCliente.setMap(null);
+                    }
+                }
+
+                setTimeout(function () {
+                    if (self.gMapCliente) {
+                        google.maps.event.trigger(self.gMapCliente, 'resize');
+                        self.gMapCliente.setCenter(center);
+                    }
+                }, 250);
+            },
+
+            initLeafletMapCliente: function (lat, lng) {
+                var self = this;
+                var defaultLat = parseFloat(this.mapConfig.lat_default) || -25.263740;
+                var defaultLng = parseFloat(this.mapConfig.lng_default) || -57.575920;
+                var defaultZoom = parseInt(this.mapConfig.zoom_default) || 14;
+
+                var hasCoord = lat && lng && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng));
+                var curLat = hasCoord ? parseFloat(lat) : defaultLat;
+                var curLng = hasCoord ? parseFloat(lng) : defaultLng;
+                var zoom = hasCoord ? 16 : defaultZoom;
+
+                var mapEl = document.getElementById('mapCliente');
+                if (!mapEl) return;
+
+                // Si existía Google Maps previo, limpiarlo
+                if (self.gMapCliente) {
+                    self.clearMapContainer('mapCliente');
+                    self.gMapCliente = null;
+                    self.gMarkerCliente = null;
+                }
+
+                if (!self.mapCliente || !mapEl.classList.contains('leaflet-container')) {
+                    self.clearMapContainer('mapCliente');
+                    self.mapCliente = L.map('mapCliente').setView([curLat, curLng], zoom);
+
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+                    }).addTo(self.mapCliente);
+
+                    self.mapCliente.on('click', function (e) {
+                        self.setUbicacionGps(e.latlng.lat, e.latlng.lng);
+                    });
+                } else {
+                    self.mapCliente.setView([curLat, curLng], zoom);
+                }
+
+                if (hasCoord) {
+                    if (!self.markerCliente) {
+                        self.markerCliente = L.marker([curLat, curLng], { draggable: true }).addTo(self.mapCliente);
+                        self.markerCliente.on('dragend', function (e) {
+                            var pos = e.target.getLatLng();
+                            self.setUbicacionGps(pos.lat, pos.lng);
+                        });
+                    } else {
+                        self.markerCliente.setLatLng([curLat, curLng]);
+                        if (!self.mapCliente.hasLayer(self.markerCliente)) {
+                            self.markerCliente.addTo(self.mapCliente);
+                        }
+                    }
+                } else {
+                    if (self.markerCliente && self.mapCliente.hasLayer(self.markerCliente)) {
+                        self.mapCliente.removeLayer(self.markerCliente);
+                    }
+                }
+
+                setTimeout(function () {
+                    if (self.mapCliente) self.mapCliente.invalidateSize();
+                }, 250);
+            },
+
+            setUbicacionGps: function (lat, lng) {
+                var latFixed = parseFloat(lat).toFixed(6);
+                var lngFixed = parseFloat(lng).toFixed(6);
+                this.form.latitud = latFixed;
+                this.form.longitud = lngFixed;
+                this.form.ubicacion_url = 'https://www.google.com/maps?q=' + latFixed + ',' + lngFixed;
+
+                var fLat = parseFloat(latFixed);
+                var fLng = parseFloat(lngFixed);
+
+                if (this.usarGoogleMaps) {
+                    var center = { lat: fLat, lng: fLng };
+                    if (!this.gMarkerCliente) {
+                        var self = this;
+                        this.gMarkerCliente = new google.maps.Marker({
+                            position: center,
+                            map: this.gMapCliente,
+                            draggable: true,
+                            title: 'Ubicación del Cliente'
+                        });
+                        this.gMarkerCliente.addListener('dragend', function (e) {
+                            self.setUbicacionGps(e.latLng.lat(), e.latLng.lng());
+                        });
+                    } else {
+                        this.gMarkerCliente.setPosition(center);
+                        if (this.gMapCliente) this.gMarkerCliente.setMap(this.gMapCliente);
+                    }
+                } else {
+                    if (!this.markerCliente) {
+                        var self = this;
+                        this.markerCliente = L.marker([fLat, fLng], { draggable: true }).addTo(this.mapCliente);
+                        this.markerCliente.on('dragend', function (e) {
+                            var pos = e.target.getLatLng();
+                            self.setUbicacionGps(pos.lat, pos.lng);
+                        });
+                    } else {
+                        this.markerCliente.setLatLng([fLat, fLng]);
+                        if (this.mapCliente && !this.mapCliente.hasLayer(this.markerCliente)) {
+                            this.markerCliente.addTo(this.mapCliente);
+                        }
+                    }
+                }
+            },
+
+            limpiarGps: function () {
+                this.form.latitud = null;
+                this.form.longitud = null;
+                this.form.ubicacion_url = null;
+                if (this.markerCliente && this.mapCliente && this.mapCliente.hasLayer(this.markerCliente)) {
+                    this.mapCliente.removeLayer(this.markerCliente);
+                }
+                if (this.gMarkerCliente) {
+                    this.gMarkerCliente.setMap(null);
+                }
+                Toast.fire({ icon: 'info', title: 'Coordenadas GPS eliminadas' });
+            },
+
+            obtenerUbicacionActual: function () {
+                var self = this;
+                if (!navigator.geolocation) {
+                    Swal.fire('No compatible', 'El navegador no soporta geolocalización GPS.', 'warning');
+                    return;
+                }
+                Toast.fire({ icon: 'info', title: 'Obteniendo GPS del dispositivo...' });
+                navigator.geolocation.getCurrentPosition(
+                    function (pos) {
+                        var lat = pos.coords.latitude;
+                        var lng = pos.coords.longitude;
+                        self.setUbicacionGps(lat, lng);
+                        if (self.usarGoogleMaps && self.gMapCliente) {
+                            self.gMapCliente.setCenter({ lat: lat, lng: lng });
+                            self.gMapCliente.setZoom(17);
+                        } else if (self.mapCliente) {
+                            self.mapCliente.setView([lat, lng], 17);
+                            self.mapCliente.invalidateSize();
+                        }
+                        Toast.fire({ icon: 'success', title: 'Ubicación GPS fijada correctamente' });
+                    },
+                    function (err) {
+                        var msg = 'No se pudo obtener la posición GPS actual.';
+                        if (err.code === 1) msg = 'Permiso de geolocalización denegado en el navegador.';
+                        else if (err.code === 2) msg = 'Posición GPS no disponible en este dispositivo.';
+                        else if (err.code === 3) msg = 'Tiempo de espera agotado al consultar GPS.';
+                        Swal.fire('GPS', msg, 'info');
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            },
+
+            actualizarMarcadorDesdeInputs: function () {
+                var lat = parseFloat(this.form.latitud);
+                var lng = parseFloat(this.form.longitud);
+                if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                    this.setUbicacionGps(lat, lng);
+                    if (this.usarGoogleMaps && this.gMapCliente) {
+                        this.gMapCliente.setCenter({ lat: lat, lng: lng });
+                        this.gMapCliente.setZoom(16);
+                    } else if (this.mapCliente) {
+                        this.mapCliente.setView([lat, lng], 16);
+                    }
+                }
+            },
+
+            verGpsModal: function (row) {
+                var self = this;
+                this.clienteGpsSeleccionado = row;
+                $('#modalVerGps').modal('show');
+                this.$nextTick(function () {
+                    setTimeout(function () {
+                        self.initMapViewer(row.latitud, row.longitud, row.nombre, row.direccion);
+                    }, 300);
+                });
+            },
+
+            initMapViewer: function (lat, lng, nombre, direccion) {
+                if (this.usarGoogleMaps) {
+                    this.initGoogleMapViewer(lat, lng, nombre, direccion);
+                } else {
+                    this.initLeafletMapViewer(lat, lng, nombre, direccion);
+                }
+            },
+
+            initGoogleMapViewer: function (lat, lng, nombre, direccion) {
+                var self = this;
+                var curLat = parseFloat(lat);
+                var curLng = parseFloat(lng);
+                if (isNaN(curLat) || isNaN(curLng)) return;
+
+                var mapEl = document.getElementById('mapPreviewViewer');
+                if (!mapEl) return;
+
+                if (self.gpsViewerMap) {
+                    try { self.gpsViewerMap.remove(); } catch(e){}
+                    self.gpsViewerMap = null;
+                    self.gpsViewerMarker = null;
+                }
+
+                var center = { lat: curLat, lng: curLng };
+
+                if (!self.gMapViewer || !mapEl.hasChildNodes()) {
+                    self.clearMapContainer('mapPreviewViewer');
+                    self.gMapViewer = new google.maps.Map(mapEl, {
+                        center: center,
+                        zoom: 16,
+                        mapTypeControl: true,
+                        streetViewControl: true,
+                        fullscreenControl: true
+                    });
+
+                    self.gMarkerViewer = new google.maps.Marker({
+                        position: center,
+                        map: self.gMapViewer,
+                        title: nombre || 'Cliente'
+                    });
+                } else {
+                    self.gMapViewer.setCenter(center);
+                    self.gMapViewer.setZoom(16);
+                    if (self.gMarkerViewer) {
+                        self.gMarkerViewer.setPosition(center);
+                        self.gMarkerViewer.setMap(self.gMapViewer);
+                    }
+                }
+
+                var infoWindow = new google.maps.InfoWindow({
+                    content: '<div style="font-family: Cairo, sans-serif; font-size: 0.9rem;"><strong style="color: #059669;">' + (nombre || 'Cliente') + '</strong><br><small class="text-muted">' + (direccion || 'Sin dirección') + '</small></div>'
+                });
+                infoWindow.open(self.gMapViewer, self.gMarkerViewer);
+
+                setTimeout(function () {
+                    if (self.gMapViewer) {
+                        google.maps.event.trigger(self.gMapViewer, 'resize');
+                        self.gMapViewer.setCenter(center);
+                    }
+                }, 250);
+            },
+
+            initLeafletMapViewer: function (lat, lng, nombre, direccion) {
+                var self = this;
+                var curLat = parseFloat(lat);
+                var curLng = parseFloat(lng);
+                if (isNaN(curLat) || isNaN(curLng)) return;
+
+                var mapEl = document.getElementById('mapPreviewViewer');
+                if (!mapEl) return;
+
+                if (self.gMapViewer) {
+                    self.clearMapContainer('mapPreviewViewer');
+                    self.gMapViewer = null;
+                    self.gMarkerViewer = null;
+                }
+
+                if (!self.gpsViewerMap || !mapEl.classList.contains('leaflet-container')) {
+                    self.clearMapContainer('mapPreviewViewer');
+                    self.gpsViewerMap = L.map('mapPreviewViewer').setView([curLat, curLng], 16);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; OpenStreetMap'
+                    }).addTo(self.gpsViewerMap);
+
+                    self.gpsViewerMarker = L.marker([curLat, curLng]).addTo(self.gpsViewerMap);
+                } else {
+                    self.gpsViewerMap.setView([curLat, curLng], 16);
+                    self.gpsViewerMarker.setLatLng([curLat, curLng]);
+                }
+
+                var popup = '<div style="font-family: Cairo, sans-serif; font-size: 0.9rem;"><strong style="color: #059669;">' + (nombre || 'Cliente') + '</strong><br><small class="text-muted">' + (direccion || 'Sin dirección') + '</small></div>';
+                self.gpsViewerMarker.bindPopup(popup).openPopup();
+
+                setTimeout(function () {
+                    if (self.gpsViewerMap) self.gpsViewerMap.invalidateSize();
+                }, 250);
+            },
+
+            /* ============================================================
+             * FUNCIONES DE DOCUMENTOS DE IDENTIDAD (CARA Y REVERSO)
+             * ============================================================ */
+            seleccionarFoto: function (tipo) {
+                if (tipo === 'frente') {
+                    if (this.$refs.inputFotoFrente) this.$refs.inputFotoFrente.click();
+                } else {
+                    if (this.$refs.inputFotoDorso) this.$refs.inputFotoDorso.click();
+                }
+            },
+
+            subirFoto: function (event, tipo) {
+                var self = this;
+                var file = event.target.files[0];
+                if (!file) return;
+
+                if (file.size > 10 * 1024 * 1024) {
+                    Swal.fire('Archivo muy grande', 'La imagen no debe superar 10 MB.', 'warning');
+                    event.target.value = '';
+                    return;
+                }
+
+                var formData = new FormData();
+                formData.append('foto', file);
+                formData.append('tipo', tipo);
+                if (self.form.id) {
+                    formData.append('id_cliente', self.form.id);
+                }
+
+                if (tipo === 'frente') self.subiendoFotoFrente = true;
+                else self.subiendoFotoDorso = true;
+
+                axios.post('{{ url("cliente/foto") }}', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                }).then(function (res) {
+                    if (tipo === 'frente') {
+                        self.subiendoFotoFrente = false;
+                        self.form.foto_ci_dorso = res.data.filename;
+                        self.form.foto_frente_url = res.data.url;
+                    } else {
+                        self.subiendoFotoDorso = false;
+                        self.form.foto_ci_reverso = res.data.filename;
+                        self.form.foto_dorso_url = res.data.url;
+                    }
+                    event.target.value = '';
+                    Toast.fire({ icon: 'success', title: res.data.message || 'Foto cargada correctamente' });
+                    if (self.form.id) {
+                        self.buscar(true);
+                    }
+                }).catch(function (err) {
+                    if (tipo === 'frente') self.subiendoFotoFrente = false;
+                    else self.subiendoFotoDorso = false;
+                    event.target.value = '';
+                    var msg = (err.response && err.response.data && err.response.data.message) || 'Error al subir la fotografía.';
+                    Swal.fire('Error', msg, 'error');
+                });
+            },
+
+            eliminarFoto: function (tipo) {
+                var self = this;
+                var titulo = tipo === 'frente' ? '¿Eliminar foto frontal de la cédula?' : '¿Eliminar foto posterior/dorso de la cédula?';
+                Swal.fire({
+                    title: titulo,
+                    text: 'Esta acción no se puede deshacer.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#ef4444'
+                }).then(function (res) {
+                    if (!res.value) return;
+
+                    var filename = tipo === 'frente' ? self.form.foto_ci_dorso : self.form.foto_ci_reverso;
+                    axios.post('{{ url("cliente/foto/eliminar") }}', {
+                        tipo: tipo,
+                        id_cliente: self.form.id || null,
+                        filename: filename
+                    }).then(function () {
+                        if (tipo === 'frente') {
+                            self.form.foto_ci_dorso = null;
+                            self.form.foto_frente_url = null;
+                        } else {
+                            self.form.foto_ci_reverso = null;
+                            self.form.foto_dorso_url = null;
+                        }
+                        Toast.fire({ icon: 'success', title: 'Foto eliminada correctamente' });
+                        if (self.form.id) {
+                            self.buscar(true);
+                        }
+                    }).catch(function () {
+                        Swal.fire('Error', 'No se pudo eliminar la imagen.', 'error');
+                    });
+                });
+            },
+
+            verFotosDoc: function (row) {
+                this.docViewerCliente = row;
+                this.docViewerTipo = row.foto_frente_url ? 'frente' : 'dorso';
+                $('#modalFotoDocViewer').modal('show');
+            },
+
+            ampliarFoto: function (url, titulo) {
+                this.fotoAmpliadaUrl = url;
+                this.fotoAmpliadaTitulo = titulo || 'Visualización de Documento';
+                $('#modalFotoIndividual').modal('show');
             }
         },
         mounted: function () {
             this.buscar(false);
+
+            // Ajustar mapas al abrir modales de Bootstrap (Google Maps y Leaflet)
+            $('#modalCliente').on('shown.bs.modal', function () {
+                if (app.usarGoogleMaps) {
+                    if (app.gMapCliente) {
+                        google.maps.event.trigger(app.gMapCliente, 'resize');
+                        var lat = parseFloat(app.form.latitud) || (parseFloat(app.mapConfig.lat_default) || -25.263740);
+                        var lng = parseFloat(app.form.longitud) || (parseFloat(app.mapConfig.lng_default) || -57.575920);
+                        app.gMapCliente.setCenter({ lat: lat, lng: lng });
+                    } else {
+                        app.initMapCliente(app.form.latitud, app.form.longitud);
+                    }
+                } else {
+                    if (app.mapCliente) {
+                        app.mapCliente.invalidateSize();
+                    } else {
+                        app.initMapCliente(app.form.latitud, app.form.longitud);
+                    }
+                }
+            });
+
+            $('#modalVerGps').on('shown.bs.modal', function () {
+                if (app.usarGoogleMaps) {
+                    if (app.gMapViewer && app.clienteGpsSeleccionado) {
+                        google.maps.event.trigger(app.gMapViewer, 'resize');
+                        var cLat = parseFloat(app.clienteGpsSeleccionado.latitud);
+                        var cLng = parseFloat(app.clienteGpsSeleccionado.longitud);
+                        if (!isNaN(cLat) && !isNaN(cLng)) {
+                            app.gMapViewer.setCenter({ lat: cLat, lng: cLng });
+                        }
+                    }
+                } else {
+                    if (app.gpsViewerMap) {
+                        app.gpsViewerMap.invalidateSize();
+                    }
+                }
+            });
         }
     });
 

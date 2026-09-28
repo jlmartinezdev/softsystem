@@ -12,6 +12,8 @@ class EmpresaController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permiso:empresa,open')->only(['index']);
+        $this->middleware('permiso:empresa,edit')->only(['update']);
     }
     /**
      * Display a listing of the resource.

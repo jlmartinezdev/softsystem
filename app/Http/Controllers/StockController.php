@@ -13,6 +13,9 @@ class StockController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permiso:inventario,open')->only(['infstock']);
+        $this->middleware('permiso:ajuste,edit')->only(['update']);
+        $this->middleware('permiso:ajuste,del')->only(['destroy']);
     }
     /**
      * Display a listing of the resource.
@@ -24,9 +27,10 @@ class StockController extends Controller
         //
     }
     public function infstock(){
-        $secciones= Seccion::All();
+        $secciones = Seccion::orderBy('present_descripcion', 'ASC')->get();
         $unidades = Unidad::All();
-        return view('informes.stock',compact('secciones','unidades'));
+        $sucursales = \App\Sucursal::all();
+        return view('informes.stock', compact('secciones', 'unidades', 'sucursales'));
     }
     /**
      * Show the form for creating a new resource.

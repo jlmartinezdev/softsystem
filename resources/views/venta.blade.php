@@ -3622,6 +3622,57 @@
                 document.addEventListener('keydown', this.onCajaKey);
                 $(document).on('shown.lte.pushmenu', this.onPushmenuCaja);
                 $(document).on('click', '[data-widget="pushmenu"]', this.onPushmenuCaja);
+
+                // Cargar presupuesto transferido si existe
+                var presRaw = sessionStorage.getItem('presupuesto_a_venta');
+                if (presRaw) {
+                    try {
+                        var presData = JSON.parse(presRaw);
+                        sessionStorage.removeItem('presupuesto_a_venta');
+                        if (presData && presData.items && presData.items.length) {
+                            var self = this;
+                            setTimeout(function () {
+                                if (presData.presupuesto && presData.presupuesto.cliente) {
+                                    self.seleccionarCliente(presData.presupuesto.cliente);
+                                }
+                                var actCarro = self.carritos[self.indiceCarroActivo];
+                                if (actCarro) {
+                                    presData.items.forEach(function (it) {
+                                        actCarro.carro.push({
+                                            codigo: it.codigo,
+                                            c_barra: it.c_barra || '',
+                                            descripcion: it.descripcion,
+                                            cantidad: it.cantidad,
+                                            precio: it.precio,
+                                            costo: it.costo || 0,
+                                            iva: it.iva,
+                                            idstock: 0,
+                                            stock: 999
+                                        });
+                                    });
+                                    if (presData.presupuesto && presData.presupuesto.descuento) {
+                                        actCarro.ventaCabecera.descuento = presData.presupuesto.descuento;
+                                    }
+                                    if (presData.presupuesto && presData.presupuesto.condicion) {
+                                        actCarro.ventaCabecera.condicionventa = presData.presupuesto.condicion;
+                                    }
+                                    self.saveDatos();
+                                }
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Presupuesto cargado al ticket',
+                                    text: 'Se importaron los artículos del Presupuesto #' + (presData.presupuesto ? presData.presupuesto.pre_numero : '') + '.',
+                                    timer: 3000,
+                                    showConfirmButton: false,
+                                    toast: true,
+                                    position: 'top-end'
+                                });
+                            }, 400);
+                        }
+                    } catch (e) {
+                        console.error('Error importando presupuesto a venta:', e);
+                    }
+                }
             },
             beforeDestroy() {
                 document.removeEventListener('click', this.onClickOutsideClientePicker);

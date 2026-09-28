@@ -3,23 +3,36 @@ Auth::routes();
 
 Route::get('/', 'HomeController@index')->name('home');
 Route::group(['middleware' => ['administrador']], function () {
-    Route::get('anularventa','VentaController@indexanular')->name('anularventa');
-    Route::get('anularcobro','CtaCobrarController@indexanular')->name('anularcobro');
-    Route::get('anularcompra','CompraController@indexanular')->name('anularcompra');
-    Route::post('anular_venta','VentaController@destroy');
-    Route::post('anular_cobro','CtaCobrarController@destroy');
-    Route::post('anular_compra','CompraController@destroy');
-    Route::post('usuario', 'UserController@store');
-    Route::delete('usuario/{id}', 'UserController@destroy');
-    Route::get('usuario', 'UserController@index')->name('usuario');
-    //Stock
-    Route::get('excel/articulos_costo/','ArticuloController@export_costo');
-    Route::get('resumen','ResumenController@index')->name('resumen');
-    Route::get('resumen/datos','ResumenController@resumen');
-    Route::post('resumen/enviar-correo','ResumenController@enviarCorreo')->name('resumen.email');
-    //Caja
-    Route::get('caja/movimiento/{id}','MovimientoCajaController@informe')->name('caja.informe');
+    // ADMINISTRACIÓN DE PRIVILEGIOS Y ROLES (Solo Administrador)
+    Route::get('permiso', 'PermisoController@index')->name('permiso.index');
+    Route::get('permiso/rol/{cod_rol}', 'PermisoController@getPermisosRol')->name('permiso.rol');
+    Route::post('permiso', 'PermisoController@store')->name('permiso.store');
+    Route::post('permiso/rol', 'PermisoController@guardarRol')->name('permiso.rol.guardar');
+    Route::delete('permiso/rol/{cod_rol}', 'PermisoController@eliminarRol')->name('permiso.rol.eliminar');
+    Route::post('permiso/copiar', 'PermisoController@copiarPermisos')->name('permiso.copiar');
 });
+
+// Auditoría y Anulaciones (Gobernadas por permisos por rol en controladores)
+Route::get('anularventa','VentaController@indexanular')->name('anularventa');
+Route::get('anularcobro','CtaCobrarController@indexanular')->name('anularcobro');
+Route::get('anularcompra','CompraController@indexanular')->name('anularcompra');
+Route::post('anular_venta','VentaController@destroy');
+Route::post('anular_cobro','CtaCobrarController@destroy');
+Route::get('cobros_recientes','CtaCobrarController@getCobrosRecientes');
+Route::post('anular_compra','CompraController@destroy');
+Route::get('compras_recientes','CompraController@getComprasRecientes');
+
+// Usuarios del Sistema
+Route::post('usuario', 'UserController@store');
+Route::delete('usuario/{id}', 'UserController@destroy');
+Route::get('usuario', 'UserController@index')->name('usuario');
+
+// Informes y Exportaciones
+Route::get('excel/articulos_costo/','ArticuloController@export_costo');
+Route::get('resumen','ResumenController@index')->name('resumen');
+Route::get('resumen/datos','ResumenController@resumen');
+Route::post('resumen/enviar-correo','ResumenController@enviarCorreo')->name('resumen.email');
+Route::get('caja/movimiento/{id}','MovimientoCajaController@informe')->name('caja.informe');
     //Articulos
     
     Route::get('inf/articulo', 'ArticuloController@informe')->name('articulo@informe');
@@ -83,6 +96,16 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('venta/facturar/{id}', 'FacturarController@index')->name('venta.facturar');
     Route::post('venta/facturar', 'FacturarController@store');
     Route::delete('venta/facturar/{id}', 'FacturarController@destroy');
+    
+    //PRESUPUESTO
+    Route::get('presupuesto', 'PresupuestoController@index')->name('presupuesto.index');
+    Route::get('presupuesto/crear', 'PresupuestoController@create')->name('presupuesto.create');
+    Route::post('presupuesto', 'PresupuestoController@store')->name('presupuesto.store');
+    Route::get('presupuesto/{id}', 'PresupuestoController@show')->name('presupuesto.show');
+    Route::put('presupuesto/{id}/estado', 'PresupuestoController@cambiarEstado')->name('presupuesto.estado');
+    Route::delete('presupuesto/{id}', 'PresupuestoController@destroy')->name('presupuesto.destroy');
+    Route::get('presupuesto/{id}/pdf', 'PresupuestoController@pdf')->name('presupuesto.pdf');
+    Route::get('presupuesto/{id}/para-venta', 'PresupuestoController@getParaVenta')->name('presupuesto.paraventa');
     
     //COMPRA
     Route::get('infcompra', 'CompraController@indexInf')->name('infcompra');
@@ -154,8 +177,10 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::post('sifen/laboratorio/ejecutar', 'SifenLaboratorioController@ejecutar')->name('sifen.laboratorio.ejecutar');
     //CIUDAD
     Route::get('ciudad','CiudadController@index')->name('ciudad.index');
+    Route::get('ciudad/all','CiudadController@all')->name('ciudad.all');
     Route::post('ciudad', 'CiudadController@store');
     Route::post('ciudad/{id}', 'CiudadController@update');
+    Route::put('ciudad/{id}', 'CiudadController@update');
     Route::delete('ciudad/{id}', 'CiudadController@destroy');
     
     //PDF A IMPRIMIR 
@@ -190,6 +215,8 @@ Route::get('cliente', 'ClienteController@index')->name('cliente.index');
 Route::delete('cliente/{id}', 'ClienteController@destroy');
 Route::post('cliente', 'ClienteController@store');
 Route::post('cliente/update', 'ClienteController@update');
+Route::post('cliente/foto', 'ClienteController@subirFotoDocumento')->name('cliente.foto.subir');
+Route::post('cliente/foto/eliminar', 'ClienteController@eliminarFotoDocumento')->name('cliente.foto.eliminar');
 
 Route::get('reffactura', 'ReffacturaController@index')->name('reffactura.index');
 Route::get('reffactura/all', 'ReffacturaController@getAll');
@@ -197,10 +224,12 @@ Route::post('reffactura', 'ReffacturaController@store');
 Route::post('reffactura', 'ReffacturaController@update');
 
 Route::get('unidades', 'UnidadController@index')->name('unidades.index');
+Route::get('unidades/all', 'UnidadController@all');
 Route::get('unidades/create', 'UnidadController@create')->name('unidades.create');
 Route::post('unidades', 'UnidadController@store')->name('unidades.store');
 Route::get('unidades/{unidad}/edit', 'UnidadController@edit')->name('unidades.edit');
 Route::put('unidades/{unidad}', 'UnidadController@update')->name('unidades.update');
+Route::post('unidades/{unidad}', 'UnidadController@update');
 Route::delete('unidades/{unidad}', 'UnidadController@destroy')->name('unidades.destroy');
 
 

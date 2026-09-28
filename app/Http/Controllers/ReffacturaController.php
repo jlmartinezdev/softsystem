@@ -7,6 +7,13 @@ use App\reffactura;
 
 class ReffacturaController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permiso:reffactura,open')->only(['index']);
+        $this->middleware('permiso:reffactura,edit')->only(['update', 'store']);
+    }
+
     public function index(){
         return view('reffactura');
     }

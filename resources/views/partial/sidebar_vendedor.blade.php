@@ -52,6 +52,13 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="{{ route('presupuesto.index') }}" id="m_presupuesto" class="nav-link">
+                        <i class="nav-icon fas fa-file-invoice-dollar text-info"></i>
+                        <p>Presupuestos</p>
+                    </a>
+                </li>
+
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link" id="m_caja">
                         <i class="nav-icon fas fa-cash-register"></i>

@@ -4,11 +4,10 @@ namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
+use App\Articulo;
 
 class Unidad extends Model
 {
- 
-
     protected $table = 'unidad';
     protected $primaryKey = 'uni_codigo';
     public $timestamps = false;
@@ -17,4 +16,9 @@ class Unidad extends Model
         'uni_nombre',
         'uni_abreviatura'
     ];
-} 
+
+    public function articulos()
+    {
+        return $this->hasMany(Articulo::class, 'uni_codigo', 'uni_codigo');
+    }
+}

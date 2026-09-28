@@ -14,6 +14,8 @@ class SifenLaboratorioController extends Controller
     public function __construct(SifenService $sifen, SifenLaboratorioService $laboratorio)
     {
         $this->middleware('auth');
+        $this->middleware('permiso:sifen,open')->only(['index']);
+        $this->middleware('permiso:sifen,edit')->only(['ejecutar']);
         $this->sifen = $sifen;
         $this->laboratorio = $laboratorio;
     }
