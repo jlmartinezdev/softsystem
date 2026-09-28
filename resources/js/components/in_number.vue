@@ -1,10 +1,11 @@
 <template>
-    <input :id="id" :tabindex="tabindex" @keyup="keyup" @keypress="isNumber($event)" v-model="text" onfocus="this.select()" :placeholder="placeholder" :class="Classes.input" type="text" />
+    <input :id="id" :tabindex="tabindex" @keyup="keyup" @keypress="isNumber($event)" v-model="text" onfocus="this.select()" :placeholder="placeholder" :class="inputClass" type="text" />
 </template>
 <script>
-const defaultClasses ={
+const defaultClasses = {
     input: "form-control form-control-sm"
-}
+};
+
 export default {
     name: "inNumber",
     props: {
@@ -17,21 +18,33 @@ export default {
     },
     data() {
         return {
-            text: "",
-            Classes: {
-            ...defaultClasses,
-            ...this.clases
+            text: ""
+        };
+    },
+    computed: {
+        inputClass() {
+            if (typeof this.clases === 'string' && this.clases) {
+                return this.clases;
             }
+            if (this.clases && typeof this.clases === 'object' && this.clases.input) {
+                return this.clases.input;
+            }
+            return defaultClasses.input;
         }
     },
     watch: {
-      value: function (newVal, oldVal) {
-        this.text= this.addCommas(newVal.toString().replace(/,/g, ''));
-      }
+        value: function (newVal) {
+            if (newVal === null || newVal === undefined || newVal === '') {
+                this.text = '';
+                return;
+            }
+            this.text = this.addCommas(newVal.toString().replace(/,/g, '').replace(/\./g, ''));
+        }
     },
     methods: {
         addCommas(nStr) {
-            let x,x1,x2;
+            if (nStr === null || nStr === undefined) return '';
+            let x, x1, x2;
             nStr += '';
             x = nStr.split('.');
             x1 = x[0];
@@ -52,24 +65,27 @@ export default {
             }
         },
         keyup() {
-            if(this.text==""){
-                //this.text= 0;
-                this.$emit("input",0);
+            if (this.text === "" || this.text === null) {
+                this.$emit("input", 0);
+                this.$emit("change", true);
                 return true;
             }
-            if(this.text.substr(0,1)=="0"){
-                this.text= this.text.substr(1,this.text.length);
+            var clean = this.text.toString().replace(/,/g, '').replace(/\./g, '');
+            if (clean.length > 1 && clean.substr(0, 1) === "0") {
+                clean = clean.substr(1);
             }
-            //this.text = this.addCommas(this.text.replace(/,/g, ''));
-            this.$emit("input", parseInt(this.text.replace(/,/g, '')));
-            this.$emit("change",true);
-            
-            
+            var parsed = parseInt(clean, 10);
+            if (isNaN(parsed)) parsed = 0;
+            this.$emit("input", parsed);
+            this.$emit("change", true);
         }
     },
-    mounted(){
-        this.text= this.value;
+    mounted() {
+        if (this.value !== null && this.value !== undefined && this.value !== '') {
+            this.text = this.addCommas(this.value.toString().replace(/,/g, '').replace(/\./g, ''));
+        } else {
+            this.text = '';
+        }
     }
-}
+};
 </script>
-

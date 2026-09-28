@@ -35,6 +35,7 @@ class ComboController extends Controller
                 'nombre' => $data['nombre'],
                 'codigo' => $data['codigo'],
                 'precio' => $data['precio'],
+                'precio_credito' => $data['precio_credito'],
                 'precio_lista' => $data['precio_lista'],
                 'activo' => $data['activo'],
                 'observacion' => $data['observacion'],
@@ -68,6 +69,7 @@ class ComboController extends Controller
                 'nombre' => $data['nombre'],
                 'codigo' => $data['codigo'],
                 'precio' => $data['precio'],
+                'precio_credito' => $data['precio_credito'],
                 'precio_lista' => $data['precio_lista'],
                 'activo' => $data['activo'],
                 'observacion' => $data['observacion'],
@@ -169,6 +171,7 @@ class ComboController extends Controller
                 'nombre' => $combo->nombre,
                 'codigo' => $combo->codigo,
                 'precio' => (float) $combo->precio,
+                'precio_credito' => (float) ($combo->precio_credito ?? 0),
                 'precio_lista' => (float) $combo->precio_lista,
                 'items' => $componentes,
                 'stock_ok' => $okStock,
@@ -241,10 +244,16 @@ class ComboController extends Controller
             $precio = $precioLista;
         }
 
+        $precioCredito = (float) $request->input('precio_credito', 0);
+        if ($precioCredito < 0) {
+            $precioCredito = 0;
+        }
+
         return [
             'nombre' => $nombre,
             'codigo' => $codigo,
             'precio' => $precio,
+            'precio_credito' => $precioCredito,
             'precio_lista' => $precioLista,
             'activo' => $request->input('activo', 1) ? 1 : 0,
             'observacion' => trim((string) $request->input('observacion', '')),

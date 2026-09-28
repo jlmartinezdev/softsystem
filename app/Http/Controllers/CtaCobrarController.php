@@ -34,7 +34,8 @@ class CtaCobrarController extends Controller
     public function indexInf()
     {
         $empresa = Empresa::first();
-        return view('informes.ctacobrar', compact('empresa'));
+        $sucursales = Sucursal::all();
+        return view('informes.ctacobrar', compact('empresa', 'sucursales'));
     }
     public function indexCobrado()
     {
@@ -108,34 +109,105 @@ class CtaCobrarController extends Controller
 
     private function getCtas($request)
     {
-        if ($request->tipo=='fecha') {
-            return $ctas= CtaCobrar::join('ventas', 'ctas_cobrar.nro_fact_ventas', 'ventas.nro_fact_ventas')
-            ->join('clientes as c', 'ventas.clientes_cod', 'c.CLIENTES_cod')
-            ->select('ctas_cobrar.nro_fact_ventas','ventas.venta_total', DB::raw('ctas_cobrar.nro_cuotas as "cuotas"'), DB::raw('ctas_cobrar.monto_cobrado as "cobrado"'), DB::raw('ctas_cobrar.monto_cuota as "total"'), DB::raw('ctas_cobrar.monto_saldo as "saldo"'), DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y") as venta_fecha'), DB::raw('DATE_FORMAT(ctas_cobrar.fecha_venc,"%Y-%m-%d") as fecha_v'), 'ventas.venta_descuento', 'c.cliente_ruc', 'c.cliente_nombre', 'c.cliente_direccion', 'c.cliente_cel')
-            ->whereBetween('ctas_cobrar.fecha_venc', [$request->desde,$request->hasta])
-            ->having('saldo', '>', 0)
-            ->ordenar($request->ordenarpor, $request->ord, $request->buscar)
-            ->get();
-        } elseif ($request->tipo=='cliente') {
-            return $ctas= CtaCobrar::join('ventas', 'ctas_cobrar.nro_fact_ventas', 'ventas.nro_fact_ventas')
-            ->join('clientes as c', 'ventas.clientes_cod', 'c.CLIENTES_cod')
-            ->select('ctas_cobrar.nro_fact_ventas', DB::raw('COUNT(ctas_cobrar.nro_cuotas) as "cuotas"'), DB::raw('SUM(ctas_cobrar.monto_cobrado) as "cobrado"'), DB::raw('SUM(ctas_cobrar.monto_cuota) as "total"'), DB::raw('SUM(ctas_cobrar.monto_saldo) as "saldo"'), DB::raw('COUNT(IF(ctas_cobrar.estado=1,1,NULL)) AS "nopagada"'), DB::raw('COUNT(IF(ctas_cobrar.estado=0,1,NULL)) AS "pagada"'), DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y") as venta_fecha'), DB::raw('DATE_FORMAT(ctas_cobrar.fecha_venc,"%Y-%m-%d") as fecha_v'), 'ventas.venta_descuento', 'c.cliente_ruc', 'c.cliente_nombre', 'c.cliente_direccion', 'c.cliente_cel')
-            ->cliente($request->buscar, $request->buscarpor)
-            ->groupBy('ctas_cobrar.nro_fact_ventas')
-            /*->having('saldo', '>', 0)*/
-            ->ordenar($request->ordenarpor, $request->ord, $request->buscar)
-            ->get();
-        } else {
-            return $ctas= CtaCobrar::join('ventas', 'ctas_cobrar.nro_fact_ventas', 'ventas.nro_fact_ventas')
-            ->join('clientes as c', 'ventas.clientes_cod', 'c.CLIENTES_cod')
-            ->select('ctas_cobrar.nro_fact_ventas', DB::raw('COUNT(ctas_cobrar.nro_cuotas) as "cuotas"'), DB::raw('SUM(ctas_cobrar.monto_cobrado) as "cobrado"'), DB::raw('SUM(ctas_cobrar.monto_cuota) as "total"'), DB::raw('SUM(ctas_cobrar.monto_saldo) as "saldo"'), DB::raw('COUNT(IF(ctas_cobrar.estado=1,1,NULL)) AS "nopagada"'), DB::raw('COUNT(IF(ctas_cobrar.estado=0,1,NULL)) AS "pagada"'), DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y") as venta_fecha'), DB::raw('DATE_FORMAT(ctas_cobrar.fecha_venc,"%Y-%m-%d") as fecha_v'), 'ventas.venta_descuento', 'c.cliente_ruc', 'c.cliente_nombre', 'c.cliente_direccion', 'c.cliente_cel')
-            ->direccion($request->buscar)
-            ->groupBy('ctas_cobrar.nro_fact_ventas')
-            ->having('saldo', '>', 0)
-            ->ordenar($request->ordenarpor, $request->ord, $request->buscar)
-            ->get();
-        }
+        $sucursal = (!empty($request->sucursal) && $request->sucursal != '0') ? $request->sucursal : null;
 
+        if ($request->tipo == 'fecha') {
+            $query = CtaCobrar::join('ventas', 'ctas_cobrar.nro_fact_ventas', '=', 'ventas.nro_fact_ventas')
+                ->join('clientes as c', 'ventas.clientes_cod', '=', 'c.CLIENTES_cod')
+                ->leftJoin('sucursales as s', 'ventas.suc_cod', '=', 's.suc_cod')
+                ->select(
+                    'ctas_cobrar.nro_fact_ventas',
+                    'ventas.venta_total',
+                    'ventas.documento',
+                    DB::raw('ctas_cobrar.nro_cuotas as "cuotas"'),
+                    DB::raw('ctas_cobrar.monto_cobrado as "cobrado"'),
+                    DB::raw('ctas_cobrar.monto_cuota as "total"'),
+                    DB::raw('ctas_cobrar.monto_saldo as "saldo"'),
+                    DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y") as venta_fecha'),
+                    DB::raw('DATE_FORMAT(ctas_cobrar.fecha_venc,"%Y-%m-%d") as fecha_v'),
+                    'ventas.venta_descuento',
+                    'c.cliente_ruc',
+                    'c.cliente_nombre',
+                    'c.cliente_direccion',
+                    'c.cliente_cel',
+                    's.suc_desc'
+                )
+                ->whereBetween('ctas_cobrar.fecha_venc', [$request->desde, $request->hasta])
+                ->having('saldo', '>', 0);
+
+            if ($sucursal) {
+                $query->where('ventas.suc_cod', $sucursal);
+            }
+
+            return $query->ordenar($request->ordenarpor, $request->ord, $request->buscar)->get();
+
+        } elseif ($request->tipo == 'cliente') {
+            $query = CtaCobrar::join('ventas', 'ctas_cobrar.nro_fact_ventas', '=', 'ventas.nro_fact_ventas')
+                ->join('clientes as c', 'ventas.clientes_cod', '=', 'c.CLIENTES_cod')
+                ->leftJoin('sucursales as s', 'ventas.suc_cod', '=', 's.suc_cod')
+                ->select(
+                    'ctas_cobrar.nro_fact_ventas',
+                    'ventas.venta_total',
+                    'ventas.documento',
+                    DB::raw('COUNT(ctas_cobrar.nro_cuotas) as "cuotas"'),
+                    DB::raw('SUM(ctas_cobrar.monto_cobrado) as "cobrado"'),
+                    DB::raw('SUM(ctas_cobrar.monto_cuota) as "total"'),
+                    DB::raw('SUM(ctas_cobrar.monto_saldo) as "saldo"'),
+                    DB::raw('COUNT(IF(ctas_cobrar.estado=1,1,NULL)) AS "nopagada"'),
+                    DB::raw('COUNT(IF(ctas_cobrar.estado=0,1,NULL)) AS "pagada"'),
+                    DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y") as venta_fecha'),
+                    DB::raw('DATE_FORMAT(ctas_cobrar.fecha_venc,"%Y-%m-%d") as fecha_v'),
+                    'ventas.venta_descuento',
+                    'c.cliente_ruc',
+                    'c.cliente_nombre',
+                    'c.cliente_direccion',
+                    'c.cliente_cel',
+                    's.suc_desc'
+                )
+                ->cliente($request->buscar, $request->buscarpor);
+
+            if ($sucursal) {
+                $query->where('ventas.suc_cod', $sucursal);
+            }
+
+            return $query->groupBy('ctas_cobrar.nro_fact_ventas')
+                ->ordenar($request->ordenarpor, $request->ord, $request->buscar)
+                ->get();
+
+        } else {
+            $query = CtaCobrar::join('ventas', 'ctas_cobrar.nro_fact_ventas', '=', 'ventas.nro_fact_ventas')
+                ->join('clientes as c', 'ventas.clientes_cod', '=', 'c.CLIENTES_cod')
+                ->leftJoin('sucursales as s', 'ventas.suc_cod', '=', 's.suc_cod')
+                ->select(
+                    'ctas_cobrar.nro_fact_ventas',
+                    'ventas.venta_total',
+                    'ventas.documento',
+                    DB::raw('COUNT(ctas_cobrar.nro_cuotas) as "cuotas"'),
+                    DB::raw('SUM(ctas_cobrar.monto_cobrado) as "cobrado"'),
+                    DB::raw('SUM(ctas_cobrar.monto_cuota) as "total"'),
+                    DB::raw('SUM(ctas_cobrar.monto_saldo) as "saldo"'),
+                    DB::raw('COUNT(IF(ctas_cobrar.estado=1,1,NULL)) AS "nopagada"'),
+                    DB::raw('COUNT(IF(ctas_cobrar.estado=0,1,NULL)) AS "pagada"'),
+                    DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y") as venta_fecha'),
+                    DB::raw('DATE_FORMAT(ctas_cobrar.fecha_venc,"%Y-%m-%d") as fecha_v'),
+                    'ventas.venta_descuento',
+                    'c.cliente_ruc',
+                    'c.cliente_nombre',
+                    'c.cliente_direccion',
+                    'c.cliente_cel',
+                    's.suc_desc'
+                )
+                ->direccion($request->buscar)
+                ->having('saldo', '>', 0);
+
+            if ($sucursal) {
+                $query->where('ventas.suc_cod', $sucursal);
+            }
+
+            return $query->groupBy('ctas_cobrar.nro_fact_ventas')
+                ->ordenar($request->ordenarpor, $request->ord, $request->buscar)
+                ->get();
+        }
     }
  
 

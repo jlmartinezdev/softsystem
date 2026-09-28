@@ -7,6 +7,8 @@ use App\Venta;
 use App\Cobro;
 use App\Apertura;
 use App\CtaCobrar;
+use App\Articulo;
+use App\Stock;
 use App\Services\SifenService;
 use Auth;
 use DB;
@@ -37,6 +39,8 @@ class HomeController extends Controller
 
         $empresa = Empresa::first();
         $usuario = Auth::user();
+        $nombreLocal = trim((string) ($empresa->emp_nombre ?? ''));
+        $localIncompleto = $nombreLocal === '' || mb_strtoupper($nombreLocal, 'UTF-8') === 'EMPRESA';
 
         $ventasMes = Venta::whereBetween(DB::raw('DATE(ventas.venta_fecha)'), [$inicioMes, $hoy])
             ->selectRaw('COUNT(*) as cantidad, COALESCE(SUM(venta_total), 0) as total')
@@ -74,9 +78,7 @@ class HomeController extends Controller
                 'usuarios.nom_usuarios'
             )
             ->where('apert_cierres_caja.apert_estado', '1')
-            ->when(!$esAdministrador, function ($query) use ($usuario) {
-                $query->where('apert_cierres_caja.cod_usuarios', $usuario->cod_usuarios);
-            })
+            ->where('apert_cierres_caja.cod_usuarios', $usuario->cod_usuarios)
             ->orderBy('nro_operacion', 'DESC')
             ->get();
 
@@ -108,6 +110,28 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
+        // Si es admin, obtener todas las cajas abiertas en el comercio
+        $todasCajasAbiertas = collect();
+        $totalArticulos = 0;
+        $articulosSinStock = 0;
+        if ($esAdministrador) {
+            $todasCajasAbiertas = Apertura::join('sucursales', 'apert_cierres_caja.suc_cod', '=', 'sucursales.suc_cod')
+                ->join('caja', 'apert_cierres_caja.caja_cod', '=', 'caja.caja_cod')
+                ->join('usuarios', 'apert_cierres_caja.cod_usuarios', '=', 'usuarios.cod_usuarios')
+                ->select(
+                    'apert_cierres_caja.*',
+                    'sucursales.suc_desc',
+                    'caja.caja_descrip',
+                    'usuarios.nom_usuarios'
+                )
+                ->where('apert_cierres_caja.apert_estado', '1')
+                ->orderBy('nro_operacion', 'DESC')
+                ->get();
+
+            $totalArticulos = Articulo::count();
+            $articulosSinStock = Stock::where('cantidad', '<=', 0)->count();
+        }
+
         $chartData = Venta::select(
             DB::raw('DATE(venta_fecha) as fecha'),
             DB::raw('COALESCE(SUM(venta_total), 0) as total'),
@@ -119,25 +143,44 @@ class HomeController extends Controller
             ->get()
             ->keyBy('fecha');
 
+        $diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
         $ventasChart = [];
         $chartTieneVentas = false;
+        $totalVentasSemana = 0;
+        $maxVentaChart = 0;
+
         for ($i = 6; $i >= 0; $i--) {
             $dia = date('Y-m-d', strtotime("-{$i} days"));
             $row = $chartData->get($dia);
             $totalDia = $row ? (float) $row->total : 0;
+            $cantDia = $row ? (int) $row->cantidad : 0;
+
             if ($totalDia > 0) {
                 $chartTieneVentas = true;
             }
+            if ($totalDia > $maxVentaChart) {
+                $maxVentaChart = $totalDia;
+            }
+            $totalVentasSemana += $totalDia;
+
+            $diaSemanaNum = (int) date('w', strtotime($dia));
             $ventasChart[] = [
-                'fecha' => date('d/m', strtotime($dia)),
+                'fecha_corta' => date('d/m', strtotime($dia)),
+                'fecha_full' => date('d/m/Y', strtotime($dia)),
+                'dia_nombre' => $diasSemana[$diaSemanaNum],
+                'es_hoy' => ($dia === $hoy),
                 'total' => $totalDia,
-                'cantidad' => $row ? (int) $row->cantidad : 0,
+                'cantidad' => $cantDia,
             ];
         }
+
+        $promedioVentaDiaria = round($totalVentasSemana / 7);
 
         return view('home', compact(
             'empresa',
             'usuario',
+            'nombreLocal',
+            'localIncompleto',
             'mes',
             'esAdministrador',
             'n_ventas',
@@ -149,10 +192,16 @@ class HomeController extends Controller
             'saldoCobrar',
             'cuotasVencidas',
             'cajasAbiertas',
+            'todasCajasAbiertas',
             'cajaHref',
             'ventasRecientes',
             'ventasChart',
             'chartTieneVentas',
+            'totalVentasSemana',
+            'promedioVentaDiaria',
+            'maxVentaChart',
+            'totalArticulos',
+            'articulosSinStock',
             'sifenActivo',
             'sifenListo',
             'sifenAmbiente',

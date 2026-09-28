@@ -81,32 +81,101 @@
             display: flex;
             align-items: center;
             min-height: 57px;
-            padding-left: 1rem;
+            padding: 0.8rem 1rem;
+            background: #073827;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .main-sidebar .brand-icon-box {
+            width: 32px;
+            height: 32px;
+            background: #0a4d36;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1rem;
         }
         .main-sidebar .brand-text {
-            margin-left: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #ffffff;
+        }
+        .sidebar-user-panel {
+            border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+        .user-avatar-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        .branch-selector-chip {
+            display: flex;
+            align-items: center;
+            padding: 0.4rem 0.7rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.8rem;
             font-weight: 600;
-            letter-spacing: 0.04em;
+            text-decoration: none !important;
+            transition: all 0.15s;
         }
-        aside.main-sidebar .nav-sidebar > .nav-item.nav-work > .nav-link > p {
-            font-weight: 600;
-            letter-spacing: 0.02em;
+        .branch-selector-chip:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            border-color: #b8860b;
         }
-        aside.main-sidebar .nav-sidebar > .nav-item.nav-more > .nav-link {
-            color: rgba(255, 255, 255, 0.72);
+        .nav-sidebar .nav-header {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: rgba(255, 255, 255, 0.42) !important;
+            padding: 1rem 0.85rem 0.35rem !important;
+            text-transform: uppercase;
         }
-        aside.main-sidebar .nav-sidebar > .nav-item.nav-more > .nav-link > p {
-            font-size: 0.9rem;
-            font-weight: 400;
+        .nav-sidebar .nav-link {
+            border-radius: 6px;
+            padding: 0.45rem 0.75rem;
+            margin-bottom: 2px;
+            transition: background 0.12s, color 0.12s;
+        }
+        .nav-sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.07);
+            color: #ffffff;
         }
         aside.main-sidebar .nav-sidebar > .nav-item > .nav-link.active,
         aside.main-sidebar .nav-sidebar .nav-treeview > .nav-item > .nav-link.active {
-            background-color: #0a4d36;
-            color: #ffffff;
+            background-color: #0a4d36 !important;
+            color: #ffffff !important;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         aside.main-sidebar .nav-sidebar .nav-link.active p,
         aside.main-sidebar .nav-sidebar .nav-link.active i {
-            color: #ffffff;
+            color: #ffffff !important;
+        }
+        aside.main-sidebar .nav-sidebar .nav-treeview .nav-link {
+            padding-left: 2rem;
+            font-size: 0.875rem;
+        }
+        aside.main-sidebar .nav-sidebar .nav-treeview .nav-link i.nav-icon {
+            font-size: 0.65rem;
+            margin-right: 0.4rem;
+        }
+        .nav-link-pos {
+            background: rgba(10, 77, 54, 0.35);
+            border: 1px solid rgba(10, 77, 54, 0.5);
+        }
+        .nav-link-pos:hover {
+            background: #0a4d36 !important;
         }
         :focus-visible {
             outline: 2px solid #b8860b;
@@ -116,11 +185,48 @@
             background: #cde4d8;
             color: #10241c;
         }
+
+        /* Prevenir FOUC en Vue antes de compilar */
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .app-loading-skeleton {
+            display: none;
+        }
+        [v-cloak] + .app-loading-skeleton {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 45vh;
+            flex-direction: column;
+            gap: 1rem;
+            color: #0a4d36;
+        }
+        body.dark-mode [v-cloak] + .app-loading-skeleton {
+            color: #10b981;
+        }
+        .v-cloak-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3.5px solid rgba(10, 77, 54, 0.15);
+            border-top-color: #0a4d36;
+            border-radius: 50%;
+            animation: vCloakSpin 0.75s infinite linear;
+        }
+        body.dark-mode .v-cloak-spinner {
+            border-color: rgba(16, 185, 129, 0.2);
+            border-top-color: #10b981;
+        }
+        @keyframes vCloakSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
     @yield('style')
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed{{ request()->routeIs('venta') ? ' venta-caja' : '' }}">
     <div class="wrapper">
         @guest
         @else
@@ -158,18 +264,19 @@
         }
 
         function activarMenu(nivel1, subnivel) {
-            var menu_nivel1 = document.getElementById(nivel1);
-            if (!menu_nivel1) {
-                return;
-            }
-            menu_nivel1.className += " active";
-            abrirAncestrosMenu(menu_nivel1);
-
             if (subnivel && subnivel.length > 0) {
                 var menu_subnivel = document.getElementById(subnivel);
                 if (menu_subnivel) {
-                    menu_subnivel.className += " active";
+                    menu_subnivel.classList.add("active");
                     abrirAncestrosMenu(menu_subnivel);
+                }
+            }
+
+            if (nivel1 && nivel1.length > 0) {
+                var menu_nivel1 = document.getElementById(nivel1);
+                if (menu_nivel1) {
+                    menu_nivel1.classList.add("active");
+                    abrirAncestrosMenu(menu_nivel1);
                 }
             }
         }
@@ -191,15 +298,16 @@
         function getSucursal() {
             var id = localStorage.getItem("suc_cod");
             var desc = localStorage.getItem("suc_desc");
-            if (desc != null) {
-                var obj = document.getElementById("sucursal");
-                obj.setAttribute('data-id', id);
-                obj.innerHTML = " " + desc
-            } else {
-                var obj = document.getElementById("sucursal");
-                obj.innerHTML = " Sel. Sucursal"
+            var obj = document.getElementById("sucursal");
+            if (!obj) {
+                return;
             }
-
+            if (desc != null) {
+                obj.setAttribute('data-id', id);
+                obj.innerHTML = " " + desc;
+            } else {
+                obj.innerHTML = " Sel. Sucursal";
+            }
         }
 
         function separador(input) {
@@ -219,17 +327,15 @@
         var currentTheme = localStorage.getItem('theme');
         var mainHeader = document.querySelector('.main-header');
 
-        if (currentTheme) {
-            if (currentTheme === 'dark') {
-                if (!document.body.classList.contains('dark-mode')) {
-                    document.body.classList.add("dark-mode");
-                }
-                if (mainHeader.classList.contains('navbar-light')) {
-                    mainHeader.classList.add('navbar-dark');
-                    mainHeader.classList.remove('navbar-light');
-                }
-                toggleSwitch.checked = true;
+        if (currentTheme === 'dark' && toggleSwitch) {
+            if (!document.body.classList.contains('dark-mode')) {
+                document.body.classList.add("dark-mode");
             }
+            if (mainHeader && mainHeader.classList.contains('navbar-light')) {
+                mainHeader.classList.add('navbar-dark');
+                mainHeader.classList.remove('navbar-light');
+            }
+            toggleSwitch.checked = true;
         }
 
         function switchTheme(e) {
@@ -237,7 +343,7 @@
                 if (!document.body.classList.contains('dark-mode')) {
                     document.body.classList.add("dark-mode");
                 }
-                if (mainHeader.classList.contains('navbar-light')) {
+                if (mainHeader && mainHeader.classList.contains('navbar-light')) {
                     mainHeader.classList.add('navbar-dark');
                     mainHeader.classList.remove('navbar-light');
                 }
@@ -246,7 +352,7 @@
                 if (document.body.classList.contains('dark-mode')) {
                     document.body.classList.remove("dark-mode");
                 }
-                if (mainHeader.classList.contains('navbar-dark')) {
+                if (mainHeader && mainHeader.classList.contains('navbar-dark')) {
                     mainHeader.classList.add('navbar-light');
                     mainHeader.classList.remove('navbar-dark');
                 }
@@ -254,8 +360,9 @@
             }
         }
 
-
-        toggleSwitch.addEventListener('change', switchTheme, false);
+        if (toggleSwitch) {
+            toggleSwitch.addEventListener('change', switchTheme, false);
+        }
 
         @auth
         getSucursal();

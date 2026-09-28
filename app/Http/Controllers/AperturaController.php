@@ -56,6 +56,7 @@ class AperturaController extends Controller
         }
 
         $aperturas = $query->paginate(15)->appends($request->query());
+        $empresa = Empresa::first();
 
         $sucursalFiltro = $request->filled('sucursal')
             ? $request->sucursal
@@ -76,7 +77,7 @@ class AperturaController extends Controller
                 ->first();
         }
 
-        return view('apertura', compact('sucursales', 'cajas', 'aperturas', 'cajaAbierta'));
+        return view('apertura', compact('sucursales', 'cajas', 'aperturas', 'cajaAbierta', 'empresa'));
     }
 
     public function indexCierre($operacion)
@@ -99,6 +100,10 @@ class AperturaController extends Controller
 
         if ((string) $apertura->apert_estado !== '1') {
             return redirect()->route('apertura')->with('error', 'La caja de esta operación ya está cerrada.');
+        }
+
+        if ((int) $apertura->cod_usuarios !== (int) Auth::user()->cod_usuarios) {
+            return redirect()->route('home')->with('error', 'Solo podés cerrar tu propia caja.');
         }
 
         $entradas = (float) MovimientoCaja::where('nro_operacion', $operacion)
@@ -181,6 +186,10 @@ class AperturaController extends Controller
 
         if ((string) $apertura->apert_estado !== '1') {
             return redirect()->route('apertura')->with('error', 'La caja ya está cerrada.');
+        }
+
+        if ((int) $apertura->cod_usuarios !== (int) Auth::user()->cod_usuarios) {
+            return redirect()->route('home')->with('error', 'Solo podés cerrar tu propia caja.');
         }
 
         $entradas = (float) MovimientoCaja::where('nro_operacion', $request->nro_operacion)

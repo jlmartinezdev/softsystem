@@ -36,13 +36,15 @@ class Venta extends Model
         }
     }
     public function scopeFiltrocliente($query, $cliente, $isNumber){
-        if(!empty($cliente)){
-            if($isNumber=='1'){
-                return $query->where('c.cliente_ci',$cliente);
-            }else{
-                return $query->where('c.cliente_nombre','like',"%$cliente%");
-            }
-            
+        if (!empty($cliente)) {
+            $clienteTrim = trim($cliente);
+            return $query->where(function ($q) use ($clienteTrim) {
+                $q->where('c.cliente_nombre', 'like', "%{$clienteTrim}%")
+                  ->orWhere('c.cliente_ruc', 'like', "%{$clienteTrim}%")
+                  ->orWhere('c.cliente_ci', 'like', "%{$clienteTrim}%")
+                  ->orWhere('ventas.nro_fact_ventas', $clienteTrim)
+                  ->orWhere('ventas.documento', 'like', "%{$clienteTrim}%");
+            });
         }
     }
 }

@@ -16,6 +16,7 @@ Route::group(['middleware' => ['administrador']], function () {
     Route::get('excel/articulos_costo/','ArticuloController@export_costo');
     Route::get('resumen','ResumenController@index')->name('resumen');
     Route::get('resumen/datos','ResumenController@resumen');
+    Route::post('resumen/enviar-correo','ResumenController@enviarCorreo')->name('resumen.email');
     //Caja
     Route::get('caja/movimiento/{id}','MovimientoCajaController@informe')->name('caja.informe');
 });

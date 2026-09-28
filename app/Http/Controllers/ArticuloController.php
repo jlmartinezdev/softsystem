@@ -204,6 +204,7 @@ class ArticuloController extends Controller
                     'nombre' => $c->nombre,
                     'codigo' => $c->codigo,
                     'precio' => (float) $c->precio,
+                    'precio_credito' => (float) ($c->precio_credito ?? 0),
                     'precio_lista' => (float) $c->precio_lista,
                     'activo' => (int) $c->activo,
                     'observacion' => $c->observacion,

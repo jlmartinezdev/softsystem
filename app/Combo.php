@@ -12,6 +12,7 @@ class Combo extends Model
         'nombre',
         'codigo',
         'precio',
+        'precio_credito',
         'precio_lista',
         'activo',
         'observacion',

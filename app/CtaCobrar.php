@@ -12,16 +12,18 @@ class CtaCobrar extends Model
     protected $fillable = [
 		'monto_cuota','monto_cobrado','monto_saldo','fecha_venc','estado','interes'
 	];
-    public function scopeCliente($query,$cliente,$buscarpor){
-        if(!empty($cliente)){
-            if(strtoupper($cliente)=='TODOS'){
+    public function scopeCliente($query, $cliente, $buscarpor){
+        if (!empty($cliente)) {
+            if (strtoupper($cliente) === 'TODOS') {
                 return;
             }
-            if($buscarpor=='ci'){
-                return $query->where('c.cliente_ci','=',$cliente);
-            }else {
-                return $query->where('c.cliente_nombre','LIKE',"%$cliente%");
-            }
+            $clean = trim($cliente);
+            return $query->where(function ($q) use ($clean) {
+                $q->where('c.cliente_nombre', 'LIKE', "%{$clean}%")
+                  ->orWhere('c.cliente_ruc', 'LIKE', "%{$clean}%")
+                  ->orWhere('c.cliente_ci', 'LIKE', "%{$clean}%")
+                  ->orWhere('ctas_cobrar.nro_fact_ventas', $clean);
+            });
         }        
     }
    

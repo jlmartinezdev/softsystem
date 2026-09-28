@@ -3,277 +3,1293 @@
 @section('style')
 <link href="{{ asset('css/icheck-bootstrap.min.css') }}" rel="stylesheet">
 <style>
-    
-        @font-face {
-            font-family: "Sofia";
-            font-style: normal;
-            font-weight: 400;
-            font-display: auto;
-            src: url({{ asset('webfonts/SofiaSans-Regular.ttf') }}) format("truetype");
-        }
+    @font-face {
+        font-family: "Cairo";
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url({{ asset("webfonts/Cairo-Bold.ttf") }}) format("truetype");
+    }
+    .font-cairo {
+        font-family: 'Cairo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
 
-        #main {
-            font-family: 'Sofia';
+    :root {
+        --dash-primary: #0a4d36;
+        --dash-primary-dark: #073827;
+        --dash-primary-light: #eaf3ef;
+        --dash-primary-border: #c8dfd5;
+        --dash-accent: #b8860b;
+        --dash-accent-light: #fef8eb;
+        --dash-text-main: #1c2430;
+        --dash-text-muted: #64748b;
+        --dash-card-bg: #ffffff;
+        --dash-border: #e2e8f0;
+    }
+
+    body.dark-mode {
+        --dash-primary: #10b981;
+        --dash-primary-dark: #059669;
+        --dash-primary-light: #064e3b;
+        --dash-primary-border: #047857;
+        --dash-accent: #f59e0b;
+        --dash-accent-light: #451a03;
+        --dash-text-main: #f3f4f6;
+        --dash-text-muted: #9ca3af;
+        --dash-card-bg: #1f2937;
+        --dash-border: #374151;
+    }
+
+    /* Reglas Globales y de Modo Oscuro */
+    .product-title {
+        font-size: 0.93rem;
+        color: var(--dash-text-main);
+    }
+    .price-display {
+        font-size: 1rem;
+        color: var(--dash-primary) !important;
+        white-space: nowrap;
+    }
+    body.dark-mode .price-display {
+        color: #34d399 !important;
+    }
+
+    /* Buscador & Inputs */
+    .toolbar-card {
+        overflow: visible !important;
+    }
+    .search-input-group {
+        width: 100%;
+        min-width: 0;
+    }
+    .search-prepend {
+        background-color: var(--dash-card-bg) !important;
+        border-color: var(--dash-border) !important;
+        color: var(--dash-text-muted) !important;
+        border-radius: 8px 0 0 8px !important;
+    }
+    .search-input {
+        background-color: var(--dash-card-bg) !important;
+        border-color: var(--dash-border) !important;
+        color: var(--dash-text-main) !important;
+        min-width: 0;
+    }
+    .search-input:focus {
+        background-color: var(--dash-card-bg) !important;
+        border-color: var(--dash-primary) !important;
+        color: var(--dash-text-main) !important;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important;
+    }
+    .search-clear-btn {
+        border: 1px solid var(--dash-border);
+        border-left: none;
+        background-color: var(--dash-card-bg);
+        color: var(--dash-text-muted);
+        border-radius: 0 8px 8px 0;
+        padding: 0.375rem 0.75rem;
+        transition: all 0.15s;
+        cursor: pointer;
+    }
+    .search-clear-btn:hover {
+        color: #ef4444;
+        background-color: var(--dash-card-bg);
+    }
+    .select-seccion {
+        background-color: var(--dash-card-bg) !important;
+        border-color: var(--dash-border) !important;
+        color: var(--dash-text-main) !important;
+        width: 100%;
+        min-width: 0;
+    }
+    .select-seccion:focus {
+        border-color: var(--dash-primary) !important;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important;
+    }
+    .toolbar-actions-wrap {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.4rem;
+    }
+    @media (min-width: 576px) {
+        .toolbar-actions-wrap {
+            justify-content: flex-end;
         }
-    .vgt-table tr{
-        font-family: Arial, Helvetica, sans-serif;
     }
-    .vgt-table td{
-        color: rgb(8, 8, 8);
+    .toolbar-actions-wrap .btn-pos-secondary {
+        white-space: nowrap;
+        margin: 0;
     }
-    .modal-dialog-rigth {
-    position: fixed;
-    margin: auto;
-    width: 360px;
-    height: 100%;
-    right: 0px;
-}
-.modal-content {
-    height: 100%;
-}
-.autocomplete-input {
-  border: 1px solid #eee;
-  border-radius: 8px;
-  width: 100%;
-  padding: 7px 7px 7px 48px;
-  box-sizing: border-box;
-  position: relative;
-  font-size: 16px;
-  line-height: 1.5;
-  flex: 1;
-  background-color: #eee;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjY2IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMSIgcj0iOCIvPjxwYXRoIGQ9Ik0yMSAyMWwtNC00Ii8+PC9zdmc+");
-  background-repeat: no-repeat;
-  background-position: 12px;
-}
-.autocomplete-input:focus,
-.autocomplete-input[aria-expanded="true"] {
-  border-color: #17a2b8;
-  background-color: #fff;
-  outline: none;
-  /* box-shadow: 0 2px 2px rgba(0, 0, 0, .16)*/
-}
-.dark-mode .autocomplete-input {
-  border-color: rgba(0, 0, 0, 0.12);
-  color: white;
-  background-color: #343a40;
-}
-.articulo-toolbar > .card-body {
-  padding-top: 0.85rem !important;
-  padding-bottom: 0.45rem !important;
-}
-.articulo-toolbar .articulo-acciones {
-  line-height: 1.2;
-}
-.articulo-toolbar .articulo-acciones .btn {
-  padding: 0 0.4rem;
-  line-height: 1.2;
-  vertical-align: middle;
-}
-#modalPromo .modal-content {
-  height: auto;
-}
-#modalPromo .promo-item {
-  border: 1px solid #dee2e6;
-  border-radius: 0.35rem;
-  padding: 0.65rem 0.75rem;
-  margin-bottom: 0.5rem;
-}
-#modalPromo .promo-item-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-#modalPromo .promo-item-title {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-#modalPromo .promo-item-title strong {
-  line-height: 1.2;
-}
-#modalPromo .promo-item-actions {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  white-space: nowrap;
-}
-#modalPromo .promo-item-actions .badge {
-  margin: 0;
-  vertical-align: middle;
-}
-#modalPromo .promo-item-actions .btn {
-  padding: 0.15rem 0.4rem;
-  line-height: 1;
-}
-#modalPromo .promo-item-body {
-  margin-top: 0.4rem;
-}
-#modalPromo .promo-item-body ul {
-  margin-bottom: 0;
-  padding-left: 1.1rem;
-}
+    body.dark-mode .toolbar-card {
+        background-color: var(--dash-card-bg);
+        border-color: var(--dash-border);
+    }
+    body.dark-mode .search-clear-btn {
+        border-color: var(--dash-border) !important;
+        background-color: var(--dash-card-bg) !important;
+        color: var(--dash-text-muted) !important;
+    }
+    body.dark-mode .search-clear-btn:hover {
+        color: #f87171 !important;
+    }
+    body.dark-mode .bg-white {
+        background-color: var(--dash-card-bg) !important;
+        color: var(--dash-text-main) !important;
+    }
+    body.dark-mode .bg-light {
+        background-color: #111827 !important;
+        color: var(--dash-text-main) !important;
+    }
+    body.dark-mode .text-dark {
+        color: var(--dash-text-main) !important;
+    }
+    body.dark-mode .text-secondary {
+        color: var(--dash-text-muted) !important;
+    }
+    body.dark-mode .card {
+        background-color: var(--dash-card-bg) !important;
+        border-color: var(--dash-border) !important;
+    }
+    body.dark-mode .modal-body {
+        background-color: var(--dash-card-bg) !important;
+        color: var(--dash-text-main);
+    }
+    body.dark-mode .modal-footer {
+        background-color: #111827 !important;
+        border-color: var(--dash-border) !important;
+    }
+
+    /* Botón Secundario en Modo Oscuro */
+    body.dark-mode .btn-pos-secondary {
+        background: #111827 !important;
+        border-color: var(--dash-border) !important;
+        color: var(--dash-text-main) !important;
+    }
+    body.dark-mode .btn-pos-secondary:hover {
+        background: var(--dash-primary-light) !important;
+        border-color: var(--dash-primary-border) !important;
+        color: #34d399 !important;
+    }
+
+    /* Badges de Sección */
+    .badge-section {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        font-weight: 600;
+        padding: 0.3rem 0.6rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        display: inline-block;
+    }
+    body.dark-mode .badge-section {
+        background: #111827;
+        color: #9ca3af;
+        border-color: #374151;
+    }
+
+    /* Badges de Código de Barra */
+    body.dark-mode .badge-barcode {
+        background: #111827;
+        color: #cbd5e1;
+        border-color: #374151;
+    }
+
+    /* Badges de Stock en Modo Oscuro */
+    body.dark-mode .badge-stock-in {
+        background-color: rgba(16, 185, 129, 0.2) !important;
+        color: #6ee7b7 !important;
+        border-color: #059669 !important;
+    }
+    body.dark-mode .badge-stock-low {
+        background-color: rgba(245, 158, 11, 0.2) !important;
+        color: #fde68a !important;
+        border-color: #d97706 !important;
+    }
+    body.dark-mode .badge-stock-out {
+        background-color: rgba(239, 68, 68, 0.2) !important;
+        color: #fca5a5 !important;
+        border-color: #dc2626 !important;
+    }
+
+    /* Tabla en Modo Oscuro */
+    body.dark-mode .table-card {
+        background: var(--dash-card-bg);
+        border-color: var(--dash-border);
+    }
+    body.dark-mode .table-toolbar-head {
+        background: var(--dash-card-bg);
+        border-color: var(--dash-border);
+        color: var(--dash-text-main);
+    }
+    body.dark-mode .custom-select-perpage {
+        background-color: #111827 !important;
+        border-color: var(--dash-border) !important;
+        color: var(--dash-text-main) !important;
+    }
+    body.dark-mode .table-custom thead th {
+        background: #111827 !important;
+        color: var(--dash-text-muted) !important;
+        border-color: var(--dash-border) !important;
+    }
+    body.dark-mode .table-custom thead th.sortable:hover {
+        background: #1e293b !important;
+        color: #34d399 !important;
+    }
+    body.dark-mode .table-custom tbody tr {
+        background-color: var(--dash-card-bg) !important;
+    }
+    body.dark-mode .table-custom tbody tr:nth-of-type(odd) {
+        background-color: rgba(255, 255, 255, 0.02) !important;
+    }
+    body.dark-mode .table-custom tbody tr:hover {
+        background-color: var(--dash-primary-light) !important;
+    }
+    body.dark-mode .table-custom tbody td {
+        border-color: var(--dash-border) !important;
+        color: var(--dash-text-main) !important;
+    }
+
+    /* Paginación en Modo Oscuro */
+    body.dark-mode .table-pagination-footer {
+        background: var(--dash-card-bg) !important;
+        border-color: var(--dash-border) !important;
+        color: var(--dash-text-main) !important;
+    }
+    body.dark-mode .page-nav-btn {
+        background: #111827 !important;
+        border-color: var(--dash-border) !important;
+        color: var(--dash-text-main) !important;
+    }
+    body.dark-mode .page-nav-btn:hover:not(:disabled) {
+        background: var(--dash-primary-light) !important;
+        border-color: var(--dash-primary-border) !important;
+        color: #34d399 !important;
+    }
+    body.dark-mode .page-number-btn {
+        background: #111827 !important;
+        border-color: var(--dash-border) !important;
+        color: var(--dash-text-main) !important;
+    }
+    body.dark-mode .page-number-btn:hover:not(.active):not(.dots) {
+        background: var(--dash-primary-light) !important;
+        border-color: var(--dash-primary-border) !important;
+        color: #34d399 !important;
+    }
+
+    /* Botones de Acción en Fila */
+    body.dark-mode .btn-action-edit {
+        background: rgba(16, 185, 129, 0.15) !important;
+        color: #34d399 !important;
+        border-color: rgba(16, 185, 129, 0.3) !important;
+    }
+    body.dark-mode .btn-action-edit:hover {
+        background: #059669 !important;
+        color: #ffffff !important;
+    }
+    body.dark-mode .btn-action-dropdown {
+        background: rgba(16, 185, 129, 0.15) !important;
+        color: #34d399 !important;
+        border-color: rgba(16, 185, 129, 0.3) !important;
+    }
+    body.dark-mode .btn-action-dropdown:hover {
+        background: #059669 !important;
+        color: #ffffff !important;
+    }
+
+    /* Menús Desplegables en Modo Oscuro */
+    body.dark-mode .dropdown-menu {
+        background-color: #1f2937 !important;
+        border: 1px solid #374151 !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6) !important;
+    }
+    body.dark-mode .dropdown-item {
+        color: #e2e8f0 !important;
+    }
+    body.dark-mode .dropdown-item:hover,
+    body.dark-mode .dropdown-item:focus {
+        background-color: #111827 !important;
+        color: #34d399 !important;
+    }
+    body.dark-mode .dropdown-divider {
+        border-color: #374151 !important;
+    }
+
+    /* Modales en Modo Oscuro */
+    body.dark-mode .modal-content {
+        background-color: #1f2937 !important;
+        color: #e2e8f0 !important;
+        border: 1px solid #374151 !important;
+    }
+    body.dark-mode .modal-header.bg-light,
+    body.dark-mode .modal-footer.bg-light {
+        background-color: #111827 !important;
+        border-color: #374151 !important;
+        color: #e2e8f0 !important;
+    }
+    body.dark-mode .list-group-item {
+        background-color: #1f2937 !important;
+        color: #e2e8f0 !important;
+        border-color: #374151 !important;
+    }
+    body.dark-mode .list-group-item:hover {
+        background-color: #111827 !important;
+    }
+    body.dark-mode .list-group-item.bg-light {
+        background-color: #111827 !important;
+        color: #34d399 !important;
+    }
+    body.dark-mode #modalfiltro .badge-light {
+        background-color: #111827 !important;
+        color: #9ca3af !important;
+        border-color: #374151 !important;
+    }
+    body.dark-mode #modalexportar .list-group-item h6 {
+        color: #f3f4f6 !important;
+    }
+    body.dark-mode #modalexportar .rounded-circle {
+        opacity: 0.9;
+    }
+
+    #app {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* Cabecera idéntica a Home */
+    .dash-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--dash-border);
+    }
+    .dash-header-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--dash-primary);
+        margin: 0;
+        line-height: 1.2;
+    }
+    .dash-header-subtitle {
+        font-size: 0.925rem;
+        color: var(--dash-text-muted);
+        margin: 0.25rem 0 0;
+    }
+    .dash-header-badges {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Botones POS idénticos a Home */
+    .btn-pos-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.35rem;
+        background: var(--dash-primary);
+        border: 1px solid var(--dash-primary);
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 0.95rem;
+        border-radius: 8px;
+        transition: all 0.15s ease-in-out;
+        text-decoration: none !important;
+        box-shadow: 0 2px 5px rgba(10, 77, 54, 0.15);
+        cursor: pointer;
+    }
+    .btn-pos-primary:hover, .btn-pos-primary:focus {
+        background: var(--dash-primary-dark);
+        border-color: var(--dash-primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(10, 77, 54, 0.25);
+    }
+    .btn-pos-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.55rem 1rem;
+        background: #ffffff;
+        border: 1px solid var(--dash-border);
+        color: var(--dash-text-main) !important;
+        font-weight: 600;
+        font-size: 0.88rem;
+        border-radius: 8px;
+        text-decoration: none !important;
+        transition: all 0.15s;
+        cursor: pointer;
+    }
+    .btn-pos-secondary:hover {
+        background: var(--dash-primary-light);
+        border-color: var(--dash-primary-border);
+        color: var(--dash-primary) !important;
+    }
+
+    /* Tarjetas KPI de Home */
+    .kpi-card {
+        background: var(--dash-card-bg);
+        border: 1px solid var(--dash-border);
+        border-radius: 12px;
+        padding: 1.15rem 1.25rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: calc(100% - 1.25rem);
+    }
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+    }
+    .kpi-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.6rem;
+    }
+    .kpi-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--dash-text-muted);
+    }
+    .kpi-icon-box {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+    .kpi-icon-green { background: #dcfce7; color: #166534; }
+    .kpi-icon-blue { background: #e0f2fe; color: #0284c7; }
+    .kpi-icon-amber { background: #fef3c7; color: #b45309; }
+    .kpi-icon-purple { background: #f3e8ff; color: #7e22ce; }
+    
+    .kpi-value {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--dash-text-main);
+        line-height: 1.2;
+        font-variant-numeric: tabular-nums;
+    }
+    .kpi-subtext {
+        margin-top: 0.4rem;
+        font-size: 0.8rem;
+        color: var(--dash-text-muted);
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    /* Card Contenedora */
+    .table-card {
+        background: var(--dash-card-bg);
+        border: 1px solid var(--dash-border);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    /* Vue Good Table adaptada al Dashboard */
+    .vgt-table {
+        border: none !important;
+        font-family: inherit;
+    }
+    .vgt-table thead th {
+        background: #f8fafc !important;
+        color: var(--dash-text-muted) !important;
+        font-size: 0.78rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.04em !important;
+        border-bottom: 1px solid var(--dash-border) !important;
+        border-top: none !important;
+        padding: 0.85rem 1rem !important;
+    }
+    .vgt-table tbody td {
+        color: var(--dash-text-main) !important;
+        vertical-align: middle !important;
+        border-bottom: 1px solid var(--dash-border) !important;
+        padding: 0.75rem 1rem !important;
+    }
+    .vgt-table.striped tbody tr:nth-of-type(odd) {
+        background-color: #fafbfc;
+    }
+    .vgt-table tbody tr:hover {
+        background-color: var(--dash-primary-light) !important;
+    }
+
+    /* Estilos de la Tabla Personalizada Dashboard (Sin librerías de terceros) */
+    .table-toolbar-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.85rem 1.25rem;
+        border-bottom: 1px solid var(--dash-border);
+        background: var(--dash-card-bg);
+    }
+    .custom-select-perpage {
+        width: auto !important;
+        display: inline-block;
+        border: 1px solid var(--dash-border);
+        border-radius: 6px;
+        font-size: 0.82rem;
+        padding: 0.25rem 0.6rem;
+        height: auto;
+        color: var(--dash-text-main);
+        background-color: #fff;
+    }
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        min-height: 220px;
+    }
+    .table-responsive::-webkit-scrollbar {
+        height: 7px;
+    }
+    .table-responsive::-webkit-scrollbar-track {
+        background: var(--dash-card-bg);
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--dash-border);
+        border-radius: 4px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: var(--dash-text-muted);
+    }
+    body.dark-mode .table-responsive::-webkit-scrollbar-track {
+        background: #1f2937;
+    }
+    body.dark-mode .table-responsive::-webkit-scrollbar-thumb {
+        background: #374151;
+    }
+
+    .table-custom {
+        min-width: 880px;
+        width: 100%;
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .table-custom thead th {
+        background: #f8fafc;
+        color: var(--dash-text-muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        border-bottom: 1px solid var(--dash-border);
+        border-top: none;
+        padding: 0.85rem 1rem;
+        vertical-align: middle;
+        user-select: none;
+        white-space: nowrap;
+        transition: background-color 0.15s, color 0.15s;
+    }
+    .table-custom thead th.sortable:hover {
+        background: #f1f5f9;
+        color: var(--dash-primary);
+    }
+    .table-custom tbody tr {
+        transition: background-color 0.15s;
+    }
+    .table-custom tbody tr:nth-of-type(odd) {
+        background-color: #fafbfc;
+    }
+    .table-custom tbody tr:hover {
+        background-color: var(--dash-primary-light) !important;
+    }
+    .table-custom tbody td {
+        padding: 0.8rem 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--dash-border);
+        color: var(--dash-text-main);
+        font-size: 0.9rem;
+    }
+
+    /* Paginación Dashboard */
+    .table-pagination-footer {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.85rem 1.25rem;
+        border-top: 1px solid var(--dash-border);
+        background: var(--dash-card-bg);
+    }
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    .page-nav-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.38rem 0.75rem;
+        border: 1px solid var(--dash-border);
+        background: #ffffff;
+        color: var(--dash-text-main);
+        border-radius: 6px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        transition: all 0.15s;
+        cursor: pointer;
+    }
+    .page-nav-btn:hover:not(:disabled) {
+        background: var(--dash-primary-light);
+        border-color: var(--dash-primary-border);
+        color: var(--dash-primary);
+    }
+    .page-nav-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+    .page-numbers {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    .page-number-btn {
+        min-width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 0.35rem;
+        border: 1px solid var(--dash-border);
+        background: #ffffff;
+        color: var(--dash-text-main);
+        border-radius: 6px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        transition: all 0.15s;
+        cursor: pointer;
+    }
+    .page-number-btn:hover:not(.active):not(.dots) {
+        background: var(--dash-primary-light);
+        border-color: var(--dash-primary-border);
+        color: var(--dash-primary);
+    }
+    .page-number-btn.active {
+        background: var(--dash-primary) !important;
+        border-color: var(--dash-primary) !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 4px rgba(10, 77, 54, 0.25);
+    }
+    .page-number-btn.dots {
+        border: none;
+        background: transparent;
+        cursor: default;
+    }
+
+    /* Estado vacío */
+    .empty-state-box {
+        padding: 3rem 1rem;
+    }
+    .empty-state-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--dash-primary-light);
+        color: var(--dash-primary);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Badges de Stock */
+    .badge-stock-in {
+        background-color: #dcfce7;
+        color: #166534;
+        font-weight: 700;
+        border: 1px solid #bbf7d0;
+        border-radius: 20px;
+        padding: 4px 10px;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
+    }
+    .badge-stock-low {
+        background-color: #fef3c7;
+        color: #92400e;
+        font-weight: 700;
+        border: 1px solid #fde68a;
+        border-radius: 20px;
+        padding: 4px 10px;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
+    }
+    .badge-stock-out {
+        background-color: #fee2e2;
+        color: #991b1b;
+        font-weight: 700;
+        border: 1px solid #fecaca;
+        border-radius: 20px;
+        padding: 4px 10px;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
+    }
+
+    /* Badge código de barra */
+    .badge-barcode {
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+        background: #f1f5f9;
+        color: #334155;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
+    }
+
+    /* Botón Edición Rápida en tabla */
+    .btn-action-edit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--dash-primary-light);
+        color: var(--dash-primary);
+        border: 1px solid var(--dash-primary-border);
+        border-radius: 6px 0 0 6px;
+        padding: 0.35rem 0.65rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        transition: all 0.15s;
+    }
+    .btn-action-edit:hover {
+        background: var(--dash-primary);
+        color: #ffffff;
+    }
+    .btn-action-dropdown {
+        background: var(--dash-primary-light);
+        color: var(--dash-primary);
+        border: 1px solid var(--dash-primary-border);
+        border-left: none;
+        border-radius: 0 6px 6px 0;
+        padding: 0.35rem 0.5rem;
+        transition: all 0.15s;
+    }
+    .btn-action-dropdown:hover {
+        background: var(--dash-primary);
+        color: #ffffff;
+    }
+
+    #modalPromo .modal-content {
+        height: auto;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    #modalPromo .promo-item {
+        border: 1px solid var(--dash-border);
+        border-radius: 8px;
+        padding: 0.65rem 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    #modalPromo .promo-item-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+    #modalPromo .promo-item-title {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+    #modalPromo .promo-item-actions {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        white-space: nowrap;
+    }
 </style>
 @endsection
 @section('main')
-    <div class="container" id="app">
-        <div class="py-2"  ><span class="font-weight-bold" style="font-size: 18pt;">Productos</span><template><span class="pl-3">@{{articulos.length}} articulos registrados</span></template></div>
-        <div class="card shadow-sm articulo-toolbar">
-            <div class="card-body px-3">
-                <div class="row align-items-center">
-                    <div class="col-sm-12 col-md-8">
-                        <input
-                        type="text"
-                        v-model="txtbuscar"
-                        placeholder="Articulo o Codigo"
-                        @keyup.enter="buscar(false)"
-                        class="autocomplete-input"
-                      />
+    <div class="container-fluid px-3 py-3" id="app" v-cloak>
+        <!-- Cabecera estilo Dashboard Inicio -->
+        <div class="dash-header">
+            <div>
+                <h1 class="dash-header-title font-cairo">
+                    <i class="fa-solid fa-boxes-stacked mr-2"></i>Artículos y Productos
+                </h1>
+                <p class="dash-header-subtitle">
+                    Catálogo de productos, control de stock por sucursales y gestión de precios
+                </p>
+            </div>
+            <div class="dash-header-badges">
+                <button type="button" class="btn-pos-primary" @click="showMArticulo">
+                    <i class="fa fa-plus-circle"></i> Nuevo Artículo
+                </button>
+                <a href="{{ route('articulo.cm') }}" class="btn-pos-secondary" title="Formulario extendido con cámara y fotos">
+                    <i class="fa fa-camera"></i> ABM con Fotos
+                </a>
+            </div>
+        </div>
+
+        <!-- Tarjetas KPI de Resumen estilo Inicio -->
+        <div class="row">
+            <div class="col-xl-3 col-sm-6 mb-3">
+                <div class="kpi-card" style="border-left: 4px solid #0284c7;">
+                    <div class="kpi-header">
+                        <span class="kpi-label">Total Productos</span>
+                        <div class="kpi-icon-box kpi-icon-blue">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
                     </div>
-                    <div class="col-sm-12 col-md-4 mt-2 mt-md-0">
-                        <a href="{{ route('articulo.cm')}}" class="btn btn-info btn-block" ><span class="fa-regular fa-plus"></span>
-                            Producto</a>
-                    </div>
-                </div>
-                <div class="row mt-2">
-                    <div class="col-12 articulo-acciones">
-                        <button :class="[filtro.seccion=='0' ? 'btn btn-link text-secondary': 'btn btn-outline-light text-primary']" data-toggle="modal" data-target="#modalfiltro"><i :class="[filtro.seccion=='0' ? 'fa-regular fa-filter':'fa-solid fa-filter text-primary']"></i> Filtro</button>
-                        <button class="btn btn-link text-secondary"><i class="fa-regular fa-folder"></i> Seccion</button>
-                        <button class="btn btn-link text-secondary" data-toggle="modal" data-target="#modalexportar"><i class="fa-regular fa-upload"></i> Exportar</button>
-                        <a href="{{ route('combo.index') }}" class="btn btn-link text-secondary"><i class="fa fa-layer-group"></i> Combos</a>
-                        <a href="{{ route('oferta.index') }}" class="btn btn-link text-secondary"><i class="fa fa-tags"></i> Ofertas</a>
+                    <div class="kpi-value font-cairo">@{{ articulos.length }}</div>
+                    <div class="kpi-subtext">
+                        <i class="fa-solid fa-layer-group text-muted"></i> En catálogo general
                     </div>
                 </div>
             </div>
+            <div class="col-xl-3 col-sm-6 mb-3">
+                <div class="kpi-card" style="border-left: 4px solid #16a34a;">
+                    <div class="kpi-header">
+                        <span class="kpi-label">Con Stock</span>
+                        <div class="kpi-icon-box kpi-icon-green">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value font-cairo" style="color: #166534;">@{{ totalConStock }}</div>
+                    <div class="kpi-subtext" style="color: #166534;">
+                        <i class="fa-solid fa-arrow-trend-up"></i> Disponibles para venta
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 mb-3">
+                <div class="kpi-card" style="border-left: 4px solid #dc2626;">
+                    <div class="kpi-header">
+                        <span class="kpi-label">Sin Stock / Agotados</span>
+                        <div class="kpi-icon-box kpi-icon-amber">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value font-cairo" style="color: #b91c1c;">@{{ totalSinStock }}</div>
+                    <div class="kpi-subtext" style="color: #b91c1c;">
+                        <i class="fa-solid fa-circle-exclamation"></i> Requieren reposición
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 mb-3">
+                <div class="kpi-card" style="border-left: 4px solid #7e22ce;">
+                    <div class="kpi-header">
+                        <span class="kpi-label">Ofertas / Combos</span>
+                        <div class="kpi-icon-box kpi-icon-purple">
+                            <i class="fa-solid fa-tags"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value font-cairo" style="color: #7e22ce;">@{{ totalConPromo }}</div>
+                    <div class="kpi-subtext" style="color: #7e22ce;">
+                        <i class="fa-solid fa-star"></i> Promociones activas
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        </div><!--  END CARD -->
-        <template>
-            <div>
-                <vue-good-table
-                  :columns="columns"
-                  :rows="rows"
-                  style-class="vgt-table striped"
-                  :pagination-options="{
-                    enabled: true
-                  }"
-                  :search-options="{
-                    enabled: true,
-                    externalQuery: txtbuscar,
-                    searchFn: busqueda_tabla
-                  }"
-                  
-                  >
-                  <template slot="table-row" slot-scope="props">
-                    <span v-if="props.row.stock=='0'">
-                      <span  style="color: rgb(226, 0, 0);">
-                        <span v-if="!props.column.html">
-                            @{{props.formattedRow[props.column.field]}}
-                        </span>
-                        <span  v-else v-html="props.row[props.column.field]">
-                        </span>
-                       
-                    </span> 
-                    </span>
-                    
-                  </template>
-                </vue-good-table>
-                  
-              </div>
-
-        </template>
-        
-
-        
-        
-        @include('articulo.delete')
-        @include('articulo.detalle')
-        @include('articulo.precio')
-        <div class="modal fade" id="modalfiltro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
-            <div class="modal-dialog modal-dialog-scrollable modal-dialog-rigth" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  Filtrar
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
-                <div class="modal-body">
-                  
-                  <table class="table table-hover table-borderless">
-                    <tr>
-                        <td>
-                            <div class="icheck-primary d-inline">
-                            <input type="radio" id="r1" name="r1"  v-model="filtro.seccion" value="0">
-                            <label for="r1">
-                                TODAS LAS SECCIONES
-                            </label>
+        <!-- Barra de Búsqueda y Filtros Rápidos -->
+        <div class="table-card toolbar-card mb-3">
+            <div class="card-body py-2 px-3">
+                <div class="row align-items-center">
+                    <!-- Buscador predictivo: 100% en pantallas menores a 1200px (móviles/tablets) y 5 cols en pantallas anchas -->
+                    <div class="col-12 col-xl-5 mb-2 mb-xl-0">
+                        <div class="input-group search-input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text search-prepend border-right-0">
+                                    <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                                </span>
                             </div>
-                        </td>
-                    </tr>
-                     
-                    @foreach ($secciones as $seccion)
+                            <input
+                                type="text"
+                                v-model="txtbuscar"
+                                placeholder="Buscar artículo por nombre o código de barra..."
+                                @keyup.enter="buscar(false)"
+                                class="form-control search-input border-left-0"
+                                :style="{ borderRadius: txtbuscar ? '0' : '0 8px 8px 0', fontSize: '0.92rem' }"
+                            />
+                            <div class="input-group-append" v-if="txtbuscar">
+                                <button class="btn search-clear-btn" type="button" @click="txtbuscar = ''; buscar(false)" title="Limpiar búsqueda">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Sección / Categoría directo -->
+                    <div class="col-12 col-sm-6 col-xl-3 mb-2 mb-xl-0">
+                        <select class="form-control select-seccion" v-model="filtro.seccion" @change="buscar(false)" style="border-radius: 8px; font-size: 0.92rem;">
+                            <option value="0">Todas las Secciones</option>
+                            @foreach ($secciones as $seccion)
+                                <option value="{{ $seccion['present_cod'] }}">{{ $seccion['present_descripcion'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Botones de Acción & Enlaces -->
+                    <div class="col-12 col-sm-6 col-xl-4 text-left text-sm-right">
+                        <div class="toolbar-actions-wrap">
+                            <button type="button" class="btn-pos-secondary" data-toggle="modal" data-target="#modalfiltro" title="Más filtros de sección">
+                                <i class="fa fa-filter"></i> Filtros
+                            </button>
+                            <button type="button" class="btn-pos-secondary" data-toggle="modal" data-target="#modalexportar" title="Exportar datos a Excel">
+                                <i class="fa fa-file-excel text-success"></i> Exportar
+                            </button>
+                            <div class="dropdown d-inline-block">
+                                <button type="button" class="btn-pos-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa fa-layer-group text-info"></i> Promos
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right shadow-sm border-0" style="border-radius: 10px;">
+                                    <a class="dropdown-item py-2" href="{{ route('combo.index') }}">
+                                        <i class="fa fa-layer-group text-info mr-2"></i> Gestión de Combos
+                                    </a>
+                                    <a class="dropdown-item py-2" href="{{ route('oferta.index') }}">
+                                        <i class="fa fa-tags text-danger mr-2"></i> Gestión de Ofertas
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla Personalizada Dashboard (Sin librerías externas) -->
+        <div class="table-card mb-4">
+            <!-- Barra superior informativa de la tabla -->
+            <div class="table-toolbar-head">
+                <div class="d-flex align-items-center flex-wrap">
+                    <span class="text-muted small">
+                        Mostrando <strong>@{{ paginatedRows.length }}</strong> de <strong>@{{ filteredRows.length }}</strong> productos encontrados
+                    </span>
+                    <span v-if="txtbuscar" class="badge badge-light border text-secondary ml-2 py-1 px-2">
+                        Búsqueda: "@{{ txtbuscar }}"
+                        <i class="fa fa-times text-danger ml-1 cursor-pointer" @click="txtbuscar = ''" title="Quitar filtro de búsqueda"></i>
+                    </span>
+                    <span v-if="filtro.seccion != 0" class="badge badge-light border text-secondary ml-2 py-1 px-2">
+                        Sección activa
+                        <i class="fa fa-times text-danger ml-1 cursor-pointer" @click="filtro.seccion = 0; buscar(false)" title="Quitar filtro de sección"></i>
+                    </span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <label class="text-muted small mb-0 mr-2 font-weight-bold">Filas por página:</label>
+                    <select class="form-control form-control-sm custom-select-perpage" v-model.number="perPage" @change="currentPage = 1">
+                        <option :value="10">10</option>
+                        <option :value="25">25</option>
+                        <option :value="50">50</option>
+                        <option :value="100">100</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tabla Nativa Responsiva -->
+            <div class="table-responsive">
+                <table class="table table-custom mb-0">
+                    <thead>
                         <tr>
-                            <td>
-                                <div class="icheck-primary d-inline">
-                                <input type="radio" id="{{ $seccion['present_cod'] }}"  v-model="filtro.seccion" name="r1" value="{{ $seccion['present_cod'] }}">
-                                <label for="{{ $seccion['present_cod'] }}">
-                                    {{ $seccion['present_descripcion'] }}
-                                </label>
+                            <th class="cursor-pointer sortable text-nowrap" @click="sortBy('codigo')" style="width: 130px; min-width: 120px;">
+                                <span>Código</span>
+                                <i class="fa-solid ml-1 text-muted" :class="getSortIcon('codigo')"></i>
+                            </th>
+                            <th class="cursor-pointer sortable text-nowrap" @click="sortBy('descripcion')" style="min-width: 220px;">
+                                <span>Descripción / Producto</span>
+                                <i class="fa-solid ml-1 text-muted" :class="getSortIcon('descripcion')"></i>
+                            </th>
+                            <th class="cursor-pointer sortable text-nowrap" @click="sortBy('seccion')" style="width: 140px; min-width: 120px;">
+                                <span>Sección</span>
+                                <i class="fa-solid ml-1 text-muted" :class="getSortIcon('seccion')"></i>
+                            </th>
+                            <th class="text-center text-nowrap" style="width: 95px; min-width: 85px;">
+                                <span>Promo</span>
+                            </th>
+                            <th class="cursor-pointer sortable text-right text-nowrap" @click="sortBy('precio')" style="width: 140px; min-width: 125px;">
+                                <span>Precio Venta</span>
+                                <i class="fa-solid ml-1 text-muted" :class="getSortIcon('precio')"></i>
+                            </th>
+                            <th class="cursor-pointer sortable text-center text-nowrap" @click="sortBy('stock')" style="width: 125px; min-width: 110px;">
+                                <span>Stock</span>
+                                <i class="fa-solid ml-1 text-muted" :class="getSortIcon('stock')"></i>
+                            </th>
+                            <th class="text-center text-nowrap" style="width: 125px; min-width: 115px;">
+                                <span>Acciones</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Estado de Carga -->
+                        <tr v-if="requestSend">
+                            <td colspan="7" class="text-center py-5">
+                                <div class="spinner-border text-success" role="status" style="width: 2.5rem; height: 2.5rem; color: var(--dash-primary) !important;">
+                                    <span class="sr-only">Cargando...</span>
+                                </div>
+                                <div class="mt-2 font-weight-bold text-muted small">Cargando catálogo de artículos...</div>
+                            </td>
+                        </tr>
+
+                        <!-- Filas de Productos -->
+                        <template v-else-if="paginatedRows.length > 0">
+                            <tr v-for="row in paginatedRows" :key="row.ARTICULOS_cod">
+                                <!-- Código de Barra -->
+                                <td class="align-middle text-nowrap">
+                                    <span v-if="row.codigo" class="badge-barcode">
+                                        <i class="fa fa-barcode mr-1 text-muted"></i>@{{ row.codigo }}
+                                    </span>
+                                    <span v-else class="text-muted small">—</span>
+                                </td>
+
+                                <!-- Descripción y Ubicación -->
+                                <td class="align-middle" style="min-width: 220px;">
+                                    <div class="font-weight-bold product-title">@{{ row.descripcion }}</div>
+                                    <div class="small text-muted mt-1" v-if="row.ubicacion">
+                                        <i class="fa fa-location-dot mr-1" style="color: var(--dash-accent);"></i>@{{ row.ubicacion }}
+                                    </div>
+                                </td>
+
+                                <!-- Sección -->
+                                <td class="align-middle text-nowrap">
+                                    <span class="badge-section">
+                                        @{{ row.seccion }}
+                                    </span>
+                                </td>
+
+                                <!-- Promo (Ofertas y Combos) -->
+                                <td class="align-middle text-center text-nowrap">
+                                    <span v-if="row.tiene_oferta" class="badge badge-danger mr-1 badge-promo cursor-pointer" @click="verPromo(row.ARTICULOS_cod, 'oferta')" title="Ver oferta activa">
+                                        OFERTA
+                                    </span>
+                                    <span v-if="row.en_combo" class="badge badge-info badge-promo cursor-pointer" @click="verPromo(row.ARTICULOS_cod, 'combo')" title="Ver combo activo">
+                                        COMBO
+                                    </span>
+                                    <span v-if="!row.tiene_oferta && !row.en_combo" class="text-muted small">—</span>
+                                </td>
+
+                                <!-- Precio -->
+                                <td class="align-middle text-right text-nowrap">
+                                    <span class="font-weight-bold font-cairo price-display">
+                                        Gs. @{{ row.precio_formateado }}
+                                    </span>
+                                </td>
+
+                                <!-- Stock con Semáforo -->
+                                <td class="align-middle text-center text-nowrap">
+                                    <span v-if="row.stock <= 0" class="badge-stock-out">
+                                        <i class="fa-solid fa-circle-xmark mr-1"></i>0 Agotado
+                                    </span>
+                                    <span v-else-if="row.stock <= 5" class="badge-stock-low">
+                                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>@{{ row.stock }} Bajo
+                                    </span>
+                                    <span v-else class="badge-stock-in">
+                                        <i class="fa-solid fa-circle-check mr-1"></i>@{{ row.stock }}
+                                    </span>
+                                </td>
+
+                                <!-- Acciones en 1 Clic -->
+                                <td class="align-middle text-center text-nowrap" style="width: 125px; min-width: 115px;">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn-action-edit" @click="showEArticulo(row.ARTICULOS_cod)" title="Edición Rápida">
+                                            <i class="fa fa-pen mr-1"></i> Editar
+                                        </button>
+                                        <button type="button" class="btn-action-dropdown dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="sr-only">Opciones</span>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right shadow-sm border-0" style="border-radius: 10px;">
+                                            <button class="dropdown-item py-2" @click="showEArticulo(row.ARTICULOS_cod)">
+                                                <i class="fa fa-pen text-primary mr-2"></i> Editar Artículo
+                                            </button>
+                                            <button class="dropdown-item py-2" @click="verPreciosCredito(row.ARTICULOS_cod, row.costo)">
+                                                <i class="fa fa-credit-card text-info mr-2"></i> Precios a Crédito
+                                            </button>
+                                            <button class="dropdown-item py-2" @click="showDetalle(row.ARTICULOS_cod, row.descripcion)">
+                                                <i class="fa fa-retweet text-success mr-2"></i> Stock / Transferir
+                                            </button>
+                                            <button class="dropdown-item py-2" @click="duplicar(row.ARTICULOS_cod)">
+                                                <i class="fa fa-copy text-warning mr-2"></i> Duplicar Artículo
+                                            </button>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item py-2" :href="'{{ url('articulo/cm') }}/' + row.ARTICULOS_cod">
+                                                <i class="fa fa-camera text-secondary mr-2"></i> ABM Completo / Fotos
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <button class="dropdown-item py-2 text-danger" @click="modalDelete(row.ARTICULOS_cod, row.descripcion)">
+                                                <i class="fa fa-trash text-danger mr-2"></i> Eliminar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+
+                        <!-- Estado Vacío -->
+                        <tr v-else>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="empty-state-box">
+                                    <div class="empty-state-icon mb-3">
+                                        <i class="fa-solid fa-boxes-stacked fa-2x"></i>
+                                    </div>
+                                    <h5 class="font-weight-bold mb-1" style="color: var(--dash-text-main);">No se encontraron productos</h5>
+                                    <p class="text-muted small mb-3">No hay artículos que coincidan con los criterios de búsqueda o filtro.</p>
+                                    <div class="d-flex justify-content-center">
+                                        <button v-if="txtbuscar || filtro.seccion != 0" type="button" class="btn-pos-secondary mr-2" @click="txtbuscar = ''; filtro.seccion = 0; buscar(false)">
+                                            <i class="fa fa-undo mr-1"></i> Limpiar Filtros
+                                        </button>
+                                        <button type="button" class="btn-pos-primary" @click="showMArticulo">
+                                            <i class="fa fa-plus-circle mr-1"></i> Crear Nuevo Artículo
+                                        </button>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
-                    @endforeach
-                       
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación Moderna del Dashboard -->
+            <div class="table-pagination-footer" v-if="filteredRows.length > 0">
+                <div class="text-muted small">
+                    Mostrando <strong>@{{ paginationFrom }}</strong> a <strong>@{{ paginationTo }}</strong> de <strong>@{{ filteredRows.length }}</strong> artículos
+                </div>
+                <div class="pagination-controls" v-if="totalPages > 1">
+                    <button type="button" class="page-nav-btn" :disabled="currentPage === 1" @click="changePage(currentPage - 1)">
+                        <i class="fa fa-chevron-left mr-1"></i> Anterior
+                    </button>
                     
+                    <div class="page-numbers">
+                        <button v-for="(p, idx) in visiblePages"
+                                :key="'page-' + idx + '-' + p"
+                                type="button"
+                                class="page-number-btn"
+                                :class="{'active': p === currentPage, 'dots': p === '...'}"
+                                :disabled="p === '...'"
+                                @click="p !== '...' && changePage(p)">
+                            @{{ p }}
+                        </button>
+                    </div>
 
-                  </table>
-                  
+                    <button type="button" class="page-nav-btn" :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)">
+                        Siguiente <i class="fa fa-chevron-right ml-1"></i>
+                    </button>
                 </div>
-                <div class="modal-footer">
-                  <button class="btn btn-info"  data-dismiss="modal" @click="buscar(false)">Filtrar</button>
-              </div>
-              </div>
-
             </div>
         </div>
-        <div class="modal fade" id="modalseccion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  Filtrar
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
-                <div class="modal-body">
-                   <!--select class="form-control" @@click="buscar(false)" v-model="filtro.seccion">
-                            <option value="0">Todos</option>
-                            @@foreach ($secciones as $seccion)
-                                <option value="{ $seccion['present_cod'] }}">{ $seccion['present_descripcion'] }}
-                                </option>
-                            @@endforeach
-                        </select -->
-                </div>
-                <div class="modal-footer">
-                  <button class="btn btn-info">Filtrar</button>
-              </div>
-              </div>
 
+                @include('articulo.modal')
+        @include('articulo.delete')
+        @include('articulo.detalle')
+        @include('articulo.precio')
+        <!-- Modal Filtros Avanzados / Por Sección -->
+        <div class="modal fade" id="modalfiltro" tabindex="-1" role="dialog" aria-labelledby="modalFiltroLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-light border-bottom">
+                        <h6 class="modal-title font-weight-bold mb-0" style="color: var(--dash-text-main);" id="modalFiltroLabel">
+                            <i class="fa fa-filter text-primary mr-2"></i>Filtrar por Sección / Categoría
+                        </h6>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <div class="list-group list-group-flush">
+                            <label class="list-group-item list-group-item-action d-flex align-items-center mb-0 cursor-pointer" :class="{'bg-light font-weight-bold text-primary': filtro.seccion == 0}">
+                                <div class="icheck-primary d-inline mr-2">
+                                    <input type="radio" id="sec_todas" name="r_seccion" v-model="filtro.seccion" value="0">
+                                    <label for="sec_todas"></label>
+                                </div>
+                                <span class="flex-grow-1">TODAS LAS SECCIONES</span>
+                                <span class="badge badge-light border">Todos</span>
+                            </label>
+                            @foreach ($secciones as $seccion)
+                            <label class="list-group-item list-group-item-action d-flex align-items-center mb-0 cursor-pointer" :class="{'bg-light font-weight-bold text-primary': filtro.seccion == '{{ $seccion['present_cod'] }}'}">
+                                <div class="icheck-primary d-inline mr-2">
+                                    <input type="radio" id="sec_{{ $seccion['present_cod'] }}" name="r_seccion" v-model="filtro.seccion" value="{{ $seccion['present_cod'] }}">
+                                    <label for="sec_{{ $seccion['present_cod'] }}"></label>
+                                </div>
+                                <span class="flex-grow-1">{{ $seccion['present_descripcion'] }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light border-top d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" @click="filtro.seccion = 0; buscar(false)" data-dismiss="modal">
+                            <i class="fa fa-undo mr-1"></i> Restablecer
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm px-3" data-dismiss="modal" @click="buscar(false)">
+                            <i class="fa fa-check mr-1"></i> Aplicar Filtro
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="modal fade" id="modalexportar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
-            <div class="modal-dialog modal-dialog-rigth" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  Exportar
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
-                
-                <div class="list-group">
-                    <button type="button" class="list-group-item list-group-item-action" @click="exportar('stock')"><i class="fa-solid fa-file-excel text-success"></i> Con stock</button>
-                    <button type="button" class="list-group-item list-group-item-action" @click="exportar('precios')"><i class="fa-solid fa-file-excel text-success"></i> Precio Credito</button>
-                </div>
-                
-              </div>
 
+        <!-- Modal Exportar a Excel -->
+        <div class="modal fade" id="modalexportar" tabindex="-1" role="dialog" aria-labelledby="modalExportarLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-light border-bottom">
+                        <h6 class="modal-title font-weight-bold mb-0" style="color: var(--dash-text-main);" id="modalExportarLabel">
+                            <i class="fa-solid fa-file-excel text-success mr-2"></i>Exportar Reporte a Excel
+                        </h6>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body p-3">
+                        <p class="text-muted small mb-3">
+                            Seleccione el tipo de informe que desea generar con los filtros de búsqueda actuales:
+                        </p>
+                        <div class="list-group">
+                            <button type="button" class="list-group-item list-group-item-action d-flex align-items-center p-3" @click="exportar('stock')" data-dismiss="modal">
+                                <div class="rounded-circle p-3 mr-3 d-flex align-items-center justify-content-center" style="width:48px;height:48px;background:#e8f5e9;">
+                                    <i class="fa-solid fa-boxes-stacked fa-lg text-success"></i>
+                                </div>
+                                <div class="flex-grow-1 text-left">
+                                    <h6 class="mb-0 font-weight-bold" style="color: var(--dash-text-main);">Planilla con Stock</h6>
+                                    <small class="text-muted">Exporta lista completa con cantidades en depósito y sucursales</small>
+                                </div>
+                                <i class="fa fa-chevron-right text-muted"></i>
+                            </button>
+                            <button type="button" class="list-group-item list-group-item-action d-flex align-items-center p-3 mt-2" @click="exportar('precios')" data-dismiss="modal">
+                                <div class="rounded-circle p-3 mr-3 d-flex align-items-center justify-content-center" style="width:48px;height:48px;background:#e3f2fd;">
+                                    <i class="fa-solid fa-tags fa-lg text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1 text-left">
+                                    <h6 class="mb-0 font-weight-bold" style="color: var(--dash-text-main);">Lista de Precios a Crédito</h6>
+                                    <small class="text-muted">Exporta lista de precios de lista, cuotas y márgenes</small>
+                                </div>
+                                <i class="fa fa-chevron-right text-muted"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light border-top py-2">
+                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -387,6 +1403,40 @@
 @section('script')
     <script src="{{ asset('js/separator.js') }}"></script>
     <script>
+        const defaultArticulo = {
+            'codigo': '',
+            'c_barra': '',
+            'descripcion': '',
+            'indicaciones': '',
+            'modouso': '',
+            'seccion': 1,
+            'unidad': 1,
+            'factor': 1,
+            'ubicacion': '',
+            'costo': 0,
+            'p1': 0,
+            'p2': 0,
+            'p3': 0,
+            'p4': 0,
+            'p5': 0,
+            'm1': 0,
+            'm2': 0,
+            'm3': 0,
+            'm4': 0,
+            'm5': 0,
+            'svenc': '0',
+            existePrecios: false
+        };
+
+        const defaultStock = {
+            'id': 1,
+            'cantidad': 0,
+            'loteold': 'S/N',
+            'lotenew': 'S/N',
+            'vencimiento': 'Sin vencimiento',
+            'sucursal': 1
+        };
+
         const defaultPrecio = [{
             p: 50,
             m: 5,
@@ -464,7 +1514,8 @@
             el: '#app',
             data: {
                 requestSend: false,
-                
+                saving: false,
+                toggleMasPrecios: false,
                 precios: [...defaultPrecio],
                 chcuota: false,
                 chprecio: false,
@@ -485,8 +1536,8 @@
                     columna: 0,
                     orden: 'ASC'
                 },
-                articulo: {},
-                stock: {},
+                articulo: { ...defaultArticulo },
+                stock: { ...defaultStock },
                 stocks: [],
                 error: '',
                 cantidadStock: 0,
@@ -503,63 +1554,33 @@
                     combos: [],
                     foco: null
                 },
-                columns: [
-                    {
-                    label: 'Codigo',
-                    field: 'codigo',
-                    },
-                    {
-                    label: 'Descripcion',
-                    field: 'descripcion',
-                    },
-                    {
-                    label: 'Seccion',
-                    field: 'seccion',
-                    },
-                    {
-                    label: 'Promo',
-                    field: 'promo',
-                    html: true,
-                    sortable: false,
-                    width: '130px'
-                    },
-                    {
-                    label: 'Precio',
-                    field: 'precio',
-                    type: 'number'
-                    },
-                    {
-                    label: 'Stock',
-                    field: 'stock',
-                    type: 'number',
-                    },
-                    {
-                    label: 'Opciones',
-                    field: 'opciones',
-                    html: true
-                    },
-                
-                ],
+                sortField: 'descripcion',
+                sortOrder: 'asc',
+                currentPage: 1,
+                perPage: 25,
                 rows: []
             },
 
             methods: {
-                busqueda_tabla: function(row, col, cellValue, searchTerm){
-                    
-                    if(!isNaN(searchTerm) && searchTerm.length>5){
-                        
-                        if(row.codigo.includes(searchTerm)){
-                            return cellValue;
-                        } 
-                    }else{
-                        if(row.descripcion.toUpperCase().includes(searchTerm.toUpperCase())){
-                            return cellValue;
-                        } 
+                sortBy: function(field) {
+                    if (this.sortField === field) {
+                        this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        this.sortField = field;
+                        this.sortOrder = 'asc';
                     }
-                    
+                    this.currentPage = 1;
                 },
-                
-               
+                getSortIcon: function(field) {
+                    if (this.sortField !== field) return 'fa-sort text-muted opacity-50';
+                    return this.sortOrder === 'asc' ? 'fa-sort-up text-success' : 'fa-sort-down text-success';
+                },
+                changePage: function(p) {
+                    if (p < 1 || p > this.totalPages) return;
+                    this.currentPage = p;
+                },
+                busqueda_tabla: function() { return true; },
+
                 redondear: function(monto) {
                     var longitud = 0,
                         x = "",
@@ -569,18 +1590,82 @@
                         longitud = monto.toString().length;
                         x = monto.toString().substr(-3);
                         if (parseInt(x) > 500) {
-                            x = "500"
+                            x = "500";
                         } else {
-                            x = "000"
+                            x = "000";
                         }
                         b = monto.toString().substr(0, longitud - 3);
                         PFinal = parseInt(b + x);
                     } else {
-                        if (monto => 500) {
+                        if (monto >= 500) {
                             PFinal = 500;
                         }
                     }
                     return PFinal;
+                },
+
+                setMargen: function(index) {
+                    if (this.viewPrecio) {
+                        return false;
+                    }
+                    if (typeof(this.articulo.costo) === 'string') {
+                        this.articulo.costo = this.articulo.costo * 1;
+                    }
+                    if (this.articulo.costo > 0 && this.precios[index].p > 0) {
+                        if (this.precios[index].p > this.articulo.costo) {
+                            var res = this.precios[index].p - this.articulo.costo;
+                            this.precios[index].m = Math.round(res * 100 / this.articulo.costo);
+                        } else {
+                            this.precios[index].m = 0;
+                        }
+                        this.setCuota(index);
+                    }
+                },
+
+                setPrecio: function(index) {
+                    if (this.viewPrecio) {
+                        return false;
+                    }
+                    if (typeof(this.articulo.costo) === 'string') {
+                        this.articulo.costo = parseInt(this.articulo.costo);
+                    }
+                    if (this.articulo.costo < 1) {
+                        this.precios[index].p = 0;
+                        return;
+                    }
+                    if (parseInt(this.precios[index].m) < 1 || !this.precios[index].m) {
+                        this.precios[index].p = 0;
+                        return;
+                    }
+
+                    var retornar = parseInt((this.articulo.costo * parseInt(this.precios[index].m)) / 100 + this.articulo.costo);
+                    if (this.chprecio) {
+                        this.precios[index].p = this.redondear(retornar);
+                    } else {
+                        this.precios[index].p = retornar;
+                    }
+                },
+
+                setCuota: function(index) {
+                    if (this.viewPrecio) {
+                        return false;
+                    }
+                    if (this.precios[index].p > 0) {
+                        if (this.chcuota) {
+                            this.precios[index].c = this.precios[index].p / (index + 2);
+                            this.precios[index].c = this.redondear(parseInt(this.precios[index].c));
+                        } else {
+                            this.precios[index].c = parseInt(this.precios[index].p / (index + 2));
+                        }
+                    } else {
+                        this.precios[index].c = 0;
+                    }
+                },
+
+                generarCodigoBarra: function() {
+                    const rnd = Math.floor(100000 + Math.random() * 900000);
+                    this.articulo.c_barra = '784' + rnd;
+                    this.validar_codigo_de_barra();
                 },
                 
                 onChange: function() { //Al cambiar pagina
@@ -850,28 +1935,18 @@
                         '</body></html>';
                 },
                 mostrarPrecios: function() {
-                    if(this.articulo.costo > 0 ){
-                        if(!this.viewPrecio){
-                            if (this.isnew) {
-                                $('#addArticulo').modal('hide');
-                            } else {
-                                $('#editArticulo').modal('hide');
-                            }
+                    if (this.articulo.costo > 0) {
+                        if (!this.viewPrecio) {
+                            $('#modalArticulo').modal('hide');
                         }
-
                         $('#precioArticulo').modal('show');
-                    }else{
-                        Swal.fire('Atención...','Agregue precio de compra','info');
+                    } else {
+                        Swal.fire('Atención...', 'Agregue precio de compra', 'info');
                     }
-                    
                 },
                 cerrarPrecios: function() {
-                    if(!this.viewPrecio){
-                        if (this.isnew) {
-                            $('#addArticulo').modal('show');
-                        } else {
-                            $('#editArticulo').modal('show');
-                        }
+                    if (!this.viewPrecio) {
+                        $('#modalArticulo').modal('show');
                     }
                     $('#precioArticulo').modal('hide');
                 },
@@ -889,7 +1964,7 @@
                 },
                 buscar: function(isPaginate) {
                     this.requestSend = true;
-                    let pag = isPaginate ? this.currentPage : 1
+                    let pag = isPaginate ? this.currentPage : 1;
                     axios.get('articulo/buscar', {
                             params: {
                                 page: pag,
@@ -904,55 +1979,33 @@
                         .then(response => {
                             this.requestSend = false;
                             if (response.data == 'NO') {
-                                Swal.fire('No se encontrado resultado!', 'Para:  ' + this.txtbuscar,
-                                    'info');
+                                Swal.fire('Sin resultados', 'No se encontraron artículos para: ' + (this.txtbuscar || 'el filtro seleccionado'), 'info');
+                                this.rows = [];
+                                this.articulos = [];
                             } else {
-                                this.rows= [];
-                                this.articulos = response.data;
-                                for (let i = 0; i < response.data.length; i++) {
-                                    let badges = '';
-                                    const codArt = this.articulos[i].ARTICULOS_cod;
-                                    if (parseInt(this.articulos[i].tiene_oferta || 0) > 0) {
-                                        badges += `<span class="badge badge-danger mr-1 badge-promo" style="cursor:pointer" onclick="app.verPromo(${codArt},'oferta')" title="Ver ofertas">OFERTA</span>`;
-                                    }
-                                    if (parseInt(this.articulos[i].en_combo || 0) > 0) {
-                                        badges += `<span class="badge badge-info mr-1 badge-promo" style="cursor:pointer" onclick="app.verPromo(${codArt},'combo')" title="Ver combos">COMBO</span>`;
-                                    }
+                                this.rows = [];
+                                this.articulos = response.data || [];
+                                for (let i = 0; i < this.articulos.length; i++) {
+                                    const art = this.articulos[i];
+                                    const cantStock = parseInt(art.cantidad || 0);
+
                                     const item = {
-                                        codigo : this.articulos[i].producto_c_barra== null ? '' : this.articulos[i].producto_c_barra,
-                                        descripcion: this.articulos[i].producto_nombre,
-                                        seccion: this.articulos[i].present_descripcion,
-                                        promo: badges || '<span class="text-muted">—</span>',
-                                        precio : this.separador(this.articulos[i].pre_venta1),
-                                        stock : this.articulos[i].cantidad,
-                                        opciones : `<div class="btn-group">
-                                        <button class="btn btn-link dropdown-toggle" data-toggle="dropdown"
-                                            aria-haspopup="true" aria-expanded="false">
-                                            <span class="fa fa-bars"></span>
-                                        </button>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                            <a class='dropdown-item' href='{{env("APP_URL")}}articulo/cm/${this.articulos[i].ARTICULOS_cod}'><span
-                                                    class="fa fa-edit text-primary"></span> Editar</a>
-                                            <button class='dropdown-item' onclick="app.verPreciosCredito( '${this.articulos[i].ARTICULOS_cod}','${this.articulos[i].producto_costo_compra}')"><span
-                                                class="fa fa-edit text-primary"></span> Ver Precios Credito</button>
-                                            <button class='dropdown-item'
-                                                onclick="app.modalDelete( '${this.articulos[i].ARTICULOS_cod}', '${this.articulos[i].producto_nombre}')"><span
-                                                    class="fa fa-trash text-primary"></span> Eliminar</button>
-                                            <button class='dropdown-item'
-                                                onclick="app.showDetalle( '${this.articulos[i].ARTICULOS_cod}','${this.articulos[i].producto_nombre}' )"><span
-                                                    class="fa fa-retweet text-primary"></span> Transferir</button>
-                                            <button class="dropdown-item" onclick="app.duplicar('${this.articulos[i].ARTICULOS_cod}')">
-                                                <span class="fa fa-copy text-primary"></span> Duplicar
-                                            </button>
-                                        </div>
-                                    </div>`
-                                    }
+                                        ARTICULOS_cod: art.ARTICULOS_cod,
+                                        codigo: art.producto_c_barra || '',
+                                        descripcion: art.producto_nombre || '',
+                                        ubicacion: art.producto_ubicacion || '',
+                                        seccion: art.present_descripcion || 'General',
+                                        tiene_oferta: parseInt(art.tiene_oferta || 0) > 0,
+                                        en_combo: parseInt(art.en_combo || 0) > 0,
+                                        precio: parseFloat(art.pre_venta1) || 0,
+                                        precio_formateado: this.separador(art.pre_venta1),
+                                        stock: cantStock,
+                                        costo: art.producto_costo_compra || 0
+                                    };
                                     this.rows.push(item);
-                                    
                                 }
-                               
+                                this.currentPage = 1;
                             }
-                            //this.error=response.data;
                         })
                         .catch(e => {
                             this.requestSend = false;
@@ -976,77 +2029,85 @@
                 },
                 showMArticulo: function() {
                     this.isnew = true;
-                    this.viewPrecio= false;
+                    this.viewPrecio = false;
                     this.cleanAll();
-                    $('#addArticulo').modal('show');
-                    $('#tabadd a:first-child').tab('show')
-                    //this.getUltimo();
-                    setTimeout(function() {
-                        $('input[name="cbarraN"]').focus();
-                        
-                    }, 500); 
-
-                    //document.getElementById("cbarraN").focus()
+                    if (this.secciones.length > 0) {
+                        this.articulo.seccion = this.secciones[0].present_cod;
+                    }
+                    if (this.unidades.length > 0) {
+                        this.articulo.unidad = this.unidades[0].uni_codigo;
+                    }
+                    $('#tab-general-tab').tab('show');
+                    $('#modalArticulo').modal('show');
+                    this.$nextTick(function() {
+                        $('#tab-general-tab').tab('show');
+                        setTimeout(function() {
+                            $('#txtArticuloDescripcion').focus().select();
+                        }, 250);
+                    });
                 },
                 showEArticulo: function(id) {
-                    const a = this.articulos[this.articulos.findIndex(e => e.ARTICULOS_cod== id)];
-                    $('#editArticulo').modal('show');
+                    const a = this.articulos.find(e => e.ARTICULOS_cod == id);
+                    if (!a) return;
+                    this.cleanAll();
+                    this.isnew = false;
+                    this.viewPrecio = false;
                     this.setArticulo(a);
                     this.getStock(a.ARTICULOS_cod);
                     this.getPrecios(a.ARTICULOS_cod);
-                    this.reservarC = false;
-                    this.isnew = false;
-                    this.viewPrecio= false;
-                    $('#tabedit a:first-child').tab('show')
-                    //this.getUltimo();
-                    setTimeout(function() {
-                        $('input[name="descripcionE"]').focus();
-                        
-                    }, 500);
+                    $('#tab-general-tab').tab('show');
+                    $('#modalArticulo').modal('show');
+                    this.$nextTick(function() {
+                        $('#tab-general-tab').tab('show');
+                        setTimeout(function() {
+                            $('#txtArticuloDescripcion').focus().select();
+                        }, 250);
+                    });
                 },
-                setArticulo: function(a){
+                setArticulo: function(a) {
                     this.articulo = {
                         'codigo': a.ARTICULOS_cod,
-                        'c_barra': a.producto_c_barra,
-                        'descripcion': a.producto_nombre,
-                        'indicaciones': a.producto_indicaciones == null ? a.producto_indicaciones : a
-                            .producto_indicaciones /*.trim()*/ ,
-                        'modouso': a.producto_dosis == null ? a.producto_dosis : a
-                            .producto_dosis /*.trim()*/ ,
-                        'seccion': a.present_cod,
-                        'unidad': a.uni_codigo,
-                        'factor': a.producto_factor,
-                        'ubicacion': a.producto_ubicacion,
-                        'costo': a.producto_costo_compra,
-                        'p1': a.pre_venta1,
-                        'p2': a.pre_venta2,
-                        'p3': a.pre_venta3,
-                        'p4': a.pre_venta4,
-                        'p5': a.pre_venta5,
-                        'm1': parseInt(a.pre_margen1, 10),
-                        'm2': parseInt(a.pre_margen2, 10),
-                        'm3': parseInt(a.pre_margen3, 10),
-                        'm4': parseInt(a.pre_margen4, 10),
-                        'm5': parseInt(a.pre_margen5, 10),
+                        'c_barra': a.producto_c_barra || '',
+                        'descripcion': a.producto_nombre || '',
+                        'indicaciones': a.producto_indicaciones || '',
+                        'modouso': a.producto_dosis || '',
+                        'seccion': a.present_cod || 1,
+                        'unidad': a.uni_codigo || 1,
+                        'factor': a.producto_factor || 1,
+                        'ubicacion': a.producto_ubicacion || '',
+                        'costo': parseFloat(a.producto_costo_compra) || 0,
+                        'p1': parseFloat(a.pre_venta1) || 0,
+                        'p2': parseFloat(a.pre_venta2) || 0,
+                        'p3': parseFloat(a.pre_venta3) || 0,
+                        'p4': parseFloat(a.pre_venta4) || 0,
+                        'p5': parseFloat(a.pre_venta5) || 0,
+                        'm1': parseInt(a.pre_margen1, 10) || 0,
+                        'm2': parseInt(a.pre_margen2, 10) || 0,
+                        'm3': parseInt(a.pre_margen3, 10) || 0,
+                        'm4': parseInt(a.pre_margen4, 10) || 0,
+                        'm5': parseInt(a.pre_margen5, 10) || 0,
                         'svenc': '0',
                         existePrecios: false
-                    }
+                    };
                 },
-                duplicar: function(id){
-                    const articulo = this.articulos[this.articulos.findIndex(e => e.ARTICULOS_cod== id)];
+                duplicar: function(id) {
+                    const a = this.articulos.find(e => e.ARTICULOS_cod == id);
+                    if (!a) return;
+                    this.cleanAll();
                     this.isnew = true;
-                    this.viewPrecio= false;
-                    this.setArticulo(articulo);
+                    this.viewPrecio = false;
+                    this.setArticulo(a);
                     this.articulo.codigo = '';
                     this.articulo.c_barra = '';
-                    $('#addArticulo').modal('show');
-                    $('#tabadd a:first-child').tab('show')
-                    //this.getUltimo();
-                    setTimeout(function() {
-                        $('input[name="cbarraN"]').focus();
-                        
-                    }, 500);
-
+                    this.articulo.descripcion = (a.producto_nombre || '') + ' (Copia)';
+                    $('#tab-general-tab').tab('show');
+                    $('#modalArticulo').modal('show');
+                    this.$nextTick(function() {
+                        $('#tab-general-tab').tab('show');
+                        setTimeout(function() {
+                            $('#txtArticuloDescripcion').focus().select();
+                        }, 250);
+                    });
                 },
                 setPrecioVenta: function() {
                     if (this.articulo.costo > 0) {
@@ -1076,32 +2137,32 @@
                 },
                 addStock: function() {
                     if (this.stock.cantidad > 0) {
-                        var x = this.stocks.findIndex(x => x.lotenew == this.stock.lotenew && x.sucursal == this
-                            .stock.sucursal);
+                        var x = this.stocks.findIndex(x => (x.lotenew || 'S/N') == (this.stock.lotenew || 'S/N') && x.sucursal == this.stock.sucursal);
                         if (x == -1) {
                             this.idstock = this.stocks.length + 1;
                             this.stock.loteold = this.stock.lotenew;
                             this.stocks.push(this.getD());
-
                             this.limpiarCamposStock();
                         } else {
                             const Toast = Swal.mixin({
                                 toast: true,
                                 position: 'top-end',
                                 showConfirmButton: false,
-                                timer: 4000,
+                                timer: 3000,
                                 timerProgressBar: true
-                            })
+                            });
                             Toast.fire({
                                 icon: 'success',
-                                title: 'Existe un lote igual a esta, se actualiza cantidad...'
-                            })
-                            this.stocks[x].cantidad = parseInt(this.stocks[x].cantidad) + parseInt(this.stock
-                                .cantidad);
-                            if (this.stock.vencimiento.length > 0) {
+                                title: 'Se sumó la cantidad al lote existente en la sucursal'
+                            });
+                            this.stocks[x].cantidad = parseInt(this.stocks[x].cantidad) + parseInt(this.stock.cantidad);
+                            if (this.stock.vencimiento && this.stock.vencimiento.length > 0) {
                                 this.stocks[x].vencimiento = this.stock.vencimiento;
                             }
+                            this.limpiarCamposStock();
                         }
+                    } else {
+                        Swal.fire('Atención', 'Ingresá una cantidad de stock mayor a 0', 'warning');
                     }
                 },
                 setStock: function(s, index) {
@@ -1151,7 +2212,31 @@
                 },
                 getByIdSucursal: function(id) {
                     const suc = this.sucursales.find(sucursal => sucursal.suc_cod == id);
-                    return suc.suc_desc;
+                    return suc ? suc.suc_desc : 'Sucursal #' + id;
+                },
+                updateStockA: function() {
+                    const idx = this.stocks.findIndex(s => s.id == this.stock.id);
+                    if (idx !== -1) {
+                        this.$set(this.stocks, idx, {
+                            ...this.stocks[idx],
+                            cantidad: parseInt(this.stock.cantidad || 0),
+                            sucursal: this.stock.sucursal,
+                            lotenew: this.stock.lotenew || 'S/N',
+                            loteold: this.stock.loteold || this.stock.lotenew || 'S/N',
+                            vencimiento: this.validarVenc(this.stock.vencimiento || '')
+                        });
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Stock actualizado correctamente'
+                        });
+                    }
+                    this.limpiarCamposStock();
                 },
                 limpiarCamposStock: function() {
                     this.bandstock = 0;
@@ -1160,101 +2245,22 @@
                 cleanAll: function() {
                     this.stocks = [];
                     this.limpiarCamposStock();
-                    for (i = 0; i < 17; i++) {
+                    for (var i = 0; i < 17; i++) {
                         this.precios[i].p = 0;
                         this.precios[i].m = 0;
                         this.precios[i].c = 0;
                     }
-                    this.articulo = {...defaultArticulo};
-
-                },
-                delStockA: function(id) {
-                    const s = this.stocks.find(stock => stock.id == id);
-                    if (s.id > 20) {
-                        const cant = parseInt(s.cantidad);
-                        var index = this.articulos.findIndex(x => x.ARTICULOS_cod == this.articulo.codigo);
-                        this.articulos[index].cantidad = parseInt(this.articulos[index].cantidad) - cant;
-                        if (!this.reservarC) {
-                            axios.delete('stock/' + s.id)
-                                .then(response => {
-                                    console.log(response.data)
-                                })
-                                .catch(e => {
-                                    console.log(e.message);
-                                });
-                        }
-                    }
-                    this.stocks.pop(s);
-                    this.limpiarCamposStock();
-                },
-                editStockA: function(stock) {
-                    this.stock = stock;
-                    this.bandstock = 1;
-                },
-                modalDelete: function(id, descripcion) {
-                    Swal.fire({
-                        title: '¿Desea eliminar este registro?',
-                        text: descripcion,
-                        icon: 'question',
-                        showCancelButton: true,
-                        //confirmButtonColor: 'btn-danger',
-                        //cancelButtonColor: 'btn-secondary',
-                        cancelButtonText: 'Cancelar',
-                        confirmButtonText: 'Si, eliminar!',
-                        confirmButtonClass: 'bg-danger'
-                    }).then((result) => {
-                        if (result.value) {
-                            axios.delete('articulo/res/' + id)
-                                .then(r => {
-                                    Swal.fire(
-                                        'Eliminado!',
-                                        'El registro ha sido eliminado.',
-                                        'success'
-                                    )
-                                    location.reload();
-                                }).catch(e => {
-                                    console.log(e.message);
-                                });
-                        }
-                    })
-                },
-                showDetalle: function(id, desc) {
-                    this.articulo.descripcion = desc;
-                    this.articulo.codigo = id;
-                    this.getStock(id);
-                    $('#detalleArticulo').modal('show');
-                },
-                delArticulo: function() {
-                    if (this.reservarC) {
-                        this.reservarC = false;
-                        axios.delete('articulo/res/' + this.articulo.codigo)
-                            .then(response => {
-                                console.log(response.data)
-                            })
-                            .catch(e => {
-                                console.log(e.message);
-                            });
-                    }
-                },
-                updateStock() {
-                    if (this.stocks.length > 0) {
-                        axios.post('stock/' + this.articulo.codigo, {
-                            stock: this.stocks
-                        }).then(r => {
-                            this.cancelTrans();
-                            this.buscar();
-                        }).catch(e => {
-                            this.error = e.message;
-                        })
-                    }
+                    this.articulo = { ...defaultArticulo };
+                    this.saving = false;
+                    this.toggleMasPrecios = false;
                 },
                 saveArticulo: function() {
-                    if (this.articulo.descripcion && this.articulo.costo && this.articulo.p1) {
-                        // this.validar_Cbarra();
-                        if(this.stocks.length < 1){
-                            this.stocks.push(defaultStock);
-                        }
+                    if (this.articulo.descripcion && this.articulo.costo !== undefined && this.articulo.p1) {
+                        this.saving = true;
                         this.error = "";
+                        if (this.stocks.length < 1) {
+                            this.stocks.push({ ...defaultStock });
+                        }
                         if (this.isnew) {
                             axios.post('articulo', {
                                 articulo: this.articulo,
@@ -1262,13 +2268,25 @@
                                 precios: this.precios
                             })
                             .then(r => {
+                                this.saving = false;
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Artículo Guardado!',
+                                    text: this.articulo.descripcion,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
                                 this.cleanAll();
-                                $('#addArticulo').modal('hide');
-                                this.buscar();
+                                $('#modalArticulo').modal('hide');
+                                this.buscar(false);
                             })
                             .catch(e => {
-                                this.error = e.message;
-                            })
+                                this.saving = false;
+                                this.error = e.response && e.response.data && e.response.data.message
+                                    ? e.response.data.message
+                                    : (e.message || 'Error al guardar');
+                                Swal.fire('Error', this.error, 'error');
+                            });
                         } else {
                             axios.put('articulo/' + this.articulo.codigo, {
                                 articulo: this.articulo,
@@ -1276,17 +2294,28 @@
                                 precios: this.precios
                             })
                             .then(r => {
+                                this.saving = false;
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Artículo Actualizado!',
+                                    text: this.articulo.descripcion,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
                                 this.cleanAll();
-                                $('#editArticulo').modal('hide');
-                                this.buscar();
+                                $('#modalArticulo').modal('hide');
+                                this.buscar(false);
                             })
                             .catch(e => {
-                                this.error = e.message;
-                            })
+                                this.saving = false;
+                                this.error = e.response && e.response.data && e.response.data.message
+                                    ? e.response.data.message
+                                    : (e.message || 'Error al actualizar');
+                                Swal.fire('Error', this.error, 'error');
+                            });
                         }
-                        
                     } else {
-                        Swal.fire('Atencion', 'Hay campos obligatorios (*) vacios!', 'warning');
+                        Swal.fire('Atención', 'Completá los campos obligatorios: Descripción, Precio de Compra y Precio de Venta 1.', 'warning');
                     }
                 },
                 getArticulo: function() {
@@ -1419,21 +2448,155 @@
                             this.error = e.message;
                         })
                     }
+                },
+                showDetalle: function(id, desc) {
+                    this.articulo.descripcion = desc;
+                    this.articulo.codigo = id;
+                    this.getStock(id);
+                    $('#detalleArticulo').modal('show');
+                },
+                modalDelete: function(id, descripcion) {
+                    this.articulo.codigo = id;
+                    this.articulo.descripcion = descripcion;
+                    $('#deleteArticulo').modal('show');
+                },
+                delArticulo: function() {
+                    if (!this.articulo.codigo) return;
+                    axios.delete('articulo/res/' + this.articulo.codigo)
+                        .then(r => {
+                            $('#deleteArticulo').modal('hide');
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Artículo eliminado correctamente',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                            this.buscar(false);
+                        }).catch(e => {
+                            Swal.fire('Error', 'No se pudo eliminar: ' + (e.response && e.response.data && e.response.data.message ? e.response.data.message : e.message), 'error');
+                        });
+                },
+                editStockA: function(stock) {
+                    this.stock = { ...stock };
+                    this.bandstock = 1;
+                },
+                delStockA: function(id) {
+                    const s = this.stocks.find(stock => stock.id == id);
+                    if (!s) return;
+                    if (s.id > 20) {
+                        const cant = parseInt(s.cantidad || 0);
+                        var index = this.articulos.findIndex(x => x.ARTICULOS_cod == this.articulo.codigo);
+                        if (index !== -1) {
+                            this.articulos[index].cantidad = parseInt(this.articulos[index].cantidad) - cant;
+                        }
+                        if (!this.reservarC) {
+                            axios.delete('stock/' + s.id)
+                                .then(response => {
+                                    console.log(response.data);
+                                })
+                                .catch(e => {
+                                    console.log(e.message);
+                                });
+                        }
+                    }
+                    this.stocks = this.stocks.filter(st => st.id != id);
+                    this.limpiarCamposStock();
                 }
                 
             },
             computed: {
+                filteredRows: function() {
+                    let list = [...this.rows];
+                    if (this.txtbuscar) {
+                        const q = this.txtbuscar.toLowerCase().trim();
+                        list = list.filter(r => {
+                            const cod = (r.codigo || '').toLowerCase();
+                            const desc = (r.descripcion || '').toLowerCase();
+                            const sec = (r.seccion || '').toLowerCase();
+                            const ubi = (r.ubicacion || '').toLowerCase();
+                            return cod.includes(q) || desc.includes(q) || sec.includes(q) || ubi.includes(q);
+                        });
+                    }
+                    if (this.sortField) {
+                        const field = this.sortField;
+                        const order = this.sortOrder === 'asc' ? 1 : -1;
+                        list.sort((a, b) => {
+                            let valA = a[field];
+                            let valB = b[field];
+                            if (field === 'precio' || field === 'stock') {
+                                valA = parseFloat(valA) || 0;
+                                valB = parseFloat(valB) || 0;
+                            } else {
+                                valA = (valA || '').toString().toLowerCase();
+                                valB = (valB || '').toString().toLowerCase();
+                            }
+                            if (valA < valB) return -1 * order;
+                            if (valA > valB) return 1 * order;
+                            return 0;
+                        });
+                    }
+                    return list;
+                },
+                totalPages: function() {
+                    return Math.ceil(this.filteredRows.length / this.perPage) || 1;
+                },
+                paginatedRows: function() {
+                    const start = (this.currentPage - 1) * this.perPage;
+                    return this.filteredRows.slice(start, start + this.perPage);
+                },
+                paginationFrom: function() {
+                    if (this.filteredRows.length === 0) return 0;
+                    return (this.currentPage - 1) * this.perPage + 1;
+                },
+                paginationTo: function() {
+                    return Math.min(this.currentPage * this.perPage, this.filteredRows.length);
+                },
+                visiblePages: function() {
+                    const total = this.totalPages;
+                    const current = this.currentPage;
+                    if (total <= 7) {
+                        const pages = [];
+                        for (let i = 1; i <= total; i++) pages.push(i);
+                        return pages;
+                    }
+                    const pages = [];
+                    pages.push(1);
+                    if (current > 3) pages.push('...');
+                    const start = Math.max(2, current - 1);
+                    const end = Math.min(total - 1, current + 1);
+                    for (let i = start; i <= end; i++) pages.push(i);
+                    if (current < total - 2) pages.push('...');
+                    pages.push(total);
+                    return pages;
+                },
                 totalStock() {
                     this.cantidadStock = 0;
-                    for (i = 0; i < this.stocks.length; i++) {
-                        this.cantidadStock += parseInt(this.stocks[i].cantidad);
+                    for (var i = 0; i < this.stocks.length; i++) {
+                        this.cantidadStock += parseInt(this.stocks[i].cantidad || 0);
                     }
                     return this.cantidadStock;
+                },
+                totalConStock() {
+                    return (this.articulos || []).filter(a => parseInt(a.cantidad || 0) > 0).length;
+                },
+                totalSinStock() {
+                    return (this.articulos || []).filter(a => parseInt(a.cantidad || 0) <= 0).length;
+                },
+                totalConPromo() {
+                    return (this.articulos || []).filter(a => parseInt(a.tiene_oferta || 0) > 0 || parseInt(a.en_combo || 0) > 0).length;
                 }
             },
             mounted() {
                 this.buscar();
                 this.getSucursal();
+                this.getSeccion();
+                this.getUnidad();
+                $('#modalArticulo').on('shown.bs.modal', function() {
+                    $('#tab-general-tab').tab('show');
+                    $('#txtArticuloDescripcion').focus().select();
+                });
             }
         })
         /* $('#addArticulo').on('hidden.bs.modal',function(e){

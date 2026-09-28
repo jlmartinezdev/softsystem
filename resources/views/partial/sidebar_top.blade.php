@@ -2,19 +2,10 @@
     <!-- Left navbar links -->
     <ul class="navbar-nav">
         <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars mx-1"></i></a>
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button" aria-label="{{ request()->routeIs('venta') ? 'Más' : 'Menú' }}">
+                <i class="fas fa-bars mx-1" aria-hidden="true"></i>
+            </a>
         </li>
-        <li class="nav-item d-none d-sm-inline-block">
-            <a href="{{ route('home') }}" class="nav-link"><span class="fas fa-home" aria-hidden="true"></span> Inicio</a>
-        </li>
-        @if(request()->routeIs("venta"))
-        <li class="nav-item">
-            <a href="{{ route('infventa.imprimir') }}" class="nav-link"><span class="fa fa-print"></span> IMPRIMIR</a>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-            <a href="{{ route('infventa') }}" class="nav-link"><span class="fa fa-file-alt"></span> INFORME</a>
-        </li>
-        @endif
         
 
     </ul>
@@ -44,23 +35,7 @@
             </div>
         </li -->
 
-      
-        <!-- Notifications Dropdown Menu -->
-        <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-expanded="false" aria-label="Notificaciones">
-                <i class="far fa-bell" aria-hidden="true"></i>
-                <!-- AGREGAR AQUI NOTIFICACION -->
-            </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <span class="dropdown-item dropdown-header">No hay notificaciones</span>
-
-            </div>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-widget="fullscreen" href="#" role="button" aria-label="Pantalla completa">
-                <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
-            </a>
-        </li>
+        @unless(request()->routeIs('venta'))
         <li class="nav-item">
             <div class="theme-switch-wrapper nav-link">
                 <label class="theme-switch" for="checkbox">
@@ -70,10 +45,11 @@
                 </label>
             </div>
         </li>
+        @endunless
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
-            aria-haspopup="true" aria-expanded="false" href="#">
-                <i class="fas fa-user"></i> <b class="caret"></b>
+            aria-haspopup="true" aria-expanded="false" href="#" aria-label="Cuenta de {{ Auth::user()->nom_usuarios }}">
+                <i class="fas fa-user" aria-hidden="true"></i> <b class="caret"></b>
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <span class="dropdown-item dropdown-header">{{ Auth::user()->nom_usuarios }}</span>

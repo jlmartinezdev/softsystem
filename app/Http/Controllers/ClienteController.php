@@ -25,24 +25,25 @@ class ClienteController extends Controller
         if ($limit < 1) {
             $limit = 50;
         }
-        if ($limit > 100) {
-            $limit = 100;
+        if ($limit > 1000) {
+            $limit = 1000;
         }
 
         $query = Cliente::select(
-            'clientes_cod',
-            'cliente_ci',
-            'cliente_nombre',
-            'cliente_direccion',
-            'cliente_cel',
-            'cliente_telef',
-            'cliente_correo',
-            'CIUDAD_cod',
-            'cliente_ruc',
-            'cliente_referente_nombre',
-            'cliente_profesion',
-            'cliente_referencia_laboral'
-        );
+            'clientes.clientes_cod',
+            'clientes.cliente_ci',
+            'clientes.cliente_nombre',
+            'clientes.cliente_direccion',
+            'clientes.cliente_cel',
+            'clientes.cliente_telef',
+            'clientes.cliente_correo',
+            'clientes.CIUDAD_cod',
+            'clientes.cliente_ruc',
+            'clientes.cliente_referente_nombre',
+            'clientes.cliente_profesion',
+            'clientes.cliente_referencia_laboral',
+            'ciudad.ciudad_nombre'
+        )->leftJoin('ciudad', 'clientes.CIUDAD_cod', '=', 'ciudad.CIUDAD_cod');
 
         if ($q !== '') {
             $likeNombre = '%' . strtoupper($q) . '%';
@@ -51,14 +52,19 @@ class ClienteController extends Controller
             $query->where(function ($builder) use ($likeNombre, $likeDoc) {
                 $builder->whereRaw('UPPER(clientes.cliente_nombre) LIKE ?', [$likeNombre])
                     ->orWhere('clientes.cliente_ci', 'LIKE', $likeDoc)
-                    ->orWhere('clientes.cliente_ruc', 'LIKE', $likeDoc);
+                    ->orWhere('clientes.cliente_ruc', 'LIKE', $likeDoc)
+                    ->orWhere('clientes.cliente_cel', 'LIKE', $likeDoc);
             });
         } elseif ($request->filled('nombre') || $request->filled('documento')) {
             $query->nombre(strtoupper((string) $request->nombre))
                 ->documento($request->documento);
         }
 
-        return $query->orderBy('cliente_nombre', 'ASC')
+        if ($request->filled('ciudad') && (int)$request->ciudad > 0) {
+            $query->where('clientes.CIUDAD_cod', (int)$request->ciudad);
+        }
+
+        return $query->orderBy('clientes.cliente_nombre', 'ASC')
             ->limit($limit)
             ->get();
     }

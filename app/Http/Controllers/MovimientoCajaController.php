@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Apertura;
+use App\Empresa;
 use App\MovimientoCaja;
 use DB;
 use Validator;
@@ -17,7 +18,8 @@ class MovimientoCajaController extends Controller
 
     public function index()
     {
-        return view('movimiento');
+        $empresa = Empresa::first();
+        return view('movimiento', compact('empresa'));
     }
 
     public function getAll($nro_operacion)

@@ -1,16 +1,57 @@
 <div class="modal fade" id="precioArticulo">
 	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-		        <h5 class="modal-title">Precios Credito</h5>
+		<div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+			<style>
+    body.dark-mode #precioArticulo .modal-content {
+        background-color: #1f2937 !important;
+        color: #f3f4f6 !important;
+        border: 1px solid #374151 !important;
+    }
+    body.dark-mode #precioArticulo .modal-body,
+    body.dark-mode #precioArticulo .modal-footer {
+        background-color: #1f2937 !important;
+        border-color: #374151 !important;
+    }
+    body.dark-mode #precioArticulo .nav-pills {
+        background-color: #111827 !important;
+        border-radius: 8px;
+        padding: 4px;
+    }
+    body.dark-mode #precioArticulo .nav-link {
+        color: #9ca3af !important;
+    }
+    body.dark-mode #precioArticulo .nav-link.active {
+        background-color: #059669 !important;
+        color: #ffffff !important;
+    }
+    body.dark-mode #precioArticulo .form-control {
+        background-color: #111827 !important;
+        color: #f3f4f6 !important;
+        border-color: #374151 !important;
+    }
+
+        #precioArticulo .nav-pills .nav-link.active { background-color: var(--dash-primary, #0a4d36) !important; color: #ffffff !important; }
+        #precioArticulo .nav-pills .nav-link { color: var(--dash-text-muted, #64748b); border-radius: 8px; }
+    </style>
+    <div class="modal-header text-white" style="background: linear-gradient(135deg, #0a4d36 0%, #073827 100%);">
+		        <div class="d-flex align-items-center">
+                    <i class="fa fa-credit-card fa-lg mr-2"></i>
+                    <div>
+                        <h5 class="modal-title font-weight-bold mb-0">Precios a Crédito y Cuotas</h5>
+                        <small class="text-white-50" v-if="articulo.costo">Base Costo: Gs. @{{ separador(articulo.costo) }}</small>
+                    </div>
+                </div>
+		        <button type="button" class="close text-white" @click="cerrarPrecios" aria-label="Close" style="opacity: 0.9; text-shadow: none;">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
 		      </div>
-			<div class="modal-body">
+			<div class="modal-body p-3">
 
                 <nav>
-					<div class="nav nav-tabs" role="tablist">
-						<a class="nav-item nav-link active" data-toggle="tab" role="tab" href="#group1" aria-controls="group1" aria-select="true">PRECIO 2 - 7</a>
-						<a class="nav-item nav-link" data-toggle="tab" role="tab" href="#group2" aria-controls="group2" aria-select="false">PRECIO 8 - 13</a>
-						<a class="nav-item nav-link" data-toggle="tab" role="tab" href="#group3" aria-controls="group3" aria-select="false">PRECIO 14 - 18</a>
+					<div class="nav nav-pills nav-fill mb-3" role="tablist">
+						<a class="nav-item nav-link active font-weight-bold" data-toggle="pill" href="#group1" aria-controls="group1" aria-selected="true">PRECIOS 2 - 7</a>
+						<a class="nav-item nav-link font-weight-bold" data-toggle="pill" href="#group2" aria-controls="group2" aria-selected="false">PRECIOS 8 - 13</a>
+						<a class="nav-item nav-link font-weight-bold" data-toggle="pill" href="#group3" aria-controls="group3" aria-selected="false">PRECIOS 14 - 18</a>
 					</div>
 				</nav>
                 <div class="tab-content">
@@ -304,10 +345,25 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <label><input type="checkbox" v-model="chprecio" name="precio"> Redondear Precio</label>
-                <label><input type="checkbox" v-model="chcuota" name="cuota"> Redondear Cuota</label>
-                <button @click="cerrarPrecios" class="btn btn-success"><span class="fa fa-save"></span> Aceptar</button>
+            <div class="modal-footer bg-light d-flex justify-content-between align-items-center py-2">
+                <div class="d-flex align-items-center">
+                    <div class="custom-control custom-checkbox mr-3">
+                        <input type="checkbox" class="custom-control-input" id="checkRedondearPrecio" v-model="chprecio" name="precio">
+                        <label class="custom-control-label font-weight-semibold text-secondary" for="checkRedondearPrecio">Redondear Precios</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="checkRedondearCuota" v-model="chcuota" name="cuota">
+                        <label class="custom-control-label font-weight-semibold text-secondary" for="checkRedondearCuota">Redondear Cuotas</label>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" @click="cerrarPrecios" class="btn btn-secondary px-3 mr-1">
+                        <i class="fa fa-times mr-1"></i> Cerrar
+                    </button>
+                    <button type="button" @click="cerrarPrecios" class="btn btn-success px-3 font-weight-bold">
+                        <i class="fa fa-check mr-1"></i> Aplicar y Continuar
+                    </button>
+                </div>
             </div>
         </div>
     </div>

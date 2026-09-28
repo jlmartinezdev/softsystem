@@ -16,6 +16,7 @@ use Auth;
 use PDF;
 use App\Support\ArticuloLibre;
 use App\Support\ArticuloCombo;
+use App\Services\SifenService;
 class VentaController extends Controller
 {
     /**
@@ -29,43 +30,159 @@ class VentaController extends Controller
     }
     public function index()
     {
-       // return view('venta.generar');
         $apertura=Apertura::join('sucursales','apert_cierres_caja.suc_cod','=','sucursales.suc_cod')->join('caja','apert_cierres_caja.caja_cod','=','caja.caja_cod')
         ->where('apert_cierres_caja.apert_fecha','=',date('Y-m-d'))->get();
         $articuloLibreId = ArticuloLibre::id();
-        return view('venta',compact('apertura', 'articuloLibreId'));
+        $sifenService = app(SifenService::class);
+        $sifenConfig = $sifenService->config();
+        $sifenFaltantes = $sifenService->validarConfig();
+        $sifenActivo = (bool) $sifenConfig->activo;
+        $sifenListo = $sifenActivo && count($sifenFaltantes) === 0;
+        $sifenAmbiente = $sifenConfig->ambiente === 'prod' ? 'prod' : 'test';
+        $sifenFalta = $sifenFaltantes[0] ?? null;
+        $esAdministrador = Auth::user()->esAdministrador();
+        $empresa = Empresa::first();
+        $nombreLocal = trim((string) ($empresa->emp_nombre ?? ''));
+        $localIncompleto = $nombreLocal === '' || mb_strtoupper($nombreLocal, 'UTF-8') === 'EMPRESA';
+
+        return view('venta', compact(
+            'apertura',
+            'articuloLibreId',
+            'sifenActivo',
+            'sifenListo',
+            'sifenAmbiente',
+            'sifenFalta',
+            'esAdministrador',
+            'nombreLocal',
+            'localIncompleto'
+        ));
     }
     public function indexanular(){
-        return view('anularventa');
+        $ultimasVentas = Venta::join('clientes as c', 'ventas.clientes_cod', '=', 'c.clientes_cod')
+            ->leftJoin('sucursales as s', 'ventas.suc_cod', '=', 's.suc_cod')
+            ->select(
+                'ventas.nro_fact_ventas',
+                'ventas.venta_total',
+                DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y %H:%i") AS fecha'),
+                'c.cliente_nombre',
+                'c.cliente_ruc',
+                'ventas.documento',
+                'ventas.tipo_factura',
+                's.suc_desc'
+            )
+            ->orderBy('ventas.nro_fact_ventas', 'desc')
+            ->limit(8)
+            ->get();
+
+        return view('anularventa', compact('ultimasVentas'));
     }
     public function indexInf(){
         $sucursales= Sucursal::all();
         return view('informes.venta',compact('sucursales'));
     }
     public function getVentaByFecha(Request $request){
-        return Venta::select('ventas.nro_fact_ventas','ventas.venta_descuento','ventas.documento','ventas.venta_total',DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y %H:%i") AS fecha'),'c.cliente_nombre', 'c.cliente_direccion', 'c.cliente_ruc','s.suc_desc','ventas.tipo_factura')
+        return Venta::select(
+            'ventas.nro_fact_ventas',
+            'ventas.venta_descuento',
+            'ventas.documento',
+            'ventas.venta_total',
+            DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y %H:%i") AS fecha'),
+            'c.cliente_nombre',
+            'c.cliente_direccion',
+            'c.cliente_ruc',
+            's.suc_desc',
+            'ventas.tipo_factura',
+            'u.nom_usuarios as vendedor'
+        )
         ->join('clientes as c','ventas.clientes_cod','=','c.clientes_cod')
         ->join('sucursales as s','ventas.suc_cod','=','s.suc_cod')
+        ->leftJoin('usuarios as u','ventas.cod_usuarios','=','u.cod_usuarios')
         ->filtrofecha($request->alld,$request->allh)
         ->filtrosuc($request->alls)
         ->orderBy('ventas.nro_fact_ventas','desc')
         ->get();
-
     }
+
     public function getVentaByCliente(Request $request){
-        return Venta::select('ventas.nro_fact_ventas','ventas.documento','ventas.venta_descuento','ventas.venta_total',DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y %H:%i") AS fecha'),'c.cliente_nombre', 'c.cliente_direccion','c.cliente_cel', 'c.cliente_ruc','s.suc_desc','ventas.tipo_factura')
+        return Venta::select(
+            'ventas.nro_fact_ventas',
+            'ventas.documento',
+            'ventas.venta_descuento',
+            'ventas.venta_total',
+            DB::raw('DATE_FORMAT(ventas.venta_fecha,"%d/%m/%Y %H:%i") AS fecha'),
+            'c.cliente_nombre',
+            'c.cliente_direccion',
+            'c.cliente_cel',
+            'c.cliente_ruc',
+            's.suc_desc',
+            'ventas.tipo_factura',
+            'u.nom_usuarios as vendedor'
+        )
         ->join('clientes as c','ventas.clientes_cod','=','c.clientes_cod')
         ->join('sucursales as s','ventas.suc_cod','=','s.suc_cod')
+        ->leftJoin('usuarios as u','ventas.cod_usuarios','=','u.cod_usuarios')
         ->filtrocliente($request->cliente,$request->isNumber)
         ->filtrosuc($request->alls)
         ->orderBy('ventas.nro_fact_ventas','desc')
         ->limit(100)
         ->get();
     }
+
     public function getVentaArticulo(Request $request){
-        $suc= $request->arts!='0' ? 'v.suc_cod='.$request->arts.' AND ' :'';
-         return DB::select("SELECT SUM(dv.venta_cantidad) AS vendida, dv.ARTICULOS_cod, a.producto_c_barra, a.producto_nombre, s.cantidad, p.present_descripcion FROM detalle_venta dv INNER JOIN ventas v ON dv.nro_fact_ventas=v.nro_fact_ventas INNER JOIN articulos a ON dv.ARTICULOS_cod=a.ARTICULOS_cod INNER JOIN stock s ON a.ARTICULOS_cod= s.ARTICULOS_cod INNER JOIN presentacion p ON a.present_cod=p.present_cod WHERE ".$suc." DATE(v.venta_fecha) BETWEEN '".$request->artd."' AND '".$request->arth."' GROUP BY dv.ARTICULOS_cod ORDER BY vendida DESC");
+        $desde = $request->artd ?: date('Y-m-01');
+        $hasta = $request->arth ?: date('Y-m-d');
+        $sucursal = ($request->arts && $request->arts != '0') ? $request->arts : null;
+
+        $query = DB::table('detalle_venta as dv')
+            ->join('ventas as v', 'dv.nro_fact_ventas', '=', 'v.nro_fact_ventas')
+            ->join('articulos as a', 'dv.ARTICULOS_cod', '=', 'a.ARTICULOS_cod')
+            ->leftJoin('presentacion as p', 'a.present_cod', '=', 'p.present_cod')
+            ->select(
+                'dv.ARTICULOS_cod',
+                'a.producto_c_barra',
+                'a.producto_nombre',
+                'p.present_descripcion',
+                DB::raw('SUM(dv.venta_cantidad) AS vendida'),
+                DB::raw('SUM(dv.venta_cantidad * dv.venta_precio) AS monto_total')
+            )
+            ->whereBetween(DB::raw('DATE(v.venta_fecha)'), [$desde, $hasta]);
+
+        if ($sucursal) {
+            $query->where('v.suc_cod', $sucursal);
+        }
+
+        $articulos = $query->groupBy(
+            'dv.ARTICULOS_cod',
+            'a.producto_c_barra',
+            'a.producto_nombre',
+            'p.present_descripcion'
+        )->orderByDesc('vendida')->get();
+
+        $artCodigos = $articulos->pluck('ARTICULOS_cod')->all();
+        $stockMap = [];
+        if (!empty($artCodigos)) {
+            $stockQuery = DB::table('stock')->whereIn('ARTICULOS_cod', $artCodigos);
+            if ($sucursal) {
+                $stockQuery->where('suc_cod', $sucursal);
+            }
+            $stockRows = $stockQuery->select('ARTICULOS_cod', DB::raw('SUM(cantidad) as total_stock'))
+                ->groupBy('ARTICULOS_cod')
+                ->get();
+
+            foreach ($stockRows as $sr) {
+                $stockMap[$sr->ARTICULOS_cod] = (float) $sr->total_stock;
+            }
+        }
+
+        foreach ($articulos as $art) {
+            $art->cantidad = $stockMap[$art->ARTICULOS_cod] ?? 0;
+            $art->vendida = (float) $art->vendida;
+            $art->monto_total = (float) ($art->monto_total ?? 0);
+        }
+
+        return $articulos;
     }
+
     public function getDetalle($nro_venta){
         return DB::select(
             'SELECT dv.*,
@@ -79,17 +196,38 @@ class VentaController extends Controller
             [$nro_venta]
         );
     }
-    public function getCabecera($nro_venta){
-        $cabecera= DB::select('SELECT v.*, c.cliente_ci,c.cliente_nombre FROM ventas v INNER JOIN clientes c ON v.CLIENTES_cod= c.CLIENTES_cod WHERE v.nro_fact_ventas= ?',[$nro_venta]);
-        return ["venta"=> $cabecera, "detalle" => $this->getDetalle($nro_venta)];
-    }
-    public function getVentaChart(Request $request){
-        
-       return Venta::select(DB::raw("SUM(ventas.venta_total) AS total"),DB::raw("DATE_FORMAT(ventas.venta_fecha,'%Y-%m-%d') AS fecha"))
-        ->filtrochart($request->chart['mes'],$request->chart['anho'])
-        ->groupBy(DB::raw("DATE(ventas.venta_fecha)"))
-        ->get();
 
+    public function getCabecera($nro_venta){
+        $cabecera = DB::select(
+            'SELECT v.*, c.cliente_ci, c.cliente_nombre, c.cliente_ruc, c.cliente_cel, c.cliente_direccion, s.suc_desc, u.nom_usuarios as vendedor
+             FROM ventas v 
+             INNER JOIN clientes c ON v.CLIENTES_cod = c.CLIENTES_cod 
+             LEFT JOIN sucursales s ON v.suc_cod = s.suc_cod
+             LEFT JOIN usuarios u ON v.cod_usuarios = u.cod_usuarios
+             WHERE v.nro_fact_ventas = ?',
+            [$nro_venta]
+        );
+        return ["venta" => $cabecera, "detalle" => $this->getDetalle($nro_venta)];
+    }
+
+    public function getVentaChart(Request $request){
+        $anho = !empty($request->chart['anho']) ? $request->chart['anho'] : date('Y');
+        $mes = !empty($request->chart['mes']) ? $request->chart['mes'] : '1';
+        $sucursal = !empty($request->chart['sucursal']) ? $request->chart['sucursal'] : 0;
+
+        $query = Venta::select(
+            DB::raw("SUM(ventas.venta_total) AS total"),
+            DB::raw("DATE_FORMAT(ventas.venta_fecha,'%Y-%m-%d') AS fecha"),
+            DB::raw("COUNT(ventas.nro_fact_ventas) AS cantidad")
+        )->filtrochart($mes, $anho);
+
+        if ($sucursal != '0' && !empty($sucursal)) {
+            $query->where('ventas.suc_cod', $sucursal);
+        }
+
+        return $query->groupBy(DB::raw("DATE(ventas.venta_fecha)"))
+            ->orderBy(DB::raw("DATE(ventas.venta_fecha)"))
+            ->get();
     }
 
 
@@ -109,6 +247,13 @@ class VentaController extends Controller
             ], 422);
         }
 
+        $bloqueoFactura = $this->bloqueoFacturaSifen($cab);
+        if ($bloqueoFactura) {
+            return response()->json([
+                'message' => $bloqueoFactura,
+            ], 422);
+        }
+
         $venta = new Venta();
         $venta->clientes_cod= $cab['clienteId'] ?? 1;
         $venta->cod_usuarios= Auth::user()->cod_usuarios;
@@ -116,7 +261,7 @@ class VentaController extends Controller
         $venta->venta_total= $cab['total'] ?? 0;
         $venta->venta_fecha = ($cab['fecha'] ?? date('Y-m-d')).date(' H:i');
         $venta->tipo_factura = $cab['condicionventa'] ?? 1;
-        $venta->cant_cuotas =0;
+        $venta->cant_cuotas = (!empty($request->cuotas) && is_array($request->cuotas)) ? count($request->cuotas) : 0;
         $venta->intervalo_venc='2030-01-01'; 
         $venta->venta_estado='2'; 
         $venta->venta_descuento=$cab['descuento'] ?? 0; 
@@ -193,26 +338,80 @@ class VentaController extends Controller
         
     }
     public function destroy(Request $request){
-        foreach ($request->articulos as $articulo) {
-            if (ArticuloLibre::esLibre($articulo['id'])) {
-                continue;
-            }
-            try {
-                $stock = Stock::where('ARTICULOS_cod', $articulo['id'])->first();
-                if ($stock) {
-                    $stock->increment('cantidad', $articulo['cantidad']);
+        $venta = Venta::find($request->id);
+        if (!$venta) {
+            return response()->json(['ok' => false, 'message' => 'Venta no encontrada.'], 404);
+        }
+        $sucursalId = $venta->suc_cod;
+
+        // Reponer stock leyendo directamente de detalle_venta
+        $detalles = DB::table('detalle_venta')->where('nro_fact_ventas', $request->id)->get();
+        if ($detalles->count() > 0) {
+            foreach ($detalles as $det) {
+                if (ArticuloLibre::esLibre($det->ARTICULOS_cod) || ArticuloCombo::esCombo($det->ARTICULOS_cod)) {
+                    continue;
                 }
-            } catch (\Throwable $error) {
-                // ignore stock restore errors
+                try {
+                    $query = Stock::where('ARTICULOS_cod', $det->ARTICULOS_cod);
+                    if ($sucursalId) {
+                        $stock = (clone $query)->where('suc_cod', $sucursalId)->first();
+                        if (!$stock) {
+                            $stock = $query->first();
+                        }
+                    } else {
+                        $stock = $query->first();
+                    }
+                    if ($stock) {
+                        $stock->increment('cantidad', (float)$det->venta_cantidad);
+                    }
+                } catch (\Throwable $error) {
+                    // ignore stock restore errors
+                }
+            }
+        } elseif ($request->has('articulos') && is_array($request->articulos)) {
+            foreach ($request->articulos as $articulo) {
+                if (ArticuloLibre::esLibre($articulo['id']) || ArticuloCombo::esCombo($articulo['id'])) {
+                    continue;
+                }
+                try {
+                    $query = Stock::where('ARTICULOS_cod', $articulo['id']);
+                    if ($sucursalId) {
+                        $stock = (clone $query)->where('suc_cod', $sucursalId)->first();
+                        if (!$stock) {
+                            $stock = $query->first();
+                        }
+                    } else {
+                        $stock = $query->first();
+                    }
+                    if ($stock) {
+                        $stock->increment('cantidad', $articulo['cantidad']);
+                    }
+                } catch (\Throwable $error) {
+                    // ignore stock restore errors
+                }
             }
         }
-        DB::table('cobranza_detalle')->where('nro_fact_ventas',$request->id)->delete();
-        DB::table('cobranzas as c')->join('cobranza_detalle as cd','c.cc_numero','=','cd.cc_numero')
-        ->where('cd.nro_fact_ventas',$request->id)->delete();
-        DB::table('ctas_cobrar')->where('nro_fact_ventas',$request->id)->delete();
-        DB::table('detalle_venta')->where('nro_fact_ventas',$request->id)->delete();
-        DB::table('ventas')->where('nro_fact_ventas',$request->id)->delete();
-        return "ok";
+
+        // Anular documento electrónico SIFEN si existiese
+        try {
+            $sifen = app(SifenService::class);
+            if ($sifen->isActivo()) {
+                $sifen->anularDocumento($request->id);
+            }
+        } catch (\Throwable $e) {
+            // Ignorar si no existe documento SIFEN o ya fue anulado
+        }
+
+        // Limpiar movimientos de caja asociados a esta venta
+        DB::table('movimiento_caja')->where('nro_fact_ventas', $request->id)->delete();
+        DB::table('cobranza_detalle')->where('nro_fact_ventas', $request->id)->delete();
+        DB::table('cobranzas as c')->join('cobranza_detalle as cd', 'c.cc_numero', '=', 'cd.cc_numero')
+            ->where('cd.nro_fact_ventas', $request->id)->delete();
+        DB::table('ctas_cobrar')->where('nro_fact_ventas', $request->id)->delete();
+        DB::table('detalle_venta')->where('nro_fact_ventas', $request->id)->delete();
+        DB::table('ventas')->where('nro_fact_ventas', $request->id)->delete();
+
+        return response()->json(['ok' => true, 'message' => 'Venta anulada correctamente. El stock ha sido repuesto.']);
     }
 
     private function storeCtaCobrar($idventa, $cuota){
@@ -273,8 +472,47 @@ class VentaController extends Controller
         return [$n1,$n2,$recibo];
     }
     private function formatFecha($fecha){
-        $array_fecha= explode("-",$fecha);
-        return $array_fecha[2]."-".$array_fecha[1]."-".$array_fecha[0];
+        if (empty($fecha)) {
+            return date('Y-m-d');
+        }
+        $fecha = str_replace('/', '-', trim((string) $fecha));
+        $array_fecha = explode("-", $fecha);
+        if (count($array_fecha) === 3) {
+            if (strlen($array_fecha[0]) === 4) {
+                return $fecha; // Already YYYY-MM-DD
+            }
+            return $array_fecha[2] . "-" . $array_fecha[1] . "-" . $array_fecha[0];
+        }
+        return date('Y-m-d');
+    }
+
+    private function bloqueoFacturaSifen(array $cab)
+    {
+        $documento = $cab['documento'] ?? 'Ticket';
+        if ($documento !== 'Factura') {
+            return null;
+        }
+
+        $sifen = app(SifenService::class);
+        $config = $sifen->config();
+        $faltantes = $sifen->validarConfig();
+        if (!$config->activo) {
+            return 'Factura electrónica apagada. Activá SIFEN para emitir factura.';
+        }
+        if (count($faltantes)) {
+            return 'Falta '.$faltantes[0].' para facturar.';
+        }
+
+        $clienteId = (int) ($cab['clienteId'] ?? 1);
+        $cliente = DB::table('clientes')->where('CLIENTES_cod', $clienteId)->first();
+        $nombre = $cliente ? (string) $cliente->cliente_nombre : '';
+        $ruc = $cliente ? trim((string) ($cliente->cliente_ruc ?? '')) : '';
+        $esOcasional = $clienteId === 1 || stripos($nombre, 'ocasional') !== false;
+        if ($esOcasional || $ruc === '' || $ruc === '0') {
+            return 'Elegí un cliente con RUC para factura electrónica.';
+        }
+
+        return null;
     }
     private function storeMovimiento($idSucursal,$ope, $datos ){
         $movimiento= new MovimientoCaja();

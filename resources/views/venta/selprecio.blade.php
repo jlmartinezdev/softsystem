@@ -1,69 +1,129 @@
-<div class="modal fade" id="selPrecio">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-		        <h5 class="modal-title">Seleccionar Precio</h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		          <span aria-hidden="true">&times;</span>
-		        </button>
-		      </div>
-			<div class="modal-body">
-                <span class="text-muted d-block">Articulo</span>
-                <span class="d-block"><strong>@{{preciosContado.articulo}}</strong></span>
-                <hr>
-                <nav>
-					<div class="nav nav-tabs" role="tablist">
-						<a class="nav-item nav-link active" data-toggle="tab" role="tab" href="#precio1" aria-controls="frmdescrip" aria-select="true"><strong>Precio Contado</strong></a>
-						<a class="nav-item nav-link" data-toggle="tab" role="tab" href="#precio2" aria-controls="frmstock" aria-select="false"><strong>Precio Credito</strong></a>
+<div class="modal fade" id="selPrecio" tabindex="-1" role="dialog" aria-labelledby="selPrecioLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content shadow-lg border-0 modal-moderno">
+			<div class="modal-header border-0 pb-0">
+				<div class="d-flex align-items-center">
+					<div class="modal-header-icon mr-2">
+						<i class="fas fa-tags text-success"></i>
 					</div>
-				</nav> 
-                <div class="tab-content">
-					<div class="tab-pane fade show active p-2" id="precio1" role="tabpanel">
-                        <template v-for="n in 5">
-                            <div class="row mb-2">
-                                <div class="col-4">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" :id="'p'+n" :value="'CO'+n" v-model="tmpIndexPrecio.iPrecio" name="radioPrecio"> 
-                                            <label class="form-check-label" :for="'p'+n"> Precio @{{n}}:</label>
-                                        </div>
-                                </div>
-                                <div class="col-3">
-                                    <input type="text" class="form-control form-control-sm" :value="preciosContado['m'+n]" disabled>
-                                </div>
-                                <div class="col-5">
-                                    <input type="text" class="form-control form-control-sm" :value="format(preciosContado['p'+n])" disabled>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                    <div class="tab-pane fade" id="precio2" role="tabpanel">
-                        <table class="mt-1 table table-sm table-striped table-hover">
-                            <tr>
-                                <th>N Cuota</th>
-                                <th>Precio</th>
-                                <th>Cuota</th>
-                            </tr>
-                            <template v-for="(p,index) in preciosCredito">
-                                <tr>
-                                    <td>
-                                        <div class="custom-control custom-radio">
-                                            <input class="custom-control-input" type="radio" :value="'CR'+index" :id="'customRadio'+index" v-model="tmpIndexPrecio.iPrecio" name="radioPrecio">
-                                            <label :for="'customRadio'+index" class="custom-control-label">@{{index+2}}</label>
-                                        </div>
-                                    </td>
-                                    <td>@{{format(p.p)}}</td>
-                                    <td>@{{format(p.c)}}</td>
-                                </tr>
-                            </template>
-                           
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <span class="text-primary align-left">PRECIO SELECCIONADO: </span>
-                <button class="btn btn-primary" @click="setPrecio"><span class="fa fa-check"></span> Aceptar</button>
-            </div>
-        </div>
-    </div>
+					<div>
+						<h5 class="modal-title font-weight-bold mb-0" id="selPrecioLabel">Elegí el Precio de Venta</h5>
+						<span class="small text-muted text-truncate d-block" style="max-width: 320px;">
+							@{{ preciosContado.articulo }}
+						</span>
+					</div>
+				</div>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body pt-3">
+				<!-- Selector de Tipo: Contado o Crédito -->
+				<div class="pago-condicion-switch mb-3" role="group" aria-label="Contado o crédito">
+					<button type="button" class="pago-chip"
+						:class="{ selected: precioVista === 'contado' }"
+						@click="precioVista = 'contado'">
+						<i class="fas fa-coins mr-1"></i> Contado
+					</button>
+					<button type="button" class="pago-chip"
+						:class="{ selected: precioVista === 'credito' }"
+						@click="precioVista = 'credito'">
+						<i class="fas fa-calendar-alt mr-1"></i> Crédito
+					</button>
+				</div>
+
+				<!-- Opciones Contado -->
+				<div v-show="precioVista === 'contado'">
+					<template v-if="articulo && articulo.es_combo">
+						<div class="precio-listas-grid">
+							<button type="button" class="precio-card-btn"
+								:class="{ on: tmpIndexPrecio.iPrecio === 'CO1' }"
+								@click="elegirListaContado(1)">
+								<div class="precio-card-header">
+									<span class="precio-card-name">Precio Contado</span>
+									<i class="fas fa-check-circle check-active" v-if="tmpIndexPrecio.iPrecio === 'CO1'"></i>
+								</div>
+								<strong class="precio-card-monto font-cairo">
+									Gs. @{{ format(articulo.precio_contado || articulo.p1 || articulo.precio) }}
+								</strong>
+								<span class="precio-card-note">Combo al contado</span>
+							</button>
+						</div>
+					</template>
+					<template v-else>
+						<div class="precio-listas-grid">
+							<button type="button" class="precio-card-btn"
+								v-for="n in listasContado"
+								:key="'CO'+n"
+								:class="{ on: tmpIndexPrecio.iPrecio === 'CO'+n }"
+								@click="elegirListaContado(n)">
+								<div class="precio-card-header">
+									<span class="precio-card-name">Precio @{{ n }}</span>
+									<i class="fas fa-check-circle check-active" v-if="tmpIndexPrecio.iPrecio === 'CO'+n"></i>
+								</div>
+								<strong class="precio-card-monto font-cairo">
+									Gs. @{{ format(preciosContado['p'+n]) }}
+								</strong>
+								<span class="precio-card-note">
+									@{{ n === 1 ? 'Minorista / Estándar' : (n === 2 ? 'Mayorista' : 'Especial') }}
+								</span>
+							</button>
+						</div>
+					</template>
+				</div>
+
+				<!-- Opciones Crédito -->
+				<div v-show="precioVista === 'credito'">
+					<template v-if="articulo && articulo.es_combo">
+						<div class="precio-listas-grid" v-if="Number(articulo.precio_credito) > 0">
+							<button type="button" class="precio-card-btn"
+								:class="{ on: tmpIndexPrecio.iPrecio === 'CR0' }"
+								@click="elegirListaCredito(0)">
+								<div class="precio-card-header">
+									<span class="precio-card-name">Precio Crédito</span>
+									<i class="fas fa-check-circle check-active" v-if="tmpIndexPrecio.iPrecio === 'CR0'"></i>
+								</div>
+								<strong class="precio-card-monto font-cairo">
+									Gs. @{{ format(articulo.precio_credito) }}
+								</strong>
+								<span class="precio-card-note">Combo a crédito</span>
+							</button>
+						</div>
+						<div class="p-3 text-center text-muted border rounded" v-else>
+							<i class="fas fa-info-circle mr-1"></i> Este combo no tiene configurado precio a crédito.
+						</div>
+					</template>
+					<template v-else>
+						<div class="precio-listas-grid" v-if="preciosCreditoConMonto.length">
+							<button type="button" class="precio-card-btn"
+								v-for="(p, index) in preciosCreditoConMonto"
+								:key="'CR'+p.index"
+								:class="{ on: tmpIndexPrecio.iPrecio === 'CR'+p.index }"
+								@click="elegirListaCredito(p.index)">
+								<div class="precio-card-header">
+									<span class="precio-card-name">Plan @{{ p.index + 2 }} cuotas</span>
+									<i class="fas fa-check-circle check-active" v-if="tmpIndexPrecio.iPrecio === 'CR'+p.index"></i>
+								</div>
+								<strong class="precio-card-monto font-cairo">
+									Gs. @{{ format(p.p) }}
+								</strong>
+								<span class="precio-card-note">Cuota: Gs. @{{ format(p.c) }}</span>
+							</button>
+						</div>
+						<div class="p-3 text-center text-muted border rounded" v-else>
+							<i class="fas fa-info-circle mr-1"></i> Este artículo no tiene precio a crédito configurado.
+						</div>
+					</template>
+					<p class="small text-muted mt-2 mb-0 font-italic">
+						<i class="fas fa-info-circle mr-1"></i> Al seleccionar esta opción, la venta se configurará en condición crédito.
+					</p>
+				</div>
+			</div>
+			<div class="modal-footer bg-light-panel border-top py-2">
+				<button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">
+					<i class="fas fa-times mr-1"></i> Cerrar
+				</button>
+			</div>
+		</div>
+	</div>
 </div>

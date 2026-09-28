@@ -8,7 +8,8 @@
     <input
       type="text"
       v-model="searchQuery"
-      placeholder="Buscar..."
+      :placeholder="placeholder"
+      :aria-label="placeholder"
       class="autocomplete-input"
       @keydown.down="selectNextItem"
       @keydown.up="selectPrevItem"
@@ -36,12 +37,14 @@
               :class="{ agotado: Number(result.cantidad) <= 0 }"
             >{{ Math.floor(Number(result.cantidad) || 0) }}
               {{ Number(result.cantidad) == 1 ? 'disponible' : 'disponibles' }}</span>
-            <span class="precio">Gs {{ new Intl.NumberFormat("de-DE").format(result.pre_venta1) }}</span>
+            <span class="precio">Gs. {{ new Intl.NumberFormat("de-DE").format(result.pre_venta1) }}</span>
           </span>
         </li>
         <li v-if="noresult" class="autocomplete-result">
-          <span class="left"> No hay resultado para <i>{{ searchQuery }}</i> </span>
-          <span class="right"><a :href="routeArticulo" class="btn btn-link btn-sm"><i class="fa fa-plus"></i>  Crear Articulo</a></span>
+          <span class="left">Ese código no está. Probá Catálogo o cargá Libre.</span>
+          <span class="right" v-if="routeArticulo">
+            <a :href="routeArticulo" class="btn btn-link btn-sm"><i class="fa fa-plus"></i> Creá un artículo</a>
+          </span>
         </li>
       </ul>
     </div>
@@ -67,7 +70,14 @@ export default {
       flagBalance: "20"
     };
   },
-  props: ["url", "idsucursal", "validarLote", "routeArticulo", "isReadyBalance"],
+  props: {
+    url: { type: String, required: true },
+    idsucursal: { default: null },
+    validarLote: { default: "false" },
+    routeArticulo: { default: "" },
+    isReadyBalance: { default: "false" },
+    placeholder: { type: String, default: "Buscá por nombre o código" }
+  },
   watch: {
     searchQuery: function () {
       if (this.searchQuery === "") {
@@ -139,7 +149,7 @@ export default {
             if (response.data == "no") {
               Toast.fire({
                 icon: "error",
-                title: "Codigo ingresado no existe en la Base de Datos...",
+                title: "Ese código no está. Probá Catálogo o cargá Libre.",
               });
               return;
             }
@@ -153,7 +163,7 @@ export default {
             } else {
               Toast.fire({
                 icon: "error",
-                title: "Codigo ingresado no existe en la Base de Datos...",
+                title: "Ese código no está. Probá Catálogo o cargá Libre.",
               });
             }
           })
@@ -200,13 +210,13 @@ export default {
         values[i] = lotes[i].lote_nro;
       }
       const { value: lote } = await Swal.fire({
-        title: "Seleccione Lote",
+        title: "Elegí el lote",
         input: "select",
         inputOptions: values,
-        inputPlaceholder: "Seleccione lote",
+        inputPlaceholder: "Elegí un lote",
         showCancelButton: true,
-        confirmButtonText: "Aceptar",
-        cancelButtonText: "Cancelar",
+        confirmButtonText: "Listo",
+        cancelButtonText: "Volver",
       });
       if (lote) {
         this.searchTerm = lotes[value];

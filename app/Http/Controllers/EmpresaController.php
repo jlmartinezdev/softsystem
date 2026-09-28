@@ -78,17 +78,37 @@ class EmpresaController extends Controller
      */
     public function update(Request $request)
     {
-        Empresa::where('emp_codigo',0)->update([
-            'emp_nombre'=>$request->nombre,
-            'suc_cod'=> $request->sucursal,
-            'CIUDAD_cod' => $request->ciudad,
-            'emp_direccion' => $request->direccion,
-            'emp_ruc' => $request->ruc,
-            'emp_celular' => $request->celular,
-            'emp_telefono' => $request->telefono,
-            'emp_correo' => $request->correo,
-            'emp_web' => $request->web,
+        $data = [
+            'emp_nombre'      => $request->nombre,
+            'suc_cod'         => $request->sucursal,
+            'CIUDAD_cod'      => $request->ciudad,
+            'emp_direccion'   => $request->direccion,
+            'emp_ruc'         => $request->ruc,
+            'emp_celular'     => $request->celular,
+            'emp_telefono'    => $request->telefono,
+            'emp_correo'      => $request->correo,
+            'emp_web'         => $request->web,
             'emp_descripcion' => $request->descripcion
+        ];
+
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $fileName = 'logo_empresa_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('img'), $fileName);
+            $data['emp_logo'] = $fileName;
+        }
+
+        $empresa = Empresa::first();
+        if ($empresa) {
+            Empresa::where('emp_codigo', $empresa->emp_codigo)->update($data);
+        } else {
+            Empresa::where('emp_codigo', 0)->update($data);
+        }
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Datos de la empresa actualizados correctamente',
+            'emp_logo' => isset($data['emp_logo']) ? $data['emp_logo'] : ($empresa ? $empresa->emp_logo : null)
         ]);
     }
 
