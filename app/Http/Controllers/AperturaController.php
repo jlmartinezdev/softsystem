@@ -313,29 +313,35 @@ class AperturaController extends Controller
     public function getStatu($id)
     {
         $date = date('Y-m-d');
-        $config = Ajuste::where('categoria', 'caja')->get();
+        $config = Ajuste::where('categoria', 'caja')->pluck('value', 'name');
+        $validez = (string) ($config['validez'] ?? '1');
+        $usuarioModalidad = (string) ($config['usuario'] ?? '1');
 
-        switch ($config[0]->value) {
+        $query = Apertura::join('sucursales', 'apert_cierres_caja.suc_cod', '=', 'sucursales.suc_cod')
+            ->join('caja', 'apert_cierres_caja.caja_cod', '=', 'caja.caja_cod')
+            ->join('usuarios', 'apert_cierres_caja.cod_usuarios', '=', 'usuarios.cod_usuarios')
+            ->select(
+                'apert_cierres_caja.*',
+                'sucursales.suc_desc',
+                'caja.caja_descrip',
+                'usuarios.nom_usuarios'
+            )
+            ->where('apert_cierres_caja.suc_cod', '=', $id)
+            ->where('apert_cierres_caja.apert_estado', '=', '1')
+            ->usuario($usuarioModalidad);
+
+        switch ($validez) {
             case '1':
-                return Apertura::join('usuarios', 'apert_cierres_caja.cod_usuarios', '=', 'usuarios.cod_usuarios')
-                    ->where('apert_cierres_caja.suc_cod', '=', $id)
-                    ->where('apert_cierres_caja.apert_fecha', '=', $date)
-                    ->usuario($config[1]->value)
-                    ->where('apert_cierres_caja.apert_estado', '=', '1')
+                return $query->where('apert_cierres_caja.apert_fecha', '=', $date)
+                    ->orderBy('apert_cierres_caja.nro_operacion', 'DESC')
                     ->first();
             case '2':
-                return Apertura::where('apert_cierres_caja.suc_cod', '=', $id)
-                    ->where(DB::raw('TIMESTAMPDIFF(HOUR,CONCAT(apert_cierres_caja.apert_fecha," ",apert_cierres_caja.apert_hora),NOW())'), '<', '24')
-                    ->usuario($config[1]->value)
-                    ->where('apert_cierres_caja.apert_estado', '=', '1')
-                    ->get()
-                    ->last();
+                return $query->where(DB::raw('TIMESTAMPDIFF(HOUR,CONCAT(apert_cierres_caja.apert_fecha," ",apert_cierres_caja.apert_hora),NOW())'), '<', '24')
+                    ->orderBy('apert_cierres_caja.nro_operacion', 'DESC')
+                    ->first();
             default:
-                return Apertura::where('apert_cierres_caja.suc_cod', '=', $id)
-                    ->usuario($config[1]->value)
-                    ->where('apert_cierres_caja.apert_estado', '=', '1')
-                    ->get()
-                    ->last();
+                return $query->orderBy('apert_cierres_caja.nro_operacion', 'DESC')
+                    ->first();
         }
     }
 

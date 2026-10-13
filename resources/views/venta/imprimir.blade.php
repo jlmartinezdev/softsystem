@@ -113,6 +113,10 @@
 											class="dropdown-item" target="_blank">
 											<span class="fa fa-print text-secondary"></span> Comprobante
 										</a>
+										<a :href="'{{ url('pdf/recibo') }}/' + venta.nro_fact_ventas"
+											class="dropdown-item" target="_blank">
+											<span class="fa fa-file-invoice text-warning"></span> Recibo
+										</a>
 										<div class="dropdown-divider"></div>
 										<a v-if="sifenActivo"
 											:href="'{{ url('venta/facturar') }}/' + venta.nro_fact_ventas"

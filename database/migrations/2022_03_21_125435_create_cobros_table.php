@@ -13,10 +13,12 @@ class CreateCobrosTable extends Migration
      */
     public function up()
     {
-        Schema::create('cobros', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('cobros')) {
+            Schema::create('cobros', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

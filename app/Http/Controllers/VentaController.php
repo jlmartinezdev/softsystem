@@ -8,6 +8,7 @@ use App\Apertura;
 use App\Sucursal;
 use App\MovimientoCaja;
 use App\Empresa;
+use App\Ajuste;
 use App\CtaCobrar;
 use App\Cobro;
 use App\Stock;
@@ -49,7 +50,11 @@ class VentaController extends Controller
         $esAdministrador = Auth::user()->esAdministrador();
         $empresa = Empresa::first();
         $nombreLocal = trim((string) ($empresa->emp_nombre ?? ''));
-        $localIncompleto = $nombreLocal === '' || mb_strtoupper($nombreLocal, 'UTF-8') === 'EMPRESA';
+        $botonPrincipalVenta = DB::table('configuraciones')->where('name', 'boton_principal')->value('value')
+            ?? DB::table('configuraciones')->where('name', 'boton_principal_venta')->value('value')
+            ?? 'cobrar_imprimir';
+        $venderSinStock = Ajuste::flag('vender_sin_stock', 1);
+        $descontarStock = Ajuste::flag('descontar_stock', 1);
 
         return view('venta', compact(
             'apertura',
@@ -60,7 +65,10 @@ class VentaController extends Controller
             'sifenFalta',
             'esAdministrador',
             'nombreLocal',
-            'localIncompleto'
+            'localIncompleto',
+            'botonPrincipalVenta',
+            'venderSinStock',
+            'descontarStock'
         ));
     }
     public function indexanular(){
@@ -276,8 +284,9 @@ class VentaController extends Controller
             ], 403);
         }
 
-        // 3. Validar autorización para venta sin stock suficiente
-        if (!Auth::user()->tieneAccion('venta_sin_stock') && is_array($request->detalle)) {
+        // 3. Si el ajuste general no permite vender sin stock, el rol tampoco puede forzarlo.
+        $venderSinStock = Ajuste::flag('vender_sin_stock', 1);
+        if ($venderSinStock !== 1 && !Auth::user()->tieneAccion('venta_sin_stock') && is_array($request->detalle)) {
             foreach ($request->detalle as $det) {
                 if (empty($det['es_libre']) && empty($det['es_combo']) && !empty($det['idstock'])) {
                     $cantDisp = DB::table('stock')->where('id_stock', $det['idstock'])->value('cantidad');
@@ -351,30 +360,78 @@ class VentaController extends Controller
                 ]
             );
 
-            if (($cab['descontar_stock'] ?? 1) == 1) {
+            $descontarStock = array_key_exists('descontar_stock', $cab)
+                ? (int) $cab['descontar_stock']
+                : Ajuste::flag('descontar_stock', 1);
+            if ($descontarStock === 1) {
                 if ($esCombo && !empty($detalle['componentes']) && is_array($detalle['componentes'])) {
                     $cantCombo = (float) ($detalle['cantidad'] || 1);
                     foreach ($detalle['componentes'] as $comp) {
-                        if (empty($comp['id_stock'])) {
+                        $cantComp = ((float) ($comp['cantidad'] ?? 1)) * $cantCombo;
+                        if ($cantComp <= 0) {
                             continue;
                         }
-                        $cantComp = ((float) ($comp['cantidad'] ?? 1)) * $cantCombo;
-                        DB::update(
-                            'update stock set cantidad = (cantidad - ?) where id_stock=?',
-                            [$cantComp, $comp['id_stock']]
-                        );
+                        $idComp = $comp['id_stock'] ?? null;
+                        if ($idComp === null || $idComp === '' || (float) $idComp <= 0) {
+                            $idComp = DB::table('stock')
+                                ->where('ARTICULOS_cod', $comp['articulos_cod'] ?? 0)
+                                ->where('suc_cod', $cab['idSucursal'])
+                                ->orderBy('id_stock')
+                                ->value('id_stock');
+                        }
+                        $this->aplicarDescuentoStock($idComp, $comp['articulos_cod'] ?? null, $cab['idSucursal'], $cantComp);
                     }
-                } elseif (!$esLibre && !$esCombo && !empty($detalle['idstock'])) {
-                    DB::update(
-                        'update stock set cantidad = (cantidad - ?) where id_stock=?',
-                        [$detalle['cantidad'], $detalle['idstock']]
-                    );
+                } elseif (!$esLibre && !$esCombo) {
+                    $cantLinea = (float) ($detalle['cantidad'] ?? 0);
+                    if ($cantLinea > 0) {
+                        $idStock = $detalle['idstock'] ?? ($detalle['id_stock'] ?? null);
+                        if ($idStock === null || $idStock === '' || (float) $idStock <= 0) {
+                            $idStock = DB::table('stock')
+                                ->where('ARTICULOS_cod', $codigo)
+                                ->where('suc_cod', $cab['idSucursal'])
+                                ->orderBy('id_stock')
+                                ->value('id_stock');
+                        }
+                        $this->aplicarDescuentoStock($idStock, $codigo, $cab['idSucursal'], $cantLinea);
+                    }
                 }
             }
         }
         return $venta->nro_fact_ventas;
         
     }
+
+    /**
+     * Resta la cantidad vendida. Si la existencia es 0, queda negativa.
+     * Si no hay fila de stock, la crea con el saldo en negativo.
+     */
+    private function aplicarDescuentoStock($idStock, $articuloId, $sucursalId, $cantidad)
+    {
+        $cantidad = (float) $cantidad;
+        if ($cantidad <= 0) {
+            return;
+        }
+
+        if ($idStock !== null && $idStock !== '' && (float) $idStock > 0) {
+            DB::update(
+                'update stock set cantidad = (cantidad - ?) where id_stock=?',
+                [$cantidad, $idStock]
+            );
+            return;
+        }
+
+        if (!$articuloId || !$sucursalId) {
+            return;
+        }
+
+        $stock = new Stock();
+        $stock->ARTICULOS_cod = $articuloId;
+        $stock->suc_cod = $sucursalId;
+        $stock->cantidad = 0 - $cantidad;
+        $stock->lote_nro = '';
+        $stock->save();
+    }
+
     public function destroy(Request $request){
         $venta = Venta::find($request->id);
         if (!$venta) {
@@ -572,6 +629,18 @@ class VentaController extends Controller
         //$pdf= PDF::loadView('pdf.venta',compact('venta','detalle','empresa'));
         // return $pdf->stream();
         return view('pdf.venta',compact('venta','detalle','empresa'));
+    }
+
+    public function pdfrecibo($id){
+        $venta = Venta::join('clientes', 'clientes.CLIENTES_cod', '=', 'ventas.CLIENTES_cod')
+            ->where('ventas.nro_fact_ventas', $id)
+            ->first();
+        if (!$venta) {
+            abort(404, 'Venta no encontrada');
+        }
+        $detalle = $this->getDetalle($id);
+        $empresa = Empresa::first();
+        return view('pdf.recibo', compact('venta', 'detalle', 'empresa'));
     }
    public function ticketfactura(){
        $empresa= Empresa::first();

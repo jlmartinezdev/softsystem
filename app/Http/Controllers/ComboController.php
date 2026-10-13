@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Articulo;
 use App\Combo;
 use App\ComboItem;
+use App\ComboPrecio;
 use App\Support\ArticuloCombo;
 use App\Support\CodigoBarra;
 use DB;
@@ -15,7 +16,7 @@ class ComboController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('permiso:combos,open')->only(['index']);
+        $this->middleware('permiso:combos,open')->only(['index', 'generarCodigo']);
         $this->middleware('permiso:combos,add')->only(['store', 'redondear']);
         $this->middleware('permiso:combos,edit')->only(['update']);
         $this->middleware('permiso:combos,del')->only(['destroy']);
@@ -24,7 +25,7 @@ class ComboController extends Controller
     public function index()
     {
         ArticuloCombo::ensureExists();
-        $combos = Combo::with(['items.articulo'])->orderBy('id', 'DESC')->get();
+        $combos = Combo::with(['items.articulo', 'precios'])->orderBy('id', 'DESC')->get();
 
         return view('combo', compact('combos'));
     }
@@ -46,12 +47,13 @@ class ComboController extends Controller
             ]);
 
             $this->syncItems($combo, $data['items']);
+            $this->syncPrecios($combo, $data['precios']);
             DB::commit();
 
             return response()->json([
                 'ok' => true,
                 'message' => 'Combo creado',
-                'combo' => $combo->load('items.articulo'),
+                'combo' => $combo->load(['items.articulo', 'precios']),
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -81,12 +83,13 @@ class ComboController extends Controller
 
             ComboItem::where('combo_id', $combo->id)->delete();
             $this->syncItems($combo, $data['items']);
+            $this->syncPrecios($combo, $data['precios']);
             DB::commit();
 
             return response()->json([
                 'ok' => true,
                 'message' => 'Combo actualizado',
-                'combo' => $combo->load('items.articulo'),
+                'combo' => $combo->load(['items.articulo', 'precios']),
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -133,7 +136,7 @@ class ComboController extends Controller
     public function listActivos(Request $request)
     {
         $suc = $request->input('suc');
-        $combos = Combo::with(['items.articulo'])
+        $combos = Combo::with(['items.articulo', 'precios'])
             ->activos()
             ->orderBy('nombre')
             ->get();
@@ -170,6 +173,16 @@ class ComboController extends Controller
                 ];
             }
 
+            $preciosCredito = $combo->precios->map(function ($p) {
+                return [
+                    'id_precio' => (int) $p->id_precio,
+                    'cant_cuota' => (int) $p->cant_cuota,
+                    'p' => (float) $p->precio,
+                    'm' => (float) $p->margen,
+                    'c' => (float) $p->monto_cuota,
+                ];
+            })->values();
+
             $result[] = [
                 'id' => $combo->id,
                 'nombre' => $combo->nombre,
@@ -177,12 +190,33 @@ class ComboController extends Controller
                 'precio' => (float) $combo->precio,
                 'precio_credito' => (float) ($combo->precio_credito ?? 0),
                 'precio_lista' => (float) $combo->precio_lista,
+                'precios' => $preciosCredito,
                 'items' => $componentes,
                 'stock_ok' => $okStock,
             ];
         }
 
         return response()->json($result);
+    }
+
+    public function getPrecios($id)
+    {
+        $combo = Combo::findOrFail($id);
+        $precios = ComboPrecio::where('combo_id', $combo->id)
+            ->orderBy('cant_cuota', 'ASC')
+            ->orderBy('id_precio', 'ASC')
+            ->get()
+            ->map(function ($p) {
+                return [
+                    'id_precio' => (int) $p->id_precio,
+                    'p' => (float) $p->precio,
+                    'm' => (float) $p->margen,
+                    'c' => (float) $p->monto_cuota,
+                    'cant_cuota' => (int) $p->cant_cuota,
+                ];
+            });
+
+        return response()->json($precios);
     }
 
     public function redondear(Request $request)
@@ -205,6 +239,14 @@ class ComboController extends Controller
         return response()->json(CodigoBarra::check($request->input('codigo', ''), $except));
     }
 
+    public function generarCodigo()
+    {
+        return response()->json([
+            'ok' => true,
+            'codigo' => CodigoBarra::generarParaCombo(),
+        ]);
+    }
+
     private function validated(Request $request)
     {
         $nombre = trim((string) $request->input('nombre', ''));
@@ -217,10 +259,20 @@ class ComboController extends Controller
         }
 
         $except = [];
+        $comboExistente = null;
         if ($request->route('id')) {
             $except['combo_id'] = (int) $request->route('id');
+            $comboExistente = Combo::find($request->route('id'));
         }
-        $codigo = CodigoBarra::validarOFallar($request->input('codigo', ''), $except);
+
+        $codigoInput = trim((string) $request->input('codigo', ''));
+        if ($codigoInput === '') {
+            $codigo = ($comboExistente && !empty($comboExistente->codigo))
+                ? $comboExistente->codigo
+                : CodigoBarra::generarParaCombo();
+        } else {
+            $codigo = CodigoBarra::validarOFallar($codigoInput, $except);
+        }
 
         $precioLista = 0;
         $cleanItems = [];
@@ -253,6 +305,36 @@ class ComboController extends Controller
             $precioCredito = 0;
         }
 
+        $preciosInput = $request->input('precios', []);
+        $cleanPrecios = [];
+        if (is_array($preciosInput)) {
+            foreach ($preciosInput as $idx => $p) {
+                $cant = isset($p['cant_cuota']) ? (int) $p['cant_cuota'] : ($idx + 2);
+                $idPrecio = isset($p['id_precio']) ? (int) $p['id_precio'] : $cant;
+                $pr = (float) ($p['p'] ?? $p['precio'] ?? 0);
+                $mg = (float) ($p['m'] ?? $p['margen'] ?? 0);
+                $ct = (float) ($p['c'] ?? $p['monto_cuota'] ?? 0);
+                if ($cant >= 2 && $cant <= 18) {
+                    $cleanPrecios[] = [
+                        'id_precio' => $idPrecio,
+                        'cant_cuota' => $cant,
+                        'p' => $pr,
+                        'm' => $mg,
+                        'c' => $ct,
+                    ];
+                }
+            }
+        }
+
+        if ($precioCredito <= 0 && !empty($cleanPrecios)) {
+            foreach ($cleanPrecios as $cp) {
+                if ($cp['p'] > 0) {
+                    $precioCredito = $cp['p'];
+                    break;
+                }
+            }
+        }
+
         return [
             'nombre' => $nombre,
             'codigo' => $codigo,
@@ -262,6 +344,7 @@ class ComboController extends Controller
             'activo' => $request->input('activo', 1) ? 1 : 0,
             'observacion' => trim((string) $request->input('observacion', '')),
             'items' => $cleanItems,
+            'precios' => $cleanPrecios,
         ];
     }
 
@@ -274,6 +357,39 @@ class ComboController extends Controller
                 'cantidad' => $item['cantidad'],
                 'precio_ref' => $item['precio_ref'],
             ]);
+        }
+    }
+
+    private function syncPrecios(Combo $combo, array $precios)
+    {
+        ComboPrecio::where('combo_id', $combo->id)->delete();
+
+        if (empty($precios)) {
+            return;
+        }
+
+        $rows = [];
+        foreach ($precios as $idx => $p) {
+            $cantCuota = isset($p['cant_cuota']) ? (int) $p['cant_cuota'] : ($idx + 2);
+            $idPrecio = isset($p['id_precio']) ? (int) $p['id_precio'] : $cantCuota;
+            $precio = (float) ($p['p'] ?? $p['precio'] ?? 0);
+            $margen = (float) ($p['m'] ?? $p['margen'] ?? 0);
+            $montoCuota = (float) ($p['c'] ?? $p['monto_cuota'] ?? 0);
+
+            if ($cantCuota >= 2 && $cantCuota <= 18) {
+                $rows[] = [
+                    'combo_id' => $combo->id,
+                    'id_precio' => $idPrecio,
+                    'precio' => $precio,
+                    'margen' => $margen,
+                    'cant_cuota' => $cantCuota,
+                    'monto_cuota' => $montoCuota,
+                ];
+            }
+        }
+
+        if (!empty($rows)) {
+            ComboPrecio::insert($rows);
         }
     }
 }

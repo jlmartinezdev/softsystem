@@ -184,20 +184,38 @@
 					</div>
 				</template>
 				<template v-else>
-					<div class="cobro-footer-salir d-flex align-items-center">
-						<button type="button" class="btn btn-outline-secondary btn-sm mr-2" data-dismiss="modal">
+					<div class="cobro-footer-salir d-flex align-items-center flex-wrap">
+						<button type="button" class="btn btn-outline-secondary btn-sm mr-2 mb-1" data-dismiss="modal">
 							<i class="fas fa-arrow-left mr-1"></i> Volver
 						</button>
-						<button type="button" class="btn btn-link btn-sm text-muted px-1" @click="finalizar(false)">
-							Guardar sin ticket
+						<button type="button" class="btn btn-link btn-sm text-muted px-2 mb-1"
+							v-if="botonPrincipalVenta !== 'cobrar'"
+							@click="finalizar('cobrar')">
+							<i class="fas fa-save mr-1"></i> Guardar sin ticket
+						</button>
+						<button type="button" class="btn btn-link btn-sm text-info px-2 mb-1"
+							v-if="botonPrincipalVenta !== 'cobrar_imprimir'"
+							@click="finalizar('imprimir')"
+							:disabled="!puedeImprimirCobro">
+							<i class="fas fa-print mr-1"></i> Cobrar e Imprimir
+						</button>
+						<button type="button" class="btn btn-link btn-sm text-warning px-2 mb-1"
+							v-if="botonPrincipalVenta !== 'cobrar_recibo'"
+							@click="finalizar('recibo')"
+							:disabled="!puedeImprimirCobro">
+							<i class="fas fa-file-invoice mr-1"></i> Con Recibo
 						</button>
 					</div>
 					<div class="cobro-footer-primario d-flex align-items-center">
 						<span class="cobro-hint mr-3 d-none d-sm-inline text-muted small font-weight-bold">
 							@{{ hintCobro }}
 						</span>
-						<button type="button" id="btn-cobrar-imprimir" class="btn btn-success font-weight-bold px-4 py-2 font-cairo shadow-sm" @click="finalizar(true)" :disabled="!puedeImprimirCobro">
-							<i class="fas fa-print mr-1"></i> Cobrar e Imprimir
+						<button type="button" id="btn-cobrar-imprimir"
+							class="btn font-weight-bold px-4 py-2 font-cairo shadow-sm"
+							:class="classBotonPrincipalModal"
+							@click="ejecutarCobroPrincipal"
+							:disabled="!puedeImprimirCobro">
+							<i class="fas mr-1" :class="iconBotonPrincipalModal"></i> @{{ labelBotonPrincipalModal }}
 						</button>
 					</div>
 				</template>

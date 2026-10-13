@@ -40,6 +40,7 @@ class ArticulosExport implements FromQuery,WithColumnFormatting, WithHeadings, W
             $articulos = Articulo::query()->join('stock', 'articulos.articulos_cod', '=', 'stock.articulos_cod')
             ->join('presentacion','articulos.present_cod','=','presentacion.present_cod')
             ->select( 'articulos.producto_c_barra',DB::raw('TRIM(articulos.producto_nombre)'),DB::raw('TRIM(presentacion.present_descripcion)'),'articulos.pre_venta1',DB::raw('SUM(stock.cantidad) AS cantidad'))
+            ->where('articulos.producto_c_barra', '!=', \App\Support\ArticuloLibre::CODIGO_BARRA)
             ->descripcion($buscar)
             ->seccion($seccion)
             ->bysucursal($idsucursal)

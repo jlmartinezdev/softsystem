@@ -43,6 +43,7 @@ Route::get('caja/movimiento/{id}','MovimientoCajaController@informe')->name('caj
     Route::get('articulo/promo/{id}', 'ArticuloController@promoDetalle')->name('articulo.promo');
     Route::get('articulo/ultimo', 'ArticuloController@getUltimo')->name('articulo@ultimo');
     Route::get('articulo/precios/{id}','ArticuloController@getPrecios');
+    Route::post('articulo/precios-por-cuota','ArticuloController@getPreciosPorCuota');
     Route::put('articulo/id/', 'ArticuloController@getById');
     Route::put('articulo', 'ArticuloController@getByCodigo');
     Route::post('articulo', 'ArticuloController@store');
@@ -61,6 +62,8 @@ Route::get('caja/movimiento/{id}','MovimientoCajaController@informe')->name('caj
     Route::get('combo/activos', 'ComboController@listActivos')->name('combo.activos');
     Route::post('combo/redondear', 'ComboController@redondear');
     Route::get('combo/validar-codigo', 'ComboController@validarCodigo');
+    Route::get('combo/generar-codigo', 'ComboController@generarCodigo');
+    Route::get('combo/precios/{id}', 'ComboController@getPrecios');
 
     // OFERTAS
     Route::get('oferta', 'OfertaController@index')->name('oferta.index');
@@ -156,6 +159,7 @@ Route::get('caja/movimiento/{id}','MovimientoCajaController@informe')->name('caj
     Route::post('ajustes','AjusteController@update');
     Route::post('ajustes/mail/test','AjusteController@testMail')->name('ajuste.mail.test');
     Route::post('ajustes/camara/test','AjusteController@testCamara')->name('ajuste.camara.test');
+    Route::post('ajustes/cloudinary/test','AjusteController@testCloudinary')->name('ajuste.cloudinary.test');
     
     //SUCURSAL
     Route::get('sucursal/all', 'SucursalController@All');
@@ -231,6 +235,18 @@ Route::get('unidades/{unidad}/edit', 'UnidadController@edit')->name('unidades.ed
 Route::put('unidades/{unidad}', 'UnidadController@update')->name('unidades.update');
 Route::post('unidades/{unidad}', 'UnidadController@update');
 Route::delete('unidades/{unidad}', 'UnidadController@destroy')->name('unidades.destroy');
+
+// GESTIÓN DE COPIAS DE SEGURIDAD (BACKUP)
+Route::group(['middleware' => ['auth', 'permiso:backup,open']], function () {
+    Route::get('backup', 'BackupController@index')->name('backup.index');
+    Route::get('backup/listar', 'BackupController@listar')->name('backup.listar');
+    Route::post('backup/crear', 'BackupController@crear')->name('backup.crear')->middleware('permiso:backup,add');
+    Route::get('backup/descargar/{archivo}', 'BackupController@descargar')->name('backup.descargar');
+    Route::get('backup/directo', 'BackupController@descargaDirecta')->name('backup.directo');
+    Route::post('backup/restaurar-existente', 'BackupController@restaurarExistente')->name('backup.restaurar_existente')->middleware('permiso:backup,edit');
+    Route::post('backup/subir-restaurar', 'BackupController@subirYRestaurar')->name('backup.subir_restaurar')->middleware('permiso:backup,edit');
+    Route::delete('backup/eliminar/{archivo}', 'BackupController@eliminar')->name('backup.eliminar')->middleware('permiso:backup,del');
+});
 
 
 

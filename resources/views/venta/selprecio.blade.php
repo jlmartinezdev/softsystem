@@ -52,8 +52,35 @@
 					</template>
 					<template v-else>
 						<div class="precio-listas-grid">
+							<div v-if="muestraPrecio1" class="precio-card-btn precio-card-p1"
+								:class="{ on: tmpIndexPrecio.iPrecio === 'CO1' }">
+								<button type="button" class="precio-card-elegir" @click="elegirListaContado(1)">
+									<div class="precio-card-header">
+										<span class="precio-card-name">Precio 1</span>
+										<i class="fas fa-check-circle check-active" v-if="tmpIndexPrecio.iPrecio === 'CO1'"></i>
+									</div>
+									<strong class="precio-card-monto font-cairo">
+										Gs. @{{ format(preciosContado.p1) }}
+									</strong>
+									<span class="precio-card-note">Minorista / Estándar</span>
+								</button>
+								<div class="precio-a-mano" @click.stop @mousedown.stop>
+									<label class="precio-a-mano-label" for="precioManualP1">Precio a mano</label>
+									<div class="precio-a-mano-row">
+										<span class="precio-a-mano-gs" aria-hidden="true">Gs.</span>
+										<input id="precioManualP1" class="precio-a-mano-input" type="text" inputmode="numeric"
+											autocomplete="off" :placeholder="format(preciosContado.p1)"
+											v-model="precioManual" @input="normalizarPrecioManual"
+											@keydown.enter.stop.prevent="aplicarPrecioManual"
+											aria-describedby="precioManualAyuda"
+											aria-label="Precio a mano en guaraníes, solo Precio 1">
+										<button type="button" class="precio-a-mano-aplicar" @click="aplicarPrecioManual">Aplicar</button>
+									</div>
+									<span id="precioManualAyuda" class="precio-a-mano-ayuda">Si lo dejás vacío o en 0, vuelve al Precio 1.</span>
+								</div>
+							</div>
 							<button type="button" class="precio-card-btn"
-								v-for="n in listasContado"
+								v-for="n in listasContadoOtras"
 								:key="'CO'+n"
 								:class="{ on: tmpIndexPrecio.iPrecio === 'CO'+n }"
 								@click="elegirListaContado(n)">
@@ -65,7 +92,7 @@
 									Gs. @{{ format(preciosContado['p'+n]) }}
 								</strong>
 								<span class="precio-card-note">
-									@{{ n === 1 ? 'Minorista / Estándar' : (n === 2 ? 'Mayorista' : 'Especial') }}
+									@{{ n === 2 ? 'Mayorista' : 'Especial' }}
 								</span>
 							</button>
 						</div>
@@ -75,7 +102,23 @@
 				<!-- Opciones Crédito -->
 				<div v-show="precioVista === 'credito'">
 					<template v-if="articulo && articulo.es_combo">
-						<div class="precio-listas-grid" v-if="Number(articulo.precio_credito) > 0">
+						<div class="precio-listas-grid" v-if="preciosCreditoConMonto.length">
+							<button type="button" class="precio-card-btn"
+								v-for="(p, index) in preciosCreditoConMonto"
+								:key="'CR'+p.index"
+								:class="{ on: tmpIndexPrecio.iPrecio === 'CR'+p.index }"
+								@click="elegirListaCredito(p.index)">
+								<div class="precio-card-header">
+									<span class="precio-card-name">Plan @{{ p.cant_cuota || (p.index + 2) }} cuotas</span>
+									<i class="fas fa-check-circle check-active" v-if="tmpIndexPrecio.iPrecio === 'CR'+p.index"></i>
+								</div>
+								<strong class="precio-card-monto font-cairo">
+									Gs. @{{ format(p.p) }}
+								</strong>
+								<span class="precio-card-note">Cuota: Gs. @{{ format(p.c) }}</span>
+							</button>
+						</div>
+						<div class="precio-listas-grid" v-else-if="Number(articulo.precio_credito) > 0">
 							<button type="button" class="precio-card-btn"
 								:class="{ on: tmpIndexPrecio.iPrecio === 'CR0' }"
 								@click="elegirListaCredito(0)">
@@ -101,7 +144,7 @@
 								:class="{ on: tmpIndexPrecio.iPrecio === 'CR'+p.index }"
 								@click="elegirListaCredito(p.index)">
 								<div class="precio-card-header">
-									<span class="precio-card-name">Plan @{{ p.index + 2 }} cuotas</span>
+									<span class="precio-card-name">Plan @{{ p.cant_cuota || (p.index + 2) }} cuotas</span>
 									<i class="fas fa-check-circle check-active" v-if="tmpIndexPrecio.iPrecio === 'CR'+p.index"></i>
 								</div>
 								<strong class="precio-card-monto font-cairo">

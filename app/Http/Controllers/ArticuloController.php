@@ -13,11 +13,15 @@ use App\Exports\articulosPreciosExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Auth;
 use App\ArticuloUnidad;
+use App\Support\ArticuloLibre;
 use App\Support\CameraSettings;
+use App\Support\CloudinarySettings;
+use App\Services\CloudinaryService;
 use App\Oferta;
 use App\Combo;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -60,12 +64,30 @@ class ArticuloController extends Controller
                     ], 422);
                 }
 
+                if (CloudinarySettings::isEnabled()) {
+                    $cloudRes = CloudinaryService::upload($body, [
+                        'folder' => CloudinarySettings::getFolder(),
+                    ]);
+
+                    if ($cloudRes['success']) {
+                        return response()->json([
+                            'success'  => true,
+                            'path'     => $cloudRes['url'],
+                            'filename' => $cloudRes['url'],
+                            'driver'   => 'cloudinary',
+                        ]);
+                    }
+
+                    Log::warning('Fallo subida de captura CCTV a Cloudinary, usando almacenamiento local: ' . ($cloudRes['message'] ?? ''));
+                }
+
                 Storage::disk('public')->put('articulos/' . $nombre, $body);
 
                 return response()->json([
-                    'success' => true,
-                    'path' => asset('storage/articulos/' . $nombre),
+                    'success'  => true,
+                    'path'     => asset('storage/articulos/' . $nombre),
                     'filename' => $nombre,
+                    'driver'   => 'local',
                 ]);
             }
 
@@ -92,14 +114,33 @@ class ArticuloController extends Controller
         ]);
 
         $file = $request->file('imagen');
+
+        if (CloudinarySettings::isEnabled()) {
+            $cloudRes = CloudinaryService::upload($file, [
+                'folder' => CloudinarySettings::getFolder(),
+            ]);
+
+            if ($cloudRes['success']) {
+                return response()->json([
+                    'success'  => true,
+                    'path'     => $cloudRes['url'],
+                    'filename' => $cloudRes['url'],
+                    'driver'   => 'cloudinary',
+                ]);
+            }
+
+            Log::warning('Fallo subida a Cloudinary, usando almacenamiento local: ' . ($cloudRes['message'] ?? ''));
+        }
+
         $ext = strtolower($file->getClientOriginalExtension() ?: 'jpg');
         $nombre = 'articulo_' . time() . '_' . mt_rand(1000, 9999) . '.' . $ext;
         Storage::disk('public')->putFileAs('articulos', $file, $nombre);
 
         return response()->json([
-            'success' => true,
-            'path' => asset('storage/articulos/' . $nombre),
+            'success'  => true,
+            'path'     => asset('storage/articulos/' . $nombre),
             'filename' => $nombre,
+            'driver'   => 'local',
         ]);
     }
 
@@ -156,6 +197,7 @@ class ArticuloController extends Controller
                 DB::raw('(SELECT COUNT(*) FROM ofertas o WHERE o.articulos_cod = articulos.ARTICULOS_cod AND o.activo = 1) AS tiene_oferta'),
                 DB::raw('(SELECT COUNT(*) FROM combo_items ci INNER JOIN combos c ON c.id = ci.combo_id AND c.activo = 1 WHERE ci.articulos_cod = articulos.ARTICULOS_cod) AS en_combo')
             )
+            ->where('articulos.producto_c_barra', '!=', ArticuloLibre::CODIGO_BARRA)
             ->descripcion($buscar)
             ->seccion($seccion)
             ->bysucursal($idsucursal)
@@ -318,7 +360,38 @@ class ArticuloController extends Controller
         return DB::select($sql, $params);
     }
     public function getPrecios($id){
-        return DB::select("SELECT truncate(precio,0) as p, truncate(margen,0) as m, truncate(monto_cuota,0) as c FROM precios where ARTICULOS_cod=".$id);
+        return DB::select("SELECT id_precio, truncate(precio,0) as p, truncate(margen,0) as m, truncate(monto_cuota,0) as c, cant_cuota FROM precios WHERE articulos_cod = ? ORDER BY cant_cuota ASC, id_precio ASC", [$id]);
+    }
+    public function getPreciosPorCuota(Request $request){
+        $codigos = $request->input('codigos', []);
+        $cantCuota = (int) $request->input('cant_cuota');
+
+        if (empty($codigos) || $cantCuota <= 0) {
+            return response()->json([]);
+        }
+
+        $cleanCodigos = [];
+        foreach ($codigos as $c) {
+            $c = (int) $c;
+            if ($c > 0) {
+                $cleanCodigos[] = $c;
+            }
+        }
+
+        if (empty($cleanCodigos)) {
+            return response()->json([]);
+        }
+
+        $cleanCodigos = array_values(array_unique($cleanCodigos));
+        $placeholders = implode(',', array_fill(0, count($cleanCodigos), '?'));
+        $params = array_merge($cleanCodigos, [$cantCuota]);
+
+        $sql = "SELECT articulos_cod, id_precio, truncate(precio,0) as precio, truncate(monto_cuota,0) as monto_cuota, cant_cuota 
+                FROM precios 
+                WHERE articulos_cod IN ($placeholders) AND cant_cuota = ? AND precio > 0";
+
+        $precios = DB::select($sql, $params);
+        return response()->json($precios);
     }
     public function getByCodigo(Request $request){
         return Articulo::join('stock', 'articulos.articulos_cod', '=', 'stock.articulos_cod')

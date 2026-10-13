@@ -223,23 +223,70 @@
             white-space: nowrap;
         }
 
-        /* Buscador & Prepend */
-        .search-prepend {
+        /* Buscador & Prepend Cobros */
+        .search-input-group {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+        }
+        .search-input-group .search-prepend,
+        .input-group .search-prepend {
+            height: 42px !important;
+            padding: 0 0.85rem !important;
             background-color: var(--dash-card-bg) !important;
-            border-color: var(--dash-border) !important;
+            border: 1px solid var(--dash-border) !important;
             color: var(--dash-text-muted) !important;
             border-radius: 8px 0 0 8px !important;
-        }
-        .search-input {
-            background-color: var(--dash-card-bg) !important;
-            border-color: var(--dash-border) !important;
-            color: var(--dash-text-main) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             font-size: 0.95rem;
         }
-        .search-input:focus {
+        .search-input-group .search-input,
+        .input-group .search-input {
+            height: 42px !important;
+            background-color: var(--dash-card-bg) !important;
+            border: 1px solid var(--dash-border) !important;
+            color: var(--dash-text-main) !important;
+            font-size: 0.95rem;
+            padding: 0.45rem 0.85rem !important;
+            border-radius: 0 !important;
+        }
+        .search-input-group .search-input:focus,
+        .input-group .search-input:focus {
             background-color: var(--dash-card-bg) !important;
             border-color: var(--dash-primary) !important;
             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important;
+            z-index: 3;
+        }
+        .search-input-group .input-group-append,
+        .input-group .input-group-append {
+            display: flex;
+            margin-left: -1px;
+        }
+        .search-input-group .input-group-append .btn-pos-primary,
+        .input-group .input-group-append .btn-pos-primary {
+            height: 42px !important;
+            padding: 0 1.25rem !important;
+            font-size: 0.92rem;
+            border-radius: 0 8px 8px 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            transform: none !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border: 1px solid var(--dash-primary) !important;
+            z-index: 2;
+        }
+        .search-input-group .input-group-append .btn-pos-primary:hover,
+        .search-input-group .input-group-append .btn-pos-primary:focus,
+        .input-group .input-group-append .btn-pos-primary:hover,
+        .input-group .input-group-append .btn-pos-primary:focus {
+            transform: none !important;
+            box-shadow: none !important;
+            background: var(--dash-primary-dark) !important;
+            border-color: var(--dash-primary-dark) !important;
         }
 
         /* Botón Acción Mini */
@@ -375,7 +422,7 @@
                     <label class="small font-weight-bold text-muted mb-1">
                         <i class="fa-solid fa-magnifying-glass mr-1"></i> BUSCAR CLIENTE (POR C.I., RUC O NOMBRE)
                     </label>
-                    <div class="input-group">
+                    <div class="input-group search-input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text search-prepend">
                                 <i class="fa-solid fa-user-tag text-muted"></i>

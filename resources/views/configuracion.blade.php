@@ -743,7 +743,7 @@
             <div>
                 <div class="kpi-label">Punto de Venta</div>
                 <div class="kpi-val font-cairo">@{{ venta.tipo_comprobante }} (@{{ venta.tamano_ticket }})</div>
-                <div class="kpi-sub">@{{ venta.descontar_stock == 1 ? 'Descuenta stock' : 'Sin descontar stock' }}</div>
+                <div class="kpi-sub">@{{ labelBotonPrincipal }} · @{{ venta.descontar_stock == 1 ? 'Descuenta stock' : 'Sin stock' }}</div>
             </div>
         </div>
 
@@ -798,6 +798,28 @@
                 </div>
             </div>
         </div>
+
+        <!-- KPI 6: Almacenamiento Imágenes -->
+        <div class="kpi-card" :class="{ 'active': activeTab === 'cloudinary' }" @click="activeTab = 'cloudinary'">
+            <div class="kpi-icon-box" :class="cloudinary.driver === 'cloudinary' ? 'kpi-icon-blue' : 'kpi-icon-green'">
+                <i class="fa fa-cloud-upload-alt"></i>
+            </div>
+            <div>
+                <div class="kpi-label">Fotos de Artículos</div>
+                <div class="kpi-val font-cairo">
+                    <span v-if="cloudinary.driver === 'cloudinary'" class="text-primary font-weight-bold">
+                        <i class="fa fa-cloud mr-1"></i> Cloudinary
+                    </span>
+                    <span v-else class="text-success font-weight-bold">
+                        <i class="fa fa-server mr-1"></i> Local
+                    </span>
+                </div>
+                <div class="kpi-sub">
+                    <span v-if="cloudinary.driver === 'cloudinary'">@{{ cloudinary.cloud_name ? cloudinary.cloud_name : 'Faltan credenciales' }}</span>
+                    <span v-else>Almacenamiento en disco local</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- MODERN NAVIGATION TABS -->
@@ -829,6 +851,13 @@
             <span>Geolocalización & Mapas</span>
             <span class="tab-badge" :class="proveedorEfectivo === 'google' ? 'badge-primary' : 'badge-success'">
                 @{{ proveedorEfectivo === 'google' ? 'Google Maps' : 'OpenStreetMap' }}
+            </span>
+        </button>
+        <button class="settings-tab-btn" :class="{ 'active': activeTab === 'cloudinary' }" @click="activeTab = 'cloudinary'">
+            <i class="fa fa-cloud-upload-alt"></i>
+            <span>Fotos & Cloudinary</span>
+            <span class="tab-badge" :class="cloudinary.driver === 'cloudinary' ? 'badge-primary' : 'badge-success'">
+                @{{ cloudinary.driver === 'cloudinary' ? 'Cloudinary' : 'Local' }}
             </span>
         </button>
     </div>
@@ -963,6 +992,38 @@
                             <i class="fa fa-scroll fa-lg mb-2 text-secondary"></i>
                             <div class="font-weight-bold">56 mm</div>
                             <small class="text-muted d-block">Angosto / Portátil (POS-58)</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-section-title mt-4">
+                <div>
+                    <h5 class="font-cairo"><i class="fa fa-hand-pointer text-primary"></i> Botón Principal de Venta</h5>
+                    <p class="card-section-desc">Selecciona la acción predeterminada para el botón principal de cobro y los atajos de teclado (Enter / F12).</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <label class="pos-label">
+                        <i class="fa fa-mouse-pointer"></i> Acción principal al cobrar
+                    </label>
+                    <div class="options-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                        <div class="option-box text-center" :class="{ 'selected': (venta.boton_principal || 'cobrar_imprimir') === 'cobrar_imprimir' }" @click="venta.boton_principal = 'cobrar_imprimir'">
+                            <i class="fa fa-print fa-lg mb-2 text-success"></i>
+                            <div class="font-weight-bold">Cobrar e Imprimir</div>
+                            <small class="text-muted d-block">Registra la venta e imprime ticket / factura</small>
+                        </div>
+                        <div class="option-box text-center" :class="{ 'selected': venta.boton_principal === 'cobrar' }" @click="venta.boton_principal = 'cobrar'">
+                            <i class="fa fa-cash-register fa-lg mb-2 text-primary"></i>
+                            <div class="font-weight-bold">Cobrar</div>
+                            <small class="text-muted d-block">Solo registra la venta sin imprimir</small>
+                        </div>
+                        <div class="option-box text-center" :class="{ 'selected': venta.boton_principal === 'cobrar_recibo' }" @click="venta.boton_principal = 'cobrar_recibo'">
+                            <i class="fa fa-file-invoice fa-lg mb-2 text-warning"></i>
+                            <div class="font-weight-bold">Cobrar e Imprimir con Recibo</div>
+                            <small class="text-muted d-block">Registra la venta e imprime recibo oficial</small>
                         </div>
                     </div>
                 </div>
@@ -1406,6 +1467,158 @@
         </div>
     </div>
 
+    <!-- ========================================== -->
+    <!-- TAB 6: ALMACENAMIENTO & CLOUDINARY        -->
+    <!-- ========================================== -->
+    <div v-show="activeTab === 'cloudinary'">
+        <div class="settings-card">
+            <div class="card-section-title">
+                <div>
+                    <h5 class="font-cairo"><i class="fa fa-cloud-upload-alt text-info"></i> Almacenamiento de Fotos de Artículos</h5>
+                    <p class="card-section-desc">Elegí dónde se alojarán las fotografías de productos subidas desde el mantenimiento de artículos o capturadas con la cámara CCTV.</p>
+                </div>
+            </div>
+
+            <!-- Selector de Almacenamiento: Local vs Cloudinary -->
+            <div class="options-grid">
+                <!-- Opción 1: Local -->
+                <div class="option-box" :class="{ 'selected': cloudinary.driver === 'local' }" @click="cloudinary.driver = 'local'">
+                    <div class="option-radio"></div>
+                    <div class="option-content">
+                        <div class="option-title font-cairo">
+                            <i class="fa fa-server text-success mr-1"></i> Almacenamiento Local (Servidor)
+                        </div>
+                        <div class="option-desc">
+                            Las imágenes se guardan en el disco duro de este equipo (<code>storage/app/public/articulos</code>).
+                            Recomendado para entornos sin conexión permanente a internet o redes locales cerradas.
+                        </div>
+                        <div class="mt-2">
+                            <span class="badge badge-success"><i class="fa fa-check mr-1"></i>Funciona 100% Offline</span>
+                            <span class="badge badge-light border text-muted ml-1">Sin límites de peticiones</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opción 2: Cloudinary -->
+                <div class="option-box" :class="{ 'selected': cloudinary.driver === 'cloudinary' }" @click="cloudinary.driver = 'cloudinary'">
+                    <div class="option-radio"></div>
+                    <div class="option-content">
+                        <div class="option-title font-cairo">
+                            <i class="fa fa-cloud text-primary mr-1"></i> Cloudinary (CDN en la Nube)
+                        </div>
+                        <div class="option-desc">
+                            Las imágenes se cargan a tu cuenta en la nube de Cloudinary y se entregan a través de su CDN global ultrarrápida.
+                            Ahorra espacio en tu servidor y optimiza automáticamente las imágenes en WebP.
+                        </div>
+                        <div class="mt-2">
+                            <span class="badge badge-primary"><i class="fa fa-cloud mr-1"></i>Ahorra Disco</span>
+                            <span class="badge badge-info ml-1">25 GB Gratis en Cloudinary</span>
+                            <span class="badge badge-light border text-muted ml-1">Optimización WebP</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Configuración Cloudinary -->
+            <div v-show="cloudinary.driver === 'cloudinary'" class="mt-4 pt-3 border-top">
+                <div class="card-section-title">
+                    <div>
+                        <h5 class="font-cairo"><i class="fa fa-key text-primary"></i> Credenciales de la API de Cloudinary</h5>
+                        <p class="card-section-desc">Ingresá los datos de tu cuenta de Cloudinary (disponibles en el Dashboard de <a href="https://cloudinary.com" target="_blank" rel="noopener">cloudinary.com</a>).</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4" style="background-color: var(--dash-info-light); color: var(--dash-text-main);">
+                    <i class="fa fa-info-circle fa-2x mr-3 text-info"></i>
+                    <div class="small">
+                        <strong>¿Dónde encontrar estos datos?</strong> Iniciá sesión en <strong>Cloudinary Console</strong> &rarr; En el menú principal entrá a <strong>Dashboard</strong> &rarr; Copiá los valores de la sección <strong>Product Environment Credentials</strong> (Cloud Name, API Key y API Secret).
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label-custom">Cloud Name <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-cloud text-muted"></i></span>
+                            </div>
+                            <input type="text" class="form-control form-control-pos font-cairo" v-model="cloudinary.cloud_name" placeholder="ej. dxy123456" />
+                        </div>
+                        <small class="text-muted">Nombre de tu entorno o nube en Cloudinary.</small>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label-custom">API Key <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-id-card text-muted"></i></span>
+                            </div>
+                            <input type="text" class="form-control form-control-pos font-cairo" v-model="cloudinary.api_key" placeholder="ej. 123456789012345" />
+                        </div>
+                        <small class="text-muted">Clave pública de autenticación.</small>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label-custom">
+                            API Secret <span class="text-danger">*</span>
+                            <span v-if="cloudinary.has_secret" class="badge badge-success ml-1 font-weight-normal" style="font-size: 0.65rem;">Configurado</span>
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-lock text-muted"></i></span>
+                            </div>
+                            <input :type="cloudinary.show_secret ? 'text' : 'password'" class="form-control form-control-pos font-cairo"
+                                   v-model="cloudinary.api_secret"
+                                   :placeholder="cloudinary.has_secret ? 'Dejar en blanco para mantener la clave actual' : 'ej. abcd1234efgh5678'" />
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" @click="cloudinary.show_secret = !cloudinary.show_secret" title="Mostrar/Ocultar">
+                                    <i class="fa" :class="cloudinary.show_secret ? 'fa-eye-slash' : 'fa-eye'"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <small class="text-muted">Clave secreta privada (nunca se comparte públicamente).</small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label-custom">Carpeta de Almacenamiento</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-folder text-muted"></i></span>
+                            </div>
+                            <input type="text" class="form-control form-control-pos font-cairo" v-model="cloudinary.folder" placeholder="articulos" />
+                        </div>
+                        <small class="text-muted">Carpeta dentro de tu Media Library en Cloudinary (por defecto: <code>articulos</code>).</small>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label-custom">Entrega y Optimización Automática</label>
+                        <div class="custom-control custom-switch mt-2">
+                            <input type="checkbox" class="custom-control-input" id="switchCloudinaryOpt" v-model="cloudinary.auto_optimize">
+                            <label class="custom-control-label font-weight-bold" for="switchCloudinaryOpt">
+                                Auto-formato WebP y Calidad Inteligente (<code>f_auto, q_auto</code>)
+                            </label>
+                        </div>
+                        <small class="text-muted d-block mt-1">Cloudinary entrega automáticamente formato WebP/AVIF reduciendo hasta un 70% el peso sin perder nitidez visual.</small>
+                    </div>
+                </div>
+
+                <!-- Botón de Prueba de Conexión -->
+                <div class="d-flex align-items-center justify-content-between p-3 rounded bg-light-panel border mt-2">
+                    <div>
+                        <strong><i class="fa fa-plug mr-1 text-primary"></i> Probar Conexión con Cloudinary</strong>
+                        <p class="text-muted small mb-0">Envía una prueba instantánea para verificar que tus credenciales funcionen correctamente.</p>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary font-cairo" @click="testCloudinary" :disabled="cloudinaryTesting">
+                        <i class="fa" :class="cloudinaryTesting ? 'fa-spinner fa-spin' : 'fa-vial'"></i>
+                        <span class="ml-1">@{{ cloudinaryTesting ? 'Probando...' : 'Probar Conexión' }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- FLOATING BOTTOM SAVE BAR -->
     <div class="floating-save-bar">
         <div class="d-flex align-items-center gap-2">
@@ -1439,9 +1652,17 @@
     @php
         $validezVal = '1';
         $usuarioVal = '1';
+        $tipoComprobanteVal = 'Ticket';
+        $botonPrincipalVal = 'cobrar_imprimir';
+        $venderSinStockVal = 1;
+        $descontarStockVal = 1;
         foreach ($ajuste as $a) {
             if ($a->name === 'validez') $validezVal = (string)$a->value;
             if ($a->name === 'usuario') $usuarioVal = (string)$a->value;
+            if ($a->name === 'tipo_comprobante') $tipoComprobanteVal = (string)$a->value;
+            if ($a->name === 'boton_principal' || $a->name === 'boton_principal_venta') $botonPrincipalVal = (string)$a->value;
+            if ($a->name === 'vender_sin_stock') $venderSinStockVal = (int) $a->value === 1 ? 1 : 0;
+            if ($a->name === 'descontar_stock') $descontarStockVal = (int) $a->value === 1 ? 1 : 0;
         }
     @endphp
 
@@ -1475,10 +1696,11 @@
                 }
             ],
             venta: {
-                tipo_comprobante: 'Ticket',
-                descontar_stock: 1,
-                vender_sin_stock: 1,
+                tipo_comprobante: @json($tipoComprobanteVal),
+                descontar_stock: {{ (int) $descontarStockVal }},
+                vender_sin_stock: {{ (int) $venderSinStockVal }},
                 tamano_ticket: '80mm',
+                boton_principal: @json($botonPrincipalVal),
             },
             camara: {
                 url: @json($camara['url'] ?? ''),
@@ -1497,7 +1719,18 @@
                 from_name: @json($mail['from_name'] ?? 'SoftSystem'),
                 to: @json($mail['to'] ?? ''),
                 cierre_caja: {{ !empty($mail['cierre_caja']) ? 'true' : 'false' }}
-            }
+            },
+            cloudinary: {
+                driver: @json($cloudinary['driver'] ?? 'local'),
+                cloud_name: @json($cloudinary['cloud_name'] ?? ''),
+                api_key: @json($cloudinary['api_key'] ?? ''),
+                api_secret: '',
+                has_secret: {{ !empty($cloudinary['has_secret']) ? 'true' : 'false' }},
+                folder: @json($cloudinary['folder'] ?? 'articulos'),
+                auto_optimize: {{ !empty($cloudinary['auto_optimize']) ? 'true' : 'false' }},
+                show_secret: false
+            },
+            cloudinaryTesting: false
         },
         computed: {
             proveedorEfectivo: function () {
@@ -1520,6 +1753,12 @@
                 if (u == '1') return 'Multiusuario compartido';
                 if (u == '2') return 'Por cada usuario';
                 return 'Multiusuario';
+            },
+            labelBotonPrincipal: function () {
+                var bp = (this.venta && this.venta.boton_principal) || 'cobrar_imprimir';
+                if (bp === 'cobrar') return 'Botón: Cobrar';
+                if (bp === 'cobrar_recibo') return 'Botón: Con Recibo';
+                return 'Botón: Cobrar e Imprimir';
             }
         },
         methods: {
@@ -1563,17 +1802,57 @@
                     Toast.fire({ title: 'Configuración SSL (Puerto 465) aplicada', icon: 'info' });
                 }
             },
+            cloudinaryPayload: function () {
+                var payload = Object.assign({}, this.cloudinary);
+                if (!payload.api_secret) {
+                    delete payload.api_secret;
+                }
+                return payload;
+            },
+            testCloudinary: function () {
+                var self = this;
+                this.cloudinaryTesting = true;
+                axios.post('{{ route('ajuste.cloudinary.test') }}', { cloudinary: this.cloudinaryPayload() })
+                    .then(function (response) {
+                        self.cloudinaryTesting = false;
+                        if (self.cloudinary.api_secret) {
+                            self.cloudinary.has_secret = true;
+                        }
+                        Swal.fire({
+                            title: '¡Conexión Exitosa!',
+                            text: response.data.message || 'La cuenta de Cloudinary está configurada y lista.',
+                            icon: 'success',
+                            confirmButtonColor: '#0a4d36'
+                        });
+                    })
+                    .catch(function (error) {
+                        self.cloudinaryTesting = false;
+                        var msg = (error.response && error.response.data && error.response.data.message)
+                            ? error.response.data.message
+                            : 'No se pudo conectar con Cloudinary. Verificá tus credenciales.';
+                        Swal.fire({
+                            title: 'Error de Conexión Cloudinary',
+                            text: msg,
+                            icon: 'error',
+                            confirmButtonColor: '#ef4444'
+                        });
+                    });
+            },
             updateCaja: function () {
                 var cajaPayload = [
                     { name: 'validez', value: this.caja[0].value },
                     { name: 'usuario', value: this.caja[1].value },
-                    { name: 'tipo_comprobante', value: this.venta.tipo_comprobante }
+                    { name: 'tipo_comprobante', value: this.venta.tipo_comprobante },
+                    { name: 'boton_principal', value: this.venta.boton_principal },
+                    { name: 'vender_sin_stock', value: Number(this.venta.vender_sin_stock) === 1 ? 1 : 0 },
+                    { name: 'descontar_stock', value: Number(this.venta.descontar_stock) === 1 ? 1 : 0 }
                 ];
                 return axios.post('{{ url('ajustes') }}', {
                     caja: cajaPayload,
                     mail: this.mailPayload(),
                     camara: this.camaraPayload(),
-                    mapas: this.mapasPayload()
+                    mapas: this.mapasPayload(),
+                    cloudinary: this.cloudinaryPayload()
                 });
             },
             updateVenta: function () {
@@ -1589,6 +1868,7 @@
                             if (typeof parsed.descontar_stock !== 'undefined') this.venta.descontar_stock = parsed.descontar_stock;
                             if (typeof parsed.vender_sin_stock !== 'undefined') this.venta.vender_sin_stock = parsed.vender_sin_stock;
                             if (parsed.tamano_ticket) this.venta.tamano_ticket = parsed.tamano_ticket;
+                            if (parsed.boton_principal) this.venta.boton_principal = parsed.boton_principal;
                         }
                     } catch (e) {}
                 }
@@ -1618,6 +1898,10 @@
                         self.guardando = false;
                         self.mail.password = '';
                         self.camara.password = '';
+                        if (self.cloudinary.api_secret) {
+                            self.cloudinary.has_secret = true;
+                        }
+                        self.cloudinary.api_secret = '';
                         Toast.fire({ title: 'Ajustes del sistema actualizados con éxito', icon: 'success' });
                     })
                     .catch(function (error) {

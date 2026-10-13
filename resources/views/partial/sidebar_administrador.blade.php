@@ -294,6 +294,12 @@
                                 <p>Referencia Factura</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('backup.index') }}" id="m_backup" class="nav-link">
+                                <i class="fas fa-database nav-icon text-success"></i>
+                                <p>Backup de Base de Datos</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
 

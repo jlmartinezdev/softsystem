@@ -8,16 +8,20 @@ class AddEmisionFieldsToSifenDocumentos extends Migration
 {
     public function up()
     {
-        Schema::table('sifen_documentos', function (Blueprint $table) {
-            $table->string('codigo_seguridad', 9)->nullable()->after('tipo_documento');
-            $table->string('digest_value', 255)->nullable()->after('qr_url');
-        });
+        if (Schema::hasTable('sifen_documentos') && !Schema::hasColumn('sifen_documentos', 'codigo_seguridad')) {
+            Schema::table('sifen_documentos', function (Blueprint $table) {
+                $table->string('codigo_seguridad', 9)->nullable()->after('tipo_documento');
+                $table->string('digest_value', 255)->nullable()->after('qr_url');
+            });
+        }
     }
 
     public function down()
     {
-        Schema::table('sifen_documentos', function (Blueprint $table) {
-            $table->dropColumn(['codigo_seguridad', 'digest_value']);
-        });
+        if (Schema::hasTable('sifen_documentos') && Schema::hasColumn('sifen_documentos', 'codigo_seguridad')) {
+            Schema::table('sifen_documentos', function (Blueprint $table) {
+                $table->dropColumn(['codigo_seguridad', 'digest_value']);
+            });
+        }
     }
 }

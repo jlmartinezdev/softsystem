@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Ajuste;
 use App\Support\CameraSettings;
+use App\Support\CloudinarySettings;
 use App\Support\MailSettings;
 use App\Support\MapSettings;
+use App\Services\CloudinaryService;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Mail;
@@ -16,25 +18,29 @@ class AjusteController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('permiso:ajuste_sistema,open')->only(['index']);
-        $this->middleware('permiso:ajuste_sistema,edit')->only(['update', 'testMail', 'testCamara']);
+        $this->middleware('permiso:ajuste_sistema,edit')->only(['update', 'testMail', 'testCamara', 'testCloudinary']);
     }
 
     public function index()
     {
-        $ajuste = Ajuste::where('categoria', 'caja')->orderBy('id')->get();
+        $ajuste = Ajuste::whereIn('categoria', ['caja', 'pos'])->orderBy('id')->get();
         $mail = MailSettings::all();
         $mail['password'] = '';
         $camara = CameraSettings::publicConfig();
         $mapas = MapSettings::publicConfig();
+        $cloudinary = CloudinarySettings::publicConfig();
 
-        return view('configuracion', compact('ajuste', 'mail', 'camara', 'mapas'));
+        return view('configuracion', compact('ajuste', 'mail', 'camara', 'mapas', 'cloudinary'));
     }
 
     public function update(Request $request)
     {
         if ($request->has('caja')) {
             foreach ($request->caja as $caja) {
-                Ajuste::where('name', $caja['name'])->update(['value' => $caja['value']]);
+                Ajuste::updateOrCreate(
+                    ['name' => $caja['name']],
+                    ['value' => $caja['value'] ?? '', 'categoria' => 'caja']
+                );
             }
         }
 
@@ -50,7 +56,23 @@ class AjusteController extends Controller
             MapSettings::save($request->mapas);
         }
 
+        if ($request->has('cloudinary')) {
+            CloudinarySettings::save($request->cloudinary);
+        }
+
         return response()->json(['ok' => true, 'message' => 'Ajustes actualizados']);
+    }
+
+    public function testCloudinary(Request $request)
+    {
+        $payload = $request->input('cloudinary', []);
+        $result = CloudinaryService::testConnection($payload);
+
+        if (!$result['ok']) {
+            return response()->json(['ok' => false, 'message' => $result['message']], 422);
+        }
+
+        return response()->json(['ok' => true, 'message' => $result['message']]);
     }
 
     public function testMail(Request $request)

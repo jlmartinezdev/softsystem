@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 
 <head>
+    <meta charset="utf-8">
+    <title>Recibo de Venta Nº {{ $venta->nro_fact_ventas ?? '' }} - {{ $empresa->emp_nombre ?? 'SoftSystem' }}</title>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
@@ -28,34 +30,34 @@
 <body>
 
     <div class="container">
-        <div style="font-size: 16pt; font-style: italic; color: #3393FF; font-weight: bold;">
-            <center>COMPROBANTE DE VENTA</center>
+        <div style="font-size: 16pt; font-style: italic; color: #0a4d36; font-weight: bold;">
+            <center>RECIBO DE VENTA</center>
         </div>
 
         <hr class="bg-primary" style="height: 4px; margin-bottom: 0px">
         <div class="row">
             <div class="col-4">
-                <img src="{{asset('img/'.$empresa->emp_logo)}}" alt="{{$empresa->emp_nombre}}">
+                <img src="{{ $empresa && $empresa->emp_logo ? asset('img/'.$empresa->emp_logo) : asset('img/logo_negro.png') }}" alt="{{ $empresa->emp_nombre ?? 'Empresa' }}" style="max-height: 90px; max-width: 100%;">
             </div>
             <div class="col-4">
                 <ul class="list-unstyled">
-                    <li class="font-weight-bold text-uppercase" style="font-size: 1.3em"> {{ $empresa->emp_nombre }}</li>
-                    <li>{{ $empresa->emp_descripcion }}</li>
-                    <li>Direccion:{{ $empresa->emp_direccion }}</li>
-                    <li>Cel:{{ $empresa->emp_celular }}</li>
+                    <li class="font-weight-bold text-uppercase" style="font-size: 1.3em"> {{ $empresa->emp_nombre ?? '' }}</li>
+                    <li>{{ $empresa->emp_descripcion ?? '' }}</li>
+                    <li>Direccion: {{ $empresa->emp_direccion ?? '' }}</li>
+                    <li>Cel: {{ $empresa->emp_celular ?? '' }}</li>
                 </ul>
             </div>
             <div class="col-4 p-2">
                 <div class="border rounded p-2 text-center">
-                    <ul class="list-unstyled">
+                    <ul class="list-unstyled mb-0">
                     <li>
-                        <h5><strong>Nº DE VENTA</strong></h5>
+                        <h5><strong>Nº DE RECIBO</strong></h5>
                     </li>
-                    <li>
+                    <li class="font-weight-bold text-primary" style="font-size: 1.15em;">
                         {{ str_pad($venta->nro_fact_ventas, 7, '0', STR_PAD_LEFT) }}
                     </li>
                     <li><strong>RUC</strong></li>
-                    <li>{{ $empresa->emp_ruc }}</li>
+                    <li>{{ $empresa->emp_ruc ?? '' }}</li>
                 </ul>
                 </div>
                 
@@ -108,15 +110,20 @@
                 {{ NumeroALetras::convertir($venta->venta_total, 'GUARANIES') }}.-
             </div>
             <hr>
-            <div class="d-print-none">
-                <button class="btn btn-primary"  onclick="javascript:window.print()" > Imprimir</button>
-                <a href="{{route('infventa.imprimir')}}" class="btn btn-secondary"> Atras</a>
+            <div class="d-print-none mt-3">
+                <button class="btn btn-primary" onclick="javascript:window.print()"><i class="fa fa-print mr-1"></i> Imprimir</button>
+                <a href="{{route('venta')}}" class="btn btn-success"><i class="fa fa-shopping-cart mr-1"></i> Volver a Ventas</a>
+                <a href="{{route('infventa.imprimir')}}" class="btn btn-secondary"> Ir a Informes</a>
             </div>
 
         </div>
     </div>
 
-
+<script>
+    window.onload = function() {
+        window.print();
+    };
+</script>
 </body>
 
 </html>

@@ -1,1 +1,1879 @@
-!function(e){var t={};function r(n){if(t[n])return t[n].exports;var a=t[n]={i:n,l:!1,exports:{}};return e[n].call(a.exports,a,a.exports,r),a.l=!0,a.exports}r.m=e,r.c=t,r.d=function(e,t,n){r.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:n})},r.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},r.t=function(e,t){if(1&t&&(e=r(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var n=Object.create(null);if(r.r(n),Object.defineProperty(n,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var a in e)r.d(n,a,function(t){return e[t]}.bind(null,a));return n},r.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return r.d(t,"a",t),t},r.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},r.p="/",r(r.s=3)}({3:function(e,t,r){e.exports=r("c22O")},"9tPo":function(e,t){e.exports=function(e){var t="undefined"!=typeof window&&window.location;if(!t)throw new Error("fixUrls requires window.location");if(!e||"string"!=typeof e)return e;var r=t.protocol+"//"+t.host,n=r+t.pathname.replace(/\/[^\/]*$/,"/");return e.replace(/url\s*\(((?:[^)(]|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gi,(function(e,t){var a,o=t.trim().replace(/^"(.*)"$/,(function(e,t){return t})).replace(/^'(.*)'$/,(function(e,t){return t}));return/^(#|data:|http:\/\/|https:\/\/|file:\/\/\/|\s*$)/i.test(o)?e:(a=0===o.indexOf("//")?o:0===o.indexOf("/")?r+o:n+o.replace(/^\.\//,""),"url("+JSON.stringify(a)+")")}))}},FPGB:function(e,t,r){"use strict";r.r(t);var n={name:"busquedaproveedor",data:function(){return{proveedores:[],proveedor:{},txtproveedor:"",requestSend:!1,searchTimer:null}},methods:{onSearchInput:function(){var e=this;clearTimeout(this.searchTimer),this.searchTimer=setTimeout((function(){e.buscar()}),250)},buscarInmediato:function(){clearTimeout(this.searchTimer),this.buscar()},buscar:function(){var e=this;e.requestSend=!0;var t=(e.txtproveedor||"").trim(),r=t.length>0?"proveedor/buscar":"proveedor/all",n=t.length>0?{nombre:t}:{};axios.get(r,{params:n}).then((function(t){e.requestSend=!1,e.proveedores=t.data||[]})).catch((function(t){e.requestSend=!1,console.error("Error al buscar proveedor:",t.message)}))},limpiarBusqueda:function(){var e=this;this.txtproveedor="",this.buscarInmediato(),this.$nextTick((function(){e.$refs.searchInput&&e.$refs.searchInput.focus()}))},selproveedor:function(e){this.$emit("set_proveedor",e)}},mounted:function(){this.buscar();var e=this;"undefined"!=typeof $&&$("#busquedaProveedor").on("shown.bs.modal",(function(){e.$refs.searchInput&&(e.$refs.searchInput.focus(),e.$refs.searchInput.select())}))}},a=(r("eZIC"),r("KHd+")),o=Object(a.a)(n,(function(){var e=this,t=e.$createElement,r=e._self._c||t;return r("div",{staticClass:"busqueda-proveedor-wrapper"},[r("div",{staticClass:"modal fade",attrs:{id:"busquedaProveedor",tabindex:"-1",role:"dialog","aria-labelledby":"busquedaProveedorLabel","aria-hidden":"true"}},[r("div",{staticClass:"modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable",attrs:{role:"document"}},[r("div",{staticClass:"modal-content modal-moderno shadow-lg border-0"},[e._m(0),e._v(" "),r("div",{staticClass:"modal-body p-3"},[r("div",{staticClass:"buscador-toolbar mb-3"},[r("div",{staticClass:"input-group search-group"},[e._m(1),e._v(" "),r("input",{directives:[{name:"model",rawName:"v-model",value:e.txtproveedor,expression:"txtproveedor"}],ref:"searchInput",staticClass:"form-control search-input border-left-0",attrs:{type:"text",placeholder:"Escribí nombre de fantasía, razón social, RUC o teléfono...",autocomplete:"off"},domProps:{value:e.txtproveedor},on:{input:[function(t){t.target.composing||(e.txtproveedor=t.target.value)},e.onSearchInput],keyup:function(t){return!t.type.indexOf("key")&&e._k(t.keyCode,"enter",13,t.key,"Enter")?null:e.buscarInmediato(t)}}}),e._v(" "),e.txtproveedor?r("div",{staticClass:"input-group-append"},[r("button",{staticClass:"btn btn-clear border-left-0 border-right-0",attrs:{type:"button",title:"Borrar búsqueda"},on:{click:e.limpiarBusqueda}},[r("i",{staticClass:"fa fa-times text-muted"})])]):e._e(),e._v(" "),r("div",{staticClass:"input-group-append"},[r("button",{staticClass:"btn btn-pos-primary px-3 font-weight-bold",attrs:{type:"button"},on:{click:e.buscarInmediato}},[e.requestSend?[r("span",{staticClass:"spinner-border spinner-border-sm mr-1",attrs:{role:"status"}}),e._v(" Buscando...\n                                    ")]:[r("i",{staticClass:"fa fa-search mr-1"}),e._v(" Buscar\n                                    ")]],2)])]),e._v(" "),r("div",{staticClass:"d-flex justify-content-between align-items-center mt-2 px-1"},[r("span",{staticClass:"small text-muted font-weight-bold"},[r("i",{staticClass:"fa fa-building mr-1 text-success"}),e._v(" "+e._s(e.proveedores.length)+" proveedor(es) disponible(s)\n                            ")]),e._v(" "),e.requestSend?r("span",{staticClass:"badge badge-success-soft"},[r("i",{staticClass:"fa fa-circle-notch fa-spin mr-1"}),e._v(" Consultando...\n                            ")]):e._e()])]),e._v(" "),r("div",{staticClass:"table-responsive border rounded-lg proveedor-tabla-wrap"},[r("table",{staticClass:"table table-hover table-proveedores mb-0"},[e._m(2),e._v(" "),e.requestSend&&!e.proveedores.length?r("tbody",[e._m(3)]):e.proveedores.length?r("tbody",e._l(e.proveedores,(function(t){return r("tr",{key:t.PROVEEDOR_cod,staticClass:"proveedor-fila",attrs:{title:"Clic para seleccionar este proveedor"},on:{click:function(r){return e.selproveedor(t)}}},[r("td",[r("span",{staticClass:"badge badge-ruc"},[r("i",{staticClass:"fa fa-id-card mr-1 text-muted"}),e._v(e._s(t.proveedor_ruc||"S/ RUC")+"\n                                        ")])]),e._v(" "),r("td",[r("div",{staticClass:"proveedor-nombre font-cairo font-weight-bold"},[e._v("\n                                            "+e._s(t.proveedor_nombre)+"\n                                        ")]),e._v(" "),r("small",{staticClass:"text-muted"},[e._v("ID: #"+e._s(t.PROVEEDOR_cod))])]),e._v(" "),r("td",[t.proveedor_telef?r("span",{staticClass:"badge badge-telef"},[r("i",{staticClass:"fa fa-phone mr-1 text-muted"}),e._v(e._s(t.proveedor_telef)+"\n                                        ")]):r("span",{staticClass:"text-muted small"},[e._v("Sin teléfono")])]),e._v(" "),r("td",[r("span",{staticClass:"small text-muted text-truncate d-inline-block",staticStyle:{"max-width":"220px"},attrs:{title:t.proveedor_direc}},[t.proveedor_direc?r("i",{staticClass:"fa fa-map-marker-alt mr-1 text-muted"}):e._e(),e._v("\n                                            "+e._s(t.proveedor_direc||"Sin dirección")+"\n                                        ")])]),e._v(" "),r("td",{staticClass:"text-right"},[r("button",{staticClass:"btn btn-sm btn-seleccionar font-weight-bold",attrs:{type:"button"},on:{click:function(r){return r.stopPropagation(),e.selproveedor(t)}}},[r("i",{staticClass:"fa fa-check mr-1"}),e._v(" Elegir\n                                        ")])])])})),0):r("tbody",[r("tr",[r("td",{staticClass:"text-center py-5",attrs:{colspan:"5"}},[e._m(4),e._v(" "),r("h6",{staticClass:"font-weight-bold mb-1 font-cairo"},[e._v("No encontramos proveedores")]),e._v(" "),e.txtproveedor?r("p",{staticClass:"small text-muted mb-3"},[e._v('\n                                            No hay resultados para "'),r("strong",[e._v(e._s(e.txtproveedor))]),e._v('". Probá con otro término o RUC.\n                                        ')]):r("p",{staticClass:"small text-muted mb-3"},[e._v("\n                                            No hay proveedores disponibles en la base de datos.\n                                        ")]),e._v(" "),r("div",{staticClass:"d-flex justify-content-center gap-2"},[e.txtproveedor?r("button",{staticClass:"btn btn-outline-secondary btn-sm mr-2",attrs:{type:"button"},on:{click:e.limpiarBusqueda}},[r("i",{staticClass:"fa fa-undo mr-1"}),e._v(" Ver todos los proveedores\n                                            ")]):e._e(),e._v(" "),e._m(5)])])])])])])]),e._v(" "),e._m(6)])])])])}),[function(){var e=this,t=e.$createElement,r=e._self._c||t;return r("div",{staticClass:"modal-header d-flex align-items-center justify-content-between p-3 border-bottom"},[r("div",{staticClass:"d-flex align-items-center"},[r("div",{staticClass:"modal-header-icon mr-2.5"},[r("i",{staticClass:"fa fa-truck-loading text-success"})]),e._v(" "),r("div",[r("h5",{staticClass:"modal-title font-weight-bold font-cairo mb-0",attrs:{id:"busquedaProveedorLabel"}},[e._v("\n                                Seleccionar Proveedor\n                            ")]),e._v(" "),r("small",{staticClass:"text-muted"},[e._v("\n                                Buscá por razón social, RUC o teléfono · Clic para seleccionar\n                            ")])])]),e._v(" "),r("div",{staticClass:"d-flex align-items-center"},[r("a",{staticClass:"btn btn-outline-primary btn-sm mr-2 font-weight-bold d-none d-sm-inline-flex align-items-center",attrs:{href:"/proveedor",target:"_blank",title:"Abrir catálogo de proveedores en nueva pestaña"}},[r("i",{staticClass:"fa fa-plus mr-1"}),e._v(" Nuevo Proveedor\n                        ")]),e._v(" "),r("button",{staticClass:"close",attrs:{type:"button","data-dismiss":"modal","aria-label":"Cerrar"}},[r("span",{attrs:{"aria-hidden":"true"}},[e._v("×")])])])])},function(){var e=this.$createElement,t=this._self._c||e;return t("div",{staticClass:"input-group-prepend"},[t("span",{staticClass:"input-group-text search-prepend border-right-0"},[t("i",{staticClass:"fa fa-search text-muted"})])])},function(){var e=this,t=e.$createElement,r=e._self._c||t;return r("thead",[r("tr",[r("th",{staticStyle:{width:"130px"}},[e._v("RUC")]),e._v(" "),r("th",[e._v("Razón Social / Nombre")]),e._v(" "),r("th",[e._v("Contacto / Teléfono")]),e._v(" "),r("th",[e._v("Dirección")]),e._v(" "),r("th",{staticClass:"text-right",staticStyle:{width:"100px"}},[e._v("Acción")])])])},function(){var e=this.$createElement,t=this._self._c||e;return t("tr",[t("td",{staticClass:"text-center py-5",attrs:{colspan:"5"}},[t("div",{staticClass:"spinner-border text-success mb-2",attrs:{role:"status"}}),this._v(" "),t("div",{staticClass:"font-weight-bold text-muted"},[this._v("Cargando lista de proveedores...")])])])},function(){var e=this.$createElement,t=this._self._c||e;return t("div",{staticClass:"empty-icon mb-2"},[t("i",{staticClass:"fa fa-building fa-3x text-muted",staticStyle:{opacity:"0.35"}})])},function(){var e=this.$createElement,t=this._self._c||e;return t("a",{staticClass:"btn btn-success btn-sm",attrs:{href:"/proveedor",target:"_blank"}},[t("i",{staticClass:"fa fa-plus mr-1"}),this._v(" Registrar Nuevo Proveedor\n                                            ")])},function(){var e=this.$createElement,t=this._self._c||e;return t("div",{staticClass:"modal-footer d-flex align-items-center justify-content-between p-2.5 border-top bg-light-panel"},[t("span",{staticClass:"small text-muted"},[t("i",{staticClass:"fa fa-lightbulb mr-1 text-warning"}),this._v(" Podés hacer clic en cualquier parte de la fila para seleccionarlo al instante.\n                    ")]),this._v(" "),t("button",{staticClass:"btn btn-secondary px-3 font-weight-bold",attrs:{type:"button","data-dismiss":"modal"}},[t("i",{staticClass:"fa fa-times mr-1"}),this._v(" Cerrar\n                    ")])])}],!1,null,"4904e41e",null);t.default=o.exports},I1BE:function(e,t){e.exports=function(e){var t=[];return t.toString=function(){return this.map((function(t){var r=function(e,t){var r=e[1]||"",n=e[3];if(!n)return r;if(t&&"function"==typeof btoa){var a=(s=n,"/*# sourceMappingURL=data:application/json;charset=utf-8;base64,"+btoa(unescape(encodeURIComponent(JSON.stringify(s))))+" */"),o=n.sources.map((function(e){return"/*# sourceURL="+n.sourceRoot+e+" */"}));return[r].concat(o).concat([a]).join("\n")}var s;return[r].join("\n")}(t,e);return t[2]?"@media "+t[2]+"{"+r+"}":r})).join("")},t.i=function(e,r){"string"==typeof e&&(e=[[null,e,""]]);for(var n={},a=0;a<this.length;a++){var o=this[a][0];"number"==typeof o&&(n[o]=!0)}for(a=0;a<e.length;a++){var s=e[a];"number"==typeof s[0]&&n[s[0]]||(r&&!s[2]?s[2]=r:r&&(s[2]="("+s[2]+") and ("+r+")"),t.push(s))}},t}},"KHd+":function(e,t,r){"use strict";function n(e,t,r,n,a,o,s,i){var d,c="function"==typeof e?e.options:e;if(t&&(c.render=t,c.staticRenderFns=r,c._compiled=!0),n&&(c.functional=!0),o&&(c._scopeId="data-v-"+o),s?(d=function(e){(e=e||this.$vnode&&this.$vnode.ssrContext||this.parent&&this.parent.$vnode&&this.parent.$vnode.ssrContext)||"undefined"==typeof __VUE_SSR_CONTEXT__||(e=__VUE_SSR_CONTEXT__),a&&a.call(this,e),e&&e._registeredComponents&&e._registeredComponents.add(s)},c._ssrRegister=d):a&&(d=i?function(){a.call(this,this.$root.$options.shadowRoot)}:a),d)if(c.functional){c._injectStyles=d;var l=c.render;c.render=function(e,t){return d.call(t),l(e,t)}}else{var f=c.beforeCreate;c.beforeCreate=f?[].concat(f,d):[d]}return{exports:e,options:c}}r.d(t,"a",(function(){return n}))},"aET+":function(e,t,r){var n,a,o={},s=(n=function(){return window&&document&&document.all&&!window.atob},function(){return void 0===a&&(a=n.apply(this,arguments)),a}),i=function(e,t){return t?t.querySelector(e):document.querySelector(e)},d=function(e){var t={};return function(e,r){if("function"==typeof e)return e();if(void 0===t[e]){var n=i.call(this,e,r);if(window.HTMLIFrameElement&&n instanceof window.HTMLIFrameElement)try{n=n.contentDocument.head}catch(e){n=null}t[e]=n}return t[e]}}(),c=null,l=0,f=[],u=r("9tPo");function p(e,t){for(var r=0;r<e.length;r++){var n=e[r],a=o[n.id];if(a){a.refs++;for(var s=0;s<a.parts.length;s++)a.parts[s](n.parts[s]);for(;s<n.parts.length;s++)a.parts.push(y(n.parts[s],t))}else{var i=[];for(s=0;s<n.parts.length;s++)i.push(y(n.parts[s],t));o[n.id]={id:n.id,refs:1,parts:i}}}}function v(e,t){for(var r=[],n={},a=0;a<e.length;a++){var o=e[a],s=t.base?o[0]+t.base:o[0],i={css:o[1],media:o[2],sourceMap:o[3]};n[s]?n[s].parts.push(i):r.push(n[s]={id:s,parts:[i]})}return r}function b(e,t){var r=d(e.insertInto);if(!r)throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");var n=f[f.length-1];if("top"===e.insertAt)n?n.nextSibling?r.insertBefore(t,n.nextSibling):r.appendChild(t):r.insertBefore(t,r.firstChild),f.push(t);else if("bottom"===e.insertAt)r.appendChild(t);else{if("object"!=typeof e.insertAt||!e.insertAt.before)throw new Error("[Style Loader]\n\n Invalid value for parameter 'insertAt' ('options.insertAt') found.\n Must be 'top', 'bottom', or Object.\n (https://github.com/webpack-contrib/style-loader#insertat)\n");var a=d(e.insertAt.before,r);r.insertBefore(t,a)}}function m(e){if(null===e.parentNode)return!1;e.parentNode.removeChild(e);var t=f.indexOf(e);t>=0&&f.splice(t,1)}function h(e){var t=document.createElement("style");if(void 0===e.attrs.type&&(e.attrs.type="text/css"),void 0===e.attrs.nonce){var n=function(){0;return r.nc}();n&&(e.attrs.nonce=n)}return g(t,e.attrs),b(e,t),t}function g(e,t){Object.keys(t).forEach((function(r){e.setAttribute(r,t[r])}))}function y(e,t){var r,n,a,o;if(t.transform&&e.css){if(!(o="function"==typeof t.transform?t.transform(e.css):t.transform.default(e.css)))return function(){};e.css=o}if(t.singleton){var s=l++;r=c||(c=h(t)),n=C.bind(null,r,s,!1),a=C.bind(null,r,s,!0)}else e.sourceMap&&"function"==typeof URL&&"function"==typeof URL.createObjectURL&&"function"==typeof URL.revokeObjectURL&&"function"==typeof Blob&&"function"==typeof btoa?(r=function(e){var t=document.createElement("link");return void 0===e.attrs.type&&(e.attrs.type="text/css"),e.attrs.rel="stylesheet",g(t,e.attrs),b(e,t),t}(t),n=w.bind(null,r,t),a=function(){m(r),r.href&&URL.revokeObjectURL(r.href)}):(r=h(t),n=k.bind(null,r),a=function(){m(r)});return n(e),function(t){if(t){if(t.css===e.css&&t.media===e.media&&t.sourceMap===e.sourceMap)return;n(e=t)}else a()}}e.exports=function(e,t){if("undefined"!=typeof DEBUG&&DEBUG&&"object"!=typeof document)throw new Error("The style-loader cannot be used in a non-browser environment");(t=t||{}).attrs="object"==typeof t.attrs?t.attrs:{},t.singleton||"boolean"==typeof t.singleton||(t.singleton=s()),t.insertInto||(t.insertInto="head"),t.insertAt||(t.insertAt="bottom");var r=v(e,t);return p(r,t),function(e){for(var n=[],a=0;a<r.length;a++){var s=r[a];(i=o[s.id]).refs--,n.push(i)}e&&p(v(e,t),t);for(a=0;a<n.length;a++){var i;if(0===(i=n[a]).refs){for(var d=0;d<i.parts.length;d++)i.parts[d]();delete o[i.id]}}}};var _,x=(_=[],function(e,t){return _[e]=t,_.filter(Boolean).join("\n")});function C(e,t,r,n){var a=r?"":n.css;if(e.styleSheet)e.styleSheet.cssText=x(t,a);else{var o=document.createTextNode(a),s=e.childNodes;s[t]&&e.removeChild(s[t]),s.length?e.insertBefore(o,s[t]):e.appendChild(o)}}function k(e,t){var r=t.css,n=t.media;if(n&&e.setAttribute("media",n),e.styleSheet)e.styleSheet.cssText=r;else{for(;e.firstChild;)e.removeChild(e.firstChild);e.appendChild(document.createTextNode(r))}}function w(e,t,r){var n=r.css,a=r.sourceMap,o=void 0===t.convertToAbsoluteUrls&&a;(t.convertToAbsoluteUrls||o)&&(n=u(n)),a&&(n+="\n/*# sourceMappingURL=data:application/json;base64,"+btoa(unescape(encodeURIComponent(JSON.stringify(a))))+" */");var s=new Blob([n],{type:"text/css"}),i=e.href;e.href=URL.createObjectURL(s),i&&URL.revokeObjectURL(i)}},aRUS:function(e,t,r){(e.exports=r("I1BE")(!1)).push([e.i,"\n.modal-moderno[data-v-4904e41e] {\n    border-radius: 16px;\n    overflow: hidden;\n    background: var(--dash-card-bg, #ffffff);\n    color: var(--dash-text-main, #1c2430);\n    border: 1px solid var(--dash-border, #e2e8f0) !important;\n}\nbody.dark-mode .modal-moderno[data-v-4904e41e] {\n    background: #1f2937;\n    color: #f3f4f6;\n    border-color: #374151 !important;\n}\n.modal-header-icon[data-v-4904e41e] {\n    width: 38px;\n    height: 38px;\n    border-radius: 10px;\n    background: var(--dash-primary-light, #eaf3ef);\n    border: 1px solid var(--dash-primary-border, #c8dfd5);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 1.15rem;\n}\nbody.dark-mode .modal-header-icon[data-v-4904e41e] {\n    background: #064e3b;\n    border-color: #047857;\n}\n.bg-light-panel[data-v-4904e41e] {\n    background-color: var(--dash-panel-bg, #f8fafc) !important;\n}\nbody.dark-mode .bg-light-panel[data-v-4904e41e] {\n    background-color: #111827 !important;\n}\n\n/* Buscador Toolbar */\n.search-group[data-v-4904e41e] {\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);\n    border-radius: 10px;\n}\n.search-prepend[data-v-4904e41e] {\n    background-color: var(--dash-panel-bg, #f8fafc) !important;\n    border-color: var(--dash-border, #e2e8f0) !important;\n    border-top-left-radius: 10px !important;\n    border-bottom-left-radius: 10px !important;\n}\nbody.dark-mode .search-prepend[data-v-4904e41e] {\n    background-color: #111827 !important;\n    border-color: #374151 !important;\n}\n.search-input[data-v-4904e41e] {\n    background-color: var(--dash-panel-bg, #f8fafc) !important;\n    border-color: var(--dash-border, #e2e8f0) !important;\n    color: var(--dash-text-main, #1c2430) !important;\n    font-size: 0.95rem;\n    padding: 0.55rem 0.85rem;\n}\nbody.dark-mode .search-input[data-v-4904e41e] {\n    background-color: #111827 !important;\n    border-color: #374151 !important;\n    color: #f3f4f6 !important;\n}\n.search-input[data-v-4904e41e]:focus {\n    background-color: var(--dash-card-bg, #ffffff) !important;\n    border-color: var(--dash-primary, #0a4d36) !important;\n    box-shadow: 0 0 0 3px var(--dash-primary-light, #eaf3ef) !important;\n}\n.btn-clear[data-v-4904e41e] {\n    background-color: var(--dash-panel-bg, #f8fafc);\n    border-color: var(--dash-border, #e2e8f0);\n}\nbody.dark-mode .btn-clear[data-v-4904e41e] {\n    background-color: #111827;\n    border-color: #374151;\n}\n.btn-pos-primary[data-v-4904e41e] {\n    background: linear-gradient(135deg, var(--dash-primary, #0a4d36), var(--dash-primary-dark, #073827));\n    color: #ffffff !important;\n    border: none;\n    border-top-right-radius: 10px !important;\n    border-bottom-right-radius: 10px !important;\n    transition: all 0.15s ease;\n}\n.btn-pos-primary[data-v-4904e41e]:hover {\n    filter: brightness(1.08);\n}\n.badge-success-soft[data-v-4904e41e] {\n    background: #ecfdf5;\n    color: #065f46;\n    border: 1px solid #a7f3d0;\n    font-size: 0.78rem;\n    padding: 0.25rem 0.5rem;\n    border-radius: 6px;\n}\nbody.dark-mode .badge-success-soft[data-v-4904e41e] {\n    background: #064e3b;\n    color: #a7f3d0;\n    border-color: #047857;\n}\n\n/* Tabla de Proveedores */\n.proveedor-tabla-wrap[data-v-4904e41e] {\n    max-height: 52vh;\n    overflow-y: auto;\n    border-color: var(--dash-border, #e2e8f0) !important;\n    border-radius: 12px;\n}\nbody.dark-mode .proveedor-tabla-wrap[data-v-4904e41e] {\n    border-color: #374151 !important;\n}\n.table-proveedores thead th[data-v-4904e41e] {\n    position: sticky;\n    top: 0;\n    z-index: 2;\n    background: var(--dash-panel-bg, #f8fafc);\n    color: var(--dash-text-muted, #64748b);\n    font-size: 0.78rem;\n    text-transform: uppercase;\n    letter-spacing: 0.04em;\n    font-weight: 700;\n    border-bottom: 2px solid var(--dash-border, #e2e8f0);\n    padding: 0.65rem 0.75rem;\n}\nbody.dark-mode .table-proveedores thead th[data-v-4904e41e] {\n    background: #111827;\n    color: #9ca3af;\n    border-bottom-color: #374151;\n}\n.proveedor-fila[data-v-4904e41e] {\n    cursor: pointer;\n    transition: background-color 0.15s ease, transform 0.1s ease;\n}\n.proveedor-fila[data-v-4904e41e]:hover {\n    background-color: var(--dash-primary-light, #eaf3ef) !important;\n}\nbody.dark-mode .proveedor-fila[data-v-4904e41e]:hover {\n    background-color: rgba(16, 185, 129, 0.12) !important;\n}\n.table-proveedores tbody td[data-v-4904e41e] {\n    vertical-align: middle;\n    padding: 0.65rem 0.75rem;\n    border-top: 1px solid var(--dash-border, #e2e8f0);\n    color: var(--dash-text-main, #1c2430);\n}\nbody.dark-mode .table-proveedores tbody td[data-v-4904e41e] {\n    border-top-color: #374151;\n    color: #f3f4f6;\n}\n.proveedor-nombre[data-v-4904e41e] {\n    font-size: 0.95rem;\n    line-height: 1.2;\n    color: var(--dash-text-main, #1c2430);\n}\nbody.dark-mode .proveedor-nombre[data-v-4904e41e] {\n    color: #f9fafb;\n}\n.badge-ruc[data-v-4904e41e] {\n    font-family: monospace;\n    font-weight: 700;\n    font-size: 0.85rem;\n    background: var(--dash-panel-bg, #f8fafc);\n    border: 1px solid var(--dash-border, #e2e8f0);\n    color: var(--dash-text-main, #1c2430);\n    padding: 0.25rem 0.5rem;\n    border-radius: 6px;\n}\nbody.dark-mode .badge-ruc[data-v-4904e41e] {\n    background: #111827;\n    border-color: #374151;\n    color: #e5e7eb;\n}\n.badge-telef[data-v-4904e41e] {\n    font-size: 0.82rem;\n    background: var(--dash-panel-bg, #f8fafc);\n    border: 1px solid var(--dash-border, #e2e8f0);\n    color: var(--dash-text-muted, #64748b);\n    padding: 0.2rem 0.45rem;\n    border-radius: 6px;\n}\nbody.dark-mode .badge-telef[data-v-4904e41e] {\n    background: #111827;\n    border-color: #374151;\n    color: #9ca3af;\n}\n.btn-seleccionar[data-v-4904e41e] {\n    background: #ffffff;\n    border: 1px solid var(--dash-primary-border, #c8dfd5);\n    color: var(--dash-primary-dark, #073827);\n    border-radius: 8px;\n    padding: 0.35rem 0.75rem;\n    transition: all 0.15s ease;\n}\nbody.dark-mode .btn-seleccionar[data-v-4904e41e] {\n    background: #1f2937;\n    border-color: #047857;\n    color: #10b981;\n}\n.proveedor-fila:hover .btn-seleccionar[data-v-4904e41e],\n.btn-seleccionar[data-v-4904e41e]:hover {\n    background: var(--dash-primary, #0a4d36) !important;\n    border-color: var(--dash-primary, #0a4d36) !important;\n    color: #ffffff !important;\n    transform: scale(1.02);\n    box-shadow: 0 2px 6px rgba(10, 77, 54, 0.25);\n}\n@media (max-width: 576px) {\n.table-proveedores thead th[data-v-4904e41e]:nth-child(3),\n    .table-proveedores tbody td[data-v-4904e41e]:nth-child(3),\n    .table-proveedores thead th[data-v-4904e41e]:nth-child(4),\n    .table-proveedores tbody td[data-v-4904e41e]:nth-child(4) {\n        display: none;\n}\n}\n",""])},c22O:function(e,t,r){Vue.component("busquedaproveedor",r("FPGB").default)},eZIC:function(e,t,r){"use strict";var n=r("rzPg");r.n(n).a},rzPg:function(e,t,r){var n=r("aRUS");"string"==typeof n&&(n=[[e.i,n,""]]);var a={hmr:!0,transform:void 0,insertInto:void 0};r("aET+")(n,a);n.locals&&(e.exports=n.locals)}});
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "/";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/busqueda_proveedor.vue?vue&type=script&lang=js&":
+/*!*****************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/busqueda_proveedor.vue?vue&type=script&lang=js& ***!
+  \*****************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: 'busquedaproveedor',
+  data: function data() {
+    return {
+      proveedores: [],
+      proveedor: {},
+      txtproveedor: '',
+      requestSend: false,
+      searchTimer: null
+    };
+  },
+  methods: {
+    onSearchInput: function onSearchInput() {
+      var _this = this;
+
+      clearTimeout(this.searchTimer);
+      this.searchTimer = setTimeout(function () {
+        _this.buscar();
+      }, 250);
+    },
+    buscarInmediato: function buscarInmediato() {
+      clearTimeout(this.searchTimer);
+      this.buscar();
+    },
+    buscar: function buscar() {
+      var self = this;
+      self.requestSend = true;
+      var term = (self.txtproveedor || '').trim();
+      var url = term.length > 0 ? 'proveedor/buscar' : 'proveedor/all';
+      var params = term.length > 0 ? {
+        nombre: term
+      } : {};
+      axios.get(url, {
+        params: params
+      }).then(function (response) {
+        self.requestSend = false;
+        self.proveedores = response.data || [];
+      })["catch"](function (error) {
+        self.requestSend = false;
+        console.error('Error al buscar proveedor:', error.message);
+      });
+    },
+    limpiarBusqueda: function limpiarBusqueda() {
+      var _this2 = this;
+
+      this.txtproveedor = '';
+      this.buscarInmediato();
+      this.$nextTick(function () {
+        if (_this2.$refs.searchInput) {
+          _this2.$refs.searchInput.focus();
+        }
+      });
+    },
+    selproveedor: function selproveedor(proveedor) {
+      this.$emit('set_proveedor', proveedor);
+    }
+  },
+  mounted: function mounted() {
+    this.buscar();
+    var self = this; // Autoenfoque al abrir el modal
+
+    if (typeof $ !== 'undefined') {
+      $('#busquedaProveedor').on('shown.bs.modal', function () {
+        if (self.$refs.searchInput) {
+          self.$refs.searchInput.focus();
+          self.$refs.searchInput.select();
+        }
+      });
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/busqueda_proveedor.vue?vue&type=style&index=0&id=19fba130&scoped=true&lang=css&":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/busqueda_proveedor.vue?vue&type=style&index=0&id=19fba130&scoped=true&lang=css& ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.modal-moderno[data-v-19fba130] {\n    border-radius: 16px;\n    overflow: hidden;\n    background: var(--dash-card-bg, #ffffff);\n    color: var(--dash-text-main, #1c2430);\n    border: 1px solid var(--dash-border, #e2e8f0) !important;\n}\nbody.dark-mode .modal-moderno[data-v-19fba130] {\n    background: #1f2937;\n    color: #f3f4f6;\n    border-color: #374151 !important;\n}\n.modal-header-icon[data-v-19fba130] {\n    width: 38px;\n    height: 38px;\n    border-radius: 10px;\n    background: var(--dash-primary-light, #eaf3ef);\n    border: 1px solid var(--dash-primary-border, #c8dfd5);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 1.15rem;\n}\nbody.dark-mode .modal-header-icon[data-v-19fba130] {\n    background: #064e3b;\n    border-color: #047857;\n}\n.bg-light-panel[data-v-19fba130] {\n    background-color: var(--dash-panel-bg, #f8fafc) !important;\n}\nbody.dark-mode .bg-light-panel[data-v-19fba130] {\n    background-color: #111827 !important;\n}\n\n/* Buscador Toolbar */\n.search-group[data-v-19fba130] {\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);\n    border-radius: 10px;\n}\n.search-prepend[data-v-19fba130] {\n    background-color: var(--dash-panel-bg, #f8fafc) !important;\n    border-color: var(--dash-border, #e2e8f0) !important;\n    border-top-left-radius: 10px !important;\n    border-bottom-left-radius: 10px !important;\n}\nbody.dark-mode .search-prepend[data-v-19fba130] {\n    background-color: #111827 !important;\n    border-color: #374151 !important;\n}\n.search-input[data-v-19fba130] {\n    background-color: var(--dash-panel-bg, #f8fafc) !important;\n    border-color: var(--dash-border, #e2e8f0) !important;\n    color: var(--dash-text-main, #1c2430) !important;\n    font-size: 0.95rem;\n    padding: 0.55rem 0.85rem;\n}\nbody.dark-mode .search-input[data-v-19fba130] {\n    background-color: #111827 !important;\n    border-color: #374151 !important;\n    color: #f3f4f6 !important;\n}\n.search-input[data-v-19fba130]:focus {\n    background-color: var(--dash-card-bg, #ffffff) !important;\n    border-color: var(--dash-primary, #0a4d36) !important;\n    box-shadow: 0 0 0 3px var(--dash-primary-light, #eaf3ef) !important;\n}\n.btn-clear[data-v-19fba130] {\n    background-color: var(--dash-panel-bg, #f8fafc);\n    border-color: var(--dash-border, #e2e8f0);\n}\nbody.dark-mode .btn-clear[data-v-19fba130] {\n    background-color: #111827;\n    border-color: #374151;\n}\n.btn-pos-primary[data-v-19fba130] {\n    background: linear-gradient(135deg, var(--dash-primary, #0a4d36), var(--dash-primary-dark, #073827));\n    color: #ffffff !important;\n    border: none;\n    border-top-right-radius: 10px !important;\n    border-bottom-right-radius: 10px !important;\n    transition: all 0.15s ease;\n}\n.btn-pos-primary[data-v-19fba130]:hover {\n    filter: brightness(1.08);\n}\n.badge-success-soft[data-v-19fba130] {\n    background: #ecfdf5;\n    color: #065f46;\n    border: 1px solid #a7f3d0;\n    font-size: 0.78rem;\n    padding: 0.25rem 0.5rem;\n    border-radius: 6px;\n}\nbody.dark-mode .badge-success-soft[data-v-19fba130] {\n    background: #064e3b;\n    color: #a7f3d0;\n    border-color: #047857;\n}\n\n/* Tabla de Proveedores */\n.proveedor-tabla-wrap[data-v-19fba130] {\n    max-height: 52vh;\n    overflow-y: auto;\n    border-color: var(--dash-border, #e2e8f0) !important;\n    border-radius: 12px;\n}\nbody.dark-mode .proveedor-tabla-wrap[data-v-19fba130] {\n    border-color: #374151 !important;\n}\n.table-proveedores thead th[data-v-19fba130] {\n    position: sticky;\n    top: 0;\n    z-index: 2;\n    background: var(--dash-panel-bg, #f8fafc);\n    color: var(--dash-text-muted, #64748b);\n    font-size: 0.78rem;\n    text-transform: uppercase;\n    letter-spacing: 0.04em;\n    font-weight: 700;\n    border-bottom: 2px solid var(--dash-border, #e2e8f0);\n    padding: 0.65rem 0.75rem;\n}\nbody.dark-mode .table-proveedores thead th[data-v-19fba130] {\n    background: #111827;\n    color: #9ca3af;\n    border-bottom-color: #374151;\n}\n.proveedor-fila[data-v-19fba130] {\n    cursor: pointer;\n    transition: background-color 0.15s ease, transform 0.1s ease;\n}\n.proveedor-fila[data-v-19fba130]:hover {\n    background-color: var(--dash-primary-light, #eaf3ef) !important;\n}\nbody.dark-mode .proveedor-fila[data-v-19fba130]:hover {\n    background-color: rgba(16, 185, 129, 0.12) !important;\n}\n.table-proveedores tbody td[data-v-19fba130] {\n    vertical-align: middle;\n    padding: 0.65rem 0.75rem;\n    border-top: 1px solid var(--dash-border, #e2e8f0);\n    color: var(--dash-text-main, #1c2430);\n}\nbody.dark-mode .table-proveedores tbody td[data-v-19fba130] {\n    border-top-color: #374151;\n    color: #f3f4f6;\n}\n.proveedor-nombre[data-v-19fba130] {\n    font-size: 0.95rem;\n    line-height: 1.2;\n    color: var(--dash-text-main, #1c2430);\n}\nbody.dark-mode .proveedor-nombre[data-v-19fba130] {\n    color: #f9fafb;\n}\n.badge-ruc[data-v-19fba130] {\n    font-family: monospace;\n    font-weight: 700;\n    font-size: 0.85rem;\n    background: var(--dash-panel-bg, #f8fafc);\n    border: 1px solid var(--dash-border, #e2e8f0);\n    color: var(--dash-text-main, #1c2430);\n    padding: 0.25rem 0.5rem;\n    border-radius: 6px;\n}\nbody.dark-mode .badge-ruc[data-v-19fba130] {\n    background: #111827;\n    border-color: #374151;\n    color: #e5e7eb;\n}\n.badge-telef[data-v-19fba130] {\n    font-size: 0.82rem;\n    background: var(--dash-panel-bg, #f8fafc);\n    border: 1px solid var(--dash-border, #e2e8f0);\n    color: var(--dash-text-muted, #64748b);\n    padding: 0.2rem 0.45rem;\n    border-radius: 6px;\n}\nbody.dark-mode .badge-telef[data-v-19fba130] {\n    background: #111827;\n    border-color: #374151;\n    color: #9ca3af;\n}\n.btn-seleccionar[data-v-19fba130] {\n    background: #ffffff;\n    border: 1px solid var(--dash-primary-border, #c8dfd5);\n    color: var(--dash-primary-dark, #073827);\n    border-radius: 8px;\n    padding: 0.35rem 0.75rem;\n    transition: all 0.15s ease;\n}\nbody.dark-mode .btn-seleccionar[data-v-19fba130] {\n    background: #1f2937;\n    border-color: #047857;\n    color: #10b981;\n}\n.proveedor-fila:hover .btn-seleccionar[data-v-19fba130],\n.btn-seleccionar[data-v-19fba130]:hover {\n    background: var(--dash-primary, #0a4d36) !important;\n    border-color: var(--dash-primary, #0a4d36) !important;\n    color: #ffffff !important;\n    transform: scale(1.02);\n    box-shadow: 0 2px 6px rgba(10, 77, 54, 0.25);\n}\n@media (max-width: 576px) {\n.table-proveedores thead th[data-v-19fba130]:nth-child(3),\n    .table-proveedores tbody td[data-v-19fba130]:nth-child(3),\n    .table-proveedores thead th[data-v-19fba130]:nth-child(4),\n    .table-proveedores tbody td[data-v-19fba130]:nth-child(4) {\n        display: none;\n}\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/lib/css-base.js":
+/*!*************************************************!*\
+  !*** ./node_modules/css-loader/lib/css-base.js ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+module.exports = function(useSourceMap) {
+	var list = [];
+
+	// return the list of modules as css string
+	list.toString = function toString() {
+		return this.map(function (item) {
+			var content = cssWithMappingToString(item, useSourceMap);
+			if(item[2]) {
+				return "@media " + item[2] + "{" + content + "}";
+			} else {
+				return content;
+			}
+		}).join("");
+	};
+
+	// import a list of modules into the list
+	list.i = function(modules, mediaQuery) {
+		if(typeof modules === "string")
+			modules = [[null, modules, ""]];
+		var alreadyImportedModules = {};
+		for(var i = 0; i < this.length; i++) {
+			var id = this[i][0];
+			if(typeof id === "number")
+				alreadyImportedModules[id] = true;
+		}
+		for(i = 0; i < modules.length; i++) {
+			var item = modules[i];
+			// skip already imported module
+			// this implementation is not 100% perfect for weird media query combinations
+			//  when a module is imported multiple times with different media queries.
+			//  I hope this will never occur (Hey this way we have smaller bundles)
+			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+				if(mediaQuery && !item[2]) {
+					item[2] = mediaQuery;
+				} else if(mediaQuery) {
+					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+				}
+				list.push(item);
+			}
+		}
+	};
+	return list;
+};
+
+function cssWithMappingToString(item, useSourceMap) {
+	var content = item[1] || '';
+	var cssMapping = item[3];
+	if (!cssMapping) {
+		return content;
+	}
+
+	if (useSourceMap && typeof btoa === 'function') {
+		var sourceMapping = toComment(cssMapping);
+		var sourceURLs = cssMapping.sources.map(function (source) {
+			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
+		});
+
+		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
+	}
+
+	return [content].join('\n');
+}
+
+// Adapted from convert-source-map (MIT)
+function toComment(sourceMap) {
+	// eslint-disable-next-line no-undef
+	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
+	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
+
+	return '/*# ' + data + ' */';
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/busqueda_proveedor.vue?vue&type=style&index=0&id=19fba130&scoped=true&lang=css&":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/busqueda_proveedor.vue?vue&type=style&index=0&id=19fba130&scoped=true&lang=css& ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../node_modules/css-loader??ref--6-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--6-2!../../../node_modules/vue-loader/lib??vue-loader-options!./busqueda_proveedor.vue?vue&type=style&index=0&id=19fba130&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/busqueda_proveedor.vue?vue&type=style&index=0&id=19fba130&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/lib/addStyles.js":
+/*!****************************************************!*\
+  !*** ./node_modules/style-loader/lib/addStyles.js ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+var stylesInDom = {};
+
+var	memoize = function (fn) {
+	var memo;
+
+	return function () {
+		if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+		return memo;
+	};
+};
+
+var isOldIE = memoize(function () {
+	// Test for IE <= 9 as proposed by Browserhacks
+	// @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
+	// Tests for existence of standard globals is to allow style-loader
+	// to operate correctly into non-standard environments
+	// @see https://github.com/webpack-contrib/style-loader/issues/177
+	return window && document && document.all && !window.atob;
+});
+
+var getTarget = function (target, parent) {
+  if (parent){
+    return parent.querySelector(target);
+  }
+  return document.querySelector(target);
+};
+
+var getElement = (function (fn) {
+	var memo = {};
+
+	return function(target, parent) {
+                // If passing function in options, then use it for resolve "head" element.
+                // Useful for Shadow Root style i.e
+                // {
+                //   insertInto: function () { return document.querySelector("#foo").shadowRoot }
+                // }
+                if (typeof target === 'function') {
+                        return target();
+                }
+                if (typeof memo[target] === "undefined") {
+			var styleTarget = getTarget.call(this, target, parent);
+			// Special case to return head of iframe instead of iframe itself
+			if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+				try {
+					// This will throw an exception if access to iframe is blocked
+					// due to cross-origin restrictions
+					styleTarget = styleTarget.contentDocument.head;
+				} catch(e) {
+					styleTarget = null;
+				}
+			}
+			memo[target] = styleTarget;
+		}
+		return memo[target]
+	};
+})();
+
+var singleton = null;
+var	singletonCounter = 0;
+var	stylesInsertedAtTop = [];
+
+var	fixUrls = __webpack_require__(/*! ./urls */ "./node_modules/style-loader/lib/urls.js");
+
+module.exports = function(list, options) {
+	if (typeof DEBUG !== "undefined" && DEBUG) {
+		if (typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+	}
+
+	options = options || {};
+
+	options.attrs = typeof options.attrs === "object" ? options.attrs : {};
+
+	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+	// tags it will allow on a page
+	if (!options.singleton && typeof options.singleton !== "boolean") options.singleton = isOldIE();
+
+	// By default, add <style> tags to the <head> element
+        if (!options.insertInto) options.insertInto = "head";
+
+	// By default, add <style> tags to the bottom of the target
+	if (!options.insertAt) options.insertAt = "bottom";
+
+	var styles = listToStyles(list, options);
+
+	addStylesToDom(styles, options);
+
+	return function update (newList) {
+		var mayRemove = [];
+
+		for (var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+
+			domStyle.refs--;
+			mayRemove.push(domStyle);
+		}
+
+		if(newList) {
+			var newStyles = listToStyles(newList, options);
+			addStylesToDom(newStyles, options);
+		}
+
+		for (var i = 0; i < mayRemove.length; i++) {
+			var domStyle = mayRemove[i];
+
+			if(domStyle.refs === 0) {
+				for (var j = 0; j < domStyle.parts.length; j++) domStyle.parts[j]();
+
+				delete stylesInDom[domStyle.id];
+			}
+		}
+	};
+};
+
+function addStylesToDom (styles, options) {
+	for (var i = 0; i < styles.length; i++) {
+		var item = styles[i];
+		var domStyle = stylesInDom[item.id];
+
+		if(domStyle) {
+			domStyle.refs++;
+
+			for(var j = 0; j < domStyle.parts.length; j++) {
+				domStyle.parts[j](item.parts[j]);
+			}
+
+			for(; j < item.parts.length; j++) {
+				domStyle.parts.push(addStyle(item.parts[j], options));
+			}
+		} else {
+			var parts = [];
+
+			for(var j = 0; j < item.parts.length; j++) {
+				parts.push(addStyle(item.parts[j], options));
+			}
+
+			stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+		}
+	}
+}
+
+function listToStyles (list, options) {
+	var styles = [];
+	var newStyles = {};
+
+	for (var i = 0; i < list.length; i++) {
+		var item = list[i];
+		var id = options.base ? item[0] + options.base : item[0];
+		var css = item[1];
+		var media = item[2];
+		var sourceMap = item[3];
+		var part = {css: css, media: media, sourceMap: sourceMap};
+
+		if(!newStyles[id]) styles.push(newStyles[id] = {id: id, parts: [part]});
+		else newStyles[id].parts.push(part);
+	}
+
+	return styles;
+}
+
+function insertStyleElement (options, style) {
+	var target = getElement(options.insertInto)
+
+	if (!target) {
+		throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");
+	}
+
+	var lastStyleElementInsertedAtTop = stylesInsertedAtTop[stylesInsertedAtTop.length - 1];
+
+	if (options.insertAt === "top") {
+		if (!lastStyleElementInsertedAtTop) {
+			target.insertBefore(style, target.firstChild);
+		} else if (lastStyleElementInsertedAtTop.nextSibling) {
+			target.insertBefore(style, lastStyleElementInsertedAtTop.nextSibling);
+		} else {
+			target.appendChild(style);
+		}
+		stylesInsertedAtTop.push(style);
+	} else if (options.insertAt === "bottom") {
+		target.appendChild(style);
+	} else if (typeof options.insertAt === "object" && options.insertAt.before) {
+		var nextSibling = getElement(options.insertAt.before, target);
+		target.insertBefore(style, nextSibling);
+	} else {
+		throw new Error("[Style Loader]\n\n Invalid value for parameter 'insertAt' ('options.insertAt') found.\n Must be 'top', 'bottom', or Object.\n (https://github.com/webpack-contrib/style-loader#insertat)\n");
+	}
+}
+
+function removeStyleElement (style) {
+	if (style.parentNode === null) return false;
+	style.parentNode.removeChild(style);
+
+	var idx = stylesInsertedAtTop.indexOf(style);
+	if(idx >= 0) {
+		stylesInsertedAtTop.splice(idx, 1);
+	}
+}
+
+function createStyleElement (options) {
+	var style = document.createElement("style");
+
+	if(options.attrs.type === undefined) {
+		options.attrs.type = "text/css";
+	}
+
+	if(options.attrs.nonce === undefined) {
+		var nonce = getNonce();
+		if (nonce) {
+			options.attrs.nonce = nonce;
+		}
+	}
+
+	addAttrs(style, options.attrs);
+	insertStyleElement(options, style);
+
+	return style;
+}
+
+function createLinkElement (options) {
+	var link = document.createElement("link");
+
+	if(options.attrs.type === undefined) {
+		options.attrs.type = "text/css";
+	}
+	options.attrs.rel = "stylesheet";
+
+	addAttrs(link, options.attrs);
+	insertStyleElement(options, link);
+
+	return link;
+}
+
+function addAttrs (el, attrs) {
+	Object.keys(attrs).forEach(function (key) {
+		el.setAttribute(key, attrs[key]);
+	});
+}
+
+function getNonce() {
+	if (false) {}
+
+	return __webpack_require__.nc;
+}
+
+function addStyle (obj, options) {
+	var style, update, remove, result;
+
+	// If a transform function was defined, run it on the css
+	if (options.transform && obj.css) {
+	    result = typeof options.transform === 'function'
+		 ? options.transform(obj.css) 
+		 : options.transform.default(obj.css);
+
+	    if (result) {
+	    	// If transform returns a value, use that instead of the original css.
+	    	// This allows running runtime transformations on the css.
+	    	obj.css = result;
+	    } else {
+	    	// If the transform function returns a falsy value, don't add this css.
+	    	// This allows conditional loading of css
+	    	return function() {
+	    		// noop
+	    	};
+	    }
+	}
+
+	if (options.singleton) {
+		var styleIndex = singletonCounter++;
+
+		style = singleton || (singleton = createStyleElement(options));
+
+		update = applyToSingletonTag.bind(null, style, styleIndex, false);
+		remove = applyToSingletonTag.bind(null, style, styleIndex, true);
+
+	} else if (
+		obj.sourceMap &&
+		typeof URL === "function" &&
+		typeof URL.createObjectURL === "function" &&
+		typeof URL.revokeObjectURL === "function" &&
+		typeof Blob === "function" &&
+		typeof btoa === "function"
+	) {
+		style = createLinkElement(options);
+		update = updateLink.bind(null, style, options);
+		remove = function () {
+			removeStyleElement(style);
+
+			if(style.href) URL.revokeObjectURL(style.href);
+		};
+	} else {
+		style = createStyleElement(options);
+		update = applyToTag.bind(null, style);
+		remove = function () {
+			removeStyleElement(style);
+		};
+	}
+
+	update(obj);
+
+	return function updateStyle (newObj) {
+		if (newObj) {
+			if (
+				newObj.css === obj.css &&
+				newObj.media === obj.media &&
+				newObj.sourceMap === obj.sourceMap
+			) {
+				return;
+			}
+
+			update(obj = newObj);
+		} else {
+			remove();
+		}
+	};
+}
+
+var replaceText = (function () {
+	var textStore = [];
+
+	return function (index, replacement) {
+		textStore[index] = replacement;
+
+		return textStore.filter(Boolean).join('\n');
+	};
+})();
+
+function applyToSingletonTag (style, index, remove, obj) {
+	var css = remove ? "" : obj.css;
+
+	if (style.styleSheet) {
+		style.styleSheet.cssText = replaceText(index, css);
+	} else {
+		var cssNode = document.createTextNode(css);
+		var childNodes = style.childNodes;
+
+		if (childNodes[index]) style.removeChild(childNodes[index]);
+
+		if (childNodes.length) {
+			style.insertBefore(cssNode, childNodes[index]);
+		} else {
+			style.appendChild(cssNode);
+		}
+	}
+}
+
+function applyToTag (style, obj) {
+	var css = obj.css;
+	var media = obj.media;
+
+	if(media) {
+		style.setAttribute("media", media)
+	}
+
+	if(style.styleSheet) {
+		style.styleSheet.cssText = css;
+	} else {
+		while(style.firstChild) {
+			style.removeChild(style.firstChild);
+		}
+
+		style.appendChild(document.createTextNode(css));
+	}
+}
+
+function updateLink (link, options, obj) {
+	var css = obj.css;
+	var sourceMap = obj.sourceMap;
+
+	/*
+		If convertToAbsoluteUrls isn't defined, but sourcemaps are enabled
+		and there is no publicPath defined then lets turn convertToAbsoluteUrls
+		on by default.  Otherwise default to the convertToAbsoluteUrls option
+		directly
+	*/
+	var autoFixUrls = options.convertToAbsoluteUrls === undefined && sourceMap;
+
+	if (options.convertToAbsoluteUrls || autoFixUrls) {
+		css = fixUrls(css);
+	}
+
+	if (sourceMap) {
+		// http://stackoverflow.com/a/26603875
+		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+	}
+
+	var blob = new Blob([css], { type: "text/css" });
+
+	var oldSrc = link.href;
+
+	link.href = URL.createObjectURL(blob);
+
+	if(oldSrc) URL.revokeObjectURL(oldSrc);
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/lib/urls.js":
+/*!***********************************************!*\
+  !*** ./node_modules/style-loader/lib/urls.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+
+/**
+ * When source maps are enabled, `style-loader` uses a link element with a data-uri to
+ * embed the css on the page. This breaks all relative urls because now they are relative to a
+ * bundle instead of the current page.
+ *
+ * One solution is to only use full urls, but that may be impossible.
+ *
+ * Instead, this function "fixes" the relative urls to be absolute according to the current page location.
+ *
+ * A rudimentary test suite is located at `test/fixUrls.js` and can be run via the `npm test` command.
+ *
+ */
+
+module.exports = function (css) {
+  // get current location
+  var location = typeof window !== "undefined" && window.location;
+
+  if (!location) {
+    throw new Error("fixUrls requires window.location");
+  }
+
+	// blank or null?
+	if (!css || typeof css !== "string") {
+	  return css;
+  }
+
+  var baseUrl = location.protocol + "//" + location.host;
+  var currentDir = baseUrl + location.pathname.replace(/\/[^\/]*$/, "/");
+
+	// convert each url(...)
+	/*
+	This regular expression is just a way to recursively match brackets within
+	a string.
+
+	 /url\s*\(  = Match on the word "url" with any whitespace after it and then a parens
+	   (  = Start a capturing group
+	     (?:  = Start a non-capturing group
+	         [^)(]  = Match anything that isn't a parentheses
+	         |  = OR
+	         \(  = Match a start parentheses
+	             (?:  = Start another non-capturing groups
+	                 [^)(]+  = Match anything that isn't a parentheses
+	                 |  = OR
+	                 \(  = Match a start parentheses
+	                     [^)(]*  = Match anything that isn't a parentheses
+	                 \)  = Match a end parentheses
+	             )  = End Group
+              *\) = Match anything and then a close parens
+          )  = Close non-capturing group
+          *  = Match anything
+       )  = Close capturing group
+	 \)  = Match a close parens
+
+	 /gi  = Get all matches, not the first.  Be case insensitive.
+	 */
+	var fixedCss = css.replace(/url\s*\(((?:[^)(]|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gi, function(fullMatch, origUrl) {
+		// strip quotes (if they exist)
+		var unquotedOrigUrl = origUrl
+			.trim()
+			.replace(/^"(.*)"$/, function(o, $1){ return $1; })
+			.replace(/^'(.*)'$/, function(o, $1){ return $1; });
+
+		// already a full url? no change
+		if (/^(#|data:|http:\/\/|https:\/\/|file:\/\/\/|\s*$)/i.test(unquotedOrigUrl)) {
+		  return fullMatch;
+		}
+
+		// convert the url to a full url
+		var newUrl;
+
+		if (unquotedOrigUrl.indexOf("//") === 0) {
+		  	//TODO: should we add protocol?
+			newUrl = unquotedOrigUrl;
+		} else if (unquotedOrigUrl.indexOf("/") === 0) {
+			// path should be relative to the base url
+			newUrl = baseUrl + unquotedOrigUrl; // already starts with '/'
+		} else {
+			// path should be relative to current directory
+			newUrl = currentDir + unquotedOrigUrl.replace(/^\.\//, ""); // Strip leading './'
+		}
+
+		// send back the fixed url(...)
+		return "url(" + JSON.stringify(newUrl) + ")";
+	});
+
+	// send back the fixed css
+	return fixedCss;
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/busqueda_proveedor.vue?vue&type=template&id=19fba130&scoped=true&":
+/*!*********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/busqueda_proveedor.vue?vue&type=template&id=19fba130&scoped=true& ***!
+  \*********************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "busqueda-proveedor-wrapper" }, [
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "busquedaProveedor",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "busquedaProveedorLabel",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          {
+            staticClass:
+              "modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable",
+            attrs: { role: "document" }
+          },
+          [
+            _c(
+              "div",
+              { staticClass: "modal-content modal-moderno shadow-lg border-0" },
+              [
+                _vm._m(0),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-body p-3" }, [
+                  _c("div", { staticClass: "buscador-toolbar mb-3" }, [
+                    _c("div", { staticClass: "input-group search-group" }, [
+                      _vm._m(1),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.txtproveedor,
+                            expression: "txtproveedor"
+                          }
+                        ],
+                        ref: "searchInput",
+                        staticClass: "form-control search-input border-left-0",
+                        attrs: {
+                          type: "text",
+                          placeholder:
+                            "Escribí nombre de fantasía, razón social, RUC o teléfono...",
+                          autocomplete: "off"
+                        },
+                        domProps: { value: _vm.txtproveedor },
+                        on: {
+                          input: [
+                            function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.txtproveedor = $event.target.value
+                            },
+                            _vm.onSearchInput
+                          ],
+                          keyup: function($event) {
+                            if (
+                              !$event.type.indexOf("key") &&
+                              _vm._k(
+                                $event.keyCode,
+                                "enter",
+                                13,
+                                $event.key,
+                                "Enter"
+                              )
+                            ) {
+                              return null
+                            }
+                            return _vm.buscarInmediato($event)
+                          }
+                        }
+                      }),
+                      _vm._v(" "),
+                      _vm.txtproveedor
+                        ? _c("div", { staticClass: "input-group-append" }, [
+                            _c(
+                              "button",
+                              {
+                                staticClass:
+                                  "btn btn-clear border-left-0 border-right-0",
+                                attrs: {
+                                  type: "button",
+                                  title: "Borrar búsqueda"
+                                },
+                                on: { click: _vm.limpiarBusqueda }
+                              },
+                              [
+                                _c("i", {
+                                  staticClass: "fa fa-times text-muted"
+                                })
+                              ]
+                            )
+                          ])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "input-group-append" }, [
+                        _c(
+                          "button",
+                          {
+                            staticClass:
+                              "btn btn-pos-primary px-3 font-weight-bold",
+                            attrs: { type: "button" },
+                            on: { click: _vm.buscarInmediato }
+                          },
+                          [
+                            _vm.requestSend
+                              ? [
+                                  _c("span", {
+                                    staticClass:
+                                      "spinner-border spinner-border-sm mr-1",
+                                    attrs: { role: "status" }
+                                  }),
+                                  _vm._v(
+                                    " Buscando...\n                                    "
+                                  )
+                                ]
+                              : [
+                                  _c("i", { staticClass: "fa fa-search mr-1" }),
+                                  _vm._v(
+                                    " Buscar\n                                    "
+                                  )
+                                ]
+                          ],
+                          2
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      {
+                        staticClass:
+                          "d-flex justify-content-between align-items-center mt-2 px-1"
+                      },
+                      [
+                        _c(
+                          "span",
+                          { staticClass: "small text-muted font-weight-bold" },
+                          [
+                            _c("i", {
+                              staticClass: "fa fa-building mr-1 text-success"
+                            }),
+                            _vm._v(
+                              " " +
+                                _vm._s(_vm.proveedores.length) +
+                                " proveedor(es) disponible(s)\n                            "
+                            )
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _vm.requestSend
+                          ? _c(
+                              "span",
+                              { staticClass: "badge badge-success-soft" },
+                              [
+                                _c("i", {
+                                  staticClass: "fa fa-circle-notch fa-spin mr-1"
+                                }),
+                                _vm._v(
+                                  " Consultando...\n                            "
+                                )
+                              ]
+                            )
+                          : _vm._e()
+                      ]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "table-responsive border rounded-lg proveedor-tabla-wrap"
+                    },
+                    [
+                      _c(
+                        "table",
+                        {
+                          staticClass:
+                            "table table-hover table-proveedores mb-0"
+                        },
+                        [
+                          _vm._m(2),
+                          _vm._v(" "),
+                          _vm.requestSend && !_vm.proveedores.length
+                            ? _c("tbody", [_vm._m(3)])
+                            : _vm.proveedores.length
+                            ? _c(
+                                "tbody",
+                                _vm._l(_vm.proveedores, function(p) {
+                                  return _c(
+                                    "tr",
+                                    {
+                                      key: p.PROVEEDOR_cod,
+                                      staticClass: "proveedor-fila",
+                                      attrs: {
+                                        title:
+                                          "Clic para seleccionar este proveedor"
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.selproveedor(p)
+                                        }
+                                      }
+                                    },
+                                    [
+                                      _c("td", [
+                                        _c(
+                                          "span",
+                                          { staticClass: "badge badge-ruc" },
+                                          [
+                                            _c("i", {
+                                              staticClass:
+                                                "fa fa-id-card mr-1 text-muted"
+                                            }),
+                                            _vm._v(
+                                              _vm._s(
+                                                p.proveedor_ruc || "S/ RUC"
+                                              ) +
+                                                "\n                                        "
+                                            )
+                                          ]
+                                        )
+                                      ]),
+                                      _vm._v(" "),
+                                      _c("td", [
+                                        _c(
+                                          "div",
+                                          {
+                                            staticClass:
+                                              "proveedor-nombre font-cairo font-weight-bold"
+                                          },
+                                          [
+                                            _vm._v(
+                                              "\n                                            " +
+                                                _vm._s(p.proveedor_nombre) +
+                                                "\n                                        "
+                                            )
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "small",
+                                          { staticClass: "text-muted" },
+                                          [
+                                            _vm._v(
+                                              "ID: #" + _vm._s(p.PROVEEDOR_cod)
+                                            )
+                                          ]
+                                        )
+                                      ]),
+                                      _vm._v(" "),
+                                      _c("td", [
+                                        p.proveedor_telef
+                                          ? _c(
+                                              "span",
+                                              {
+                                                staticClass: "badge badge-telef"
+                                              },
+                                              [
+                                                _c("i", {
+                                                  staticClass:
+                                                    "fa fa-phone mr-1 text-muted"
+                                                }),
+                                                _vm._v(
+                                                  _vm._s(p.proveedor_telef) +
+                                                    "\n                                        "
+                                                )
+                                              ]
+                                            )
+                                          : _c(
+                                              "span",
+                                              {
+                                                staticClass: "text-muted small"
+                                              },
+                                              [_vm._v("Sin teléfono")]
+                                            )
+                                      ]),
+                                      _vm._v(" "),
+                                      _c("td", [
+                                        _c(
+                                          "span",
+                                          {
+                                            staticClass:
+                                              "small text-muted text-truncate d-inline-block",
+                                            staticStyle: {
+                                              "max-width": "220px"
+                                            },
+                                            attrs: { title: p.proveedor_direc }
+                                          },
+                                          [
+                                            p.proveedor_direc
+                                              ? _c("i", {
+                                                  staticClass:
+                                                    "fa fa-map-marker-alt mr-1 text-muted"
+                                                })
+                                              : _vm._e(),
+                                            _vm._v(
+                                              "\n                                            " +
+                                                _vm._s(
+                                                  p.proveedor_direc ||
+                                                    "Sin dirección"
+                                                ) +
+                                                "\n                                        "
+                                            )
+                                          ]
+                                        )
+                                      ]),
+                                      _vm._v(" "),
+                                      _c("td", { staticClass: "text-right" }, [
+                                        _c(
+                                          "button",
+                                          {
+                                            staticClass:
+                                              "btn btn-sm btn-seleccionar font-weight-bold",
+                                            attrs: { type: "button" },
+                                            on: {
+                                              click: function($event) {
+                                                $event.stopPropagation()
+                                                return _vm.selproveedor(p)
+                                              }
+                                            }
+                                          },
+                                          [
+                                            _c("i", {
+                                              staticClass: "fa fa-check mr-1"
+                                            }),
+                                            _vm._v(
+                                              " Elegir\n                                        "
+                                            )
+                                          ]
+                                        )
+                                      ])
+                                    ]
+                                  )
+                                }),
+                                0
+                              )
+                            : _c("tbody", [
+                                _c("tr", [
+                                  _c(
+                                    "td",
+                                    {
+                                      staticClass: "text-center py-5",
+                                      attrs: { colspan: "5" }
+                                    },
+                                    [
+                                      _vm._m(4),
+                                      _vm._v(" "),
+                                      _c(
+                                        "h6",
+                                        {
+                                          staticClass:
+                                            "font-weight-bold mb-1 font-cairo"
+                                        },
+                                        [_vm._v("No encontramos proveedores")]
+                                      ),
+                                      _vm._v(" "),
+                                      _vm.txtproveedor
+                                        ? _c(
+                                            "p",
+                                            {
+                                              staticClass:
+                                                "small text-muted mb-3"
+                                            },
+                                            [
+                                              _vm._v(
+                                                '\n                                            No hay resultados para "'
+                                              ),
+                                              _c("strong", [
+                                                _vm._v(_vm._s(_vm.txtproveedor))
+                                              ]),
+                                              _vm._v(
+                                                '". Probá con otro término o RUC.\n                                        '
+                                              )
+                                            ]
+                                          )
+                                        : _c(
+                                            "p",
+                                            {
+                                              staticClass:
+                                                "small text-muted mb-3"
+                                            },
+                                            [
+                                              _vm._v(
+                                                "\n                                            No hay proveedores disponibles en la base de datos.\n                                        "
+                                              )
+                                            ]
+                                          ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "div",
+                                        {
+                                          staticClass:
+                                            "d-flex justify-content-center gap-2"
+                                        },
+                                        [
+                                          _vm.txtproveedor
+                                            ? _c(
+                                                "button",
+                                                {
+                                                  staticClass:
+                                                    "btn btn-outline-secondary btn-sm mr-2",
+                                                  attrs: { type: "button" },
+                                                  on: {
+                                                    click: _vm.limpiarBusqueda
+                                                  }
+                                                },
+                                                [
+                                                  _c("i", {
+                                                    staticClass:
+                                                      "fa fa-undo mr-1"
+                                                  }),
+                                                  _vm._v(
+                                                    " Ver todos los proveedores\n                                            "
+                                                  )
+                                                ]
+                                              )
+                                            : _vm._e(),
+                                          _vm._v(" "),
+                                          _vm._m(5)
+                                        ]
+                                      )
+                                    ]
+                                  )
+                                ])
+                              ])
+                        ]
+                      )
+                    ]
+                  )
+                ]),
+                _vm._v(" "),
+                _vm._m(6)
+              ]
+            )
+          ]
+        )
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass:
+          "modal-header d-flex align-items-center justify-content-between p-3 border-bottom"
+      },
+      [
+        _c("div", { staticClass: "d-flex align-items-center" }, [
+          _c("div", { staticClass: "modal-header-icon mr-2.5" }, [
+            _c("i", { staticClass: "fa fa-truck-loading text-success" })
+          ]),
+          _vm._v(" "),
+          _c("div", [
+            _c(
+              "h5",
+              {
+                staticClass: "modal-title font-weight-bold font-cairo mb-0",
+                attrs: { id: "busquedaProveedorLabel" }
+              },
+              [
+                _vm._v(
+                  "\n                                Seleccionar Proveedor\n                            "
+                )
+              ]
+            ),
+            _vm._v(" "),
+            _c("small", { staticClass: "text-muted" }, [
+              _vm._v(
+                "\n                                Buscá por razón social, RUC o teléfono · Clic para seleccionar\n                            "
+              )
+            ])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "d-flex align-items-center" }, [
+          _c(
+            "a",
+            {
+              staticClass:
+                "btn btn-outline-primary btn-sm mr-2 font-weight-bold d-none d-sm-inline-flex align-items-center",
+              attrs: {
+                href: "/proveedor",
+                target: "_blank",
+                title: "Abrir catálogo de proveedores en nueva pestaña"
+              }
+            },
+            [
+              _c("i", { staticClass: "fa fa-plus mr-1" }),
+              _vm._v(" Nuevo Proveedor\n                        ")
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "close",
+              attrs: {
+                type: "button",
+                "data-dismiss": "modal",
+                "aria-label": "Cerrar"
+              }
+            },
+            [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+          )
+        ])
+      ]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "input-group-prepend" }, [
+      _c(
+        "span",
+        { staticClass: "input-group-text search-prepend border-right-0" },
+        [_c("i", { staticClass: "fa fa-search text-muted" })]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { staticStyle: { width: "130px" } }, [_vm._v("RUC")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Razón Social / Nombre")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Contacto / Teléfono")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Dirección")]),
+        _vm._v(" "),
+        _c(
+          "th",
+          { staticClass: "text-right", staticStyle: { width: "100px" } },
+          [_vm._v("Acción")]
+        )
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [
+      _c("td", { staticClass: "text-center py-5", attrs: { colspan: "5" } }, [
+        _c("div", {
+          staticClass: "spinner-border text-success mb-2",
+          attrs: { role: "status" }
+        }),
+        _vm._v(" "),
+        _c("div", { staticClass: "font-weight-bold text-muted" }, [
+          _vm._v("Cargando lista de proveedores...")
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "empty-icon mb-2" }, [
+      _c("i", {
+        staticClass: "fa fa-building fa-3x text-muted",
+        staticStyle: { opacity: "0.35" }
+      })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "a",
+      {
+        staticClass: "btn btn-success btn-sm",
+        attrs: { href: "/proveedor", target: "_blank" }
+      },
+      [
+        _c("i", { staticClass: "fa fa-plus mr-1" }),
+        _vm._v(
+          " Registrar Nuevo Proveedor\n                                            "
+        )
+      ]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass:
+          "modal-footer d-flex align-items-center justify-content-between p-2.5 border-top bg-light-panel"
+      },
+      [
+        _c("span", { staticClass: "small text-muted" }, [
+          _c("i", { staticClass: "fa fa-lightbulb mr-1 text-warning" }),
+          _vm._v(
+            " Podés hacer clic en cualquier parte de la fila para seleccionarlo al instante.\n                    "
+          )
+        ]),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-secondary px-3 font-weight-bold",
+            attrs: { type: "button", "data-dismiss": "modal" }
+          },
+          [
+            _c("i", { staticClass: "fa fa-times mr-1" }),
+            _vm._v(" Cerrar\n                    ")
+          ]
+        )
+      ]
+    )
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/runtime/componentNormalizer.js ***!
+  \********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return normalizeComponent; });
+/* globals __VUE_SSR_CONTEXT__ */
+
+// IMPORTANT: Do NOT use ES2015 features in this file (except for modules).
+// This module is a runtime utility for cleaner component module output and will
+// be included in the final webpack user bundle.
+
+function normalizeComponent (
+  scriptExports,
+  render,
+  staticRenderFns,
+  functionalTemplate,
+  injectStyles,
+  scopeId,
+  moduleIdentifier, /* server only */
+  shadowMode /* vue-cli only */
+) {
+  // Vue.extend constructor export interop
+  var options = typeof scriptExports === 'function'
+    ? scriptExports.options
+    : scriptExports
+
+  // render functions
+  if (render) {
+    options.render = render
+    options.staticRenderFns = staticRenderFns
+    options._compiled = true
+  }
+
+  // functional template
+  if (functionalTemplate) {
+    options.functional = true
+  }
+
+  // scopedId
+  if (scopeId) {
+    options._scopeId = 'data-v-' + scopeId
+  }
+
+  var hook
+  if (moduleIdentifier) { // server build
+    hook = function (context) {
+      // 2.3 injection
+      context =
+        context || // cached call
+        (this.$vnode && this.$vnode.ssrContext) || // stateful
+        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
+      // 2.2 with runInNewContext: true
+      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+        context = __VUE_SSR_CONTEXT__
+      }
+      // inject component styles
+      if (injectStyles) {
+        injectStyles.call(this, context)
+      }
+      // register component module identifier for async chunk inferrence
+      if (context && context._registeredComponents) {
+        context._registeredComponents.add(moduleIdentifier)
+      }
+    }
+    // used by ssr in case component is cached and beforeCreate
+    // never gets called
+    options._ssrRegister = hook
+  } else if (injectStyles) {
+    hook = shadowMode
+      ? function () { injectStyles.call(this, this.$root.$options.shadowRoot) }
+      : injectStyles
+  }
+
+  if (hook) {
+    if (options.functional) {
+      // for template-only hot-reload because in that case the render fn doesn't
+      // go through the normalizer
+      options._injectStyles = hook
+      // register for functioal component in vue file
+      var originalRender = options.render
+      options.render = function renderWithStyleInjection (h, context) {
+        hook.call(context)
+        return originalRender(h, context)
+      }
+    } else {
+      // inject component registration as beforeCreate hook
+      var existing = options.beforeCreate
+      options.beforeCreate = existing
+        ? [].concat(existing, hook)
+        : [hook]
+    }
+  }
+
+  return {
+    exports: scriptExports,
+    options: options
+  }
+}
+
+
+/***/ }),
+
+/***/ "./resources/js/components/busqueda_proveedor.vue":
+/*!********************************************************!*\
+  !*** ./resources/js/components/busqueda_proveedor.vue ***!
+  \********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _busqueda_proveedor_vue_vue_type_template_id_19fba130_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./busqueda_proveedor.vue?vue&type=template&id=19fba130&scoped=true& */ "./resources/js/components/busqueda_proveedor.vue?vue&type=template&id=19fba130&scoped=true&");
+/* harmony import */ var _busqueda_proveedor_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./busqueda_proveedor.vue?vue&type=script&lang=js& */ "./resources/js/components/busqueda_proveedor.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _busqueda_proveedor_vue_vue_type_style_index_0_id_19fba130_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./busqueda_proveedor.vue?vue&type=style&index=0&id=19fba130&scoped=true&lang=css& */ "./resources/js/components/busqueda_proveedor.vue?vue&type=style&index=0&id=19fba130&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _busqueda_proveedor_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _busqueda_proveedor_vue_vue_type_template_id_19fba130_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _busqueda_proveedor_vue_vue_type_template_id_19fba130_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "19fba130",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/busqueda_proveedor.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/busqueda_proveedor.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************!*\
+  !*** ./resources/js/components/busqueda_proveedor.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_busqueda_proveedor_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./busqueda_proveedor.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/busqueda_proveedor.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_busqueda_proveedor_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/busqueda_proveedor.vue?vue&type=style&index=0&id=19fba130&scoped=true&lang=css&":
+/*!*****************************************************************************************************************!*\
+  !*** ./resources/js/components/busqueda_proveedor.vue?vue&type=style&index=0&id=19fba130&scoped=true&lang=css& ***!
+  \*****************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_busqueda_proveedor_vue_vue_type_style_index_0_id_19fba130_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader!../../../node_modules/css-loader??ref--6-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--6-2!../../../node_modules/vue-loader/lib??vue-loader-options!./busqueda_proveedor.vue?vue&type=style&index=0&id=19fba130&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/busqueda_proveedor.vue?vue&type=style&index=0&id=19fba130&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_busqueda_proveedor_vue_vue_type_style_index_0_id_19fba130_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_busqueda_proveedor_vue_vue_type_style_index_0_id_19fba130_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_busqueda_proveedor_vue_vue_type_style_index_0_id_19fba130_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_busqueda_proveedor_vue_vue_type_style_index_0_id_19fba130_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_busqueda_proveedor_vue_vue_type_style_index_0_id_19fba130_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./resources/js/components/busqueda_proveedor.vue?vue&type=template&id=19fba130&scoped=true&":
+/*!***************************************************************************************************!*\
+  !*** ./resources/js/components/busqueda_proveedor.vue?vue&type=template&id=19fba130&scoped=true& ***!
+  \***************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_busqueda_proveedor_vue_vue_type_template_id_19fba130_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./busqueda_proveedor.vue?vue&type=template&id=19fba130&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/busqueda_proveedor.vue?vue&type=template&id=19fba130&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_busqueda_proveedor_vue_vue_type_template_id_19fba130_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_busqueda_proveedor_vue_vue_type_template_id_19fba130_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/proveedor.js":
+/*!***********************************!*\
+  !*** ./resources/js/proveedor.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+Vue.component('busquedaproveedor', __webpack_require__(/*! ./components/busqueda_proveedor.vue */ "./resources/js/components/busqueda_proveedor.vue")["default"]);
+
+/***/ }),
+
+/***/ 3:
+/*!*****************************************!*\
+  !*** multi ./resources/js/proveedor.js ***!
+  \*****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(/*! C:\laragon\www\softsystem\resources\js\proveedor.js */"./resources/js/proveedor.js");
+
+
+/***/ })
+
+/******/ });

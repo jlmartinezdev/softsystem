@@ -22,7 +22,7 @@
             <div class="modal-body p-3" style="background: var(--dash-card-bg);">
                 <!-- Campo de búsqueda -->
                 <div class="mb-3">
-                    <div class="input-group">
+                    <div class="input-group search-input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text search-prepend">
                                 <i class="fa-solid fa-magnifying-glass text-muted"></i>

@@ -632,6 +632,11 @@
 					<div class="turno-hero-title">
 						<span class="turno-status-dot"></span>
 						<span>Turno de Caja Abierto</span>
+						@if (($usuarioModalidad ?? '1') == '1')
+							<span class="badge badge-light text-primary border ml-2" style="font-size: 0.72rem; vertical-align: middle; padding: 3px 8px;">
+								<i class="fas fa-users mr-1"></i> Multiusuario compartido
+							</span>
+						@endif
 					</div>
 					<div class="turno-hero-details">
 						<div class="turno-hero-item">
@@ -640,6 +645,11 @@
 						<div class="turno-hero-item">
 							<i class="fas fa-cash-register mr-1"></i> Caja: <strong>{{ $cajaTurno->caja_descrip }}</strong>
 						</div>
+						@if (!empty($cajaTurno->nom_usuarios))
+							<div class="turno-hero-item">
+								<i class="fas fa-user-circle mr-1"></i> Abierta por: <strong>{{ $cajaTurno->nom_usuarios }}</strong>
+							</div>
+						@endif
 						<div class="turno-hero-item">
 							<i class="far fa-clock mr-1"></i> Apertura: <strong>{{ date('d/m/Y', strtotime($cajaTurno->apert_fecha)) }} {{ $cajaTurno->apert_hora }}</strong>
 						</div>
@@ -726,7 +736,8 @@
 		@endif
 	</div>
 
-	{{-- 4. Tarjetas KPI de Métricas Clave --}}
+	{{-- 4. Tarjetas KPI de Métricas Clave (solo administrador) --}}
+	@if ($esAdministrador)
 	<div class="row">
 		{{-- Ventas de Hoy --}}
 		<div class="col-xl-3 col-sm-6">
@@ -819,10 +830,12 @@
 			</div>
 		</div>
 	</div>
+	@endif
 
 	{{-- 5. Fila: Gráfico de Ventas de la Semana + Panel Lateral --}}
 	<div class="row">
 		{{-- Gráfico de Ventas de los últimos 7 días --}}
+		@if ($esAdministrador)
 		<div class="col-lg-8">
 			<div class="chart-card">
 				<div class="chart-card-head">
@@ -874,9 +887,10 @@
 				@endif
 			</div>
 		</div>
+		@endif
 
 		{{-- Panel Lateral: Monitor de Cajas Activas y Resumen de Stock --}}
-		<div class="col-lg-4">
+		<div class="{{ $esAdministrador ? 'col-lg-4' : 'col-lg-6' }}">
 			@if ($esAdministrador)
 				{{-- Monitor de Cajas Abiertas --}}
 				<div class="side-panel-card">

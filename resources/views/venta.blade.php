@@ -10,6 +10,13 @@
         font-display: swap;
         src: url({{ asset("webfonts/Cairo-Bold.ttf") }}) format("truetype");
     }
+    @font-face {
+        font-family: "Sofia";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url({{ asset("webfonts/SofiaSans-Regular.ttf") }}) format("truetype");
+    }
 
     .font-cairo {
         font-family: 'Cairo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
@@ -731,6 +738,33 @@
         font-size: 0.72rem;
         color: var(--dash-text-muted);
     }
+    .ticket-gs .ticket-cuota-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 0.70rem !important;
+        font-weight: 700 !important;
+        color: #ffffff !important;
+        background: #0284c7 !important;
+        padding: 2px 7px;
+        border-radius: 4px;
+        margin-top: 3px;
+        line-height: 1.2;
+        letter-spacing: 0.2px;
+        box-shadow: 0 1px 2px rgba(2, 132, 199, 0.25);
+    }
+    .ticket-gs .ticket-cuota-badge i {
+        font-size: 0.65rem;
+        color: #ffffff !important;
+    }
+    body.dark-mode .ticket-gs .ticket-cuota-badge {
+        background: #0369a1 !important;
+        color: #ffffff !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+    .ticket-gs .badge {
+        color: #ffffff !important;
+    }
     .ticket-quitar {
         width: 32px;
         height: 32px;
@@ -1358,6 +1392,126 @@
         color: var(--dash-primary);
         font-size: 1.1rem;
     }
+    .precio-card-p1 {
+        grid-column: 1 / -1;
+        cursor: default;
+        gap: 0.35rem;
+    }
+    .precio-card-p1:hover {
+        transform: none;
+    }
+    .precio-card-elegir {
+        background: transparent;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        text-align: left;
+        color: inherit;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        font: inherit;
+    }
+    .precio-card-elegir:focus {
+        outline: none;
+    }
+    .precio-card-elegir:focus-visible {
+        outline: 2px solid #6b4f00;
+        outline-offset: 2px;
+        border-radius: 8px;
+    }
+    .precio-a-mano {
+        margin-top: 0.1rem;
+        padding-top: 0.45rem;
+        border-top: 1px dashed var(--dash-primary-border);
+    }
+    .precio-a-mano-label {
+        display: block;
+        margin: 0 0 0.3rem;
+        font-family: Sofia, "Segoe UI", sans-serif;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #0a4d36;
+    }
+    body.dark-mode .precio-a-mano-label {
+        color: #a7f3d0;
+    }
+    .precio-a-mano-row {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: #fff;
+        border: 1px solid #c8dfd5;
+        border-radius: 8px;
+        padding: 0.15rem 0.15rem 0.15rem 0.55rem;
+    }
+    .precio-a-mano-row:focus-within {
+        border-color: #6b4f00;
+        box-shadow: 0 0 0 3px rgba(107, 79, 0, 0.22);
+    }
+    body.dark-mode .precio-a-mano-row {
+        background: #111827;
+        border-color: #047857;
+    }
+    .precio-a-mano-gs {
+        font-family: Sofia, "Segoe UI", sans-serif;
+        font-weight: 700;
+        color: #0a4d36;
+        font-size: 0.85rem;
+        flex: 0 0 auto;
+    }
+    .precio-a-mano-input {
+        flex: 1 1 auto;
+        min-width: 0;
+        height: 32px;
+        border: 0 !important;
+        box-shadow: none !important;
+        outline: none !important;
+        background: transparent;
+        padding: 0 0.25rem;
+        font-family: Sofia, "Segoe UI", sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        color: #0a4d36;
+        border-radius: 8px;
+    }
+    body.dark-mode .precio-a-mano-gs,
+    body.dark-mode .precio-a-mano-input {
+        color: #ecfdf5;
+    }
+    .precio-a-mano-aplicar {
+        flex: 0 0 auto;
+        height: 32px;
+        border: 0;
+        border-radius: 8px;
+        background: #0a4d36;
+        color: #fff;
+        font-family: Sofia, "Segoe UI", sans-serif;
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 0 0.75rem;
+        cursor: pointer;
+    }
+    .precio-a-mano-aplicar:hover,
+    .precio-a-mano-aplicar:focus {
+        background: #073827;
+        outline: none;
+    }
+    .precio-a-mano-aplicar:focus-visible {
+        box-shadow: 0 0 0 3px rgba(107, 79, 0, 0.35);
+    }
+    .precio-a-mano-ayuda {
+        display: block;
+        margin-top: 0.28rem;
+        font-family: Sofia, "Segoe UI", sans-serif;
+        font-size: 0.72rem;
+        color: var(--dash-text-muted);
+        line-height: 1.3;
+    }
 
     /* Combos Grid */
     .combos-grid {
@@ -1589,7 +1743,7 @@
                                     <div class="venta-qty-wrapper">
                                         <button type="button" class="btn-qty" @click.stop="decrementarCantidad(item)" aria-label="Disminuir">-</button>
                                         <input type="number" class="venta-qty form-control form-control-sm font-cairo font-weight-bold"
-                                            min="1" :max="(item.es_libre || item.es_combo) ? 999999 : item.stock" v-model.number="item.cantidad"
+                                            min="1" :max="(item.es_libre || item.es_combo || Number(ventaCabecera.vender_sin_stock) === 1) ? 999999 : item.stock" v-model.number="item.cantidad"
                                             @change="onCantidadCarritoChange(item)" :aria-label="'Cantidad de ' + item.descripcion">
                                         <button type="button" class="btn-qty" @click.stop="incrementarCantidad(item)" aria-label="Aumentar">+</button>
                                     </div>
@@ -1597,6 +1751,9 @@
                                         :aria-label="'Elegí el precio de ' + item.descripcion + '. Unitario Gs. ' + format(item.precio) + '. Total Gs. ' + format(item.precio * item.cantidad)">
                                         <strong class="font-cairo">@{{ format(item.precio * item.cantidad) }}</strong>
                                         <span>Gs. @{{ format(item.precio) }} c/u</span>
+                                        <span v-if="esCredito && item.monto_cuota" class="ticket-cuota-badge" :title="'Cuota estimada: Gs. ' + format(item.monto_cuota)">
+                                            <i class="fa fa-calendar-alt mr-1"></i>@{{ tmpIndexPrecio.cant_cuota }}x Gs. @{{ format(item.monto_cuota) }}
+                                        </span>
                                     </button>
                                     <button type="button" class="ticket-quitar" title="Quitar del ticket" :aria-label="'Quitar ' + item.descripcion" @click="delArticulo(item)">
                                         <span class="fa fa-times" aria-hidden="true"></span>
@@ -1830,13 +1987,13 @@
                         <div class="card-footer bg-light-panel border-top py-3">
                             <div class="cobrar-row">
                                 <button type="button" class="btn-cobrar font-cairo shadow-sm" @click="showFinalizar" :disabled="!puedeCobrar">
-                                    <i class="fa fa-cash-register mr-2"></i> Cobrar
+                                    <i class="fa mr-2" :class="iconBotonPrincipalModal"></i> @{{ labelBotonPrincipalModal }}
                                 </button>
                             </div>
                             <div class="text-center mt-2">
                                 <span class="cobrar-motivo" v-if="!puedeCobrar">@{{ motivoNoCobrar }}</span>
                                 <span class="cobro-hint cobro-hint-rail" v-else-if="puedeCobrar">
-                                    <kbd class="shortcut-key">Enter</kbd> o <kbd class="shortcut-key">F12</kbd> abre el cobro
+                                    <kbd class="shortcut-key">Enter</kbd> o <kbd class="shortcut-key">F12</kbd> abre el cobro (@{{ labelBotonPrincipalModal }})
                                 </span>
                             </div>
                             <button type="button" class="btn-volver-ticket mt-2 w-100" v-if="motivoBloqueoFactura" @click="setDocumento('Ticket')">
@@ -1859,7 +2016,7 @@
                 <span class="cobro-hint" v-else-if="puedeCobrar">Enter o F12 cobra</span>
             </div>
             <button type="button" class="btn-cobrar font-cairo" @click="showFinalizar" :disabled="!puedeCobrar">
-                Cobrar
+                @{{ labelBotonPrincipalModal }}
             </button>
         </div>
 
@@ -2031,15 +2188,18 @@
                 cajaConsultada: false,
                 nrooperacion: '',
                 precioVista: 'contado',
+                precioManual: '',
                 sifenActivo: {!! json_encode((bool) ($sifenActivo ?? false)) !!},
                 sifenListo: {!! json_encode((bool) ($sifenListo ?? false)) !!},
                 sifenAmbiente: {!! json_encode($sifenAmbiente ?? 'test') !!},
                 sifenFalta: {!! json_encode($sifenFalta ?? null) !!},
                 esAdministrador: {!! json_encode((bool) ($esAdministrador ?? false)) !!},
                 urlFacturar: '{{ url('venta/facturar') }}',
+                botonPrincipalVenta: {!! json_encode($botonPrincipalVenta ?? 'cobrar_imprimir') !!},
                 tmpIndexPrecio: {
                     iPrecio: 'CO1',
                     iArticulo: 0,
+                    cant_cuota: 1,
                     monto_cuota: 0,
                     is_multiple: false
                 },
@@ -2096,8 +2256,8 @@
                     descuento: 0,
                     nro_operacion: 0,
                     generarcuota: true,
-                    vender_sin_stock: 0,
-                    descontar_stock: 1
+                    vender_sin_stock: {{ (int) $venderSinStock }},
+                    descontar_stock: {{ (int) $descontarStock }}
                 },
                 fastItem: {
                     precio: 0,
@@ -2136,8 +2296,7 @@
                         timer: 3000,
                     });
                     //Buscar articulo si no esta en la lista
-                    if (a.cantidad == 0 && this.ventaCabecera.vender_sin_stock == 0) {
-                        console.log("No se puede agregar")
+                    if (!(Number(a.cantidad) > 0) && Number(this.ventaCabecera.vender_sin_stock) !== 1) {
                         Toast.fire({
                             title: 'No se puede agregar un artículo sin stock.',
                             icon: 'error'
@@ -2177,7 +2336,7 @@
                         this.cantidad = 0;
                     } else {
                         //vender sin stock
-                        if(this.ventaCabecera.vender_sin_stock==1){
+                        if(Number(this.ventaCabecera.vender_sin_stock) === 1){
                             this.carro[i].cantidad = this.peso.length > 0 ? +(this.carro[i].cantidad+ this.cantidad).toFixed(2) : parseInt(this.carro[i].cantidad) + 1;
                         }else{
                             if ((this.carro[i].cantidad + 1) <= a.cantidad) {
@@ -2193,6 +2352,9 @@
                         //Actualizar cantidad
                     }
                     this.saveDatos();
+                    if (this.esCredito && this.tmpIndexPrecio && Number(this.tmpIndexPrecio.cant_cuota) > 0) {
+                        this.aplicarPlanCreditoCarro(this.tmpIndexPrecio.cant_cuota);
+                    }
                 },
                 cargarOfertasActivas: function () {
                     var self = this;
@@ -2244,6 +2406,7 @@
                 },
                 aplicarOfertaItem: function (item) {
                     if (!item || item.es_libre || item.es_combo) return;
+                    if (item.precio_manual) return;
                     var base = Number(item.precio_lista);
                     if (!base) {
                         base = Number(item.p1) || Number(item.precio) || 0;
@@ -2282,11 +2445,15 @@
                 },
                 onCantidadCarritoChange: function (item) {
                     this.aplicarOfertaItem(item);
+                    if (this.esCredito && this.tmpIndexPrecio && Number(this.tmpIndexPrecio.cant_cuota) > 0) {
+                        this.aplicarPlanCreditoCarro(this.tmpIndexPrecio.cant_cuota);
+                    }
                     this.saveDatos();
                 },
                 incrementarCantidad: function (item) {
                     if (!item) return;
-                    var max = (item.es_libre || item.es_combo) ? 999999 : Number(item.stock || 999999);
+                    var sinTope = item.es_libre || item.es_combo || Number(this.ventaCabecera.vender_sin_stock) === 1;
+                    var max = sinTope ? 999999 : Number(item.stock);
                     var cant = Number(item.cantidad) || 0;
                     if (cant < max) {
                         item.cantidad = cant + 1;
@@ -2337,6 +2504,9 @@
                         if (realIndex !== -1) {
                             this.carro[realIndex].cantidad = cant;
                             this.aplicarOfertaItem(this.carro[realIndex]);
+                            if (this.esCredito && this.tmpIndexPrecio && Number(this.tmpIndexPrecio.cant_cuota) > 0) {
+                                this.aplicarPlanCreditoCarro(this.tmpIndexPrecio.cant_cuota);
+                            }
                         }
                         this.saveDatos();
                     }
@@ -2353,27 +2523,72 @@
                     }
                     this.preciosContado.articulo = articulo.descripcion;
                     this.precioVista = String(this.ventaCabecera.condicionventa) === '2' ? 'credito' : 'contado';
+                    this.precioManual = '';
+                    if (articulo && articulo.precio_manual && Number(articulo.precio) > 0) {
+                        this.precioManual = String(parseInt(articulo.precio, 10));
+                    }
+                    if (this.precioVista === 'contado' && articulo && articulo.iPrecio && String(articulo.iPrecio).indexOf('CO') === 0) {
+                        this.tmpIndexPrecio.iPrecio = articulo.iPrecio;
+                    }
                     $('#selPrecio').modal('show');
                     this.preciosCredito = [];
                     if (articulo.es_combo) {
-                        var pCred = Number(articulo.precio_credito) || 0;
-                        if (pCred > 0) {
-                            this.preciosCredito.push({
-                                p: pCred,
-                                c: pCred,
-                                m: 0
+                        var comboPrecios = articulo.precios || [];
+                        if (comboPrecios.length > 0) {
+                            for (i = 0; i < comboPrecios.length; i++) {
+                                let cant = comboPrecios[i].cant_cuota ? parseInt(comboPrecios[i].cant_cuota) : (i + 2);
+                                let precios = {
+                                    p: comboPrecios[i].p || comboPrecios[i].precio,
+                                    c: comboPrecios[i].c || comboPrecios[i].monto_cuota,
+                                    m: comboPrecios[i].m || comboPrecios[i].margen,
+                                    cant_cuota: cant
+                                };
+                                this.preciosCredito.push(precios);
+                            }
+                        } else if (articulo.combo_id) {
+                            var self = this;
+                            axios.get('combo/precios/' + articulo.combo_id).then(function(response) {
+                                if (response.data && response.data.length > 0) {
+                                    self.preciosCredito = [];
+                                    for (var j = 0; j < response.data.length; j++) {
+                                        var cant = response.data[j].cant_cuota ? parseInt(response.data[j].cant_cuota) : (j + 2);
+                                        self.preciosCredito.push({
+                                            p: response.data[j].p,
+                                            c: response.data[j].c,
+                                            m: response.data[j].m,
+                                            cant_cuota: cant
+                                        });
+                                    }
+                                    articulo.precios = self.preciosCredito.slice();
+                                }
+                            }).catch(function(error) {
+                                console.error('Error al cargar precios de combo:', error);
                             });
+                        }
+
+                        if (this.preciosCredito.length === 0) {
+                            var pCred = Number(articulo.precio_credito) || 0;
+                            if (pCred > 0) {
+                                this.preciosCredito.push({
+                                    p: pCred,
+                                    c: pCred,
+                                    m: 0,
+                                    cant_cuota: 1
+                                });
+                            }
                         }
                     } else {
                         axios.get('articulo/precios/' + articulo.codigo).then(response => {
                             if (response.data.length > 0)
                                 this.preciosCredito = [];
                             for (i = 0; i < response.data.length; i++) {
+                                let cant = response.data[i].cant_cuota ? parseInt(response.data[i].cant_cuota) : (i + 2);
                                 let precios = {
                                     p: response.data[i].p,
                                     c: response.data[i].c,
-                                    m: response.data[i].m
-                                }
+                                    m: response.data[i].m,
+                                    cant_cuota: cant
+                                };
                                 this.preciosCredito.push(precios);
                             }
 
@@ -2387,46 +2602,216 @@
                     let iPrecio = this.tmpIndexPrecio.iPrecio;
                     let x = iPrecio.substr(2);
                     let index = this.tmpIndexPrecio.iArticulo;
-                    if (this.articulo && this.articulo.es_combo) {
-                        if (iPrecio.includes('CO')) {
-                            this.ventaCabecera.condicionventa = 1;
-                            this.ventaCabecera.generarcuota = true;
-                            let newPrecio = Number(this.articulo.precio_contado) || Number(this.articulo.p1) || Number(this.articulo.precio);
-                            if (newPrecio > 0) {
-                                this.carro[index].precio = newPrecio;
-                                this.carro[index].iPrecio = 'CO1';
-                            }
-                        } else {
-                            this.ventaCabecera.condicionventa = 2;
-                            this.ventaCabecera.generarcuota = false;
-                            let newPrecio = Number(this.articulo.precio_credito) || 0;
-                            if (newPrecio > 0) {
-                                this.carro[index].precio = newPrecio;
-                                this.carro[index].iPrecio = 'CR0';
-                                this.tmpIndexPrecio.monto_cuota = newPrecio;
-                                this.tmpIndexPrecio.is_multiple = this.carro.length > 1;
-                            }
+                    var eraCredito = this._contadoDesdeCredito === true;
+                    this._contadoDesdeCredito = false;
+                    if (iPrecio.includes('CO')) {
+                        var n = parseInt(x, 10) || 1;
+                        if (eraCredito) {
+                            this.restaurarPreciosContadoCarro();
                         }
-                    } else if (iPrecio.includes('CO')) {
+                        this.aplicarListaContadoLinea(index, n);
+                        this.tmpIndexPrecio.iPrecio = 'CO' + n;
                         this.ventaCabecera.condicionventa = 1;
-                        this.ventaCabecera.generarcuota = true;
-                        let newPrecio = this.articulo['p' + x];
-                        if (newPrecio > 0)
-                            this.carro[index].precio = newPrecio;
                     } else {
-                        this.ventaCabecera.condicionventa = 2
-                        this.ventaCabecera.generarcuota = false;
-                        let newPrecio = this.preciosCredito[x] ? this.preciosCredito[x].p : 0;
-                        if (newPrecio > 0) {
-                            
-                            this.carro[index].precio = newPrecio;
-                            this.tmpIndexPrecio.monto_cuota = this.preciosCredito[x].c;
-                            this.tmpIndexPrecio.is_multiple = this.carro.length > 1;
-                        }
-
+                        let itemCredito = this.preciosCredito[x] || null;
+                        let cantCuota = (itemCredito && itemCredito.cant_cuota) ? parseInt(itemCredito.cant_cuota) : (parseInt(x) + 2);
+                        this.tmpIndexPrecio.iPrecio = 'CR' + x;
+                        this.tmpIndexPrecio.cant_cuota = cantCuota;
+                        this.aplicarPlanCreditoCarro(cantCuota);
                     }
                     this.$refs.buscador.focusSearchInput();
                     this.saveDatos();
+                },
+                restaurarPreciosContadoCarro: function() {
+                    (this.carro || []).forEach(function(it) {
+                        if (it.es_combo) {
+                            it.precio = Number(it.precio_contado) || Number(it.p1) || Number(it.precio);
+                            it.iPrecio = 'CO1';
+                        } else if (!it.es_libre) {
+                            it.precio = Number(it.p1) || Number(it.precio_lista) || Number(it.precio);
+                            it.iPrecio = 'CO1';
+                        }
+                        it.precio_manual = false;
+                        it.monto_cuota = 0;
+                        it.tiene_credito_cuota = false;
+                    });
+                    this.ventaCabecera.condicionventa = 1;
+                    this.ventaCabecera.generarcuota = true;
+                    this.cuotas = [];
+                    this.tmpIndexPrecio.iPrecio = 'CO1';
+                    this.tmpIndexPrecio.cant_cuota = 1;
+                    this.tmpIndexPrecio.monto_cuota = 0;
+                    if (this.$refs.generarcuota) {
+                        this.$refs.generarcuota.cuotas = [];
+                        this.$refs.generarcuota.cant_cuota = 1;
+                    }
+                    this.saveDatos && this.saveDatos();
+                },
+                aplicarPlanCreditoCarro: function(cantCuota, callback) {
+                    var self = this;
+                    cantCuota = Number(cantCuota) || 1;
+                    if (cantCuota < 1) cantCuota = 1;
+
+                    self.ventaCabecera.condicionventa = 2;
+                    self.ventaCabecera.generarcuota = false;
+
+                    var codigos = [];
+                    (this.carro || []).forEach(function(it) {
+                        if (!it.es_libre && !it.es_combo && it.codigo) {
+                            codigos.push(it.codigo);
+                        }
+                    });
+
+                    if (codigos.length === 0) {
+                        self.ajustarPreciosYCuotasCarro({}, cantCuota);
+                        if (callback) callback();
+                        return;
+                    }
+
+                    axios.post('articulo/precios-por-cuota', {
+                        codigos: codigos,
+                        cant_cuota: cantCuota
+                    }).then(function(response) {
+                        var preciosData = response.data || [];
+                        var mapa = {};
+                        preciosData.forEach(function(p) {
+                            mapa[p.articulos_cod] = p;
+                        });
+
+                        self.ajustarPreciosYCuotasCarro(mapa, cantCuota);
+                        if (callback) callback();
+                    }).catch(function(err) {
+                        console.error('Error al obtener precios por cuota:', err);
+                        self.ajustarPreciosYCuotasCarro({}, cantCuota);
+                        if (callback) callback();
+                    });
+                },
+                ajustarPreciosYCuotasCarro: function(mapa, cantCuota) {
+                    cantCuota = Number(cantCuota) || 1;
+                    if (cantCuota < 1) cantCuota = 1;
+
+                    var totalCuotaSuma = 0;
+
+                    (this.carro || []).forEach(function(it) {
+                        var cant = Number(it.cantidad) || 1;
+                        if (it.es_combo) {
+                            var pPlan = null;
+                            if (Array.isArray(it.precios) && it.precios.length > 0) {
+                                pPlan = it.precios.find(function(p) {
+                                    var c = p.cant_cuota ? Number(p.cant_cuota) : null;
+                                    var pr = Number(p.p || p.precio) || 0;
+                                    return c === Number(cantCuota) && pr > 0;
+                                });
+                            }
+                            if (pPlan) {
+                                it.precio = Number(pPlan.p || pPlan.precio);
+                                it.monto_cuota = Number(pPlan.c || pPlan.monto_cuota) || Math.round(it.precio / cantCuota);
+                                it.iPrecio = 'CR' + cantCuota;
+                                it.tiene_credito_cuota = true;
+                            } else {
+                                var pCred = Number(it.precio_credito) || 0;
+                                if (pCred > 0) {
+                                    it.precio = pCred;
+                                    it.iPrecio = 'CR' + cantCuota;
+                                    it.monto_cuota = Math.round(pCred / cantCuota);
+                                    it.tiene_credito_cuota = true;
+                                } else {
+                                    it.precio = Number(it.precio_contado) || Number(it.p1) || Number(it.precio);
+                                    it.iPrecio = 'CO1';
+                                    it.monto_cuota = Math.round(it.precio / cantCuota);
+                                    it.tiene_credito_cuota = false;
+                                }
+                            }
+                        } else if (it.es_libre) {
+                            var pLibre = Number(it.precio) || 0;
+                            it.monto_cuota = Math.round(pLibre / cantCuota);
+                        } else {
+                            var precioObj = mapa[it.codigo];
+                            if (precioObj && Number(precioObj.precio) > 0) {
+                                it.precio = Number(precioObj.precio);
+                                it.monto_cuota = Number(precioObj.monto_cuota) || Math.round(it.precio / cantCuota);
+                                it.iPrecio = 'CR' + cantCuota;
+                                it.tiene_credito_cuota = true;
+                            } else {
+                                var normal = Number(it.p1) || Number(it.precio_lista) || Number(it.precio);
+                                it.precio = normal;
+                                it.monto_cuota = Math.round(normal / cantCuota);
+                                it.iPrecio = 'CO1';
+                                it.tiene_credito_cuota = false;
+                            }
+                        }
+                        totalCuotaSuma += (it.monto_cuota * cant);
+                    });
+
+                    this.tmpIndexPrecio.cant_cuota = cantCuota;
+                    this.tmpIndexPrecio.monto_cuota = totalCuotaSuma;
+
+                    this.establecerCuotasCredito(cantCuota, totalCuotaSuma);
+                    this.saveDatos && this.saveDatos();
+                },
+                establecerCuotasCredito: function(cantCuota, montoCuota) {
+                    cantCuota = Number(cantCuota) || 1;
+                    if (cantCuota < 1) cantCuota = 1;
+
+                    var total = 0;
+                    for (var i = 0; i < this.carro.length; i++) {
+                        total += (Number(this.carro[i].precio) || 0) * (Number(this.carro[i].cantidad) || 0);
+                    }
+                    if (this.ventaCabecera.descuento > 0 && total > 0) {
+                        total -= Number(this.ventaCabecera.descuento) || 0;
+                    }
+                    if (total <= 0) {
+                        this.cuotas = [];
+                        return;
+                    }
+
+                    var baseDate = this.ventaCabecera.fecha ? new Date(this.ventaCabecera.fecha + 'T00:00:00') : new Date();
+                    if (isNaN(baseDate.getTime())) {
+                        baseDate = new Date();
+                    }
+
+                    var montoPorCuota = 0;
+                    if (Number(montoCuota) > 0) {
+                        montoPorCuota = Number(montoCuota);
+                    } else {
+                        montoPorCuota = Math.floor(total / cantCuota);
+                        if (montoPorCuota > 1000) {
+                            montoPorCuota = Math.round(montoPorCuota / 1000) * 1000;
+                        }
+                    }
+
+                    var cuotasGeneradas = [];
+                    var totalAsignado = 0;
+
+                    for (var j = 0; j < cantCuota; j++) {
+                        var d = new Date(baseDate);
+                        d.setMonth(d.getMonth() + (j + 1));
+                        var dia = String(d.getDate()).padStart(2, '0');
+                        var mes = String(d.getMonth() + 1).padStart(2, '0');
+                        var anio = d.getFullYear();
+                        var venc = dia + '-' + mes + '-' + anio;
+
+                        var montoLinea = montoPorCuota;
+                        if (j === cantCuota - 1) {
+                            montoLinea = total - totalAsignado;
+                        }
+                        totalAsignado += montoLinea;
+
+                        cuotasGeneradas.push({
+                            nro: j + 1,
+                            interes: 0,
+                            vencimiento: venc,
+                            monto: montoLinea,
+                            tipo: 'Cuota'
+                        });
+                    }
+
+                    this.cuotas = cuotasGeneradas;
+                    if (this.$refs.generarcuota) {
+                        this.$refs.generarcuota.cant_cuota = cantCuota;
+                        this.$refs.generarcuota.cuotas = cuotasGeneradas.slice();
+                    }
+                    this.saveDatos && this.saveDatos();
                 },
                 findCarroIndex: function(a) {
                     if (a && a.linea_uid) {
@@ -2446,8 +2831,12 @@
                     if (validar > -1) {
                         this.carro.splice(validar, 1);
                     }
+                    if (this.carro.length === 0) {
+                        this.restaurarPreciosContadoCarro();
+                    } else if (this.esCredito && this.tmpIndexPrecio && Number(this.tmpIndexPrecio.cant_cuota) > 0) {
+                        this.aplicarPlanCreditoCarro(this.tmpIndexPrecio.cant_cuota);
+                    }
                     this.saveDatos();
-                    
                 },
                 format: function(numero) {
                     return new Intl.NumberFormat("de-DE").format(numero);
@@ -2521,7 +2910,8 @@
                         Swal.fire('No se puede facturar', this.motivoBloqueoFactura, 'warning');
                         return false;
                     }
-                    if (print && !this.esCredito && this.esEfectivo && !this.puedeEnterCobrar) {
+                    var requirePrint = (print === true || print === 'imprimir' || print === 'ticket' || print === 'recibo');
+                    if (requirePrint && !this.esCredito && this.esEfectivo && !this.puedeEnterCobrar) {
                         return false;
                     }
                     this.calcularVuelto();
@@ -2544,7 +2934,9 @@
                                 this.indiceCarroActivo = this.carritos.length - 1;
                             }
                             this.saveDatos();
-                            if (print) {
+                            if (print === 'recibo') {
+                                window.location.assign('{{ env('APP_URL') }}' + 'pdf/recibo/' + response.data);
+                            } else if (print === true || print === 'imprimir' || print === 'ticket') {
                                 if (docParaPrint == 'Factura') {
                                     window.location.assign(this.urlFacturar + '/' + response.data);
                                 } else if (docParaPrint == 'Ticket') {
@@ -2556,6 +2948,14 @@
                                 }
                             } else {
                                 $('#finalizarventa').modal('hide');
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: 'Venta Nº ' + response.data + ' registrada',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
                             }
                         })
                         .catch(error => {
@@ -2578,7 +2978,7 @@
                     var vc = (def && typeof def === 'object') ? JSON.parse(JSON.stringify(def)) : {
                         fecha: '', clienteId: '1', clienteNombre: 'Cliente Ocasional', documento: 'Ticket',
                         idSucursal: this.ventaCabecera.idSucursal, formacobro: 1, condicionventa: 1, total: 0, descuento: 0, nro_operacion: this.nrooperacion,
-                        generarcuota: true, vender_sin_stock: 0, descontar_stock: 1
+                        generarcuota: true, vender_sin_stock: {{ (int) $venderSinStock }}, descontar_stock: {{ (int) $descontarStock }}
                     };
                     return { id: id, carro: [], ventaCabecera: vc, efectivoRecibido: 0, vuelto: 0, cuotas: [] };
                 },
@@ -2841,30 +3241,25 @@
                     });
                 },
                 seleccionarCondicionVenta: function (valor) {
-                    this.ventaCabecera.condicionventa = valor;
                     if (String(valor) === '2') {
-                        (this.carro || []).forEach(function (it) {
-                            if (it.es_combo && Number(it.precio_credito) > 0) {
-                                it.precio = Number(it.precio_credito);
-                                it.iPrecio = 'CR0';
-                            }
-                        });
-                        this.abrirCuotas();
+                        var cant = (this.tmpIndexPrecio && this.tmpIndexPrecio.cant_cuota && Number(this.tmpIndexPrecio.cant_cuota) > 0)
+                            ? Number(this.tmpIndexPrecio.cant_cuota)
+                            : 3;
+                        this.aplicarPlanCreditoCarro(cant);
                     } else if (String(valor) === '1') {
-                        (this.carro || []).forEach(function (it) {
-                            if (it.es_combo) {
-                                it.precio = Number(it.precio_contado) || Number(it.p1) || Number(it.precio);
-                                it.iPrecio = 'CO1';
-                            }
-                        });
-                        this.ventaCabecera.generarcuota = true;
-                        this.cuotas = [];
+                        this.restaurarPreciosContadoCarro();
                     }
-                    this.saveDatos && this.saveDatos();
                 },
                 abrirCuotas: function() {
-                    if (this.$refs.generarcuota && (!this.cuotas || !this.cuotas.length)) {
-                        this.$refs.generarcuota.generar();
+                    if (this.$refs.generarcuota) {
+                        if (this.tmpIndexPrecio && this.tmpIndexPrecio.cant_cuota) {
+                            this.$refs.generarcuota.cant_cuota = Number(this.tmpIndexPrecio.cant_cuota);
+                        }
+                        if (!this.cuotas || !this.cuotas.length) {
+                            this.$refs.generarcuota.generar();
+                        } else {
+                            this.$refs.generarcuota.cuotas = this.cuotas.slice();
+                        }
                     }
                     $('#modalCuotas').modal('show');
                 },
@@ -2872,6 +3267,12 @@
                     if (!(this.cuotas && this.cuotas.length)) {
                         Swal.fire('Faltan cuotas', 'Elegí un plan de cuotas.', 'warning');
                         return;
+                    }
+                    if (this.$refs.generarcuota && this.$refs.generarcuota.cant_cuota) {
+                        var nuevaCant = Number(this.$refs.generarcuota.cant_cuota);
+                        if (nuevaCant !== Number(this.tmpIndexPrecio.cant_cuota)) {
+                            this.aplicarPlanCreditoCarro(nuevaCant);
+                        }
                     }
                     $('#modalCuotas').modal('hide');
                 },
@@ -2951,8 +3352,8 @@
                             descuento: 0,
                             nro_operacion: 0,
                             generarcuota: true,
-                            vender_sin_stock: 0,
-                            descontar_stock: 1
+                            vender_sin_stock: {{ (int) $venderSinStock }},
+                            descontar_stock: {{ (int) $descontarStock }}
                         };
                     }
                     if (!act.ventaCabecera || typeof act.ventaCabecera !== 'object') {
@@ -3113,15 +3514,110 @@
                     e.preventDefault();
                     this.showFinalizar();
                 },
-                intentarCobrarImprimir: function() {
+                ejecutarCobroPrincipal: function() {
                     this.calcularVuelto();
                     if (!this.puedeImprimirCobro) return;
-                    this.finalizar(true);
+                    if (this.botonPrincipalVenta === 'cobrar') {
+                        this.finalizar('cobrar');
+                    } else if (this.botonPrincipalVenta === 'cobrar_recibo') {
+                        this.finalizar('recibo');
+                    } else {
+                        this.finalizar('imprimir');
+                    }
+                },
+                intentarCobrarImprimir: function() {
+                    this.ejecutarCobroPrincipal();
                 },
                 elegirListaContado: function(n) {
+                    this._contadoDesdeCredito = String(this.ventaCabecera.condicionventa) === '2';
                     this.tmpIndexPrecio.iPrecio = 'CO' + n;
-                    this.ventaCabecera.condicionventa = 1;
                     this.setPrecio();
+                },
+                parseGsEntero: function(valor) {
+                    var raw = String(valor == null ? '' : valor).trim();
+                    if (!raw) return 0;
+                    var digits = raw.replace(/\D/g, '');
+                    if (!digits) return 0;
+                    var n = parseInt(digits, 10);
+                    return isFinite(n) && n > 0 ? n : 0;
+                },
+                normalizarPrecioManual: function() {
+                    var digits = String(this.precioManual == null ? '' : this.precioManual).replace(/\D/g, '');
+                    if (digits !== this.precioManual) this.precioManual = digits;
+                },
+                asegurarPrecioLista: function(item) {
+                    if (!item) return;
+                    var lista = Number(item.precio_lista);
+                    if (!(lista > 0)) {
+                        lista = Number(item.p1) || 0;
+                        if (lista > 0) this.$set(item, 'precio_lista', lista);
+                    }
+                    if (!(Number(item.p1) > 0) && Number(item.precio_lista) > 0) {
+                        this.$set(item, 'p1', Number(item.precio_lista));
+                    }
+                    if (!(Number(item.precio_lista) > 0) && !item.precio_manual) {
+                        var actual = Number(item.precio) || 0;
+                        if (actual > 0) {
+                            this.$set(item, 'precio_lista', actual);
+                            if (!(Number(item.p1) > 0)) this.$set(item, 'p1', actual);
+                        }
+                    }
+                },
+                aplicarListaContadoLinea: function(index, n) {
+                    var item = (this.carro || [])[index];
+                    if (!item) return;
+                    n = parseInt(n, 10) || 1;
+                    this.asegurarPrecioLista(item);
+                    var lista;
+                    if (item.es_combo) {
+                        lista = Number(item.precio_contado) || Number(item.p1) || Number(item.precio) || 0;
+                    } else if (n === 1) {
+                        lista = Number(item.precio_lista) || Number(item.p1) || 0;
+                    } else {
+                        lista = Number(item['p' + n]) || Number(this.preciosContado['p' + n]) || 0;
+                    }
+                    if (!(lista > 0)) {
+                        lista = Number(item.precio_lista) || Number(item.p1) || Number(item.precio) || 0;
+                    }
+                    this.$set(item, 'precio_manual', false);
+                    item.precio = lista;
+                    item.iPrecio = 'CO' + n;
+                    item.monto_cuota = 0;
+                    item.tiene_credito_cuota = false;
+                },
+                aplicarPrecioManual: function() {
+                    var index = this.tmpIndexPrecio.iArticulo;
+                    var monto = this.parseGsEntero(this.precioManual);
+                    var eraCredito = String(this.ventaCabecera.condicionventa) === '2';
+                    if (eraCredito) {
+                        this.restaurarPreciosContadoCarro();
+                    }
+                    var item = (this.carro || [])[index];
+                    if (!item) {
+                        $('#selPrecio').modal('hide');
+                        return;
+                    }
+                    this.asegurarPrecioLista(item);
+                    if (!(monto > 0)) {
+                        this.$set(item, 'precio_manual', false);
+                        item.iPrecio = 'CO1';
+                        item.precio = Number(item.precio_lista) || Number(item.p1) || 0;
+                        item.monto_cuota = 0;
+                        item.tiene_credito_cuota = false;
+                    } else {
+                        this.$set(item, 'precio', monto);
+                        this.$set(item, 'precio_manual', true);
+                        item.iPrecio = 'CO1';
+                        item.monto_cuota = 0;
+                        item.tiene_credito_cuota = false;
+                    }
+                    this.tmpIndexPrecio.iPrecio = 'CO1';
+                    this.ventaCabecera.condicionventa = 1;
+                    $('#selPrecio').modal('hide');
+                    this.saveDatos();
+                    if (this.$refs.buscador && this.$refs.buscador.focusSearchInput) {
+                        this.$refs.buscador.focusSearchInput();
+                    }
                 },
                 elegirListaCredito: function(index) {
                     this.tmpIndexPrecio.iPrecio = 'CR' + index;
@@ -3170,6 +3666,8 @@
                 },
                 getConfigVenta() {
                     this.ensureVentaCabecera();
+                    var vender = {{ (int) $venderSinStock }} === 1 ? 1 : 0;
+                    var descontar = {{ (int) $descontarStock }} === 1 ? 1 : 0;
                     var config = localStorage.getItem('config_venta');
                     if (config != null && config !== '' && config !== 'undefined') {
                         try {
@@ -3177,11 +3675,26 @@
                             if (config && typeof config.tipo_comprobante !== 'undefined') {
                                 var vc = this.carritos[this.indiceCarroActivo].ventaCabecera;
                                 this.$set(vc, 'documento', config.tipo_comprobante);
-                                this.$set(vc, 'vender_sin_stock', config.vender_sin_stock);
-                                this.$set(vc, 'descontar_stock', config.descontar_stock);
+                            }
+                            if (config && typeof config.vender_sin_stock !== 'undefined' && config.vender_sin_stock !== null && config.vender_sin_stock !== '') {
+                                vender = Number(config.vender_sin_stock) === 1 ? 1 : 0;
+                            }
+                            if (config && typeof config.descontar_stock !== 'undefined' && config.descontar_stock !== null && config.descontar_stock !== '') {
+                                descontar = Number(config.descontar_stock) === 1 ? 1 : 0;
+                            }
+                            if (config && config.boton_principal) {
+                                this.botonPrincipalVenta = config.boton_principal;
                             }
                         } catch (e) {}
                     }
+                    this.defaultVentaCabecera.vender_sin_stock = vender;
+                    this.defaultVentaCabecera.descontar_stock = descontar;
+                    var self = this;
+                    this.carritos.forEach(function (c) {
+                        if (!c.ventaCabecera) return;
+                        self.$set(c.ventaCabecera, 'vender_sin_stock', vender);
+                        self.$set(c.ventaCabecera, 'descontar_stock', descontar);
+                    });
                 },
                 abrirItemLibre: function () {
                     this.fastItem = { precio: '', descripcion: '', cantidad: 1 };
@@ -3212,7 +3725,34 @@
                     var esVentaCredito = String(this.ventaCabecera.condicionventa) === '2';
                     var pContado = Number(combo.precio) || 0;
                     var pCredito = Number(combo.precio_credito) || 0;
-                    var precioAplicar = (esVentaCredito && pCredito > 0) ? pCredito : pContado;
+                    var comboPrecios = (combo.precios || []).map(function(p) {
+                        return {
+                            id_precio: p.id_precio,
+                            cant_cuota: p.cant_cuota,
+                            p: Number(p.p || p.precio) || 0,
+                            m: Number(p.m || p.margen) || 0,
+                            c: Number(p.c || p.monto_cuota) || 0
+                        };
+                    });
+
+                    var cantCuotaActual = (this.tmpIndexPrecio && Number(this.tmpIndexPrecio.cant_cuota) > 0)
+                        ? Number(this.tmpIndexPrecio.cant_cuota)
+                        : 1;
+
+                    var precioAplicar = pContado;
+                    var iPrecioAplicar = 'CO1';
+                    if (esVentaCredito) {
+                        var planActual = comboPrecios.find(function(p) {
+                            return Number(p.cant_cuota) === cantCuotaActual && p.p > 0;
+                        });
+                        if (planActual) {
+                            precioAplicar = planActual.p;
+                            iPrecioAplicar = 'CR' + cantCuotaActual;
+                        } else if (pCredito > 0) {
+                            precioAplicar = pCredito;
+                            iPrecioAplicar = 'CR' + cantCuotaActual;
+                        }
+                    }
 
                     var art = {
                         codigo: 'COMBO-' + combo.id,
@@ -3221,6 +3761,7 @@
                         descripcion: combo.nombre,
                         descripcion_libre: combo.nombre,
                         es_combo: true,
+                        precios: comboPrecios,
                         componentes: (combo.items || []).map(function (it) {
                             return {
                                 articulos_cod: it.articulos_cod,
@@ -3246,12 +3787,15 @@
                         m4: 0,
                         m5: 0,
                         costo: 0,
-                        iPrecio: (esVentaCredito && pCredito > 0) ? 'CR0' : 'CO1'
+                        iPrecio: iPrecioAplicar
                     };
                     var lista = this.carro.slice();
                     lista.push(art);
                     this.carro = lista;
                     this.saveDatos();
+                    if (this.esCredito && this.tmpIndexPrecio && Number(this.tmpIndexPrecio.cant_cuota) > 0) {
+                        this.aplicarPlanCreditoCarro(this.tmpIndexPrecio.cant_cuota);
+                    }
                     $('#modalCombos').modal('hide');
                     var Toast = Swal.mixin({
                         toast: true,
@@ -3575,7 +4119,24 @@
                     if (this.motivoBloqueoFactura) return this.motivoBloqueoFactura;
                     if (this.esCredito && !(this.cuotas && this.cuotas.length)) return 'Armá las cuotas para cobrar';
                     if (!this.esCredito && this.esEfectivo && !this.puedeEnterCobrar) return 'Recibí el total para Enter o F12';
+                    if (this.botonPrincipalVenta === 'cobrar') return 'Enter o F12 cobra';
+                    if (this.botonPrincipalVenta === 'cobrar_recibo') return 'Enter o F12 cobra e imprime recibo';
                     return 'Enter o F12 cobra e imprime';
+                },
+                labelBotonPrincipalModal: function() {
+                    if (this.botonPrincipalVenta === 'cobrar') return 'Cobrar';
+                    if (this.botonPrincipalVenta === 'cobrar_recibo') return 'Cobrar e Imprimir Recibo';
+                    return 'Cobrar e Imprimir';
+                },
+                iconBotonPrincipalModal: function() {
+                    if (this.botonPrincipalVenta === 'cobrar') return 'fa-check-circle';
+                    if (this.botonPrincipalVenta === 'cobrar_recibo') return 'fa-file-invoice';
+                    return 'fa-print';
+                },
+                classBotonPrincipalModal: function() {
+                    if (this.botonPrincipalVenta === 'cobrar') return 'btn-primary';
+                    if (this.botonPrincipalVenta === 'cobrar_recibo') return 'btn-warning text-dark';
+                    return 'btn-success';
                 },
                 resumenCuotas: function() {
                     var c = this.cuotas || [];
@@ -3595,9 +4156,21 @@
                     if (out.length > 3) out = out.slice(0, 3);
                     return out.length ? out : [1];
                 },
+                muestraPrecio1: function() {
+                    return this.listasContado.indexOf(1) !== -1;
+                },
+                listasContadoOtras: function() {
+                    return this.listasContado.filter(function(n) { return n !== 1; });
+                },
                 preciosCreditoConMonto: function() {
                     return (this.preciosCredito || []).map(function(p, index) {
-                        return { p: p.p, c: p.c, index: index };
+                        return {
+                            p: p.p,
+                            c: p.c,
+                            m: p.m,
+                            cant_cuota: p.cant_cuota || (index + 2),
+                            index: index
+                        };
                     }).filter(function(p) {
                         return Number(p.p) > 0;
                     });

@@ -268,6 +268,15 @@ export default {
         }
     },
     watch: {
+        datoscuota: {
+            immediate: true,
+            deep: true,
+            handler(val) {
+                if (val && val.cant_cuota) {
+                    this.cant_cuota = Number(val.cant_cuota) || 1;
+                }
+            }
+        },
         total() {
             this.entrega = 0;
             this.initFechaVencimiento();
@@ -278,6 +287,9 @@ export default {
             this.generar();
         },
         calcularcuota() {
+            if (this.datoscuota && this.datoscuota.cant_cuota) {
+                this.cant_cuota = Number(this.datoscuota.cant_cuota) || 1;
+            }
             this.initFechaVencimiento();
             this.generar();
         }
@@ -393,10 +405,15 @@ export default {
             }
 
             // 2. Calcular monto base por cuota
-            var montoCuotaBase = Math.floor(saldo / cantidad);
-            if (this.redondear && montoCuotaBase > 1000) {
-                // Redondear a múltiplos de 1.000
-                montoCuotaBase = Math.round(montoCuotaBase / 1000) * 1000;
+            var montoCuotaBase = 0;
+            if (this.datoscuota && Number(this.datoscuota.monto_cuota) > 0 && entregaMonto === 0 && Number(this.interes) === 0 && Number(this.datoscuota.cant_cuota) === cantidad) {
+                montoCuotaBase = Number(this.datoscuota.monto_cuota);
+            } else {
+                montoCuotaBase = Math.floor(saldo / cantidad);
+                if (this.redondear && montoCuotaBase > 1000) {
+                    // Redondear a múltiplos de 1.000
+                    montoCuotaBase = Math.round(montoCuotaBase / 1000) * 1000;
+                }
             }
 
             // 3. Calcular fechas de vencimiento según frecuencia
@@ -491,6 +508,9 @@ export default {
         }
     },
     mounted() {
+        if (this.datoscuota && this.datoscuota.cant_cuota) {
+            this.cant_cuota = Number(this.datoscuota.cant_cuota) || 1;
+        }
         this.initFechaVencimiento();
         this.generar();
     }

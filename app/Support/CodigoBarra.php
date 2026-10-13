@@ -89,4 +89,37 @@ class CodigoBarra
 
         return $result['codigo'];
     }
+
+    /**
+     * Genera un código de barras único y secuencial para un combo.
+     * Formato: CMB0001, CMB0002, etc.
+     *
+     * @return string
+     */
+    public static function generarParaCombo()
+    {
+        $maxNum = 0;
+        $codigosExistentes = Combo::where('codigo', 'LIKE', 'CMB%')->pluck('codigo');
+        foreach ($codigosExistentes as $c) {
+            if (preg_match('/^CMB(\d+)$/i', $c, $matches)) {
+                $n = (int) $matches[1];
+                if ($n > $maxNum) {
+                    $maxNum = $n;
+                }
+            }
+        }
+
+        $maxId = (int) (Combo::max('id') ?: 0);
+        $siguiente = max($maxNum + 1, $maxId + 1, 1);
+
+        for ($i = $siguiente; $i < $siguiente + 10000; $i++) {
+            $candidato = 'CMB' . str_pad($i, 4, '0', STR_PAD_LEFT);
+            $check = self::check($candidato);
+            if ($check['ok']) {
+                return $candidato;
+            }
+        }
+
+        return 'CMB' . time();
+    }
 }

@@ -470,6 +470,55 @@
     body.dark-mode .form-control { background-color: #111827 !important; border-color: var(--dash-border) !important; color: var(--dash-text-main) !important; }
     body.dark-mode .input-group-text { background-color: #111827 !important; border-color: var(--dash-border) !important; color: var(--dash-text-muted) !important; }
     body.dark-mode .price-display { color: #34d399 !important; }
+
+    /* Estilos del Modal Precios a Crédito */
+    #precioComboModal .nav-pills {
+        background-color: #f1f5f9;
+        border-radius: 10px;
+        padding: 4px;
+    }
+    #precioComboModal .nav-pills .nav-link {
+        color: #64748b;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        transition: all 0.15s ease;
+    }
+    #precioComboModal .nav-pills .nav-link.active {
+        background-color: var(--dash-primary, #0a4d36) !important;
+        color: #ffffff !important;
+    }
+    body.dark-mode #precioComboModal .modal-content {
+        background-color: #1f2937 !important;
+        color: #f3f4f6 !important;
+        border: 1px solid #374151 !important;
+    }
+    body.dark-mode #precioComboModal .modal-body,
+    body.dark-mode #precioComboModal .modal-footer {
+        background-color: #1f2937 !important;
+        border-color: #374151 !important;
+    }
+    body.dark-mode #precioComboModal .card {
+        background-color: #111827 !important;
+        border-color: #374151 !important;
+        color: #f3f4f6 !important;
+    }
+    body.dark-mode #precioComboModal .form-control,
+    body.dark-mode #precioComboModal .input-group-text {
+        background-color: #1f2937 !important;
+        color: #f3f4f6 !important;
+        border-color: #374151 !important;
+    }
+    body.dark-mode #precioComboModal .nav-pills {
+        background-color: #111827 !important;
+    }
+    body.dark-mode #precioComboModal .nav-link {
+        color: #9ca3af !important;
+    }
+    body.dark-mode #precioComboModal .nav-link.active {
+        background-color: #059669 !important;
+        color: #ffffff !important;
+    }
 </style>
 @endsection
 
@@ -637,6 +686,9 @@
                                     <div v-if="Number(c.precio_credito) > 0" class="font-weight-bold font-cairo" style="font-size: 0.88rem; color: #0284c7;">
                                         <span class="badge badge-info mr-1" style="font-size: 0.65rem; font-weight: 600; background: #0284c7;">CRÉD.</span>Gs. @{{ format(c.precio_credito) }}
                                     </div>
+                                    <div v-if="c.precios && c.precios.filter(function(p){ return Number(p.precio) > 0; }).length" class="small mt-0.5" style="font-size: 0.72rem; color: #0284c7;">
+                                        <i class="fa fa-calendar-check mr-1"></i>@{{ c.precios.filter(function(p){ return Number(p.precio) > 0; }).length }} cuotas config.
+                                    </div>
                                     <div class="small text-muted" v-if="c.precio_lista > c.precio" style="text-decoration: line-through; font-size: 0.75rem;">
                                         Lista: Gs. @{{ format(c.precio_lista) }}
                                     </div>
@@ -706,19 +758,40 @@
                                    style="border-radius: 8px; font-size: 0.95rem;">
                         </div>
                         <div class="col-12 col-md-5 mb-3">
-                            <label class="font-weight-bold small text-muted mb-1">
-                                <i class="fa-solid fa-barcode mr-1 text-muted"></i> CÓDIGO DE BARRAS <span class="text-danger">*</span>
-                            </label>
-                            <input type="text"
-                                   class="form-control"
-                                   :class="{'is-invalid': codigoEstado === 'error', 'is-valid': codigoEstado === 'ok'}"
-                                   v-model.trim="form.codigo"
-                                   placeholder="Ej: CMB001 o código EAN"
-                                   @blur="validarCodigo"
-                                   @input="codigoEstado = ''"
-                                   style="border-radius: 8px; font-size: 0.95rem;">
-                            <small class="form-text" :class="codigoEstado === 'error' ? 'text-danger' : 'text-muted'" v-if="codigoMensaje">
-                                @{{ codigoMensaje }}
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <label class="font-weight-bold small text-muted mb-0">
+                                    <i class="fa-solid fa-barcode mr-1 text-muted"></i> CÓDIGO DE BARRAS
+                                </label>
+                                <button type="button" class="btn btn-link btn-sm py-0 px-1 text-primary"
+                                        style="font-size: 0.8rem; font-weight: 600; text-decoration: none;"
+                                        @click="generarCodigoAuto"
+                                        :disabled="generandoCodigo"
+                                        title="Generar código automático">
+                                  
+                                </button>
+                            </div>
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control"
+                                       :class="{'is-invalid': codigoEstado === 'error', 'is-valid': codigoEstado === 'ok'}"
+                                       v-model.trim="form.codigo"
+                                       placeholder="Dejá vacío para auto (Ej: CMB0001)"
+                                       @blur="validarCodigo"
+                                       @input="codigoEstado = ''"
+                                       style="border-radius: 8px 0 0 8px; font-size: 0.95rem;">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary"
+                                            type="button"
+                                            @click="generarCodigoAuto"
+                                            :disabled="generandoCodigo"
+                                            title="Generar código de barras automático"
+                                            style="border-radius: 0 8px 8px 0;">
+                                        <i class="fa-solid fa-arrows-rotate" :class="{'fa-spin': generandoCodigo}"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <small class="form-text" :class="codigoEstado === 'error' ? 'text-danger' : 'text-muted'">
+                                @{{ codigoMensaje || 'Si no ingresás código, se generará uno automáticamente.' }}
                             </small>
                         </div>
                     </div>
@@ -937,7 +1010,16 @@
                                     +30%
                                 </button>
                             </div>
-                            <small class="text-muted d-block mt-0.5" v-if="form.precio_credito > form.precio">
+                            <button type="button"
+                                    class="btn btn-outline-info btn-block btn-sm font-weight-bold mt-2 d-flex align-items-center justify-content-center"
+                                    @click="abrirModalPrecios"
+                                    style="border-radius: 6px; padding: 0.45rem 0.75rem;">
+                                <i class="fa fa-calculator mr-2"></i> Configurar Cuotas y Precios Crédito (2 a 18)
+                                <span class="badge badge-info ml-2" v-if="cantPreciosConfigurados > 0">
+                                    @{{ cantPreciosConfigurados }} cuotas
+                                </span>
+                            </button>
+                            <small class="text-muted d-block mt-1" v-if="form.precio_credito > form.precio">
                                 Recargo: +Gs. @{{ format(form.precio_credito - form.precio) }} (+@{{ porcentajeRecargoCredito }}%)
                             </small>
                         </div>
@@ -1022,6 +1104,228 @@
                         @{{ form.id ? 'Actualizar Combo #' + form.id : 'Guardar Nuevo Combo' }}
                     </button>
                 </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Modal Precios Crédito y Cuotas (2 a 18) -->
+    <div class="modal fade" id="precioComboModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, #0a4d36 0%, #073827 100%);">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-credit-card fa-lg mr-2"></i>
+                        <div>
+                            <h5 class="modal-title font-weight-bold mb-0">Precios a Crédito y Cuotas del Combo</h5>
+                            <small class="text-white-50">
+                                Base Contado: Gs. @{{ format(form.precio || precioLista) }}
+                                <span v-if="form.nombre"> &bull; @{{ form.nombre }}</span>
+                            </small>
+                        </div>
+                    </div>
+                    <button type="button" class="close text-white" @click="cerrarModalPrecios" aria-label="Close" style="opacity: 0.9; text-shadow: none;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-3">
+                    <!-- Barra de herramientas rápidas -->
+                    <div class="p-2.5 px-3 rounded mb-3 border d-flex flex-wrap align-items-center justify-content-between" style="background: rgba(16, 185, 129, 0.05); border-radius: 8px;">
+                        <div class="d-flex align-items-center flex-wrap">
+                            <span class="small font-weight-bold mr-2">
+                                <i class="fa fa-wand-magic-sparkles text-success mr-1"></i> Aplicar margen rápido a todas las cuotas:
+                            </span>
+                            <button type="button" class="btn btn-xs btn-outline-secondary font-weight-bold mr-1 my-1" @click="aplicarMargenGeneral(0)">= Contado (0%)</button>
+                            <button type="button" class="btn btn-xs btn-outline-info font-weight-bold mr-1 my-1" @click="aplicarMargenGeneral(10)">+10%</button>
+                            <button type="button" class="btn btn-xs btn-outline-info font-weight-bold mr-1 my-1" @click="aplicarMargenGeneral(15)">+15%</button>
+                            <button type="button" class="btn btn-xs btn-outline-info font-weight-bold mr-1 my-1" @click="aplicarMargenGeneral(20)">+20%</button>
+                            <button type="button" class="btn btn-xs btn-outline-info font-weight-bold mr-1 my-1" @click="aplicarMargenGeneral(25)">+25%</button>
+                            <button type="button" class="btn btn-xs btn-outline-info font-weight-bold mr-1 my-1" @click="aplicarMargenGeneral(30)">+30%</button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-xs btn-outline-danger font-weight-bold my-1" @click="limpiarPreciosCredito" title="Borrar todos los precios crédito">
+                                <i class="fa fa-trash-alt mr-1"></i> Limpiar Cuotas
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pestañas de Cuotas (2-7, 8-13, 14-18) -->
+                    <ul class="nav nav-pills nav-fill mb-3" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active font-weight-bold" data-toggle="pill" href="#tabComboPrecios1" role="tab">
+                                CUOTAS 2 - 7
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-bold" data-toggle="pill" href="#tabComboPrecios2" role="tab">
+                                CUOTAS 8 - 13
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-bold" data-toggle="pill" href="#tabComboPrecios3" role="tab">
+                                CUOTAS 14 - 18
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- GRUPO 1: Cuotas 2 a 7 -->
+                        <div class="tab-pane fade show active" id="tabComboPrecios1" role="tabpanel">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6 mb-3" v-for="p in grupoCuotas1" :key="'cuota-' + p.cant_cuota">
+                                    <div class="card shadow-none border h-100 p-2.5" style="border-radius: 8px;">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <span class="badge badge-success font-weight-bold" style="font-size: 0.8rem; background: var(--dash-primary); color: #fff;">
+                                                PLAN @{{ p.cant_cuota }} CUOTAS
+                                            </span>
+                                            <span class="small font-weight-bold text-success font-cairo" v-if="p.c > 0">
+                                                Gs. @{{ format(p.c) }} / cuota
+                                            </span>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="small text-muted font-weight-bold mb-0.5 d-flex justify-content-between">
+                                                <span>Margen %</span>
+                                                <span v-if="p.m > 0" class="text-info font-weight-bold">+@{{ p.m }}%</span>
+                                            </label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="number" class="form-control text-right" v-model.number="p.m" @input="setPrecioItem(p)" placeholder="0">
+                                                <div class="input-group-append"><span class="input-group-text">%</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="small text-muted font-weight-bold mb-0.5">Precio Total Crédito</label>
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-prepend"><span class="input-group-text">Gs.</span></div>
+                                                <input type="number" class="form-control text-right font-weight-bold font-cairo" v-model.number="p.p" @change="setMargenItem(p)" placeholder="0">
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-0">
+                                            <label class="small text-muted font-weight-bold mb-0.5">Monto por Cuota (@{{ p.cant_cuota }} pagos)</label>
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-prepend"><span class="input-group-text">Gs.</span></div>
+                                                <input type="number" class="form-control text-right font-weight-bold text-success font-cairo" v-model.number="p.c" @input="onCuotaInputItem(p)" placeholder="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GRUPO 2: Cuotas 8 a 13 -->
+                        <div class="tab-pane fade" id="tabComboPrecios2" role="tabpanel">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6 mb-3" v-for="p in grupoCuotas2" :key="'cuota-' + p.cant_cuota">
+                                    <div class="card shadow-none border h-100 p-2.5" style="border-radius: 8px;">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <span class="badge badge-success font-weight-bold" style="font-size: 0.8rem; background: var(--dash-primary); color: #fff;">
+                                                PLAN @{{ p.cant_cuota }} CUOTAS
+                                            </span>
+                                            <span class="small font-weight-bold text-success font-cairo" v-if="p.c > 0">
+                                                Gs. @{{ format(p.c) }} / cuota
+                                            </span>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="small text-muted font-weight-bold mb-0.5 d-flex justify-content-between">
+                                                <span>Margen %</span>
+                                                <span v-if="p.m > 0" class="text-info font-weight-bold">+@{{ p.m }}%</span>
+                                            </label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="number" class="form-control text-right" v-model.number="p.m" @input="setPrecioItem(p)" placeholder="0">
+                                                <div class="input-group-append"><span class="input-group-text">%</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="small text-muted font-weight-bold mb-0.5">Precio Total Crédito</label>
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-prepend"><span class="input-group-text">Gs.</span></div>
+                                                <input type="number" class="form-control text-right font-weight-bold font-cairo" v-model.number="p.p" @change="setMargenItem(p)" placeholder="0">
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-0">
+                                            <label class="small text-muted font-weight-bold mb-0.5">Monto por Cuota (@{{ p.cant_cuota }} pagos)</label>
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-prepend"><span class="input-group-text">Gs.</span></div>
+                                                <input type="number" class="form-control text-right font-weight-bold text-success font-cairo" v-model.number="p.c" @input="onCuotaInputItem(p)" placeholder="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GRUPO 3: Cuotas 14 a 18 -->
+                        <div class="tab-pane fade" id="tabComboPrecios3" role="tabpanel">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6 mb-3" v-for="p in grupoCuotas3" :key="'cuota-' + p.cant_cuota">
+                                    <div class="card shadow-none border h-100 p-2.5" style="border-radius: 8px;">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <span class="badge badge-success font-weight-bold" style="font-size: 0.8rem; background: var(--dash-primary); color: #fff;">
+                                                PLAN @{{ p.cant_cuota }} CUOTAS
+                                            </span>
+                                            <span class="small font-weight-bold text-success font-cairo" v-if="p.c > 0">
+                                                Gs. @{{ format(p.c) }} / cuota
+                                            </span>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="small text-muted font-weight-bold mb-0.5 d-flex justify-content-between">
+                                                <span>Margen %</span>
+                                                <span v-if="p.m > 0" class="text-info font-weight-bold">+@{{ p.m }}%</span>
+                                            </label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="number" class="form-control text-right" v-model.number="p.m" @input="setPrecioItem(p)" placeholder="0">
+                                                <div class="input-group-append"><span class="input-group-text">%</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="small text-muted font-weight-bold mb-0.5">Precio Total Crédito</label>
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-prepend"><span class="input-group-text">Gs.</span></div>
+                                                <input type="number" class="form-control text-right font-weight-bold font-cairo" v-model.number="p.p" @change="setMargenItem(p)" placeholder="0">
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-0">
+                                            <label class="small text-muted font-weight-bold mb-0.5">Monto por Cuota (@{{ p.cant_cuota }} pagos)</label>
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-prepend"><span class="input-group-text">Gs.</span></div>
+                                                <input type="number" class="form-control text-right font-weight-bold text-success font-cairo" v-model.number="p.c" @input="onCuotaInputItem(p)" placeholder="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer del Modal -->
+                <div class="modal-footer bg-light d-flex justify-content-between align-items-center py-2">
+                    <div class="d-flex align-items-center flex-wrap">
+                        <div class="custom-control custom-checkbox mr-3">
+                            <input type="checkbox" class="custom-control-input" id="checkRedondearPrecioCombo" v-model="chprecio">
+                            <label class="custom-control-label font-weight-bold text-secondary small" for="checkRedondearPrecioCombo">Redondear Precios</label>
+                        </div>
+                        <div class="custom-control custom-checkbox mr-3">
+                            <input type="checkbox" class="custom-control-input" id="checkRedondearCuotaCombo" v-model="chcuota">
+                            <label class="custom-control-label font-weight-bold text-secondary small" for="checkRedondearCuotaCombo">Redondear Cuotas</label>
+                        </div>
+                        <div class="d-inline-flex align-items-center">
+                            <span class="small text-muted mr-1">Múltiplo:</span>
+                            <select class="form-control form-control-sm font-weight-bold" v-model.number="form.multiplo" style="width: 100px; height: 30px; font-size: 0.8rem;">
+                                <option :value="100">100 Gs.</option>
+                                <option :value="500">500 Gs.</option>
+                                <option :value="1000">1.000 Gs.</option>
+                                <option :value="5000">5.000 Gs.</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" @click="cerrarModalPrecios" class="btn btn-secondary btn-sm px-3 mr-1">
+                            <i class="fa fa-times mr-1"></i> Cerrar
+                        </button>
+                        <button type="button" @click="aplicarPreciosModal" class="btn btn-success btn-sm px-3 font-weight-bold">
+                            <i class="fa fa-check mr-1"></i> Aplicar y Continuar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1037,6 +1341,20 @@
         timer: 2500
     });
 
+    function getDefaultComboPrecios() {
+        var arr = [];
+        for (var i = 2; i <= 18; i++) {
+            arr.push({
+                id_precio: i,
+                cant_cuota: i,
+                p: 0,
+                m: 0,
+                c: 0
+            });
+        }
+        return arr;
+    }
+
     var app = new Vue({
         el: '#app',
         data: {
@@ -1047,9 +1365,12 @@
             resultados: [],
             buscarTimer: null,
             guardando: false,
+            generandoCodigo: false,
             precioEditado: false,
             codigoEstado: '',
             codigoMensaje: '',
+            chprecio: true,
+            chcuota: true,
             form: {
                 id: null,
                 nombre: '',
@@ -1059,7 +1380,8 @@
                 multiplo: 500,
                 activo: true,
                 observacion: '',
-                items: []
+                items: [],
+                precios: getDefaultComboPrecios()
             }
         },
         computed: {
@@ -1086,6 +1408,20 @@
                     return Math.round(((cred - cont) / cont) * 100);
                 }
                 return 0;
+            },
+            cantPreciosConfigurados: function () {
+                return (this.form.precios || []).filter(function (p) {
+                    return Number(p.p) > 0;
+                }).length;
+            },
+            grupoCuotas1: function () {
+                return (this.form.precios || []).slice(0, 6);
+            },
+            grupoCuotas2: function () {
+                return (this.form.precios || []).slice(6, 12);
+            },
+            grupoCuotas3: function () {
+                return (this.form.precios || []).slice(12, 17);
             },
             combosFiltrados: function () {
                 if (!this.filtroCombos) return this.combos;
@@ -1124,7 +1460,8 @@
                     multiplo: 500,
                     activo: true,
                     observacion: '',
-                    items: []
+                    items: [],
+                    precios: getDefaultComboPrecios()
                 };
             },
             nuevo: function () {
@@ -1134,8 +1471,43 @@
                 this.buscar = '';
                 this.codigoEstado = '';
                 this.codigoMensaje = '';
+                this.generarCodigoAuto();
+            },
+            generarCodigoAuto: function () {
+                var self = this;
+                this.generandoCodigo = true;
+                return axios.get('{{ url('combo/generar-codigo') }}')
+                    .then(function (r) {
+                        self.generandoCodigo = false;
+                        if (r.data && r.data.codigo) {
+                            self.form.codigo = r.data.codigo;
+                            self.codigoEstado = 'ok';
+                            self.codigoMensaje = 'Código autogenerado (' + r.data.codigo + ')';
+                        }
+                        return (r.data && r.data.codigo) || '';
+                    })
+                    .catch(function () {
+                        self.generandoCodigo = false;
+                        return '';
+                    });
             },
             editar: function (c) {
+                var preciosList = getDefaultComboPrecios();
+                if (c.precios && c.precios.length > 0) {
+                    c.precios.forEach(function (cp) {
+                        var cant = Number(cp.cant_cuota);
+                        var idx = preciosList.findIndex(function (x) { return x.cant_cuota === cant; });
+                        if (idx !== -1) {
+                            preciosList[idx].p = Math.round(Number(cp.precio || cp.p || 0));
+                            preciosList[idx].m = Math.round(Number(cp.margen || cp.m || 0));
+                            preciosList[idx].c = Math.round(Number(cp.monto_cuota || cp.c || 0));
+                        }
+                    });
+                } else if (Number(c.precio_credito) > 0) {
+                    preciosList[0].p = Number(c.precio_credito);
+                    preciosList[0].c = Math.round(Number(c.precio_credito) / 2);
+                }
+
                 this.form = {
                     id: c.id,
                     nombre: c.nombre,
@@ -1154,7 +1526,8 @@
                             cantidad: Number(it.cantidad) || 1,
                             precio_ref: Number(it.precio_ref) || Number(art.pre_venta1) || 0
                         };
-                    })
+                    }),
+                    precios: preciosList
                 };
                 this.precioEditado = Number(c.precio) !== Number(c.precio_lista);
                 this.resultados = [];
@@ -1165,9 +1538,9 @@
                 var self = this;
                 var codigo = (this.form.codigo || '').trim();
                 if (!codigo) {
-                    this.codigoEstado = 'error';
-                    this.codigoMensaje = 'El código de barras es obligatorio.';
-                    return Promise.resolve(false);
+                    this.codigoEstado = '';
+                    this.codigoMensaje = 'Se generará automáticamente al guardar.';
+                    return Promise.resolve(true);
                 }
                 return axios.get('{{ url('combo/validar-codigo') }}', {
                     params: { codigo: codigo, id: this.form.id || null }
@@ -1264,6 +1637,126 @@
                     this.precioEditado = true;
                 }
             },
+            abrirModalPrecios: function () {
+                var base = Number(this.form.precio) || this.precioLista || 0;
+                if (base <= 0) {
+                    Swal.fire('Precio Requerido', 'Ingresá primero los artículos y el precio del combo.', 'warning');
+                    return;
+                }
+                if (!this.form.precios || !this.form.precios.length) {
+                    this.form.precios = getDefaultComboPrecios();
+                }
+                $('#precioComboModal').modal('show');
+            },
+            cerrarModalPrecios: function () {
+                $('#precioComboModal').modal('hide');
+            },
+            setPrecioItem: function (item) {
+                var base = Number(this.form.precio) || this.precioLista || 0;
+                if (base <= 0) {
+                    item.p = 0;
+                    item.c = 0;
+                    return;
+                }
+                var m = Number(item.m) || 0;
+                if (m < 0) {
+                    m = 0;
+                    item.m = 0;
+                }
+                var total = Math.round((base * m) / 100 + base);
+                item.p = this.chprecio ? this.redondearMonto(total) : total;
+                this.setCuotaItem(item);
+            },
+            setMargenItem: function (item) {
+                var base = Number(this.form.precio) || this.precioLista || 0;
+                if (base <= 0) {
+                    item.m = 0;
+                    this.setCuotaItem(item);
+                    return;
+                }
+                var p = Number(item.p) || 0;
+                if (p > base) {
+                    var diff = p - base;
+                    item.m = Math.round((diff * 100) / base);
+                } else {
+                    item.m = 0;
+                }
+                this.setCuotaItem(item);
+            },
+            setCuotaItem: function (item) {
+                var p = Number(item.p) || 0;
+                var cant = Number(item.cant_cuota) || 1;
+                if (p > 0 && cant > 0) {
+                    var c = p / cant;
+                    item.c = this.chcuota ? this.redondearMonto(Math.round(c)) : Math.round(c);
+                } else {
+                    item.c = 0;
+                }
+            },
+            onCuotaInputItem: function (item) {
+                var c = Number(item.c) || 0;
+                var cant = Number(item.cant_cuota) || 1;
+                if (c > 0 && cant > 0) {
+                    var p = c * cant;
+                    item.p = this.chprecio ? this.redondearMonto(p) : p;
+                    var base = Number(this.form.precio) || this.precioLista || 0;
+                    if (base > 0 && item.p > base) {
+                        item.m = Math.round(((item.p - base) * 100) / base);
+                    } else {
+                        item.m = 0;
+                    }
+                }
+            },
+            setPrecio: function (index) {
+                if (this.form.precios && this.form.precios[index]) {
+                    this.setPrecioItem(this.form.precios[index]);
+                }
+            },
+            setMargen: function (index) {
+                if (this.form.precios && this.form.precios[index]) {
+                    this.setMargenItem(this.form.precios[index]);
+                }
+            },
+            setCuota: function (index) {
+                if (this.form.precios && this.form.precios[index]) {
+                    this.setCuotaItem(this.form.precios[index]);
+                }
+            },
+            onCuotaInput: function (index) {
+                if (this.form.precios && this.form.precios[index]) {
+                    this.onCuotaInputItem(this.form.precios[index]);
+                }
+            },
+            redondearMonto: function (monto) {
+                var mult = Number(this.form.multiplo) || 500;
+                return Math.round(monto / mult) * mult;
+            },
+            aplicarMargenGeneral: function (pct) {
+                var base = Number(this.form.precio) || this.precioLista || 0;
+                if (base <= 0) {
+                    Swal.fire('Atención', 'Definí primero el precio de contado del combo.', 'warning');
+                    return;
+                }
+                var self = this;
+                (this.form.precios || []).forEach(function (item) {
+                    item.m = Number(pct) || 0;
+                    self.setPrecioItem(item);
+                });
+            },
+            limpiarPreciosCredito: function () {
+                (this.form.precios || []).forEach(function (item) {
+                    item.p = 0;
+                    item.m = 0;
+                    item.c = 0;
+                });
+            },
+            aplicarPreciosModal: function () {
+                var primerPlan = (this.form.precios || []).find(function (p) { return Number(p.p) > 0; });
+                if (primerPlan && (!this.form.precio_credito || Number(this.form.precio_credito) <= Number(this.form.precio))) {
+                    this.form.precio_credito = Number(primerPlan.p);
+                }
+                $('#precioComboModal').modal('hide');
+            },
             payload: function () {
                 return {
                     nombre: this.form.nombre,
@@ -1279,6 +1772,15 @@
                             cantidad: it.cantidad,
                             precio_ref: it.precio_ref
                         };
+                    }),
+                    precios: (this.form.precios || []).map(function (p, i) {
+                        return {
+                            id_precio: p.id_precio || (i + 2),
+                            cant_cuota: p.cant_cuota || (i + 2),
+                            p: Number(p.p) || 0,
+                            m: Number(p.m) || 0,
+                            c: Number(p.c) || 0
+                        };
                     })
                 };
             },
@@ -1286,10 +1788,6 @@
                 var self = this;
                 if (!this.form.nombre) {
                     Swal.fire('Falta nombre', 'Indicá el nombre del combo.', 'warning');
-                    return;
-                }
-                if (!(this.form.codigo || '').trim()) {
-                    Swal.fire('Falta código', 'Indicá el código de barras del combo.', 'warning');
                     return;
                 }
                 if (this.form.items.length < 2) {
@@ -1301,12 +1799,8 @@
                     return;
                 }
                 this.guardando = true;
-                this.validarCodigo().then(function (ok) {
-                    if (!ok) {
-                        self.guardando = false;
-                        Swal.fire('Código inválido', self.codigoMensaje || 'Revisá el código de barras.', 'warning');
-                        return;
-                    }
+
+                var executeSave = function () {
                     var req = self.form.id
                         ? axios.put('{{ url('combo') }}/' + self.form.id, self.payload())
                         : axios.post('{{ url('combo') }}', self.payload());
@@ -1322,7 +1816,22 @@
                             : 'No se pudo guardar el combo';
                         Swal.fire('Error', msg, 'error');
                     });
-                });
+                };
+
+                var cod = (this.form.codigo || '').trim();
+                if (!cod) {
+                    // Si no ingresó código, el backend lo genera automáticamente
+                    executeSave();
+                } else {
+                    this.validarCodigo().then(function (ok) {
+                        if (!ok) {
+                            self.guardando = false;
+                            Swal.fire('Código inválido', self.codigoMensaje || 'Revisá el código de barras.', 'warning');
+                            return;
+                        }
+                        executeSave();
+                    });
+                }
             },
             eliminar: function (c) {
                 var self = this;
@@ -1349,6 +1858,9 @@
         },
         mounted: function () {
             activarMenu('m_combo', '');
+            if (!this.form.id && !this.form.codigo) {
+                this.generarCodigoAuto();
+            }
         }
     });
 </script>
