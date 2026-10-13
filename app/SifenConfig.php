@@ -71,6 +71,6 @@ class SifenConfig extends Model
 
     public function esModoApi()
     {
-        return strtolower((string) $this->modo_emision) === 'api';
+        return true;
     }
 }

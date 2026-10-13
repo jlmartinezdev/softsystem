@@ -231,13 +231,7 @@
                         <li class="nav-item">
                             <a href="{{ route('sifen.index') }}" id="m_sifen" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Configuración SIFEN</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('sifen.laboratorio') }}" id="m_sifen_lab" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Laboratorio SIFEN</p>
+                                <p>Facturación por API</p>
                             </a>
                         </li>
                     </ul>

@@ -177,8 +177,6 @@ Route::get('caja/movimiento/{id}','MovimientoCajaController@informe')->name('caj
     Route::post('sifen/sync', 'SifenConfigController@sincronizarEmpresa')->name('sifen.sync');
     Route::post('sifen/api/probar', 'SifenConfigController@probarApi')->name('sifen.api.probar');
     Route::post('sifen/api/token', 'SifenConfigController@obtenerTokenApi')->name('sifen.api.token');
-    Route::get('sifen/laboratorio', 'SifenLaboratorioController@index')->name('sifen.laboratorio');
-    Route::post('sifen/laboratorio/ejecutar', 'SifenLaboratorioController@ejecutar')->name('sifen.laboratorio.ejecutar');
     //CIUDAD
     Route::get('ciudad','CiudadController@index')->name('ciudad.index');
     Route::get('ciudad/all','CiudadController@all')->name('ciudad.all');

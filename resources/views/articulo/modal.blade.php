@@ -143,6 +143,9 @@
         border-color: #374151 !important;
         color: #f3f4f6 !important;
     }
+    .stock-table tbody tr.stock-row-edit {
+        background: #f4f7f5;
+    }
     .stock-table tbody tr:hover {
         background-color: var(--dash-primary-light);
     }
@@ -204,17 +207,17 @@
         <ul class="nav nav-pills nav-fill bg-light p-2 border-bottom" id="tabArticulo" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link active font-weight-bold py-2" id="tab-general-tab" data-toggle="pill" href="#tab-general" role="tab" aria-controls="tab-general" aria-selected="true">
-                            <i class="fa fa-info-circle mr-1"></i> 1. General
+                            <i class="fa fa-info-circle mr-1"></i><span class="d-none d-sm-inline">1. General</span><span class="d-sm-none">General</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link font-weight-bold py-2" id="tab-precios-tab" data-toggle="pill" href="#tab-precios" role="tab" aria-controls="tab-precios" aria-selected="false">
-                            <i class="fa fa-tag mr-1"></i> 2. Precios & Margen
+                            <i class="fa fa-tag mr-1"></i><span class="d-none d-sm-inline">2. Precios y margen</span><span class="d-sm-none">Precios</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link font-weight-bold py-2" id="tab-stock-tab" data-toggle="pill" href="#tab-stock" role="tab" aria-controls="tab-stock" aria-selected="false">
-                            <i class="fa fa-boxes-stacked mr-1"></i> 3. Stock & Depósito
+                            <i class="fa fa-boxes-stacked mr-1"></i><span class="d-none d-sm-inline">3. Stock y depósito</span><span class="d-sm-none">Stock</span>
                         </a>
                     </li>
                 </ul>
@@ -422,7 +425,7 @@
 
                         <!-- Precios 2 a 5 Plegables -->
                         <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2 precios-extra-acciones">
                                 <button class="btn btn-outline-secondary btn-sm" type="button" @click="toggleMasPrecios = !toggleMasPrecios">
                                     <i :class="toggleMasPrecios ? 'fa fa-eye-slash mr-1' : 'fa fa-layer-group mr-1'"></i>
                                     @{{ toggleMasPrecios ? 'Ocultar Precios Adicionales (2 al 5)' : 'Configurar Precios 2 al 5 (Mayorista, etc.)' }}
@@ -477,103 +480,9 @@
                     <!-- ================= TAB 3: STOCK & DEPÓSITO ================= -->
                     <div class="tab-pane fade" id="tab-stock" role="tabpanel" aria-labelledby="tab-stock-tab">
                         <!-- Cabecera Informativa con Total KPI -->
-                        <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 p-2 px-3 rounded-lg" style="background: var(--dash-primary-light); border: 1px solid var(--dash-primary-border); border-radius: 10px;">
-                            <div class="d-flex align-items-center">
-                                <div class="mr-2" style="width: 36px; height: 36px; border-radius: 8px; background: var(--dash-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
-                                    <i class="fa-solid fa-boxes-stacked"></i>
-                                </div>
-                                <div>
-                                    <h6 class="font-weight-bold mb-0" style="color: var(--dash-primary);">Control de Stock por Sucursales</h6>
-                                    <small class="text-muted">Asigná cantidades disponibles, lotes y fechas de vencimiento</small>
-                                </div>
-                            </div>
-                            <div class="mt-2 mt-sm-0">
-                                <span class="badge-stock-in" style="font-size: 0.9rem; padding: 5px 12px;">
-                                    <i class="fa-solid fa-circle-check mr-1"></i>
-                                    Stock Total: <strong class="ml-1 font-cairo">@{{ totalStock }}</strong> unid.
-                                </span>
-                            </div>
-                        </div>
+                       
 
-                        <!-- Formulario de entrada de stock para sucursales -->
-                        <div class="stock-form-card">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="d-flex align-items-center">
-                                    <i :class="bandstock == 1 ? 'fa-solid fa-pen-to-square text-warning mr-2' : 'fa-solid fa-circle-plus text-success mr-2'"></i>
-                                    <span class="font-weight-bold" style="color: var(--dash-text-main); font-size: 0.95rem;">
-                                        @{{ bandstock == 1 ? 'Modificar Registro de Stock' : 'Asignar Stock a Sucursal' }}
-                                    </span>
-                                </div>
-                                <span class="badge badge-warning py-1 px-2" v-if="bandstock == 1">
-                                    <i class="fa fa-pen mr-1"></i> Editando Registro
-                                </span>
-                            </div>
-
-                            <div class="row">
-                                <!-- Sucursal -->
-                                <div class="col-md-4 col-sm-6 mb-2">
-                                    <label class="small text-muted font-weight-bold mb-1">
-                                        <i class="fa-solid fa-store mr-1 text-muted"></i> Sucursal
-                                    </label>
-                                    <select v-model="stock.sucursal" class="form-control select-seccion" style="border-radius: 8px; font-size: 0.9rem;">
-                                        <template v-for="suc in sucursales">
-                                            <option :value="suc.suc_cod">@{{ suc.suc_desc }}</option>
-                                        </template>
-                                    </select>
-                                </div>
-
-                                <!-- Cantidad Stock -->
-                                <div class="col-md-3 col-sm-6 mb-2">
-                                    <label class="small text-muted font-weight-bold mb-1">
-                                        <i class="fa-solid fa-cubes mr-1 text-muted"></i> Cantidad Stock
-                                    </label>
-                                    <input type="number"
-                                           v-model.number="stock.cantidad"
-                                           onfocus="this.select()"
-                                           class="form-control font-weight-bold text-center"
-                                           min="0"
-                                           placeholder="0"
-                                           style="border-radius: 8px; font-size: 0.95rem;" />
-                                </div>
-
-                                <!-- Lote -->
-                                <div class="col-md-3 col-sm-6 mb-2">
-                                    <label class="small text-muted font-weight-bold mb-1">
-                                        <i class="fa-solid fa-barcode mr-1 text-muted"></i> Lote
-                                    </label>
-                                    <input type="text"
-                                           v-model="stock.lotenew"
-                                           class="form-control"
-                                           placeholder="Ej: LOTE-01 o S/N"
-                                           style="border-radius: 8px; font-size: 0.9rem;" />
-                                </div>
-
-                                <!-- Vencimiento -->
-                                <div class="col-md-2 col-sm-6 mb-2">
-                                    <label class="small text-muted font-weight-bold mb-1">
-                                        <i class="fa-solid fa-calendar mr-1 text-muted"></i> Vencimiento
-                                    </label>
-                                    <input type="date"
-                                           v-model="stock.vencimiento"
-                                           class="form-control"
-                                           style="border-radius: 8px; font-size: 0.9rem;" />
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-end align-items-center mt-3 pt-2 border-top">
-                                <button v-if="bandstock == 1" class="btn-pos-secondary mr-2" type="button" @click="limpiarCamposStock">
-                                    <i class="fa fa-times mr-1"></i> Cancelar Edición
-                                </button>
-                                <button v-if="bandstock == 0" class="btn-pos-primary" type="button" @click="addStock">
-                                    <i class="fa fa-plus-circle mr-1"></i> Asignar Stock
-                                </button>
-                                <button v-else class="btn-pos-primary" type="button" @click="updateStockA">
-                                    <i class="fa fa-check mr-1"></i> Guardar Cambios
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Tabla de stocks asignados -->
+                        <!-- Stock actual -->
                         <div class="stock-table-card">
                             <div class="table-responsive">
                                 <table class="table stock-table mb-0">
@@ -588,51 +497,86 @@
                                     </thead>
                                     <tbody>
                                         <tr v-if="!stocks || stocks.length === 0">
-                                            <td colspan="5" class="text-center py-4">
+                                            <td colspan="5" class="text-center py-4 stock-empty">
                                                 <div class="text-muted mb-2" style="font-size: 1.6rem;">
                                                     <i class="fa-solid fa-boxes-stacked"></i>
                                                 </div>
-                                                <div class="font-weight-bold" style="color: var(--dash-text-main);">Sin stock asignado a sucursales</div>
-                                                <div class="small text-muted">Completá los campos superiores para asignar cantidades a cada local (se guardará con 0 si no se asigna).</div>
+                                                <div class="font-weight-bold" style="color: var(--dash-text-main);">Sin stock asignado</div>
+                                                <div class="small text-muted">Usá el botón de abajo para crear el primer stock.</div>
                                             </td>
                                         </tr>
-                                        <tr v-for="s in stocks" :key="s.id">
-                                            <td class="align-middle">
-                                                <div class="font-weight-bold" style="color: var(--dash-text-main);">
+                                        <tr v-for="s in stocks" :key="s.id" :class="{ 'stock-row-edit': bandstock == 1 && stock.id == s.id }">
+                                            <td class="align-middle" data-label="Sucursal">
+                                                <select v-if="bandstock == 1 && stock.id == s.id" v-model="stock.sucursal" class="form-control form-control-sm" style="border-radius: 8px;">
+                                                    <option v-for="suc in sucursales" :key="suc.suc_cod" :value="suc.suc_cod">@{{ suc.suc_desc }}</option>
+                                                </select>
+                                                <div v-else class="font-weight-bold" style="color: var(--dash-text-main);">
                                                     <i class="fa-solid fa-shop text-muted mr-1"></i>@{{ getByIdSucursal(s.sucursal) }}
                                                 </div>
                                             </td>
-                                            <td class="align-middle text-center">
-                                                <span v-if="s.cantidad <= 0" class="badge-stock-out">
-                                                    <i class="fa-solid fa-circle-xmark mr-1"></i>0 Agotado
-                                                </span>
-                                                <span v-else-if="s.cantidad <= 5" class="badge-stock-low">
-                                                    <i class="fa-solid fa-triangle-exclamation mr-1"></i>@{{ s.cantidad }} Bajo
-                                                </span>
-                                                <span v-else class="badge-stock-in">
-                                                    <i class="fa-solid fa-circle-check mr-1"></i>@{{ s.cantidad }}
-                                                </span>
+                                            <td class="align-middle text-center" data-label="Cantidad">
+                                                <input v-if="bandstock == 1 && stock.id == s.id"
+                                                       type="number"
+                                                       v-model.number="stock.cantidad"
+                                                       onfocus="this.select()"
+                                                       class="form-control form-control-sm font-weight-bold text-center"
+                                                       placeholder="0"
+                                                       style="border-radius: 8px; max-width: 110px; margin: 0 auto;">
+                                                <template v-else>
+                                                    <span v-if="s.cantidad <= 0" class="badge-stock-out">
+                                                        <i class="fa-solid fa-circle-xmark mr-1"></i>0 Agotado
+                                                    </span>
+                                                    <span v-else-if="s.cantidad <= 5" class="badge-stock-low">
+                                                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>@{{ s.cantidad }} Bajo
+                                                    </span>
+                                                    <span v-else class="badge-stock-in">
+                                                        <i class="fa-solid fa-circle-check mr-1"></i>@{{ s.cantidad }}
+                                                    </span>
+                                                </template>
                                             </td>
-                                            <td class="align-middle">
-                                                <span class="badge-barcode">
+                                            <td class="align-middle" data-label="Lote">
+                                                <input v-if="bandstock == 1 && stock.id == s.id"
+                                                       type="text"
+                                                       v-model="stock.lotenew"
+                                                       class="form-control form-control-sm"
+                                                       placeholder="S/N"
+                                                       style="border-radius: 8px;">
+                                                <span v-else class="badge-barcode">
                                                     <i class="fa fa-barcode mr-1 text-muted"></i>@{{ s.lotenew || 'S/N' }}
                                                 </span>
                                             </td>
-                                            <td class="align-middle">
-                                                <span v-if="s.vencimiento && s.vencimiento !== 'Sin vencimiento'" class="small text-secondary font-weight-semibold">
-                                                    <i class="fa-regular fa-calendar-check text-success mr-1"></i>@{{ s.vencimiento }}
-                                                </span>
-                                                <span v-else class="text-muted small">
-                                                    <i class="fa-solid fa-infinity mr-1 text-muted"></i>Sin vencimiento
-                                                </span>
+                                            <td class="align-middle" data-label="Vencimiento">
+                                                <input v-if="bandstock == 1 && stock.id == s.id"
+                                                       type="date"
+                                                       v-model="stock.vencimiento"
+                                                       class="form-control form-control-sm"
+                                                       style="border-radius: 8px;">
+                                                <template v-else>
+                                                    <span v-if="s.vencimiento && s.vencimiento !== 'Sin vencimiento' && String(s.vencimiento).substring(0, 10) !== '2030-01-01'" class="small text-secondary font-weight-semibold">
+                                                        <i class="fa-regular fa-calendar-check text-success mr-1"></i>@{{ String(s.vencimiento).substring(0, 10) }}
+                                                    </span>
+                                                    <span v-else class="text-muted small">
+                                                        <i class="fa-solid fa-infinity mr-1 text-muted"></i>Sin vencimiento
+                                                    </span>
+                                                </template>
                                             </td>
-                                            <td class="align-middle text-center text-nowrap">
-                                                <button type="button" class="btn-action-stock-edit mr-1" @click="editStockA(s)" title="Editar este registro">
-                                                    <i class="fa fa-pen"></i>
-                                                </button>
-                                                <button type="button" class="btn-action-stock-delete" @click="delStockA(s.id)" title="Eliminar este registro">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
+                                            <td class="align-middle text-center text-nowrap" data-label="Acciones">
+                                                <template v-if="bandstock == 1 && stock.id == s.id">
+                                                    <button type="button" class="btn-action-stock-edit mr-1" @click="updateStockA" title="Guardar este stock">
+                                                        <i class="fa fa-check"></i>
+                                                    </button>
+                                                    <button type="button" class="btn-action-stock-edit" @click="limpiarCamposStock" title="Cancelar">
+                                                        <i class="fa fa-times"></i>
+                                                    </button>
+                                                </template>
+                                                <template v-else>
+                                                    <button type="button" class="btn-action-stock-edit mr-1" @click="editStockA(s)" title="Editar este stock">
+                                                        <i class="fa fa-pen"></i>
+                                                    </button>
+                                                    <button type="button" class="btn-action-stock-delete" @click="delStockA(s.id)" title="Eliminar este registro">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </template>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -649,13 +593,77 @@
                                 </span>
                             </div>
                         </div>
+
+                        <div class="mt-3">
+                            <button type="button" class="btn-pos-primary btn-crear-stock" @click="abrirNuevoStock" v-if="!formStockNuevo">
+                                <i class="fa fa-plus-circle mr-1"></i> Crear otro stock
+                            </button>
+                        </div>
+
+                        <div class="stock-form-card mt-3" v-if="formStockNuevo">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa-solid fa-circle-plus text-success mr-2"></i>
+                                    <span class="font-weight-bold" style="color: var(--dash-text-main); font-size: 0.95rem;">Nuevo stock</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 col-sm-6 mb-2">
+                                    <label class="small text-muted font-weight-bold mb-1">
+                                        <i class="fa-solid fa-store mr-1 text-muted"></i> Sucursal
+                                    </label>
+                                    <select v-model="stock.sucursal" class="form-control select-seccion" style="border-radius: 8px; font-size: 0.9rem;">
+                                        <option v-for="suc in sucursales" :key="'n-' + suc.suc_cod" :value="suc.suc_cod">@{{ suc.suc_desc }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-2">
+                                    <label class="small text-muted font-weight-bold mb-1">
+                                        <i class="fa-solid fa-cubes mr-1 text-muted"></i> Cantidad
+                                    </label>
+                                    <input type="number"
+                                           v-model.number="stock.cantidad"
+                                           onfocus="this.select()"
+                                           class="form-control font-weight-bold text-center"
+                                           min="0"
+                                           placeholder="0"
+                                           style="border-radius: 8px; font-size: 0.95rem;" />
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-2">
+                                    <label class="small text-muted font-weight-bold mb-1">
+                                        <i class="fa-solid fa-barcode mr-1 text-muted"></i> Lote
+                                    </label>
+                                    <input type="text"
+                                           v-model="stock.lotenew"
+                                           class="form-control"
+                                           placeholder="Ej: LOTE-01 o S/N"
+                                           style="border-radius: 8px; font-size: 0.9rem;" />
+                                </div>
+                                <div class="col-md-2 col-sm-6 mb-2">
+                                    <label class="small text-muted font-weight-bold mb-1">
+                                        <i class="fa-solid fa-calendar mr-1 text-muted"></i> Vencimiento
+                                    </label>
+                                    <input type="date"
+                                           v-model="stock.vencimiento"
+                                           class="form-control"
+                                           style="border-radius: 8px; font-size: 0.9rem;" />
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end align-items-center mt-3 pt-2 border-top">
+                                <button class="btn-pos-secondary mr-2" type="button" @click="limpiarCamposStock">
+                                    <i class="fa fa-times mr-1"></i> Cancelar
+                                </button>
+                                <button class="btn-pos-primary" type="button" @click="addStock">
+                                    <i class="fa fa-check mr-1"></i> Guardar stock
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Modal Footer -->
             <div class="modal-footer bg-light d-flex justify-content-between align-items-center py-2">
-                <div>
+                <div class="articulo-modal-extra">
                     <!-- Enlace directo para abrir ABM Completo si se requiere cargar fotos o gestión avanzada -->
                     <a v-if="!isnew && articulo.codigo"
                        :href="'{{ url('articulo/cm') }}/' + articulo.codigo"
@@ -670,7 +678,7 @@
                         <i class="fa fa-arrow-up-right-from-square mr-1"></i> Abrir en ABM Avanzado con fotos
                     </a>
                 </div>
-                <div>
+                <div class="articulo-modal-acciones">
                     <button type="button" class="btn-pos-secondary px-3 mr-2" data-dismiss="modal">
                         <i class="fa fa-times mr-1"></i> Cancelar
                     </button>

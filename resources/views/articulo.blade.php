@@ -44,6 +44,13 @@
     .product-title {
         font-size: 0.93rem;
         color: var(--dash-text-main);
+        line-height: 1.3;
+    }
+    .product-seccion {
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--dash-text-muted);
+        line-height: 1.2;
     }
     .price-display {
         font-size: 1rem;
@@ -117,9 +124,26 @@
             justify-content: flex-end;
         }
     }
-    .toolbar-actions-wrap .btn-pos-secondary {
+    .toolbar-actions-wrap .btn-pos-secondary,
+    .toolbar-actions-wrap .dropdown {
         white-space: nowrap;
         margin: 0;
+        flex: 0 0 auto;
+    }
+    @media (min-width: 1200px) {
+        .articulo-toolbar-seccion {
+            flex: 0 0 240px;
+            width: 240px;
+            max-width: 240px;
+        }
+        .articulo-toolbar-actions {
+            flex: 0 0 auto;
+            width: auto;
+            max-width: none;
+        }
+        .toolbar-actions-wrap {
+            flex-wrap: nowrap;
+        }
     }
     body.dark-mode .toolbar-card {
         background-color: var(--dash-card-bg);
@@ -830,6 +854,184 @@
         gap: 0.4rem;
         white-space: nowrap;
     }
+
+    @media (max-width: 767.98px) {
+        #modalArticulo .modal-dialog {
+            margin: 0;
+            max-width: 100%;
+            width: 100%;
+            height: 100%;
+            min-height: 100%;
+        }
+        #modalArticulo .modal-content {
+            height: 100%;
+            max-height: 100%;
+            border-radius: 0 !important;
+        }
+        #modalArticulo .modal-header {
+            border-radius: 0 !important;
+            padding: 0.75rem 0.85rem;
+            align-items: center;
+        }
+        #modalArticulo .modal-header .mr-3 {
+            width: 36px !important;
+            height: 36px !important;
+            margin-right: 0.65rem !important;
+            flex: 0 0 36px;
+        }
+        #modalArticulo .modal-title {
+            font-size: 1.05rem;
+            line-height: 1.2;
+        }
+        #modalArticulo .modal-header .close {
+            min-width: 44px;
+            min-height: 44px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #modalArticulo #tabArticulo {
+            display: flex;
+            flex-wrap: nowrap;
+            padding: 0.45rem !important;
+            gap: 0.35rem;
+        }
+        #modalArticulo #tabArticulo .nav-item {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+        #modalArticulo #tabArticulo .nav-link {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.35rem 0.25rem !important;
+            font-size: 0.82rem;
+            white-space: nowrap;
+        }
+        #modalArticulo #tabArticuloContent {
+            padding: 0.85rem !important;
+        }
+        #modalArticulo .form-control,
+        #modalArticulo select.form-control {
+            font-size: 16px;
+            min-height: 44px;
+        }
+        #modalArticulo textarea.form-control {
+            min-height: 88px;
+        }
+        #modalArticulo #tab-precios .card-header {
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+        #modalArticulo #tab-precios .precios-extra-acciones {
+            flex-direction: column;
+            align-items: stretch !important;
+            gap: 0.5rem;
+        }
+        #modalArticulo #tab-precios .precios-extra-acciones .btn {
+            width: 100%;
+            min-height: 44px;
+        }
+        #modalArticulo #tab-precios .table thead {
+            display: none;
+        }
+        #modalArticulo #tab-precios .table tr,
+        #modalArticulo #tab-precios .table td {
+            display: block;
+            width: 100% !important;
+        }
+        #modalArticulo #tab-precios .table td {
+            padding: 0.35rem 0;
+        }
+        #modalArticulo .stock-table thead {
+            display: none;
+        }
+        #modalArticulo .stock-table,
+        #modalArticulo .stock-table tbody,
+        #modalArticulo .stock-table tr,
+        #modalArticulo .stock-table td {
+            display: block;
+            width: 100% !important;
+        }
+        #modalArticulo .stock-table tr {
+            padding: 0.75rem 0.85rem;
+            border-bottom: 1px solid var(--dash-border, #d5ddd8);
+        }
+        #modalArticulo .stock-table td {
+            border: 0;
+            padding: 0.35rem 0;
+            text-align: left !important;
+        }
+        #modalArticulo .stock-table td[data-label]::before {
+            content: attr(data-label);
+            display: block;
+            margin-bottom: 0.2rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #4a5c54;
+        }
+        #modalArticulo .stock-table td.stock-empty::before {
+            content: none;
+        }
+        #modalArticulo .stock-table td[data-label="Acciones"] {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding-top: 0.55rem;
+        }
+        #modalArticulo .stock-table td[data-label="Acciones"]::before {
+            flex: 1 0 100%;
+        }
+        #modalArticulo .stock-table input,
+        #modalArticulo .stock-table select {
+            max-width: none !important;
+            width: 100%;
+            margin: 0 !important;
+        }
+        #modalArticulo .btn-action-stock-edit,
+        #modalArticulo .btn-action-stock-delete {
+            width: 44px;
+            height: 44px;
+        }
+        #modalArticulo .btn-crear-stock {
+            width: 100%;
+            min-height: 44px;
+        }
+        #modalArticulo .modal-footer {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
+            padding: 0.75rem 0.85rem;
+        }
+        #modalArticulo .articulo-modal-extra {
+            order: 2;
+        }
+        #modalArticulo .articulo-modal-acciones {
+            order: 1;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 0.5rem;
+            width: 100%;
+        }
+        #modalArticulo .articulo-modal-acciones .btn-pos-primary,
+        #modalArticulo .articulo-modal-acciones .btn-pos-secondary {
+            width: 100%;
+            min-height: 44px;
+            margin: 0 !important;
+        }
+        #modalArticulo .articulo-modal-extra a {
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            white-space: normal;
+            text-align: left;
+        }
+    }
 </style>
 @endsection
 @section('main')
@@ -918,8 +1120,8 @@
         <div class="table-card toolbar-card mb-3">
             <div class="card-body py-2 px-3">
                 <div class="row align-items-center">
-                    <!-- Buscador predictivo: 100% en pantallas menores a 1200px (móviles/tablets) y 5 cols en pantallas anchas -->
-                    <div class="col-12 col-xl-5 mb-2 mb-xl-0">
+                    <!-- Buscador: ocupa el espacio que sobra en pantallas anchas -->
+                    <div class="col-12 col-xl mb-2 mb-xl-0">
                         <div class="input-group search-input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text search-prepend border-right-0">
@@ -943,7 +1145,7 @@
                     </div>
 
                     <!-- Filtro por Sección / Categoría directo -->
-                    <div class="col-12 col-sm-6 col-xl-3 mb-2 mb-xl-0">
+                    <div class="col-12 col-sm-6 col-xl-auto mb-2 mb-xl-0 articulo-toolbar-seccion">
                         <select class="form-control select-seccion" v-model="filtro.seccion" @change="buscar(false)" style="border-radius: 8px; font-size: 0.92rem;">
                             <option value="0">Todas las Secciones</option>
                             @foreach ($secciones as $seccion)
@@ -953,9 +1155,9 @@
                     </div>
 
                     <!-- Botones de Acción & Enlaces -->
-                    <div class="col-12 col-sm-6 col-xl-4 text-left text-sm-right">
+                    <div class="col-12 col-sm-6 col-xl-auto text-left text-sm-right articulo-toolbar-actions">
                         <div class="toolbar-actions-wrap">
-                            <button type="button" class="btn-pos-secondary" data-toggle="modal" data-target="#modalfiltro" title="Más filtros de sección">
+                            <button type="button" class="btn-pos-secondary" data-toggle="modal" data-target="#modalfiltro" title="Filtrar por stock y vencimiento">
                                 <i class="fa fa-filter"></i> Filtros
                             </button>
                             <button type="button" class="btn-pos-secondary" data-toggle="modal" data-target="#modalexportar" title="Exportar datos a Excel">
@@ -996,6 +1198,10 @@
                         Sección activa
                         <i class="fa fa-times text-danger ml-1 cursor-pointer" @click="filtro.seccion = 0; buscar(false)" title="Quitar filtro de sección"></i>
                     </span>
+                    <span v-if="filtro.estado" class="badge badge-light border text-secondary ml-2 py-1 px-2">
+                        @{{ etiquetaFiltroEstado }}
+                        <i class="fa fa-times text-danger ml-1 cursor-pointer" @click="setFiltroEstado('')" title="Quitar filtro"></i>
+                    </span>
                 </div>
                 <div class="d-flex align-items-center">
                     <label class="text-muted small mb-0 mr-2 font-weight-bold">Filas por página:</label>
@@ -1021,10 +1227,6 @@
                                 <span>Descripción / Producto</span>
                                 <i class="fa-solid ml-1 text-muted" :class="getSortIcon('descripcion')"></i>
                             </th>
-                            <th class="cursor-pointer sortable text-nowrap" @click="sortBy('seccion')" style="width: 140px; min-width: 120px;">
-                                <span>Sección</span>
-                                <i class="fa-solid ml-1 text-muted" :class="getSortIcon('seccion')"></i>
-                            </th>
                             <th class="text-center text-nowrap" style="width: 95px; min-width: 85px;">
                                 <span>Promo</span>
                             </th>
@@ -1044,7 +1246,7 @@
                     <tbody>
                         <!-- Estado de Carga -->
                         <tr v-if="requestSend">
-                            <td colspan="7" class="text-center py-5">
+                            <td colspan="6" class="text-center py-5">
                                 <div class="spinner-border text-success" role="status" style="width: 2.5rem; height: 2.5rem; color: var(--dash-primary) !important;">
                                     <span class="sr-only">Cargando...</span>
                                 </div>
@@ -1063,19 +1265,13 @@
                                     <span v-else class="text-muted small">—</span>
                                 </td>
 
-                                <!-- Descripción y Ubicación -->
+                                <!-- Descripción y sección -->
                                 <td class="align-middle" style="min-width: 220px;">
                                     <div class="font-weight-bold product-title">@{{ row.descripcion }}</div>
+                                    <div class="product-seccion mt-1">@{{ row.seccion }}</div>
                                     <div class="small text-muted mt-1" v-if="row.ubicacion">
                                         <i class="fa fa-location-dot mr-1" style="color: var(--dash-accent);"></i>@{{ row.ubicacion }}
                                     </div>
-                                </td>
-
-                                <!-- Sección -->
-                                <td class="align-middle text-nowrap">
-                                    <span class="badge-section">
-                                        @{{ row.seccion }}
-                                    </span>
                                 </td>
 
                                 <!-- Promo (Ofertas y Combos) -->
@@ -1147,7 +1343,7 @@
 
                         <!-- Estado Vacío -->
                         <tr v-else>
-                            <td colspan="7" class="text-center py-5">
+                            <td colspan="6" class="text-center py-5">
                                 <div class="empty-state-box">
                                     <div class="empty-state-icon mb-3">
                                         <i class="fa-solid fa-boxes-stacked fa-2x"></i>
@@ -1155,7 +1351,7 @@
                                     <h5 class="font-weight-bold mb-1" style="color: var(--dash-text-main);">No se encontraron productos</h5>
                                     <p class="text-muted small mb-3">No hay artículos que coincidan con los criterios de búsqueda o filtro.</p>
                                     <div class="d-flex justify-content-center">
-                                        <button v-if="txtbuscar || filtro.seccion != 0" type="button" class="btn-pos-secondary mr-2" @click="txtbuscar = ''; filtro.seccion = 0; buscar(false)">
+                                        <button v-if="txtbuscar || filtro.seccion != 0 || filtro.estado" type="button" class="btn-pos-secondary mr-2" @click="txtbuscar = ''; filtro.seccion = 0; setFiltroEstado(''); buscar(false)">
                                             <i class="fa fa-undo mr-1"></i> Limpiar Filtros
                                         </button>
                                         <button type="button" class="btn-pos-primary" @click="showMArticulo">
@@ -1202,13 +1398,13 @@
         @include('articulo.delete')
         @include('articulo.detalle')
         @include('articulo.precio')
-        <!-- Modal Filtros Avanzados / Por Sección -->
+        <!-- Modal Filtros de stock y vencimiento -->
         <div class="modal fade" id="modalfiltro" tabindex="-1" role="dialog" aria-labelledby="modalFiltroLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content border-0 shadow">
                     <div class="modal-header bg-light border-bottom">
                         <h6 class="modal-title font-weight-bold mb-0" style="color: var(--dash-text-main);" id="modalFiltroLabel">
-                            <i class="fa fa-filter text-primary mr-2"></i>Filtrar por Sección / Categoría
+                            <i class="fa fa-filter text-primary mr-2"></i>Filtrar artículos
                         </h6>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -1216,31 +1412,42 @@
                     </div>
                     <div class="modal-body p-0">
                         <div class="list-group list-group-flush">
-                            <label class="list-group-item list-group-item-action d-flex align-items-center mb-0 cursor-pointer" :class="{'bg-light font-weight-bold text-primary': filtro.seccion == 0}">
+                            <label class="list-group-item list-group-item-action d-flex align-items-center mb-0 cursor-pointer" :class="{'bg-light font-weight-bold text-primary': filtro.estado === ''}">
                                 <div class="icheck-primary d-inline mr-2">
-                                    <input type="radio" id="sec_todas" name="r_seccion" v-model="filtro.seccion" value="0">
-                                    <label for="sec_todas"></label>
+                                    <input type="radio" id="fil_todos" name="r_estado" value="" :checked="filtro.estado === ''" @change="setFiltroEstado('')">
+                                    <label for="fil_todos"></label>
                                 </div>
-                                <span class="flex-grow-1">TODAS LAS SECCIONES</span>
-                                <span class="badge badge-light border">Todos</span>
+                                <span class="flex-grow-1">Todos</span>
                             </label>
-                            @foreach ($secciones as $seccion)
-                            <label class="list-group-item list-group-item-action d-flex align-items-center mb-0 cursor-pointer" :class="{'bg-light font-weight-bold text-primary': filtro.seccion == '{{ $seccion['present_cod'] }}'}">
+                            <label class="list-group-item list-group-item-action d-flex align-items-center mb-0 cursor-pointer" :class="{'bg-light font-weight-bold text-primary': filtro.estado === 'con_stock'}">
                                 <div class="icheck-primary d-inline mr-2">
-                                    <input type="radio" id="sec_{{ $seccion['present_cod'] }}" name="r_seccion" v-model="filtro.seccion" value="{{ $seccion['present_cod'] }}">
-                                    <label for="sec_{{ $seccion['present_cod'] }}"></label>
+                                    <input type="radio" id="fil_con_stock" name="r_estado" value="con_stock" :checked="filtro.estado === 'con_stock'" @change="setFiltroEstado('con_stock')">
+                                    <label for="fil_con_stock"></label>
                                 </div>
-                                <span class="flex-grow-1">{{ $seccion['present_descripcion'] }}</span>
+                                <span class="flex-grow-1">Con stock</span>
                             </label>
-                            @endforeach
+                            <label class="list-group-item list-group-item-action d-flex align-items-center mb-0 cursor-pointer" :class="{'bg-light font-weight-bold text-primary': filtro.estado === 'sin_stock'}">
+                                <div class="icheck-primary d-inline mr-2">
+                                    <input type="radio" id="fil_sin_stock" name="r_estado" value="sin_stock" :checked="filtro.estado === 'sin_stock'" @change="setFiltroEstado('sin_stock')">
+                                    <label for="fil_sin_stock"></label>
+                                </div>
+                                <span class="flex-grow-1">Sin stock</span>
+                            </label>
+                            <label class="list-group-item list-group-item-action d-flex align-items-center mb-0 cursor-pointer" :class="{'bg-light font-weight-bold text-primary': filtro.estado === 'vencimiento'}">
+                                <div class="icheck-primary d-inline mr-2">
+                                    <input type="radio" id="fil_vencimiento" name="r_estado" value="vencimiento" :checked="filtro.estado === 'vencimiento'" @change="setFiltroEstado('vencimiento')">
+                                    <label for="fil_vencimiento"></label>
+                                </div>
+                                <span class="flex-grow-1">Con vencimiento</span>
+                            </label>
                         </div>
                     </div>
                     <div class="modal-footer bg-light border-top d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" @click="filtro.seccion = 0; buscar(false)" data-dismiss="modal">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" @click="setFiltroEstado('')" data-dismiss="modal">
                             <i class="fa fa-undo mr-1"></i> Restablecer
                         </button>
-                        <button type="button" class="btn btn-primary btn-sm px-3" data-dismiss="modal" @click="buscar(false)">
-                            <i class="fa fa-check mr-1"></i> Aplicar Filtro
+                        <button type="button" class="btn btn-primary btn-sm px-3" data-dismiss="modal">
+                            <i class="fa fa-check mr-1"></i> Aplicar filtro
                         </button>
                     </div>
                 </div>
@@ -1522,6 +1729,7 @@
                 url: 'controller/ArticulosController.php',
                 reservarC: false,
                 bandstock: 0,
+                formStockNuevo: false,
                 isnew: true,
                 viewPrecio: false,
                 txtbuscar: '',
@@ -1534,7 +1742,8 @@
                 filtro: {
                     seccion: 0,
                     columna: 0,
-                    orden: 'ASC'
+                    orden: 'ASC',
+                    estado: ''
                 },
                 articulo: { ...defaultArticulo },
                 stock: { ...defaultStock },
@@ -1962,6 +2171,10 @@
                         cant: 0
                     }
                 },
+                setFiltroEstado: function(estado) {
+                    this.filtro.estado = estado || '';
+                    this.currentPage = 1;
+                },
                 buscar: function(isPaginate) {
                     this.requestSend = true;
                     let pag = isPaginate ? this.currentPage : 1;
@@ -2000,6 +2213,7 @@
                                         precio: parseFloat(art.pre_venta1) || 0,
                                         precio_formateado: this.separador(art.pre_venta1),
                                         stock: cantStock,
+                                        tiene_vencimiento: parseInt(art.tiene_vencimiento || 0) > 0,
                                         costo: art.producto_costo_compra || 0
                                     };
                                     this.rows.push(item);
@@ -2240,7 +2454,19 @@
                 },
                 limpiarCamposStock: function() {
                     this.bandstock = 0;
+                    this.formStockNuevo = false;
                     this.stock = {...defaultStock};
+                },
+                abrirNuevoStock: function() {
+                    this.bandstock = 0;
+                    this.stock = {...defaultStock};
+                    if (this.sucursales.length > 0) {
+                        this.stock.sucursal = this.sucursales[0].suc_cod;
+                    }
+                    this.stock.cantidad = 0;
+                    this.stock.lotenew = 'S/N';
+                    this.stock.vencimiento = '';
+                    this.formStockNuevo = true;
                 },
                 cleanAll: function() {
                     this.stocks = [];
@@ -2479,7 +2705,15 @@
                         });
                 },
                 editStockA: function(stock) {
-                    this.stock = { ...stock };
+                    this.formStockNuevo = false;
+                    var copia = { ...stock };
+                    var venc = copia.vencimiento ? String(copia.vencimiento) : '';
+                    if (!venc || venc === 'Sin vencimiento' || venc.substring(0, 10) === '2030-01-01') {
+                        copia.vencimiento = '';
+                    } else {
+                        copia.vencimiento = venc.substring(0, 10);
+                    }
+                    this.stock = copia;
                     this.bandstock = 1;
                 },
                 delStockA: function(id) {
@@ -2507,6 +2741,12 @@
                 
             },
             computed: {
+                etiquetaFiltroEstado: function() {
+                    if (this.filtro.estado === 'con_stock') return 'Con stock';
+                    if (this.filtro.estado === 'sin_stock') return 'Sin stock';
+                    if (this.filtro.estado === 'vencimiento') return 'Con vencimiento';
+                    return '';
+                },
                 filteredRows: function() {
                     let list = [...this.rows];
                     if (this.txtbuscar) {
@@ -2518,6 +2758,13 @@
                             const ubi = (r.ubicacion || '').toLowerCase();
                             return cod.includes(q) || desc.includes(q) || sec.includes(q) || ubi.includes(q);
                         });
+                    }
+                    if (this.filtro.estado === 'con_stock') {
+                        list = list.filter(r => Number(r.stock) > 0);
+                    } else if (this.filtro.estado === 'sin_stock') {
+                        list = list.filter(r => Number(r.stock) <= 0);
+                    } else if (this.filtro.estado === 'vencimiento') {
+                        list = list.filter(r => r.tiene_vencimiento);
                     }
                     if (this.sortField) {
                         const field = this.sortField;

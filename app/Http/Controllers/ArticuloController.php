@@ -194,6 +194,7 @@ class ArticuloController extends Controller
                 DB::raw('MIN(stock.id_stock) AS id_stock'),
                 'unidad.uni_nombre',
                 'unidad.uni_abreviatura',
+                DB::raw("(SELECT COUNT(*) FROM stock sv WHERE sv.ARTICULOS_cod = articulos.ARTICULOS_cod AND sv.stock_fech_venc IS NOT NULL AND sv.stock_fech_venc > '1900-01-01' AND sv.stock_fech_venc <> '2030-01-01') AS tiene_vencimiento"),
                 DB::raw('(SELECT COUNT(*) FROM ofertas o WHERE o.articulos_cod = articulos.ARTICULOS_cod AND o.activo = 1) AS tiene_oferta'),
                 DB::raw('(SELECT COUNT(*) FROM combo_items ci INNER JOIN combos c ON c.id = ci.combo_id AND c.activo = 1 WHERE ci.articulos_cod = articulos.ARTICULOS_cod) AS en_combo')
             )
