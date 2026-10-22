@@ -12,18 +12,25 @@ class User extends Authenticatable
 
     protected $table = 'usuarios';
     protected $primaryKey = 'cod_usuarios';
-     public $timestamps = false;
+    public $timestamps = false;
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'nom_usuarios', 'user_usuarios', 'clave_usuarios',
+        'nom_usuarios',
+        'user_usuarios',
+        'clave_usuarios',
+        'tel_usuarios',
+        'direcc_usuarios',
+        'cod_rol',
+        'cod_cargo',
+        'activo',
     ];
 
-
-   /* protected $hidden = [
+    /* protected $hidden = [
         'clave_usuarios'//, 'remember_token',
     ];*/
 
@@ -34,14 +41,26 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'activo' => 'integer',
     ];
 
+    public function isActivo()
+    {
+        return (int) $this->activo === 1;
+    }
+
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', 1);
+    }
 
     public function getAuthPassword()
     {
         return $this->clave_usuarios;
     }
-    public function roles(){
+
+    public function roles()
+    {
         return $this->belongsTo(Roles::class, 'cod_rol');
     }
 
@@ -158,4 +177,3 @@ class User extends Authenticatable
         return !empty($this->accionesCache[$claveAccion]);
     }
 }
-

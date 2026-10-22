@@ -12,7 +12,7 @@ class UserController extends Controller
     {
         $this->middleware('auth')->except(['showAll']);
         $this->middleware('permiso:usuarios,open')->only(['index']);
-        $this->middleware('permiso:usuarios,add')->only(['store']);
+        $this->middleware('permiso:usuarios,add')->only(['store', 'toggleStatus']);
         $this->middleware('permiso:usuarios,del')->only(['destroy']);
     }
 
@@ -33,6 +33,7 @@ class UserController extends Controller
                 'usuarios.user_usuarios',
                 'usuarios.tel_usuarios',
                 'usuarios.direcc_usuarios',
+                DB::raw('COALESCE(usuarios.activo, 1) as activo'),
                 'roles.nom_rol',
                 'cargo.nom_cargo'
             )
@@ -45,7 +46,6 @@ class UserController extends Controller
 
         return view('usuario', compact('usuario', 'cargo', 'roles', 'currentUserId'));
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -100,6 +100,7 @@ class UserController extends Controller
             $user->clave_usuarios = md5($request->password);
             $user->tel_usuarios = trim((string)$request->celular);
             $user->direcc_usuarios = trim((string)$request->direccion);
+            $user->activo = $request->has('activo') ? ((int)$request->activo === 0 ? 0 : 1) : 1;
             $user->save();
         } else {
             $user = User::where('cod_usuarios', $request->codigo)->first();
@@ -114,6 +115,17 @@ class UserController extends Controller
                 return response()->json(['error' => 'El nombre de usuario "' . $usuarioTrim . '" ya está en uso por otro operador.'], 422);
             }
 
+            $currentUserId = auth()->check() ? auth()->user()->cod_usuarios : null;
+            $nuevoActivo = $request->has('activo') ? ((int)$request->activo === 0 ? 0 : 1) : (int)$user->activo;
+
+            if ($currentUserId && (int)$request->codigo === (int)$currentUserId && $nuevoActivo === 0) {
+                return response()->json(['error' => 'No podés deshabilitar tu propia cuenta mientras estés en sesión.'], 422);
+            }
+
+            if ((int)$request->codigo === 1 && $nuevoActivo === 0) {
+                return response()->json(['error' => 'No se puede deshabilitar la cuenta del Administrador principal del sistema.'], 422);
+            }
+
             $password = !empty($request->password) ? md5($request->password) : $user->clave_usuarios;
 
             $user->update([
@@ -123,11 +135,51 @@ class UserController extends Controller
                 'user_usuarios' => $usuarioTrim,
                 'clave_usuarios' => $password,
                 'tel_usuarios' => trim((string)$request->celular),
-                'direcc_usuarios' => trim((string)$request->direccion)
+                'direcc_usuarios' => trim((string)$request->direccion),
+                'activo' => $nuevoActivo,
             ]);
         }
 
         return response()->json(['status' => 'OK']);
+    }
+
+    /**
+     * Alternar el estado activo/deshabilitado de un usuario.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function toggleStatus($id)
+    {
+        $currentUserId = auth()->check() ? auth()->user()->cod_usuarios : null;
+        if ($currentUserId && (int)$id === (int)$currentUserId) {
+            return response()->json(['error' => 'No podés deshabilitar tu propia cuenta mientras estés en sesión.'], 422);
+        }
+
+        $user = User::where('cod_usuarios', $id)->first();
+        if (!$user) {
+            return response()->json(['error' => 'El usuario no existe.'], 404);
+        }
+
+        $estadoActual = (int) $user->activo;
+        $nuevoEstado = ($estadoActual === 1) ? 0 : 1;
+
+        if ((int)$id === 1 && $nuevoEstado === 0) {
+            return response()->json(['error' => 'No se puede deshabilitar la cuenta del Administrador principal del sistema.'], 422);
+        }
+
+        $user->activo = $nuevoEstado;
+        $user->save();
+
+        $mensaje = ($nuevoEstado === 1) 
+            ? 'Usuario "' . trim($user->nom_usuarios) . '" habilitado correctamente.' 
+            : 'Usuario "' . trim($user->nom_usuarios) . '" deshabilitado correctamente.';
+
+        return response()->json([
+            'status' => 'OK',
+            'activo' => $nuevoEstado,
+            'message' => $mensaje,
+        ]);
     }
 
     /**
@@ -140,9 +192,15 @@ class UserController extends Controller
     {
         //
     }
+
+    /**
+     * Lista de usuarios activos para selector en login.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function showAll()
     {
-        return User::select(
+        return User::where('activo', 1)->select(
             DB::raw('TRIM(user_usuarios) as user_usuarios'),
             DB::raw('TRIM(nom_usuarios) as nom_usuarios')
         )->get()->sortBy(function ($user) {
@@ -152,6 +210,7 @@ class UserController extends Controller
             return $sistema . '-' . $user->nom_usuarios;
         })->values();
     }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -188,6 +247,10 @@ class UserController extends Controller
             return response()->json(['error' => 'No podés eliminar tu propia cuenta mientras estés en sesión.'], 422);
         }
 
+        if ((int)$id === 1) {
+            return response()->json(['error' => 'No se puede eliminar la cuenta del Administrador principal del sistema.'], 422);
+        }
+
         try {
             $user = User::where('cod_usuarios', $id)->first();
             if (!$user) {
@@ -196,7 +259,9 @@ class UserController extends Controller
             $user->delete();
             return response()->json(['status' => 'OK']);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'No se puede eliminar el usuario porque posee registros o ventas asociadas en el sistema.'], 422);
+            return response()->json([
+                'error' => 'No se puede eliminar el usuario porque posee registros o ventas asociadas. Te sugerimos deshabilitarlo en su lugar.'
+            ], 422);
         }
     }
 }

@@ -25,6 +25,7 @@ Route::get('compras_recientes','CompraController@getComprasRecientes');
 // Usuarios del Sistema
 Route::post('usuario', 'UserController@store');
 Route::delete('usuario/{id}', 'UserController@destroy');
+Route::post('usuario/{id}/toggle-status', 'UserController@toggleStatus')->name('usuario.toggle-status');
 Route::get('usuario', 'UserController@index')->name('usuario');
 
 // Informes y Exportaciones

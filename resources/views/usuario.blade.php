@@ -120,7 +120,7 @@
     /* KPI Summary Cards */
     .kpi-row {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1rem;
         margin-bottom: 1.25rem;
     }
@@ -161,6 +161,10 @@
         background: #fef3c7;
         color: #92400e;
     }
+    .kpi-icon-red {
+        background: #fee2e2;
+        color: #991b1b;
+    }
     body.dark-mode .kpi-icon-green {
         background: #064e3b;
         color: #a7f3d0;
@@ -172,6 +176,10 @@
     body.dark-mode .kpi-icon-amber {
         background: #451a03;
         color: #fde68a;
+    }
+    body.dark-mode .kpi-icon-red {
+        background: #450a0a;
+        color: #fca5a5;
     }
     .kpi-label {
         font-size: 0.78rem;
@@ -306,6 +314,21 @@
         border-bottom: none;
     }
 
+    /* Fila deshabilitada / inactiva */
+    .table-row-inactivo {
+        background-color: rgba(239, 68, 68, 0.035);
+    }
+    .table-row-inactivo:hover {
+        background-color: rgba(239, 68, 68, 0.08) !important;
+    }
+    .table-row-inactivo .user-avatar {
+        filter: grayscale(85%);
+        opacity: 0.65;
+    }
+    .table-row-inactivo .user-info-name {
+        color: var(--dash-text-muted);
+    }
+
     /* User Avatar and Badges */
     .user-avatar {
         width: 40px;
@@ -412,6 +435,38 @@
         border-color: #475569;
     }
 
+    /* Badges de Estado Activo / Inactivo */
+    .badge-estado {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.3rem 0.65rem;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+    }
+    .badge-estado-activo {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+    .badge-estado-inactivo {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+    body.dark-mode .badge-estado-activo {
+        background: #064e3b;
+        color: #a7f3d0;
+        border-color: #047857;
+    }
+    body.dark-mode .badge-estado-inactivo {
+        background: #450a0a;
+        color: #fca5a5;
+        border-color: #7f1d1d;
+    }
+
     /* Action Buttons */
     .btn-action-group {
         display: flex;
@@ -436,6 +491,18 @@
         background: var(--dash-primary-light);
         border-color: var(--dash-primary);
         color: var(--dash-primary);
+        transform: translateY(-1px);
+    }
+    .btn-action-disable:hover {
+        background: #fef2f2;
+        border-color: #ef4444;
+        color: #dc2626;
+        transform: translateY(-1px);
+    }
+    .btn-action-enable:hover {
+        background: #dcfce7;
+        border-color: #10b981;
+        color: #166534;
         transform: translateY(-1px);
     }
     .btn-action-delete:hover {
@@ -528,6 +595,15 @@
         line-height: 1.35;
     }
 
+    /* Estado Switch Box in Modal */
+    .estado-switch-box {
+        background: var(--dash-panel-bg);
+        border: 1px solid var(--dash-border);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        transition: all 0.15s ease;
+    }
+
     /* Empty state */
     .empty-state-box {
         padding: 3rem 1.5rem;
@@ -560,7 +636,7 @@
             </div>
             <div>
                 <h1 class="dash-header-title font-cairo">Gestión de Usuarios y Accesos</h1>
-                <p class="dash-header-subtitle">Control de cuentas de operadores, asignación de roles y permisos del sistema</p>
+                <p class="dash-header-subtitle">Control de cuentas de operadores, habilitación de acceso, roles y permisos del sistema</p>
             </div>
         </div>
         <div>
@@ -573,16 +649,34 @@
     <!-- KPI Summary Row -->
     <div class="kpi-row">
         <div class="kpi-card">
-            <div class="kpi-icon-box kpi-icon-green">
+            <div class="kpi-icon-box kpi-icon-blue">
                 <i class="fas fa-users"></i>
             </div>
             <div>
-                <div class="kpi-label">Total Operadores</div>
+                <div class="kpi-label">Total Cuentas</div>
                 <div class="kpi-val font-cairo">@{{ usuarios.length }}</div>
             </div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-icon-box kpi-icon-blue">
+            <div class="kpi-icon-box kpi-icon-green">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div>
+                <div class="kpi-label">Activos / Habilitados</div>
+                <div class="kpi-val font-cairo text-success">@{{ totalActivos }}</div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon-box kpi-icon-red">
+                <i class="fas fa-user-slash"></i>
+            </div>
+            <div>
+                <div class="kpi-label">Deshabilitados</div>
+                <div class="kpi-val font-cairo text-danger">@{{ totalInactivos }}</div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon-box kpi-icon-amber">
                 <i class="fas fa-shield-alt"></i>
             </div>
             <div>
@@ -590,26 +684,24 @@
                 <div class="kpi-val font-cairo">@{{ totalAdmins }}</div>
             </div>
         </div>
-        <div class="kpi-card">
-            <div class="kpi-icon-box kpi-icon-amber">
-                <i class="fas fa-cash-register"></i>
-            </div>
-            <div>
-                <div class="kpi-label">Vendedores / Stock</div>
-                <div class="kpi-val font-cairo">@{{ totalOperativos }}</div>
-            </div>
-        </div>
     </div>
 
     <!-- Filter Card -->
     <div class="card-filter">
         <div class="row align-items-center">
-            <div class="col-md-5 mb-2 mb-md-0">
+            <div class="col-md-4 mb-2 mb-md-0">
                 <div class="search-input-wrap">
                     <i class="fa fa-search" aria-hidden="true"></i>
                     <label for="buscarUsuario" class="sr-only">Buscar usuario</label>
                     <input type="text" id="buscarUsuario" v-model="filtroTexto" placeholder="Buscar por nombre, @usuario, teléfono o cargo..." autocomplete="off">
                 </div>
+            </div>
+            <div class="col-6 col-md-2 mb-2 mb-md-0">
+                <select class="form-control filter-select" v-model="filtroEstado">
+                    <option value="">Todos los estados</option>
+                    <option value="1">Activos</option>
+                    <option value="0">Deshabilitados</option>
+                </select>
             </div>
             <div class="col-6 col-md-3 mb-2 mb-md-0">
                 <select class="form-control filter-select" v-model="filtroRol">
@@ -619,7 +711,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-6 col-md-3 mb-2 mb-md-0">
+            <div class="col-6 col-md-2 mb-2 mb-md-0">
                 <select class="form-control filter-select" v-model="filtroCargo">
                     <option value="">Todos los cargos</option>
                     @foreach($cargo as $c)
@@ -627,7 +719,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-1 text-md-right" v-if="filtroTexto || filtroRol || filtroCargo">
+            <div class="col-6 col-md-1 text-md-right" v-if="filtroTexto || filtroEstado !== '' || filtroRol || filtroCargo">
                 <button type="button" class="btn btn-outline-secondary btn-sm w-100" @click="limpiarFiltros" title="Limpiar filtros">
                     <i class="fas fa-times"></i>
                 </button>
@@ -649,16 +741,17 @@
             <table class="table dash-table">
                 <thead>
                     <tr>
-                        <th style="width: 50px;">#</th>
+                        <th style="width: 45px;">#</th>
                         <th>Operador</th>
                         <th>Rol de Acceso</th>
                         <th>Cargo</th>
                         <th>Contacto</th>
-                        <th style="width: 110px;" class="text-right">Acciones</th>
+                        <th style="width: 140px;">Estado</th>
+                        <th style="width: 120px;" class="text-right">Acciones</th>
                     </tr>
                 </thead>
                 <tbody v-if="usuariosFiltrados.length">
-                    <tr v-for="(u, idx) in usuariosFiltrados" :key="u.cod_usuarios">
+                    <tr v-for="(u, idx) in usuariosFiltrados" :key="u.cod_usuarios" :class="{ 'table-row-inactivo': Number(u.activo) === 0 }">
                         <td class="text-muted font-weight-bold" style="font-size: 0.82rem;">
                             @{{ idx + 1 }}
                         </td>
@@ -706,15 +799,41 @@
                                 </span>
                             </div>
                         </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="custom-control custom-switch custom-control-inline mr-1"
+                                     :title="isCurrentUser(u) ? 'No podés deshabilitar tu propio usuario en sesión' : (isMainAdmin(u) ? 'No se puede deshabilitar el Administrador principal' : (Number(u.activo) === 1 ? 'Click para deshabilitar usuario' : 'Click para habilitar usuario'))">
+                                    <input type="checkbox"
+                                           class="custom-control-input"
+                                           :id="'sw-user-' + u.cod_usuarios"
+                                           :checked="Number(u.activo) === 1"
+                                           :disabled="isCurrentUser(u) || isMainAdmin(u)"
+                                           @change="toggleEstado(u)">
+                                    <label class="custom-control-label" :for="'sw-user-' + u.cod_usuarios"></label>
+                                </div>
+                                <span class="badge-estado" :class="Number(u.activo) === 1 ? 'badge-estado-activo' : 'badge-estado-inactivo'">
+                                    <i class="fas" :class="Number(u.activo) === 1 ? 'fa-check-circle' : 'fa-ban'"></i>
+                                    @{{ Number(u.activo) === 1 ? 'Activo' : 'Inactivo' }}
+                                </span>
+                            </div>
+                        </td>
                         <td class="text-right">
                             <div class="btn-action-group justify-content-end">
-                                <button type="button" class="btn-action btn-action-edit" @click="edit(u)" title="Editar datos y permisos">
+                                <button type="button" class="btn-action btn-action-edit" @click="edit(u)" title="Editar datos, contraseña y estado">
                                     <i class="fas fa-pen"></i>
                                 </button>
+                                <button type="button" 
+                                        class="btn-action" 
+                                        :class="Number(u.activo) === 1 ? 'btn-action-disable' : 'btn-action-enable'"
+                                        :disabled="isCurrentUser(u) || isMainAdmin(u)"
+                                        @click="toggleEstado(u)"
+                                        :title="isCurrentUser(u) ? 'No podés deshabilitar tu propia cuenta' : (isMainAdmin(u) ? 'No se puede deshabilitar el Administrador principal' : (Number(u.activo) === 1 ? 'Deshabilitar acceso al sistema' : 'Habilitar acceso al sistema'))">
+                                    <i class="fas" :class="Number(u.activo) === 1 ? 'fa-user-slash' : 'fa-user-check'"></i>
+                                </button>
                                 <button type="button" class="btn-action btn-action-delete"
-                                    :disabled="currentUserId && Number(u.cod_usuarios) === Number(currentUserId)"
+                                    :disabled="isCurrentUser(u) || isMainAdmin(u)"
                                     @click="del(u)"
-                                    :title="currentUserId && Number(u.cod_usuarios) === Number(currentUserId) ? 'No podés eliminar tu propia cuenta en sesión' : 'Eliminar usuario'">
+                                    :title="isCurrentUser(u) ? 'No podés eliminar tu propia cuenta en sesión' : (isMainAdmin(u) ? 'No se puede eliminar el Administrador principal' : 'Eliminar usuario')">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
@@ -723,14 +842,14 @@
                 </tbody>
                 <tbody v-else>
                     <tr>
-                        <td colspan="6" class="p-0">
+                        <td colspan="7" class="p-0">
                             <div class="empty-state-box">
                                 <div class="empty-state-icon">
                                     <i class="fas fa-user-slash"></i>
                                 </div>
                                 <h5 class="font-weight-bold font-cairo mb-1">No se encontraron usuarios</h5>
                                 <p class="small text-muted mb-2">No hay operadores que coincidan con los filtros aplicados.</p>
-                                <button type="button" class="btn btn-outline-secondary btn-sm font-weight-bold" @click="limpiarFiltros" v-if="filtroTexto || filtroRol || filtroCargo">
+                                <button type="button" class="btn btn-outline-secondary btn-sm font-weight-bold" @click="limpiarFiltros" v-if="filtroTexto || filtroEstado !== '' || filtroRol || filtroCargo">
                                     <i class="fas fa-undo mr-1"></i> Restablecer filtros
                                 </button>
                             </div>
@@ -755,7 +874,7 @@
                                 @{{ user.band == 0 ? 'Crear Nuevo Usuario' : 'Editar Usuario: ' + user.nombre }}
                             </h2>
                             <p class="small text-muted mb-0">
-                                @{{ user.band == 0 ? 'Completá los datos y credenciales para habilitar el acceso' : 'Actualizá los datos personales, contraseña o rol del operador' }}
+                                @{{ user.band == 0 ? 'Completá los datos y credenciales para habilitar el acceso' : 'Actualizá los datos personales, contraseña, rol o estado del operador' }}
                             </p>
                         </div>
                     </div>
@@ -824,7 +943,7 @@
                         </div>
 
                         <!-- Sección 3: Permisos y Cargo -->
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <div class="form-section-title">
                                 <i class="fas fa-user-shield text-muted"></i> Nivel de Permisos y Cargo
                             </div>
@@ -849,6 +968,36 @@
                                         @endforeach
                                     </select>
                                     <small class="text-muted d-block mt-2">Puesto o función formal del operador en el negocio.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 4: Estado de la Cuenta -->
+                        <div class="mb-2 pt-2 border-top">
+                            <div class="form-section-title">
+                                <i class="fas fa-toggle-on text-muted"></i> Estado de la Cuenta (Acceso al Sistema)
+                            </div>
+                            <div class="estado-switch-box d-flex align-items-center justify-content-between">
+                                <div class="pr-3">
+                                    <div class="font-weight-bold" :class="Number(user.activo) === 1 ? 'text-success' : 'text-danger'">
+                                        <i class="fas" :class="Number(user.activo) === 1 ? 'fa-check-circle' : 'fa-ban'"></i>
+                                        @{{ Number(user.activo) === 1 ? 'Usuario Habilitado' : 'Usuario Deshabilitado' }}
+                                    </div>
+                                    <small class="text-muted d-block">
+                                        @{{ Number(user.activo) === 1 
+                                            ? 'El operador puede iniciar sesión y realizar operaciones en el sistema.' 
+                                            : 'El acceso al sistema está bloqueado y no aparecerá en la pantalla de inicio de sesión.' }}
+                                    </small>
+                                </div>
+                                <div class="custom-control custom-switch custom-control-lg flex-shrink-0"
+                                     :title="isCurrentUser(user) ? 'No podés deshabilitar tu propia cuenta' : (isMainAdmin(user) ? 'No se puede deshabilitar el Administrador principal' : '')">
+                                    <input type="checkbox" 
+                                           class="custom-control-input" 
+                                           id="modal-sw-activo" 
+                                           :checked="Number(user.activo) === 1" 
+                                           :disabled="isCurrentUser(user) || isMainAdmin(user)" 
+                                           @change="user.activo = $event.target.checked ? 1 : 0">
+                                    <label class="custom-control-label font-weight-bold" for="modal-sw-activo"></label>
                                 </div>
                             </div>
                         </div>
@@ -879,6 +1028,7 @@
             cargos: @json($cargo),
             currentUserId: {{ $currentUserId ?? 'null' }},
             filtroTexto: '',
+            filtroEstado: '',
             filtroRol: '',
             filtroCargo: '',
             showPassword: false,
@@ -892,16 +1042,19 @@
                 password: '',
                 rol: {{ $roles[0]->cod_rol ?? 4 }},
                 cargo: {{ $cargo[0]->cod_cargo ?? 4 }},
+                activo: 1,
                 band: 0
             }
         },
         computed: {
             usuariosFiltrados: function () {
                 var q = (this.filtroTexto || '').toLowerCase().trim();
+                var estado = this.filtroEstado !== '' ? String(this.filtroEstado) : '';
                 var rol = this.filtroRol ? String(this.filtroRol) : '';
                 var cargo = this.filtroCargo ? String(this.filtroCargo) : '';
 
                 return this.usuarios.filter(function (u) {
+                    if (estado !== '' && String(u.activo) !== estado) return false;
                     if (rol && String(u.cod_rol) !== rol) return false;
                     if (cargo && String(u.cod_cargo) !== cargo) return false;
 
@@ -922,14 +1075,20 @@
                         || cnom.indexOf(q) !== -1;
                 });
             },
+            totalActivos: function () {
+                return this.usuarios.filter(function (u) {
+                    return Number(u.activo) === 1;
+                }).length;
+            },
+            totalInactivos: function () {
+                return this.usuarios.filter(function (u) {
+                    return Number(u.activo) === 0;
+                }).length;
+            },
             totalAdmins: function () {
                 return this.usuarios.filter(function (u) {
                     return Number(u.cod_rol) === 4 || (u.nom_rol && u.nom_rol.toLowerCase().indexOf('admin') !== -1);
                 }).length;
-            },
-            totalOperativos: function () {
-                var total = this.usuarios.length;
-                return Math.max(0, total - this.totalAdmins);
             }
         },
         methods: {
@@ -982,8 +1141,20 @@
                 }
                 return 'Rol personalizado con los permisos definidos para este perfil de operador.';
             },
+            isCurrentUser: function (u) {
+                if (!u) return false;
+                var id = u.cod_usuarios || u.codigo;
+                return this.currentUserId && Number(id) === Number(this.currentUserId);
+            },
+            isMainAdmin: function (u) {
+                if (!u) return false;
+                var id = u.cod_usuarios || u.codigo;
+                var usr = (u.user_usuarios || u.usuario || '').toString().trim().toUpperCase();
+                return Number(id) === 1 || usr === 'PROGRAMADOR';
+            },
             limpiarFiltros: function () {
                 this.filtroTexto = '';
+                this.filtroEstado = '';
                 this.filtroRol = '';
                 this.filtroCargo = '';
             },
@@ -1000,6 +1171,7 @@
                     password: '',
                     rol: defaultRol,
                     cargo: defaultCargo,
+                    activo: 1,
                     band: 0
                 };
                 this.showPassword = false;
@@ -1019,6 +1191,7 @@
                     password: '',
                     rol: u.cod_rol,
                     cargo: u.cod_cargo,
+                    activo: Number(u.activo) === 0 ? 0 : 1,
                     band: 1
                 };
                 this.showPassword = false;
@@ -1026,6 +1199,56 @@
                 this.$nextTick(function () {
                     var el = document.getElementById('usr-nombre');
                     if (el) el.focus();
+                });
+            },
+            toggleEstado: function (u) {
+                var self = this;
+                if (this.isCurrentUser(u)) {
+                    Swal.fire('Acción no permitida', 'No podés deshabilitar tu propia cuenta mientras estés en sesión.', 'warning');
+                    return;
+                }
+                if (this.isMainAdmin(u) && Number(u.activo) === 1) {
+                    Swal.fire('Acción no permitida', 'No se puede deshabilitar la cuenta del Administrador principal del sistema.', 'warning');
+                    return;
+                }
+
+                var habilitar = Number(u.activo) === 0;
+                var nombre = this.trim(u.nom_usuarios);
+                var handle = this.trim(u.user_usuarios);
+
+                Swal.fire({
+                    title: habilitar ? '¿Habilitar operador?' : '¿Deshabilitar operador?',
+                    html: habilitar
+                        ? 'Se restablecerá el acceso al sistema para <strong>' + nombre + '</strong> (@' + handle + ').'
+                        : 'Se bloqueará el acceso al sistema para <strong>' + nombre + '</strong> (@' + handle + '). No podrá iniciar sesión.',
+                    icon: habilitar ? 'question' : 'warning',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonText: habilitar ? 'Sí, habilitar' : 'Sí, deshabilitar',
+                    confirmButtonColor: habilitar ? '#10b981' : '#ef4444',
+                    focusCancel: true
+                }).then(function (result) {
+                    if (result.value) {
+                        axios.post('{{ url("usuario") }}/' + u.cod_usuarios + '/toggle-status')
+                            .then(function (response) {
+                                u.activo = response.data.activo;
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: response.data.message || (habilitar ? 'Usuario habilitado' : 'Usuario deshabilitado'),
+                                    showConfirmButton: false,
+                                    timer: 2500
+                                });
+                            })
+                            .catch(function (error) {
+                                var msg = 'Ocurrió un error al cambiar el estado.';
+                                if (error.response && error.response.data && error.response.data.error) {
+                                    msg = error.response.data.error;
+                                }
+                                Swal.fire('Atención', msg, 'error');
+                            });
+                    }
                 });
             },
             save: function () {
@@ -1079,9 +1302,18 @@
                 var nombre = this.trim(u.nom_usuarios);
                 var id = u.cod_usuarios;
 
+                if (this.isCurrentUser(u)) {
+                    Swal.fire('Acción no permitida', 'No podés eliminar tu propia cuenta mientras estés en sesión.', 'warning');
+                    return;
+                }
+                if (this.isMainAdmin(u)) {
+                    Swal.fire('Acción no permitida', 'No se puede eliminar la cuenta del Administrador principal del sistema.', 'warning');
+                    return;
+                }
+
                 Swal.fire({
                     title: '¿Eliminar este operador?',
-                    html: 'Se eliminará el acceso para <strong>' + nombre + '</strong> (@' + this.trim(u.user_usuarios) + ').',
+                    html: 'Se eliminará el acceso para <strong>' + nombre + '</strong> (@' + this.trim(u.user_usuarios) + ').<br><small class="text-muted">Si el usuario posee ventas o registros en el sistema, te sugerimos <strong>deshabilitarlo</strong> en lugar de borrarlo.</small>',
                     icon: 'warning',
                     showCancelButton: true,
                     cancelButtonText: 'Cancelar',
