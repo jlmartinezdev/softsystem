@@ -27,7 +27,7 @@ class LoginController extends Controller
         $meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'setiembre', 'octubre', 'noviembre', 'diciembre'];
         $fecha = date('d') . ' de ' . $meses[(int) date('n') - 1] . ' de ' . date('Y');
 
-        $usuarios = \App\User::select(
+        $usuarios = \App\User::where('activo', 1)->select(
             \DB::raw('TRIM(user_usuarios) as user_usuarios'),
             \DB::raw('TRIM(nom_usuarios) as nom_usuarios')
         )->get()->sortBy(function ($user) {
@@ -65,6 +65,16 @@ class LoginController extends Controller
 
         $request->merge([$this->username() => $usuario]);
 
+        // Verificar si el usuario existe y si está deshabilitado
+        $userObj = \App\User::whereRaw('LOWER(TRIM(user_usuarios)) = ?', [strtolower($usuario)])->first();
+        if ($userObj && (int) $userObj->activo === 0) {
+            return response()->json([
+                'success' => 'no',
+                'field' => 'usuario',
+                'message' => 'El usuario "' . $usuario . '" está deshabilitado. Contacte al administrador del sistema.',
+            ], 422);
+        }
+
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
 
@@ -85,6 +95,13 @@ class LoginController extends Controller
             'remaining' => $remaining,
             'message' => $this->mensajeClaveIncorrecta($remaining),
         ], 200);
+    }
+
+    protected function credentials(Request $request)
+    {
+        $creds = $request->only($this->username(), 'password');
+        $creds['activo'] = 1;
+        return $creds;
     }
 
     protected function intentosRestantes(Request $request)
