@@ -240,6 +240,32 @@
         background: var(--dash-panel-bg);
     }
 
+    .perm-accion-row td {
+        background: var(--dash-panel-bg);
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+    }
+    .perm-accion-row:hover td {
+        background: var(--dash-primary-light) !important;
+    }
+    .perm-accion-label {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.45rem;
+        padding-left: 2.15rem;
+    }
+    .perm-accion-label .perm-accion-text {
+        line-height: 1.25;
+    }
+    .table-matrix td.perm-accion-control {
+        text-align: left;
+    }
+    .perm-accion-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+    }
+
     /* Category divider row in matrix */
     .category-divider-row td {
         background: var(--dash-panel-bg) !important;
@@ -583,7 +609,7 @@
                         <input
                             type="text"
                             class="form-control border-left-0"
-                            placeholder="Filtrar módulo..."
+                            placeholder="Filtrar módulo o permiso..."
                             v-model="busquedaModulo"
                         >
                     </div>
@@ -712,6 +738,37 @@
                                     >
                                         <i class="fas fa-sync-alt"></i>
                                     </button>
+                                </td>
+                            </tr>
+                            <tr
+                                v-for="acc in accionesDeModulo(mod)"
+                                :key="'acc-' + mod.for_codigo + '-' + acc.cod_per"
+                                class="perm-accion-row"
+                            >
+                                <td>
+                                    <div class="perm-accion-label">
+                                        <i class="fas fa-key text-warning mt-1"></i>
+                                        <div class="perm-accion-text">
+                                            <div class="font-weight-bold">@{{ acc.nombre_accion }}</div>
+                                            <div class="small text-muted">@{{ acc.descripcion_accion }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td colspan="6" class="perm-accion-control">
+                                    <label class="perm-accion-switch" :title="'Autorizar: ' + acc.nombre_accion">
+                                        <span class="perm-switch">
+                                            <input
+                                                type="checkbox"
+                                                v-model="accionesMap[acc.cod_per]"
+                                                :true-value="1"
+                                                :false-value="0"
+                                            >
+                                            <span class="perm-slider"></span>
+                                        </span>
+                                        <span class="small font-weight-bold" :class="Number(accionesMap[acc.cod_per]) === 1 ? 'text-success' : 'text-muted'">
+                                            @{{ Number(accionesMap[acc.cod_per]) === 1 ? 'Permitido' : 'Bloqueado' }}
+                                        </span>
+                                    </label>
                                 </td>
                             </tr>
                         </template>
@@ -1011,22 +1068,43 @@ ALTER TABLE `roles`
                 return cats;
             },
             formulariosFiltrados: function () {
+                var self = this;
                 var cat = this.categoriaFiltro;
-                var q = this.busquedaModulo.trim().toLowerCase();
+                var q = this.normalizar(this.busquedaModulo);
 
                 return this.formularios.filter(function (f) {
                     var matchCat = (cat === 'TODOS') || (f.for_categoria === cat);
-                    var matchQ = true;
-                    if (q) {
-                        var tit = (f.for_titulo || '').toLowerCase();
-                        var nom = (f.for_nombre || '').toLowerCase();
-                        matchQ = tit.indexOf(q) !== -1 || nom.indexOf(q) !== -1;
-                    }
-                    return matchCat && matchQ;
+                    if (!matchCat) return false;
+                    if (!q) return true;
+                    return self.moduloCoincide(f, q) || self.accionesDeModulo(f, q).length > 0;
                 });
             }
         },
         methods: {
+            normalizar: function (valor) {
+                return String(valor || '')
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .trim();
+            },
+            moduloCoincide: function (mod, q) {
+                var tit = this.normalizar(mod.for_titulo);
+                var nom = this.normalizar(mod.for_nombre);
+                return tit.indexOf(q) !== -1 || nom.indexOf(q) !== -1;
+            },
+            accionesDeModulo: function (mod, qForzado) {
+                var q = qForzado == null ? this.normalizar(this.busquedaModulo) : qForzado;
+                var self = this;
+                var moduloMatch = q && this.moduloCoincide(mod, q);
+
+                return this.acciones.filter(function (a) {
+                    if (String(a.for_codigo) !== String(mod.for_codigo)) return false;
+                    if (!q || moduloMatch) return true;
+                    var blob = self.normalizar((a.nombre_accion || '') + ' ' + (a.descripcion_accion || '') + ' ' + (a.clave_accion || ''));
+                    return blob.indexOf(q) !== -1;
+                });
+            },
             inicializarEstructuras: function () {
                 var pMap = {};
                 this.formularios.forEach(function (f) {
