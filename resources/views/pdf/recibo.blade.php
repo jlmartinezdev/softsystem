@@ -135,33 +135,36 @@
         <div class="p-2">
             <table class="table-bordered border-dark" style="width: 100%;">
                 <tr>
-                    <th style="width: 90px" class="pl-2">Nro. Venta</th>
-                    <th style="width: 150px" class="pl-2">Fecha Venta</th>
+                    <th style="width: 120px" class="pl-2">Nro. Venta</th>
+                    <th style="width: 180px" class="pl-2">Fecha Venta</th>
+                    <th style="width: 150px" class="pl-2">Condición</th>
+                    <th style="width: 160px" class="text-right pr-2">Descuento</th>
+                    <th style="width: 180px" class="text-right pr-2">Total Gs.</th>
+                </tr>
+                <tr>
+                    <td class="pl-2">{{ $venta->nro_fact_ventas }}</td>
+                    <td class="pl-2">{{ date_format(new DateTime($venta->venta_fecha), 'd/m/Y H:i') }}</td>
+                    <td class="pl-2">{{ $venta->tipo_factura == "1" ? "Contado" : "Crédito" }}</td>
+                    <td class="text-right pr-2">{{ number_format($venta->venta_descuento ?? 0, 2, ',', '.') }}</td>
+                    <td class="text-right pr-2"><strong>{{ number_format($venta->venta_total, 2, ',', '.') }}</strong></td>
+                </tr>
+            </table>
+            <hr>
+            <table class="table-bordered border-dark" style="width: 100%;">
+                <tr>
+                    <th style="width: 100px" class="text-center">Cantidad</th>
                     <th class="pl-2">Artículo</th>
-                    <th style="width: 95px" class="text-center">Cantidad</th>
-                    <th style="width: 140px" class="text-right pr-2">Precio</th>
-                    <th style="width: 140px" class="text-right pr-2">Importe</th>
+                    <th style="width: 150px" class="text-right pr-2">Precio</th>
+                    <th style="width: 150px" class="text-right pr-2">Importe</th>
                 </tr>
                 @foreach ($detalle as $d)
                     <tr>
-                        <td>&nbsp;&nbsp;{{ $venta->nro_fact_ventas }}</td>
-                        <td>&nbsp;&nbsp;{{ date_format(new DateTime($venta->venta_fecha), 'd/m/Y H:i') }}</td>
-                        <td>&nbsp;&nbsp;{{ $d->producto_nombre }}</td>
                         <td class="text-center">{{ number_format($d->venta_cantidad, 2, ',', '.') }}</td>
+                        <td class="pl-2">{{ $d->producto_nombre }}</td>
                         <td class="text-right pr-2">{{ number_format($d->venta_precio, 2, ',', '.') }}</td>
                         <td class="text-right pr-2">{{ number_format($d->venta_precio * $d->venta_cantidad, 2, ',', '.') }}</td>
                     </tr>
                 @endforeach
-                @if(($venta->venta_descuento ?? 0) > 0)
-                    <tr>
-                        <td colspan="5" class="text-right pr-2"><strong>Descuento:</strong></td>
-                        <td class="text-right pr-2">{{ number_format($venta->venta_descuento, 2, ',', '.') }}</td>
-                    </tr>
-                @endif
-                <tr>
-                    <td colspan="5" class="text-right pr-2"><strong>Total Gs.:</strong></td>
-                    <td class="text-right pr-2"><strong>{{ number_format($venta->venta_total, 2, ',', '.') }}</strong></td>
-                </tr>
             </table>
         </div>
 
