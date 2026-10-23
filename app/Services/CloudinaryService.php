@@ -56,6 +56,13 @@ class CloudinaryService
         $signString .= $apiSecret;
         $signature = sha1($signString);
 
+        $url = "https://api.cloudinary.com/v1_1/{$cloudName}/image/upload";
+
+        // Fallback automático con cURL nativo si la carpeta vendor/guzzlehttp no fue subida al hosting
+        if (!class_exists(\GuzzleHttp\Client::class)) {
+            return self::uploadViaCurl($url, $file, $apiKey, $timestamp, $folder, $signature, $options, $config);
+        }
+
         // Armar multipart para Guzzle
         $multipart = [
             ['name' => 'api_key',   'contents' => $apiKey],
@@ -95,8 +102,6 @@ class CloudinaryService
                 'filename' => 'captura_' . $timestamp . '.jpg',
             ];
         }
-
-        $url = "https://api.cloudinary.com/v1_1/{$cloudName}/image/upload";
 
         try {
             $client = new Client(['timeout' => 25]);
@@ -190,6 +195,15 @@ class CloudinaryService
 
         $url = "https://api.cloudinary.com/v1_1/{$cloudName}/image/destroy";
 
+        if (!class_exists(\GuzzleHttp\Client::class)) {
+            return self::deleteViaCurl($url, [
+                'public_id' => $publicId,
+                'api_key'   => $apiKey,
+                'timestamp' => $timestamp,
+                'signature' => $signature,
+            ]);
+        }
+
         try {
             $client = new Client(['timeout' => 15]);
             $response = $client->post($url, [
@@ -211,6 +225,119 @@ class CloudinaryService
             Log::error('CloudinaryService::delete error: ' . $e->getMessage());
             return ['success' => false, 'message' => $e->getMessage()];
         }
+    }
+
+    /**
+     * Sube una imagen a Cloudinary usando cURL nativo de PHP (sin depender de GuzzleHttp).
+     */
+    protected static function uploadViaCurl($url, $file, $apiKey, $timestamp, $folder, $signature, array $options, array $config)
+    {
+        $postFields = [
+            'api_key'   => $apiKey,
+            'timestamp' => (string) $timestamp,
+            'folder'    => $folder,
+            'signature' => $signature,
+        ];
+
+        if (!empty($options['public_id'])) {
+            $postFields['public_id'] = $options['public_id'];
+        }
+
+        if ($file instanceof UploadedFile) {
+            $postFields['file'] = new \CURLFile(
+                $file->getRealPath(),
+                $file->getMimeType() ?: 'image/jpeg',
+                $file->getClientOriginalName() ?: 'upload.jpg'
+            );
+        } elseif (is_string($file) && file_exists($file)) {
+            $mime = function_exists('mime_content_type') ? (mime_content_type($file) ?: 'image/jpeg') : 'image/jpeg';
+            $postFields['file'] = new \CURLFile($file, $mime, basename($file));
+        } elseif (is_string($file) && (strpos($file, 'data:') === 0 || filter_var($file, FILTER_VALIDATE_URL))) {
+            $postFields['file'] = $file;
+        } else {
+            $postFields['file'] = 'data:image/jpeg;base64,' . base64_encode((string) $file);
+        }
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $postFields,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 25,
+            CURLOPT_SSL_VERIFYPEER => false,
+        ]);
+
+        $rawResponse = curl_exec($ch);
+        $curlErr = curl_error($ch);
+        curl_close($ch);
+
+        if ($rawResponse === false) {
+            Log::error('CloudinaryService::uploadViaCurl error: ' . $curlErr);
+            return [
+                'success' => false,
+                'message' => 'Error de conexión cURL con Cloudinary: ' . $curlErr,
+            ];
+        }
+
+        $body = json_decode((string) $rawResponse, true);
+
+        if (!empty($body['secure_url'])) {
+            $secureUrl = $body['secure_url'];
+            $autoOptimize = isset($options['auto_optimize']) ? $options['auto_optimize'] : ($config['auto_optimize'] ?? true);
+            if ($autoOptimize) {
+                $secureUrl = self::optimizeUrl($secureUrl);
+            }
+
+            return [
+                'success'   => true,
+                'url'       => $secureUrl,
+                'raw_url'   => $body['secure_url'],
+                'public_id' => $body['public_id'] ?? null,
+                'format'    => $body['format'] ?? null,
+                'width'     => $body['width'] ?? null,
+                'height'    => $body['height'] ?? null,
+                'bytes'     => $body['bytes'] ?? null,
+            ];
+        }
+
+        $errorMsg = $body['error']['message'] ?? 'Respuesta inesperada de Cloudinary.';
+        Log::error('CloudinaryService::uploadViaCurl api error: ' . $errorMsg);
+
+        return [
+            'success' => false,
+            'message' => $errorMsg,
+        ];
+    }
+
+    /**
+     * Elimina una imagen en Cloudinary usando cURL nativo de PHP.
+     */
+    protected static function deleteViaCurl($url, array $postFields)
+    {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => http_build_query($postFields),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 15,
+            CURLOPT_SSL_VERIFYPEER => false,
+        ]);
+
+        $rawResponse = curl_exec($ch);
+        $curlErr = curl_error($ch);
+        curl_close($ch);
+
+        if ($rawResponse === false) {
+            Log::error('CloudinaryService::deleteViaCurl error: ' . $curlErr);
+            return ['success' => false, 'message' => $curlErr];
+        }
+
+        $body = json_decode((string) $rawResponse, true);
+        if (($body['result'] ?? '') === 'ok') {
+            return ['success' => true];
+        }
+
+        return ['success' => false, 'message' => $body['result'] ?? 'No se pudo eliminar'];
     }
 
     /**
