@@ -306,7 +306,7 @@ class VentaController extends Controller
         $venta->cod_usuarios= Auth::user()->cod_usuarios;
         $venta->suc_cod= $cab['idSucursal'];
         $venta->venta_total= $cab['total'] ?? 0;
-        $venta->venta_fecha = ($cab['fecha'] ?? date('Y-m-d')).date(' H:i');
+        $venta->venta_fecha = (!empty($cab['fecha']) ? $cab['fecha'] : date('Y-m-d')).date(' H:i');
         $venta->tipo_factura = $cab['condicionventa'] ?? 1;
         $venta->cant_cuotas = (!empty($request->cuotas) && is_array($request->cuotas)) ? count($request->cuotas) : 0;
         $venta->intervalo_venc='2030-01-01'; 
@@ -532,7 +532,7 @@ class VentaController extends Controller
         $cobro = new Cobro();
         $cobro->nro_operacion = $ventaCabecera['nro_operacion'];
         $cobro->suc_cod = $ventaCabecera['idSucursal'];
-        $cobro->cob_fecha = $ventaCabecera['fecha'];
+        $cobro->cob_fecha = !empty($ventaCabecera['fecha']) ? $ventaCabecera['fecha'] : date('Y-m-d');
         $cobro->recibon1 = $recibo[0];
         $cobro->recibon2 = $recibo[1];
         $cobro->nro_recibo = $recibo[2];

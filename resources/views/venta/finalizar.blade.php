@@ -144,6 +144,15 @@
 									<div class="small font-weight-bold text-dark-mode mb-2">
 										@{{ resumenCuotas }}
 									</div>
+									<div class="custom-control custom-checkbox mb-2 pt-1 border-top">
+										<input type="checkbox" class="custom-control-input" id="checkEntregaPrimeraCuotaModal"
+											:checked="tieneEntregaCredito"
+											@change="togglePrimeraCuotaHoy">
+										<label class="custom-control-label small font-weight-bold" for="checkEntregaPrimeraCuotaModal" style="cursor: pointer;">
+											Entregar 1ª cuota hoy
+											<span v-if="cuotas && cuotas[0]" class="text-success font-cairo">(Gs. @{{ format(cuotas[0].monto) }})</span>
+										</label>
+									</div>
 									<button type="button" class="btn btn-outline-primary btn-sm font-weight-bold w-100" @click="abrirCuotas">
 										<i class="fas fa-edit mr-1"></i> Modificar Cuotas
 									</button>
@@ -200,7 +209,7 @@
 							<i class="fas fa-print mr-1"></i> Cobrar e Imprimir
 						</button>
 						<button type="button" class="btn btn-link btn-sm text-warning px-2 mb-1"
-							v-if="botonPrincipalVenta !== 'cobrar_recibo'"
+							v-if="botonPrincipalVenta !== 'cobrar_recibo' && (!esCredito || tieneEntregaCredito)"
 							@click="finalizar('recibo')"
 							:disabled="!puedeImprimirCobro">
 							<i class="fas fa-file-invoice mr-1"></i> Con Recibo

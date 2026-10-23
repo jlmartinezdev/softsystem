@@ -2780,6 +2780,19 @@
                         }
                     }
 
+                    var entregaPrev = (this.$refs.generarcuota && Number(this.$refs.generarcuota.entrega) > 0)
+                        ? Number(this.$refs.generarcuota.entrega)
+                        : 0;
+                    var primeraHoyPrev = (this.$refs.generarcuota && this.$refs.generarcuota.primeracuotaHoy)
+                        || (Array.isArray(this.cuotas) && this.cuotas.length > 0 && this.cuotas[0].tipo === 'Entrega' && entregaPrev === 0);
+
+                    if (this.$refs.generarcuota && (entregaPrev > 0 || primeraHoyPrev)) {
+                        this.$refs.generarcuota.cant_cuota = cantCuota;
+                        this.$refs.generarcuota.generar();
+                        this.saveDatos && this.saveDatos();
+                        return;
+                    }
+
                     var cuotasGeneradas = [];
                     var totalAsignado = 0;
 
@@ -2802,7 +2815,7 @@
                             interes: 0,
                             vencimiento: venc,
                             monto: montoLinea,
-                            tipo: 'Cuota'
+                            tipo: (j === 0 && primeraHoyPrev) ? 'Entrega' : 'Cuota'
                         });
                     }
 
@@ -2914,6 +2927,12 @@
                     if (requirePrint && !this.esCredito && this.esEfectivo && !this.puedeEnterCobrar) {
                         return false;
                     }
+                    var esVentaCredito = String(cabecera.condicionventa) === '2';
+                    var tieneEntrega = Array.isArray(this.cuotas) && this.cuotas.some(function(c) {
+                        return c && c.tipo === 'Entrega' && Number(c.monto) > 0;
+                    });
+                    // Si la venta es a crédito y el cliente NO entrega la primera cuota, no imprimir recibo de dinero
+                    var imprimirRecibo = (print === 'recibo') && (!esVentaCredito || tieneEntrega);
                     this.calcularVuelto();
                     this.requestFinalizar = true;
                     axios.post('venta', {
@@ -2934,7 +2953,7 @@
                                 this.indiceCarroActivo = this.carritos.length - 1;
                             }
                             this.saveDatos();
-                            if (print === 'recibo') {
+                            if (imprimirRecibo) {
                                 window.location.assign('{{ env('APP_URL') }}' + 'pdf/recibo/' + response.data);
                             } else if (print === true || print === 'imprimir' || print === 'ticket') {
                                 if (docParaPrint == 'Factura') {
@@ -3271,10 +3290,37 @@
                     if (this.$refs.generarcuota && this.$refs.generarcuota.cant_cuota) {
                         var nuevaCant = Number(this.$refs.generarcuota.cant_cuota);
                         if (nuevaCant !== Number(this.tmpIndexPrecio.cant_cuota)) {
-                            this.aplicarPlanCreditoCarro(nuevaCant);
+                            var self = this;
+                            this.aplicarPlanCreditoCarro(nuevaCant, function() {
+                                if (self.$refs.generarcuota) {
+                                    self.$refs.generarcuota.generar();
+                                }
+                            });
                         }
                     }
                     $('#modalCuotas').modal('hide');
+                },
+                togglePrimeraCuotaHoy: function() {
+                    if (!this.cuotas || !this.cuotas.length) return;
+                    var nuevoEstado = !this.tieneEntregaCredito;
+                    var nuevas = this.cuotas.map(function(c, idx) {
+                        var copia = Object.assign({}, c);
+                        if (idx === 0) {
+                            copia.tipo = nuevoEstado ? 'Entrega' : 'Cuota';
+                        } else if (!nuevoEstado && copia.tipo === 'Entrega') {
+                            copia.tipo = 'Cuota';
+                        }
+                        return copia;
+                    });
+                    this.cuotas = nuevas;
+                    if (this.$refs.generarcuota) {
+                        this.$refs.generarcuota.primeracuotaHoy = nuevoEstado;
+                        if (!nuevoEstado) {
+                            this.$refs.generarcuota.entrega = 0;
+                        }
+                        this.$refs.generarcuota.cuotas = nuevas.slice();
+                    }
+                    this.saveDatos && this.saveDatos();
                 },
                 setDocumento: function(tipo) {
                     if (!this.ventaCabecera) return;
@@ -3520,7 +3566,11 @@
                     if (this.botonPrincipalVenta === 'cobrar') {
                         this.finalizar('cobrar');
                     } else if (this.botonPrincipalVenta === 'cobrar_recibo') {
-                        this.finalizar('recibo');
+                        if (this.esCredito && !this.tieneEntregaCredito) {
+                            this.finalizar('cobrar');
+                        } else {
+                            this.finalizar('recibo');
+                        }
                     } else {
                         this.finalizar('imprimir');
                     }
@@ -4115,22 +4165,38 @@
                     if (!this.esCredito && this.esEfectivo && !this.puedeEnterCobrar) return false;
                     return true;
                 },
+                tieneEntregaCredito: function() {
+                    if (!this.esCredito) return false;
+                    var c = this.cuotas || [];
+                    return c.some(function(item) {
+                        return item && item.tipo === 'Entrega' && Number(item.monto) > 0;
+                    });
+                },
                 hintCobro: function() {
                     if (this.motivoBloqueoFactura) return this.motivoBloqueoFactura;
                     if (this.esCredito && !(this.cuotas && this.cuotas.length)) return 'Armá las cuotas para cobrar';
                     if (!this.esCredito && this.esEfectivo && !this.puedeEnterCobrar) return 'Recibí el total para Enter o F12';
                     if (this.botonPrincipalVenta === 'cobrar') return 'Enter o F12 cobra';
-                    if (this.botonPrincipalVenta === 'cobrar_recibo') return 'Enter o F12 cobra e imprime recibo';
+                    if (this.botonPrincipalVenta === 'cobrar_recibo') {
+                        if (this.esCredito && !this.tieneEntregaCredito) return 'Crédito sin entrega (no imprime recibo)';
+                        return 'Enter o F12 cobra e imprime recibo';
+                    }
                     return 'Enter o F12 cobra e imprime';
                 },
                 labelBotonPrincipalModal: function() {
                     if (this.botonPrincipalVenta === 'cobrar') return 'Cobrar';
-                    if (this.botonPrincipalVenta === 'cobrar_recibo') return 'Cobrar e Imprimir Recibo';
+                    if (this.botonPrincipalVenta === 'cobrar_recibo') {
+                        if (this.esCredito && !this.tieneEntregaCredito) return 'Finalizar Venta (Sin Recibo)';
+                        return 'Cobrar e Imprimir Recibo';
+                    }
                     return 'Cobrar e Imprimir';
                 },
                 iconBotonPrincipalModal: function() {
                     if (this.botonPrincipalVenta === 'cobrar') return 'fa-check-circle';
-                    if (this.botonPrincipalVenta === 'cobrar_recibo') return 'fa-file-invoice';
+                    if (this.botonPrincipalVenta === 'cobrar_recibo') {
+                        if (this.esCredito && !this.tieneEntregaCredito) return 'fa-check-circle';
+                        return 'fa-file-invoice';
+                    }
                     return 'fa-print';
                 },
                 classBotonPrincipalModal: function() {
@@ -4144,7 +4210,11 @@
                     var first = c[0] || {};
                     var n = c.length;
                     var line = n + (n === 1 ? ' cuota' : ' cuotas') + ' · primera Gs. ' + this.format(first.monto);
-                    if (first.vencimiento) line += ' · vence ' + first.vencimiento;
+                    if (first.tipo === 'Entrega') {
+                        line += ' (Cobrado hoy)';
+                    } else if (first.vencimiento) {
+                        line += ' · vence ' + first.vencimiento;
+                    }
                     return line;
                 },
                 listasContado: function() {

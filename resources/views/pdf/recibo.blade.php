@@ -22,7 +22,8 @@
         $nroReciboTexto = '001-001-' . str_pad($venta->nro_fact_ventas, 7, '0', STR_PAD_LEFT);
     }
 
-    $importeRecibo = $venta->venta_total ?? 0;
+    $esCreditoConEntrega = ($venta->tipo_factura != "1" && !empty($cobro) && (float) $cobro->cob_importe > 0);
+    $importeRecibo = $esCreditoConEntrega ? (float) $cobro->cob_importe : ($venta->venta_total ?? 0);
 @endphp
 <!DOCTYPE html>
 <html lang="es">
@@ -126,7 +127,7 @@
         <div class="m-2 p-2 d-flex flex-column">
             <span>Recibimos del/la Sr./a <strong>{{ $venta->cliente_nombre }}</strong> con documento y/o R.U.C. número <strong>{{ $ruc_formateado }}</strong> <br> en la fecha <strong>{{ date_format(new DateTime($venta->venta_fecha), 'd-m-Y') }}</strong></span>
             <span>La suma de: <strong>{{ NumeroALetras::convertir($importeRecibo, "Guaranies") }}</strong></span>
-            <span>En concepto: <strong>se detalla a continuación ({{ $venta->tipo_factura == "1" ? "Venta Contado" : "Venta Crédito" }})</strong></span>
+            <span>En concepto: <strong>se detalla a continuación ({{ $venta->tipo_factura == "1" ? "Venta Contado" : ($esCreditoConEntrega ? "Venta Crédito - Entrega 1ª Cuota" : "Venta Crédito") }})</strong></span>
         </div>
 
         <div class="m-2 border border-dark pl-2 pr-2 pt-1 pb-1 d-flex flex-column font-weight-bold">
@@ -139,7 +140,10 @@
                     <th style="width: 180px" class="pl-2">Fecha Venta</th>
                     <th style="width: 150px" class="pl-2">Condición</th>
                     <th style="width: 160px" class="text-right pr-2">Descuento</th>
-                    <th style="width: 180px" class="text-right pr-2">Total Gs.</th>
+                    <th style="width: 180px" class="text-right pr-2">Total Venta Gs.</th>
+                    @if($esCreditoConEntrega)
+                        <th style="width: 180px" class="text-right pr-2">Entrega / 1ª Cuota</th>
+                    @endif
                 </tr>
                 <tr>
                     <td class="pl-2">{{ $venta->nro_fact_ventas }}</td>
@@ -147,6 +151,9 @@
                     <td class="pl-2">{{ $venta->tipo_factura == "1" ? "Contado" : "Crédito" }}</td>
                     <td class="text-right pr-2">{{ number_format($venta->venta_descuento ?? 0, 2, ',', '.') }}</td>
                     <td class="text-right pr-2"><strong>{{ number_format($venta->venta_total, 2, ',', '.') }}</strong></td>
+                    @if($esCreditoConEntrega)
+                        <td class="text-right pr-2"><strong>{{ number_format($cobro->cob_importe, 2, ',', '.') }}</strong></td>
+                    @endif
                 </tr>
             </table>
             <hr>
