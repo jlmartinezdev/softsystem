@@ -640,7 +640,12 @@ class VentaController extends Controller
         }
         $detalle = $this->getDetalle($id);
         $empresa = Empresa::first();
-        return view('pdf.recibo', compact('venta', 'detalle', 'empresa'));
+        $cobro = Cobro::join('cobranza_detalle as cd', 'cobranzas.cc_numero', '=', 'cd.cc_numero')
+            ->select('cobranzas.*')
+            ->where('cd.nro_fact_ventas', $id)
+            ->orderBy('cobranzas.cc_numero', 'asc')
+            ->first();
+        return view('pdf.recibo', compact('venta', 'detalle', 'empresa', 'cobro'));
     }
    public function ticketfactura(){
        $empresa= Empresa::first();
