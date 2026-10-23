@@ -1,3 +1,16 @@
+@php
+    $logoEmpresa = null;
+    if (!empty($empresa) && !empty($empresa->emp_logo)) {
+        $logoName = trim($empresa->emp_logo);
+        if (file_exists(public_path('img/' . $logoName))) {
+            $logoEmpresa = asset('img/' . $logoName);
+        } elseif (file_exists(public_path($logoName))) {
+            $logoEmpresa = asset($logoName);
+        }
+    }
+    $logoFinal = $logoEmpresa ?: asset('img/logo-softsystem.PNG');
+    $nombreEmpresa = !empty($empresa->emp_nombre) ? trim($empresa->emp_nombre) : 'SOFTSYSTEM';
+@endphp
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,7 +18,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('favicon.ico') }}">
-    <title>Iniciar Sesión — {{ $empresa->emp_nombre ?? 'SOFTSYSTEM' }}</title>
+    <title>Iniciar Sesión — {{ $nombreEmpresa }}</title>
     <link href="{{ asset('css/all.css') }}" rel="stylesheet">
     <style>
         @font-face {
@@ -89,22 +102,25 @@
             color: #ffffff;
         }
         .brand-logo-container {
-            width: 68px;
-            height: 68px;
-            margin: 0 auto 12px;
-            border-radius: 20px;
-            background: #ffffff;
-            padding: 6px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15);
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            min-width: 76px;
+            max-width: 190px;
+            height: 76px;
+            margin: 0 auto 12px;
+            border-radius: 18px;
+            background: #ffffff;
+            padding: 8px 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15);
         }
         .brand-logo-container img {
-            width: 100%;
-            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
             object-fit: contain;
-            border-radius: 14px;
+            border-radius: 6px;
         }
         .brand-title {
             font-family: "Cairo", sans-serif;
@@ -437,10 +453,16 @@
         <!-- Header Branding -->
         <header class="brand-header">
             <div class="brand-logo-container">
-                <img src="{{ asset('img/logo-softsystem.PNG') }}" alt="{{ $empresa->emp_nombre ?? 'SOFTSYSTEM' }}">
+                <img src="{{ $logoFinal }}" alt="{{ $nombreEmpresa }}" onerror="this.onerror=null; this.src='{{ asset('img/logo-softsystem.PNG') }}';">
             </div>
-            <h1 class="brand-title">{{ $empresa->emp_nombre ?? 'SOFTSYSTEM' }}</h1>
-            <p class="brand-subtitle">Punto de Venta &amp; Gestión Comercial</p>
+            <h1 class="brand-title">{{ $nombreEmpresa }}</h1>
+            <p class="brand-subtitle">
+                @if(!empty($empresa) && !empty($empresa->emp_descripcion) && trim($empresa->emp_descripcion) !== '-' && trim($empresa->emp_descripcion) !== '')
+                    {{ trim($empresa->emp_descripcion) }}
+                @else
+                    Punto de Venta &amp; Gestión Comercial
+                @endif
+            </p>
             <div class="status-pill">
                 <span class="dot"></span>
                 <span>Turno del {{ $fecha_turno }}</span>
