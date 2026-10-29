@@ -28,7 +28,7 @@
           :data-result-index="index"
           class="autocomplete-result"
         >
-          <span class="left">
+          <span class="left" :title="result.producto_nombre">
             {{ result.producto_nombre }}
           </span>
           <span class="right">

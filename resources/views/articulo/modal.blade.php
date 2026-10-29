@@ -286,6 +286,21 @@
                                 </div>
                             </div>
 
+                            <div class="col-12 mb-3">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox"
+                                           class="custom-control-input"
+                                           id="articuloVisibleBuscador"
+                                           v-model="articulo.activo"
+                                           :true-value="1"
+                                           :false-value="0">
+                                    <label class="custom-control-label font-weight-bold" for="articuloVisibleBuscador">
+                                        Artículo habilitado
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">Si lo apagás, queda deshabilitado: no aparece en Artículos ni en el buscador de ventas, compras y presupuestos.</small>
+                            </div>
+
                             <!-- Sección / Categoría -->
                             <div class="col-md-6 mb-3">
                                 <label class="font-weight-semibold text-secondary small mb-1">

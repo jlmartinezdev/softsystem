@@ -201,6 +201,14 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="form-group mb-2">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="cmArticuloVisibleBuscador"
+                                    v-model="articulo.activo" :true-value="1" :false-value="0">
+                                <label class="custom-control-label" for="cmArticuloVisibleBuscador">Artículo habilitado</label>
+                            </div>
+                            <small class="form-text text-muted">Si lo apagás, queda deshabilitado y no aparece en Artículos ni en el buscador.</small>
+                        </div>
 
                         <div class="form-row">
                             <div class="col">
@@ -1059,6 +1067,7 @@
             'm4': 0,
             'm5': 0,
             'svenc': '0',
+            'activo': 1,
             existePrecios: false
         }
         var app = new Vue({
@@ -1395,6 +1404,7 @@
                         'm4': parseInt(a.pre_margen4, 10),
                         'm5': parseInt(a.pre_margen5, 10),
                         'svenc': '0',
+                        'activo': Number(a.activo) === 0 ? 0 : 1,
                         existePrecios: false
                     };
                     this.setImagenFromFilename(a.foto || '');

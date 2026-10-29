@@ -150,7 +150,7 @@ class ArticuloController extends Controller
         $this->middleware('auth');
         $this->middleware('permiso:articulos,open')->only(['index']);
         $this->middleware('permiso:articulos,add')->only(['store', 'capturarImagen', 'subirImagen']);
-        $this->middleware('permiso:articulos,edit')->only(['update']);
+        $this->middleware('permiso:articulos,edit')->only(['update', 'toggleActivo']);
         $this->middleware('permiso:articulos,del')->only(['destroy']);
         $this->middleware('permiso:articulos,export')->only(['export', 'exportPrecio', 'export_costo']);
         $this->middleware('permiso:ajuste,open')->only(['cm', 'cmupdate']);
@@ -199,6 +199,12 @@ class ArticuloController extends Controller
                 DB::raw('(SELECT COUNT(*) FROM combo_items ci INNER JOIN combos c ON c.id = ci.combo_id AND c.activo = 1 WHERE ci.articulos_cod = articulos.ARTICULOS_cod) AS en_combo')
             )
             ->where('articulos.producto_c_barra', '!=', ArticuloLibre::CODIGO_BARRA)
+            ->when($this->soloInactivos($request), function ($query) {
+                $query->where('articulos.activo', 0);
+            })
+            ->when(!$this->soloInactivos($request) && !$this->incluyeInactivos($request), function ($query) {
+                $query->where('articulos.activo', 1);
+            })
             ->descripcion($buscar)
             ->seccion($seccion)
             ->bysucursal($idsucursal)
@@ -465,6 +471,7 @@ class ArticuloController extends Controller
         $articulo->producto_dosis= is_null($request->articulo['modouso']) ? '' :$request->articulo['modouso'] ;
         $articulo->producto_formula= '';
         $articulo->producto_dimagen= '';
+        $articulo->activo = $this->activoDesdeRequest($request, 1);
         $articulo->save();
         $articulo= Articulo::latest('ARTICULOS_cod', 'desc')->first();
         $cbarra= null;
@@ -575,6 +582,10 @@ class ArticuloController extends Controller
             'producto_formula'=> '',
             'producto_dimagen'=> ''
         ];
+        $activo = $this->activoDesdeRequest($request, null);
+        if ($activo !== null) {
+            $data['activo'] = $activo;
+        }
 
         if ($request->exists('imagen')) {
             $data['foto'] = (string) ($request->input('imagen') ?? '');
@@ -617,6 +628,52 @@ class ArticuloController extends Controller
         //$ok= $ok ? "OK": "ERROR";
         return $ok;
     }
+    /**
+     * Muestra u oculta el artículo en el buscador de ventas, compras y presupuestos.
+     */
+    public function toggleActivo(Request $request, $id)
+    {
+        $articulo = Articulo::where('articulos_cod', $id)->first();
+        if (!$articulo) {
+            return response()->json(['message' => 'Artículo no encontrado.'], 404);
+        }
+
+        if ($articulo->producto_c_barra === ArticuloLibre::CODIGO_BARRA) {
+            return response()->json(['message' => 'El ítem libre no se puede ocultar del buscador.'], 422);
+        }
+
+        $activo = $request->has('activo')
+            ? ((int) $request->input('activo') === 1 ? 1 : 0)
+            : ((int) $articulo->activo === 1 ? 0 : 1);
+
+        Articulo::where('articulos_cod', $id)->update(['activo' => $activo]);
+
+        return response()->json([
+            'ok' => true,
+            'activo' => $activo,
+        ]);
+    }
+
+    private function soloInactivos(Request $request)
+    {
+        $valor = $request->input('solo_inactivos');
+        return $valor === true || $valor === 1 || $valor === '1' || $valor === 'true';
+    }
+
+    private function incluyeInactivos(Request $request)
+    {
+        $valor = $request->input('incluir_inactivos');
+        return $valor === true || $valor === 1 || $valor === '1' || $valor === 'true';
+    }
+
+    private function activoDesdeRequest(Request $request, $default)
+    {
+        if (!$request->exists('articulo.activo') && !$request->has('articulo.activo')) {
+            return $default;
+        }
+        return (int) $request->input('articulo.activo') === 0 ? 0 : 1;
+    }
+
     private function setVencimiento($fecha){
         if(empty($fecha) || $fecha=="Sin vencimiento"){
             return "2030-01-01";

@@ -61,7 +61,8 @@ class OfertaController extends Controller
         $query = Articulo::query()
             ->select('ARTICULOS_cod', 'producto_c_barra', 'producto_nombre', 'pre_venta1')
             ->where('producto_c_barra', '!=', 'VARIOS')
-            ->where('producto_c_barra', '!=', 'COMBO');
+            ->where('producto_c_barra', '!=', 'COMBO')
+            ->where('activo', 1);
 
         if ($q !== '') {
             $query->where(function ($w) use ($q) {

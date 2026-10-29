@@ -43604,7 +43604,10 @@ var render = function() {
                       }
                     },
                     [
-                      _c("span", { staticClass: "left" }, [
+                      _c("span", {
+                        staticClass: "left",
+                        attrs: { title: result.producto_nombre }
+                      }, [
                         _vm._v(
                           "\n          " +
                             _vm._s(result.producto_nombre) +

@@ -49,6 +49,7 @@ Route::get('caja/movimiento/{id}','MovimientoCajaController@informe')->name('caj
     Route::put('articulo', 'ArticuloController@getByCodigo');
     Route::post('articulo', 'ArticuloController@store');
     Route::put('articulo/{id}', 'ArticuloController@update')->name('articulo.update');
+    Route::post('articulo/{id}/activo', 'ArticuloController@toggleActivo')->name('articulo.activo');
     Route::delete('articulo/res/{id}', 'ArticuloController@destroy')->name('articulo.destroy');
     Route::get('articulo/validar/cbarra/{cbarra}','ArticuloController@validarCbarra');
     Route::post('articulo/capturar', 'ArticuloController@capturarImagen');

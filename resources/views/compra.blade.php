@@ -184,6 +184,29 @@
         color: var(--dash-text-main) !important;
     }
 
+    /* La lista de resultados usa el ancho de la barra completa, no solo el input */
+    .venta-scan .buscador-catalogo {
+        position: relative;
+    }
+    .venta-scan .autocomplete {
+        position: static !important;
+    }
+    .venta-scan .autocomplete-result-container {
+        position: absolute !important;
+        top: calc(100% + 4px) !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: auto !important;
+        min-width: 0 !important;
+        z-index: 1050 !important;
+    }
+    .venta-scan .autocomplete-result-list {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: none !important;
+        box-sizing: border-box;
+    }
+
     /* Contenedor y alineación de los atajos del buscador en la misma línea */
     .venta-scan .buscador-catalogo .navbar-nav.flex-row {
         flex: 0 0 auto !important;

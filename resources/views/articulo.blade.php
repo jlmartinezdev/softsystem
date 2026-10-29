@@ -52,6 +52,38 @@
         color: var(--dash-text-muted);
         line-height: 1.2;
     }
+    .badge-oculto-buscador {
+        display: inline-block;
+        margin-top: 0.25rem;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: #9a3412;
+        background: #ffedd5;
+        border-radius: 999px;
+        padding: 0.1rem 0.45rem;
+    }
+    body.dark-mode .badge-oculto-buscador {
+        color: #fdba74;
+        background: rgba(154, 52, 18, 0.35);
+    }
+    tr.articulo-oculto .product-title {
+        color: var(--dash-text-muted);
+    }
+    tr.articulo-sin-stock .product-title,
+    tr.articulo-sin-stock .price-display {
+        color: #dc2626 !important;
+    }
+    tr.articulo-sin-stock td {
+        background: #fff5f5;
+    }
+    body.dark-mode tr.articulo-sin-stock .product-title,
+    body.dark-mode tr.articulo-sin-stock .price-display {
+        color: #fca5a5 !important;
+    }
+    body.dark-mode tr.articulo-sin-stock td {
+        background: rgba(127, 29, 29, 0.22);
+    }
     .price-display {
         font-size: 1rem;
         color: var(--dash-primary) !important;
@@ -454,6 +486,16 @@
         background: var(--dash-primary-light);
         border-color: var(--dash-primary-border);
         color: var(--dash-primary) !important;
+    }
+    .btn-deshabilitados.is-on {
+        background: #fff7ed;
+        border-color: #fdba74;
+        color: #9a3412 !important;
+    }
+    body.dark-mode .btn-deshabilitados.is-on {
+        background: rgba(154, 52, 18, 0.35);
+        border-color: #ea580c;
+        color: #fdba74 !important;
     }
 
     /* Tarjetas KPI de Home */
@@ -1157,6 +1199,10 @@
                     <!-- Botones de Acción & Enlaces -->
                     <div class="col-12 col-sm-6 col-xl-auto text-left text-sm-right articulo-toolbar-actions">
                         <div class="toolbar-actions-wrap">
+                            <button type="button" class="btn-pos-secondary btn-deshabilitados" :class="{ 'is-on': verDeshabilitados }" @click="toggleVerDeshabilitados" :title="verDeshabilitados ? 'Volver a los artículos habilitados' : 'Ver artículos deshabilitados'">
+                                <i class="fa" :class="verDeshabilitados ? 'fa-check' : 'fa-ban'"></i>
+                                @{{ verDeshabilitados ? 'Ver habilitados' : 'Deshabilitados' }}
+                            </button>
                             <button type="button" class="btn-pos-secondary" data-toggle="modal" data-target="#modalfiltro" title="Filtrar por stock y vencimiento">
                                 <i class="fa fa-filter"></i> Filtros
                             </button>
@@ -1197,6 +1243,10 @@
                     <span v-if="filtro.seccion != 0" class="badge badge-light border text-secondary ml-2 py-1 px-2">
                         Sección activa
                         <i class="fa fa-times text-danger ml-1 cursor-pointer" @click="filtro.seccion = 0; buscar(false)" title="Quitar filtro de sección"></i>
+                    </span>
+                    <span v-if="verDeshabilitados" class="badge badge-light border text-secondary ml-2 py-1 px-2">
+                        Deshabilitados
+                        <i class="fa fa-times text-danger ml-1 cursor-pointer" @click="toggleVerDeshabilitados" title="Volver a los habilitados"></i>
                     </span>
                     <span v-if="filtro.estado" class="badge badge-light border text-secondary ml-2 py-1 px-2">
                         @{{ etiquetaFiltroEstado }}
@@ -1256,7 +1306,7 @@
 
                         <!-- Filas de Productos -->
                         <template v-else-if="paginatedRows.length > 0">
-                            <tr v-for="row in paginatedRows" :key="row.ARTICULOS_cod">
+                            <tr v-for="row in paginatedRows" :key="row.ARTICULOS_cod" :class="{ 'articulo-oculto': Number(row.activo) !== 1, 'articulo-sin-stock': Number(row.stock) <= 0 }">
                                 <!-- Código de Barra -->
                                 <td class="align-middle text-nowrap">
                                     <span v-if="row.codigo" class="badge-barcode">
@@ -1269,6 +1319,7 @@
                                 <td class="align-middle" style="min-width: 220px;">
                                     <div class="font-weight-bold product-title">@{{ row.descripcion }}</div>
                                     <div class="product-seccion mt-1">@{{ row.seccion }}</div>
+                                    <span v-if="Number(row.activo) !== 1" class="badge-oculto-buscador">Deshabilitado</span>
                                     <div class="small text-muted mt-1" v-if="row.ubicacion">
                                         <i class="fa fa-location-dot mr-1" style="color: var(--dash-accent);"></i>@{{ row.ubicacion }}
                                     </div>
@@ -1327,6 +1378,10 @@
                                             <button class="dropdown-item py-2" @click="duplicar(row.ARTICULOS_cod)">
                                                 <i class="fa fa-copy text-warning mr-2"></i> Duplicar Artículo
                                             </button>
+                                            <button class="dropdown-item py-2" @click="toggleBuscador(row)">
+                                                <i class="fa mr-2" :class="Number(row.activo) === 1 ? 'fa-eye-slash text-warning' : 'fa-eye text-success'"></i>
+                                                @{{ Number(row.activo) === 1 ? 'Deshabilitar' : 'Habilitar' }}
+                                            </button>
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item py-2" :href="'{{ url('articulo/cm') }}/' + row.ARTICULOS_cod">
                                                 <i class="fa fa-camera text-secondary mr-2"></i> ABM Completo / Fotos
@@ -1348,8 +1403,8 @@
                                     <div class="empty-state-icon mb-3">
                                         <i class="fa-solid fa-boxes-stacked fa-2x"></i>
                                     </div>
-                                    <h5 class="font-weight-bold mb-1" style="color: var(--dash-text-main);">No se encontraron productos</h5>
-                                    <p class="text-muted small mb-3">No hay artículos que coincidan con los criterios de búsqueda o filtro.</p>
+                                    <h5 class="font-weight-bold mb-1" style="color: var(--dash-text-main);">@{{ verDeshabilitados ? 'No hay artículos deshabilitados' : 'No se encontraron productos' }}</h5>
+                                    <p class="text-muted small mb-3">@{{ verDeshabilitados ? 'Los artículos deshabilitados no aparecen en este listado ni en el buscador.' : 'No hay artículos que coincidan con los criterios de búsqueda o filtro.' }}</p>
                                     <div class="d-flex justify-content-center">
                                         <button v-if="txtbuscar || filtro.seccion != 0 || filtro.estado" type="button" class="btn-pos-secondary mr-2" @click="txtbuscar = ''; filtro.seccion = 0; setFiltroEstado(''); buscar(false)">
                                             <i class="fa fa-undo mr-1"></i> Limpiar Filtros
@@ -1632,6 +1687,7 @@
             'm4': 0,
             'm5': 0,
             'svenc': '0',
+            'activo': 1,
             existePrecios: false
         };
 
@@ -1733,6 +1789,7 @@
                 isnew: true,
                 viewPrecio: false,
                 txtbuscar: '',
+                verDeshabilitados: false,
                 datos: 'F',
                 idstock: 1,
                 articulos: [],
@@ -2171,6 +2228,50 @@
                         cant: 0
                     }
                 },
+                toggleVerDeshabilitados: function() {
+                    this.verDeshabilitados = !this.verDeshabilitados;
+                    this.currentPage = 1;
+                    this.buscar(false);
+                },
+                toggleBuscador: function(row) {
+                    var self = this;
+                    if (!row || !row.ARTICULOS_cod) return;
+                    var nuevo = Number(row.activo) === 1 ? 0 : 1;
+                    axios.post('articulo/' + row.ARTICULOS_cod + '/activo', { activo: nuevo })
+                        .then(function(response) {
+                            var activo = Number(response.data && response.data.activo) === 1 ? 1 : 0;
+                            var sigueEnLista = self.verDeshabilitados ? activo === 0 : activo === 1;
+                            if (!sigueEnLista) {
+                                self.rows = (self.rows || []).filter(function(r) {
+                                    return String(r.ARTICULOS_cod) !== String(row.ARTICULOS_cod);
+                                });
+                                self.articulos = (self.articulos || []).filter(function(a) {
+                                    return String(a.ARTICULOS_cod) !== String(row.ARTICULOS_cod);
+                                });
+                            } else {
+                                row.activo = activo;
+                                var art = (self.articulos || []).find(function(a) {
+                                    return String(a.ARTICULOS_cod) === String(row.ARTICULOS_cod);
+                                });
+                                if (art) art.activo = activo;
+                            }
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: activo === 1 ? 'Artículo habilitado' : 'Artículo deshabilitado',
+                                showConfirmButton: false,
+                                timer: 1800
+                            });
+                        })
+                        .catch(function(error) {
+                            var msg = 'No se pudo cambiar el artículo.';
+                            if (error.response && error.response.data && error.response.data.message) {
+                                msg = error.response.data.message;
+                            }
+                            Swal.fire('No se pudo cambiar', msg, 'error');
+                        });
+                },
                 setFiltroEstado: function(estado) {
                     this.filtro.estado = estado || '';
                     this.currentPage = 1;
@@ -2186,7 +2287,8 @@
                                 seccion: this.filtro.seccion,
                                 col: this.filtro.columna,
                                 ord: this.filtro.orden,
-                                suc: null
+                                suc: null,
+                                solo_inactivos: this.verDeshabilitados ? 1 : 0
                             }
                         })
                         .then(response => {
@@ -2214,7 +2316,8 @@
                                         precio_formateado: this.separador(art.pre_venta1),
                                         stock: cantStock,
                                         tiene_vencimiento: parseInt(art.tiene_vencimiento || 0) > 0,
-                                        costo: art.producto_costo_compra || 0
+                                        costo: art.producto_costo_compra || 0,
+                                        activo: Number(art.activo) === 0 ? 0 : 1
                                     };
                                     this.rows.push(item);
                                 }
@@ -2301,6 +2404,7 @@
                         'm4': parseInt(a.pre_margen4, 10) || 0,
                         'm5': parseInt(a.pre_margen5, 10) || 0,
                         'svenc': '0',
+                        'activo': Number(a.activo) === 0 ? 0 : 1,
                         existePrecios: false
                     };
                 },
@@ -2314,6 +2418,7 @@
                     this.articulo.codigo = '';
                     this.articulo.c_barra = '';
                     this.articulo.descripcion = (a.producto_nombre || '') + ' (Copia)';
+                    this.articulo.activo = 1;
                     $('#tab-general-tab').tab('show');
                     $('#modalArticulo').modal('show');
                     this.$nextTick(function() {

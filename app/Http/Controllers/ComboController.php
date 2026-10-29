@@ -121,7 +121,8 @@ class ComboController extends Controller
                 'foto'
             )
             ->where('producto_c_barra', '!=', ArticuloCombo::CODIGO_BARRA)
-            ->where('producto_c_barra', '!=', 'VARIOS');
+            ->where('producto_c_barra', '!=', 'VARIOS')
+            ->where('activo', 1);
 
         if ($q !== '') {
             $query->where(function ($w) use ($q) {
