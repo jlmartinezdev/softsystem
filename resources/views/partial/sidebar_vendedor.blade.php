@@ -114,6 +114,15 @@
                     </a>
                 </li>
 
+                @if (Auth::user()->tienePermiso('compra', 'open'))
+                <li class="nav-item">
+                    <a href="{{ route('compra') }}" id="m_compra" class="nav-link">
+                        <i class="nav-icon fas fa-truck-loading"></i>
+                        <p>Compras</p>
+                    </a>
+                </li>
+                @endif
+
                 <li class="nav-item">
                     <a href="{{ route('cliente.index') }}" id="m_cliente" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
