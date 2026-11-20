@@ -12,13 +12,21 @@
         <div class="sidebar-user-panel mt-3 pb-3 mb-2 d-flex flex-column border-bottom">
             <div class="d-flex align-items-center mb-2 px-2">
                 <div class="user-avatar-circle mr-2">
-                    <i class="fas fa-user-shield text-success"></i>
+                    @if (Auth::user()->esSuperAdministrador())
+                        <i class="fas fa-crown text-warning"></i>
+                    @else
+                        <i class="fas fa-user-shield text-success"></i>
+                    @endif
                 </div>
                 <div class="user-info-text text-truncate">
                     <div class="font-weight-bold text-white text-truncate" style="font-size: 0.875rem;">
                         {{ Auth::user()->nom_usuarios ?? 'Administrador' }}
                     </div>
-                    <span class="badge badge-success" style="font-size: 0.68rem; font-weight: 600;">Administrador</span>
+                    @if (Auth::user()->esSuperAdministrador())
+                        <span class="badge badge-warning text-dark" style="font-size: 0.68rem; font-weight: 700;">Superadministrador</span>
+                    @else
+                        <span class="badge badge-success" style="font-size: 0.68rem; font-weight: 600;">Administrador</span>
+                    @endif
                 </div>
             </div>
             <a href="{{ route('sucursal.set') }}" class="branch-selector-chip mx-2" id="m_sucursal" title="Cambiar de sucursal">
@@ -58,6 +66,20 @@
                         <p>Presupuestos</p>
                     </a>
                 </li>
+
+                @if (\App\Support\ReparacionSettings::isModuloActivo() || Auth::user()->esSuperAdministrador())
+                <li class="nav-item">
+                    <a href="{{ route('reparacion.index') }}" id="m_reparacion" class="nav-link">
+                        <i class="nav-icon fas fa-mobile-alt text-warning"></i>
+                        <p>
+                            Servicio Técnico
+                            @if (!\App\Support\ReparacionSettings::isModuloActivo())
+                                <span class="badge badge-secondary right" title="Módulo deshabilitado (Solo visible para Superadministrador)">OFF</span>
+                            @endif
+                        </p>
+                    </a>
+                </li>
+                @endif
 
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link" id="m_caja">

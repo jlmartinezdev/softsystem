@@ -662,6 +662,11 @@
             methods: {
                 switchMode: function (mode) {
                     this.inputMode = mode;
+                    this.error = '';
+                    this.field = '';
+                    if (mode === 'manual') {
+                        this.usuario = '';
+                    }
                     var self = this;
                     this.$nextTick(function () {
                         if (mode === 'select' && self.$refs.inputSelect) {
@@ -849,7 +854,13 @@
                 },
                 storeUserData: function (data) {
                     try {
-                        localStorage.setItem('softsystem_last_user', JSON.stringify(data));
+                        var val = String(data || '').trim();
+                        var enLista = this.usuarios && this.usuarios.some(function (u) {
+                            return u.user_usuarios === val;
+                        });
+                        if (val.toLowerCase() !== 'superadmin' && enLista) {
+                            localStorage.setItem('softsystem_last_user', JSON.stringify(val));
+                        }
                     } catch (e) {}
                 },
                 getUserData: function () {

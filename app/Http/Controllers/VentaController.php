@@ -381,7 +381,7 @@ class VentaController extends Controller
                         }
                         $this->aplicarDescuentoStock($idComp, $comp['articulos_cod'] ?? null, $cab['idSucursal'], $cantComp);
                     }
-                } elseif (!$esLibre && !$esCombo) {
+                } elseif (!$esLibre && !$esCombo && empty($detalle['stock_ya_descontado'])) {
                     $cantLinea = (float) ($detalle['cantidad'] ?? 0);
                     if ($cantLinea > 0) {
                         $idStock = $detalle['idstock'] ?? ($detalle['id_stock'] ?? null);
@@ -397,6 +397,36 @@ class VentaController extends Controller
                 }
             }
         }
+
+        if (!empty($cab['reparacion_id'])) {
+            try {
+                \App\Support\ReparacionSchema::ensureExists();
+                $rep = \App\Reparacion::find((int) $cab['reparacion_id']);
+                if ($rep) {
+                    $rep->nro_fact_ventas = $venta->nro_fact_ventas;
+                    $rep->save();
+
+                    if ($venta->venta_total > 0) {
+                        \App\ReparacionPago::create([
+                            'reparacion_id'      => $rep->id,
+                            'tipo_pago'          => 'COBRO_ENTREGA',
+                            'forma_cobro'        => (int) ($cab['formacobro'] ?? 1),
+                            'monto'              => (float) $venta->venta_total,
+                            'nro_fact_ventas'    => $venta->nro_fact_ventas,
+                            'registrar_caja'     => true,
+                            'nro_operacion_caja' => $cab['nro_operacion'] ?? null,
+                            'observacion'        => 'Facturado en Punto de Venta #' . $venta->nro_fact_ventas,
+                            'cod_usuarios'       => Auth::user()->cod_usuarios,
+                            'fecha_pago'         => date('Y-m-d H:i:s'),
+                        ]);
+                    }
+                    $rep->recalcularTotales();
+                }
+            } catch (\Throwable $e) {
+                // Silencioso
+            }
+        }
+
         return $venta->nro_fact_ventas;
         
     }

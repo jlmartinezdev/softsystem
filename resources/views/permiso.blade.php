@@ -470,6 +470,45 @@
         </div>
     </div>
 
+    @if (!empty($esSuperAdministrador))
+    <!-- ========================================== -->
+    <!-- CONTROL SUPERADMINISTRADOR: MÓDULOS        -->
+    <!-- ========================================== -->
+    <div class="card-modern mb-3 py-2 px-3" :style="moduloReparacionActivo ? 'border-left: 4px solid #10b981;' : 'border-left: 4px solid #e11d48;'">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="d-flex align-items-center">
+                <div class="mr-3 d-flex align-items-center justify-content-center rounded"
+                     :style="moduloReparacionActivo ? 'width:40px;height:40px;background:#eaf3ef;color:#0a4d36;' : 'width:40px;height:40px;background:#fff1f2;color:#e11d48;'">
+                    <i class="fas fa-mobile-alt fa-lg"></i>
+                </div>
+                <div>
+                    <div class="font-cairo font-weight-bold" style="font-size: 0.98rem;">
+                        Módulo de Servicio Técnico y Reparación de Celulares
+                        <span class="badge ml-2" :class="moduloReparacionActivo ? 'badge-success' : 'badge-danger'">
+                            @{{ moduloReparacionActivo ? 'HABILITADO' : 'DESHABILITADO' }}
+                        </span>
+                    </div>
+                    <div class="text-muted small">
+                        Control exclusivo de Superadministrador: habilita o deshabilita globalmente el módulo de Recepción, Diagnóstico, Repuestos, Entrega y Garantías.
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center">
+                <a v-if="moduloReparacionActivo" href="{{ route('reparacion.index') }}" class="btn btn-xs btn-outline-success font-weight-bold mr-2">
+                    <i class="fas fa-external-link-alt mr-1"></i> Abrir Módulo
+                </a>
+                <button type="button" class="btn btn-sm font-weight-bold font-cairo"
+                        :class="moduloReparacionActivo ? 'btn-outline-danger' : 'btn-success'"
+                        :disabled="cambiandoModuloReparacion"
+                        @click="toggleModuloReparacion">
+                    <i class="fas mr-1" :class="cambiandoModuloReparacion ? 'fa-spinner fa-spin' : (moduloReparacionActivo ? 'fa-power-off' : 'fa-check-circle')"></i>
+                    @{{ moduloReparacionActivo ? 'Deshabilitar Módulo' : 'Habilitar Módulo' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- ========================================== -->
     <!-- SELECTOR DE ROLES INTERACTIVO              -->
     <!-- ========================================== -->
@@ -1040,6 +1079,8 @@ ALTER TABLE `roles`
             categoriaFiltro: 'TODOS',
             busquedaModulo: '',
             guardando: false,
+            moduloReparacionActivo: {{ !empty($moduloReparacionActivo) ? 'true' : 'false' }},
+            cambiandoModuloReparacion: false,
 
             // Modal Rol
             guardandoRol: false,
@@ -1390,6 +1431,29 @@ ALTER TABLE `roles`
             /* Script SQL */
             abrirModalSql: function () {
                 $('#modalSql').modal('show');
+            },
+            toggleModuloReparacion: function () {
+                var self = this;
+                this.cambiandoModuloReparacion = true;
+                axios.post('{{ route("reparacion.toggle_modulo") }}', {
+                    activo: !this.moduloReparacionActivo ? 1 : 0
+                }).then(function (res) {
+                    if (res.data && res.data.success) {
+                        self.moduloReparacionActivo = !!res.data.activo;
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: res.data.message,
+                            showConfirmButton: false,
+                            timer: 2500
+                        });
+                    }
+                }).catch(function () {
+                    Swal.fire('Error', 'No se pudo cambiar el estado del módulo.', 'error');
+                }).finally(function () {
+                    self.cambiandoModuloReparacion = false;
+                });
             },
             copiarSqlClipboard: function () {
                 var el = document.getElementById('sqlBox');

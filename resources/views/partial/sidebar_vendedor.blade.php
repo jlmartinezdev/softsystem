@@ -59,6 +59,15 @@
                     </a>
                 </li>
 
+                @if (\App\Support\ReparacionSettings::isModuloActivo() && Auth::user()->tienePermiso('reparacion', 'open'))
+                <li class="nav-item">
+                    <a href="{{ route('reparacion.index') }}" id="m_reparacion" class="nav-link">
+                        <i class="nav-icon fas fa-mobile-alt text-warning"></i>
+                        <p>Servicio Técnico</p>
+                    </a>
+                </li>
+                @endif
+
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link" id="m_caja">
                         <i class="nav-icon fas fa-cash-register"></i>

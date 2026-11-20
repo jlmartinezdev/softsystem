@@ -23,19 +23,23 @@ class LoginController extends Controller
 
     public function showLoginForm()
     {
+        \App\Support\ReparacionSchema::ensureSuperAdminExists();
+
         $empresa = Empresa::first();
         $meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'setiembre', 'octubre', 'noviembre', 'diciembre'];
         $fecha = date('d') . ' de ' . $meses[(int) date('n') - 1] . ' de ' . date('Y');
 
-        $usuarios = \App\User::where('activo', 1)->select(
-            \DB::raw('TRIM(user_usuarios) as user_usuarios'),
-            \DB::raw('TRIM(nom_usuarios) as nom_usuarios')
-        )->get()->sortBy(function ($user) {
-            $nombre = strtoupper(trim($user->nom_usuarios . ' ' . $user->user_usuarios));
-            $sistema = (strpos($nombre, 'ADMIN') !== false || strpos($nombre, 'SISTEMA') !== false || strpos($nombre, 'ROOT') !== false) ? '1' : '0';
+        $usuarios = \App\User::where('activo', 1)
+            ->sinSuperAdmin()
+            ->select(
+                \DB::raw('TRIM(user_usuarios) as user_usuarios'),
+                \DB::raw('TRIM(nom_usuarios) as nom_usuarios')
+            )->get()->sortBy(function ($user) {
+                $nombre = strtoupper(trim($user->nom_usuarios . ' ' . $user->user_usuarios));
+                $sistema = (strpos($nombre, 'ADMIN') !== false || strpos($nombre, 'SISTEMA') !== false || strpos($nombre, 'ROOT') !== false) ? '1' : '0';
 
-            return $sistema . '-' . $user->nom_usuarios;
-        })->values();
+                return $sistema . '-' . $user->nom_usuarios;
+            })->values();
 
         return view('auth.login', [
             'empresa' => $empresa,
@@ -46,6 +50,8 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
+        \App\Support\ReparacionSchema::ensureSuperAdminExists();
+
         $usuario = trim((string) $request->input($this->username()));
         if ($usuario === '' || strcasecmp($usuario, 'Seleccionar') === 0) {
             return response()->json([

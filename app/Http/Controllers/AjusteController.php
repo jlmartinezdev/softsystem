@@ -23,14 +23,18 @@ class AjusteController extends Controller
 
     public function index()
     {
+        \App\Support\ReparacionSchema::ensureExists();
         $ajuste = Ajuste::whereIn('categoria', ['caja', 'pos'])->orderBy('id')->get();
         $mail = MailSettings::all();
         $mail['password'] = '';
         $camara = CameraSettings::publicConfig();
         $mapas = MapSettings::publicConfig();
         $cloudinary = CloudinarySettings::publicConfig();
+        $reparacion = \App\Support\ReparacionSettings::all();
+        $esAdministrador = \Auth::user()->esAdministrador();
+        $esSuperAdministrador = \Auth::user()->esSuperAdministrador();
 
-        return view('configuracion', compact('ajuste', 'mail', 'camara', 'mapas', 'cloudinary'));
+        return view('configuracion', compact('ajuste', 'mail', 'camara', 'mapas', 'cloudinary', 'reparacion', 'esAdministrador', 'esSuperAdministrador'));
     }
 
     public function update(Request $request)
@@ -58,6 +62,10 @@ class AjusteController extends Controller
 
         if ($request->has('cloudinary')) {
             CloudinarySettings::save($request->cloudinary);
+        }
+
+        if ($request->has('reparacion') && \Auth::user()->esSuperAdministrador()) {
+            \App\Support\ReparacionSettings::save($request->reparacion);
         }
 
         return response()->json(['ok' => true, 'message' => 'Ajustes actualizados']);

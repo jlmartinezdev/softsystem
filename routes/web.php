@@ -111,6 +111,33 @@ Route::get('caja/movimiento/{id}','MovimientoCajaController@informe')->name('caj
     Route::delete('presupuesto/{id}', 'PresupuestoController@destroy')->name('presupuesto.destroy');
     Route::get('presupuesto/{id}/pdf', 'PresupuestoController@pdf')->name('presupuesto.pdf');
     Route::get('presupuesto/{id}/para-venta', 'PresupuestoController@getParaVenta')->name('presupuesto.paraventa');
+
+    // SERVICIO TÉCNICO Y REPARACIÓN DE CELULARES
+    Route::post('reparacion/toggle-modulo', 'ReparacionController@toggleModulo')->name('reparacion.toggle_modulo');
+    Route::get('reparacion/repuestos/buscar', 'ReparacionController@buscarRepuestos')->name('reparacion.repuestos.buscar');
+    Route::post('reparacion/imagen/subir', 'ReparacionController@subirImagen')->name('reparacion.imagen.subir');
+    Route::post('reparacion/imagen/base64', 'ReparacionController@subirImagenBase64')->name('reparacion.imagen.base64');
+    Route::post('reparacion/imagen/camara', 'ReparacionController@capturarImagenCamara')->name('reparacion.imagen.camara');
+    Route::get('reparacion', 'ReparacionController@index')->name('reparacion.index');
+    Route::post('reparacion', 'ReparacionController@store')->name('reparacion.store');
+    Route::get('reparacion/{id}', 'ReparacionController@show')->name('reparacion.show');
+    Route::put('reparacion/{id}/recepcion', 'ReparacionController@updateRecepcion')->name('reparacion.recepcion.update');
+    Route::put('reparacion/{id}/diagnostico', 'ReparacionController@guardarDiagnostico')->name('reparacion.diagnostico');
+    Route::put('reparacion/{id}/estado', 'ReparacionController@cambiarEstado')->name('reparacion.estado');
+    Route::post('reparacion/{id}/repuestos', 'ReparacionController@agregarRepuesto')->name('reparacion.repuestos.add');
+    Route::delete('reparacion/{id}/repuestos/{repuestoId}', 'ReparacionController@eliminarRepuesto')->name('reparacion.repuestos.del');
+    Route::delete('reparacion/{id}/imagen/{imagenId}', 'ReparacionController@eliminarImagen')->name('reparacion.imagen.del');
+    Route::post('reparacion/{id}/pagos', 'ReparacionController@registrarPago')->name('reparacion.pagos.add');
+    Route::delete('reparacion/{id}/pagos/{pagoId}', 'ReparacionController@eliminarPago')->name('reparacion.pagos.del');
+    Route::post('reparacion/{id}/entregar', 'ReparacionController@entregarEquipo')->name('reparacion.entregar');
+    Route::post('reparacion/{id}/garantia', 'ReparacionController@registrarGarantia')->name('reparacion.garantia.add');
+    Route::put('reparacion/{id}/garantia/{garantiaId}', 'ReparacionController@actualizarGarantia')->name('reparacion.garantia.update');
+    Route::post('reparacion/{id}/garantia-reingreso', 'ReparacionController@crearReingresoGarantia')->name('reparacion.garantia.reingreso');
+    Route::delete('reparacion/{id}', 'ReparacionController@destroy')->name('reparacion.destroy');
+    Route::get('reparacion/{id}/para-venta', 'ReparacionController@getParaVenta')->name('reparacion.paraventa');
+    Route::get('reparacion/{id}/pdf/orden', 'ReparacionController@pdfOrden')->name('reparacion.pdf.orden');
+    Route::get('reparacion/{id}/pdf/etiqueta', 'ReparacionController@pdfEtiqueta')->name('reparacion.pdf.etiqueta');
+    Route::get('reparacion/{id}/pdf/garantia', 'ReparacionController@pdfGarantia')->name('reparacion.pdf.garantia');
     
     //COMPRA
     Route::get('infcompra', 'CompraController@indexInf')->name('infcompra');

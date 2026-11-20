@@ -820,6 +820,29 @@
                 </div>
             </div>
         </div>
+
+        @if (!empty($esSuperAdministrador))
+        <!-- KPI 7: Módulo de Reparación de Celulares -->
+        <div class="kpi-card" :class="{ 'active': activeTab === 'reparacion' }" @click="activeTab = 'reparacion'">
+            <div class="kpi-icon-box" :class="reparacion.activo ? 'kpi-icon-green' : 'kpi-icon-amber'">
+                <i class="fa fa-mobile-alt"></i>
+            </div>
+            <div>
+                <div class="kpi-label">Servicio Técnico / Taller</div>
+                <div class="kpi-val font-cairo">
+                    <span v-if="reparacion.activo" class="text-success font-weight-bold">
+                        <i class="fa fa-check-circle mr-1"></i> Habilitado
+                    </span>
+                    <span v-else class="text-danger font-weight-bold">
+                        <i class="fa fa-power-off mr-1"></i> Deshabilitado
+                    </span>
+                </div>
+                <div class="kpi-sub">
+                    Prefijo @{{ reparacion.prefijo_orden }} · Garantía @{{ reparacion.garantia_dias_default }} días
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 
     <!-- MODERN NAVIGATION TABS -->
@@ -860,6 +883,15 @@
                 @{{ cloudinary.driver === 'cloudinary' ? 'Cloudinary' : 'Local' }}
             </span>
         </button>
+        @if (!empty($esSuperAdministrador))
+        <button class="settings-tab-btn" :class="{ 'active': activeTab === 'reparacion' }" @click="activeTab = 'reparacion'">
+            <i class="fa fa-mobile-alt"></i>
+            <span>Servicio Técnico (Superadmin)</span>
+            <span class="tab-badge" :class="reparacion.activo ? 'badge-success' : 'badge-danger'">
+                @{{ reparacion.activo ? 'Habilitado' : 'Off' }}
+            </span>
+        </button>
+        @endif
     </div>
 
     <!-- ========================================== -->
@@ -1619,6 +1651,94 @@
         </div>
     </div>
 
+    @if (!empty($esSuperAdministrador))
+    <!-- ========================================== -->
+    <!-- TAB 7: SERVICIO TÉCNICO / REPARACIONES     -->
+    <!-- ========================================== -->
+    <div v-show="activeTab === 'reparacion'">
+        <div class="settings-card">
+            <div class="card-section-title">
+                <div>
+                    <h5 class="font-cairo"><i class="fa fa-mobile-alt text-success"></i> Control Maestro del Módulo de Reparación de Celulares</h5>
+                    <p class="card-section-desc">Exclusivo Superadministrador. Habilitá o deshabilitá el módulo de Servicio Técnico en todo el sistema y configurá las reglas de taller y garantías.</p>
+                </div>
+                <a href="{{ route('reparacion.index') }}" class="btn btn-outline-success btn-sm font-weight-bold">
+                    <i class="fa fa-external-link-alt mr-1"></i> Ir a Servicio Técnico
+                </a>
+            </div>
+
+            <!-- Switch Maestro de Habilitación -->
+            <div class="modern-switch" :style="reparacion.activo ? 'border-color: var(--dash-primary); background: var(--dash-primary-light);' : ''">
+                <div class="switch-label-wrap">
+                    <div class="switch-title font-cairo">
+                        <i class="fa fa-power-off" :class="reparacion.activo ? 'text-success' : 'text-danger'"></i>
+                        <span>Habilitar Módulo de Administración de Reparación de Celulares</span>
+                        <span class="badge ml-2" :class="reparacion.activo ? 'badge-success' : 'badge-danger'">
+                            @{{ reparacion.activo ? 'ACTIVO EN EL SISTEMA' : 'DESHABILITADO' }}
+                        </span>
+                    </div>
+                    <span class="switch-desc">
+                        Al estar activo, el módulo aparece en el menú de Operaciones y permite a los roles autorizados registrar recepciones, diagnósticos, fotos, repuestos, entregas y garantías.
+                    </span>
+                </div>
+                <label class="switch-ui mb-0">
+                    <input type="checkbox" v-model="reparacion.activo">
+                    <span class="switch-slider"></span>
+                </label>
+            </div>
+
+            <!-- Switch Descuento de Stock de Repuestos -->
+            <div class="modern-switch">
+                <div class="switch-label-wrap">
+                    <div class="switch-title font-cairo">
+                        <i class="fa fa-boxes text-primary"></i>
+                        <span>Descontar Stock de Repuestos Automáticamente al Asignar en Taller</span>
+                    </div>
+                    <span class="switch-desc">
+                        Cuando el técnico agrega un repuesto del catálogo general a la orden de reparación, se descuenta inmediatamente de la existencia de la sucursal (y se repone si se retira o anula la orden).
+                    </span>
+                </div>
+                <label class="switch-ui mb-0">
+                    <input type="checkbox" v-model="reparacion.descontar_stock">
+                    <span class="switch-slider"></span>
+                </label>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4 mb-3">
+                    <label class="pos-label"><i class="fa fa-hashtag text-muted"></i> Prefijo de Nro. de Orden</label>
+                    <input type="text" class="pos-input font-cairo" v-model="reparacion.prefijo_orden" placeholder="ST-" maxlength="10">
+                    <span class="pos-help-text">Ej: <code>ST-</code> generará órdenes <code>ST-000001</code>.</span>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="pos-label"><i class="fa fa-shield-alt text-muted"></i> Días de Garantía por Defecto</label>
+                    <input type="number" class="pos-input font-cairo" v-model.number="reparacion.garantia_dias_default" min="0" max="365">
+                    <span class="pos-help-text">Plazo sugerido automáticamente al entregar un celular reparado (ej. 30, 60 o 90 días).</span>
+                </div>
+                <div class="col-md-4 mb-3 d-flex align-items-center">
+                    <div class="p-3 rounded border bg-light-panel w-100 small text-muted">
+                        <i class="fa fa-user-shield text-success mr-1"></i>
+                        <strong>Permisos por Rol:</strong> Podés definir qué roles pueden diagnosticar, cargar repuestos, entregar o ver costos desde <a href="{{ route('permiso.index') }}" class="font-weight-bold">Privilegios y Permisos</a>.
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col-md-6 mb-3">
+                    <label class="pos-label"><i class="fa fa-file-signature text-muted"></i> Condiciones Impresas en Comprobante de Recepción</label>
+                    <textarea class="pos-input" rows="5" v-model="reparacion.condiciones_recepcion" placeholder="Términos y condiciones de recepción..."></textarea>
+                    <span class="pos-help-text">Se imprime al pie de la Orden de Recepción que firma el cliente al dejar el equipo.</span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="pos-label"><i class="fa fa-award text-muted"></i> Cláusulas del Certificado de Entrega y Garantía</label>
+                    <textarea class="pos-input" rows="5" v-model="reparacion.condiciones_garantia" placeholder="Condiciones de cobertura de garantía..."></textarea>
+                    <span class="pos-help-text">Se imprime en el Certificado de Garantía al entregar el celular reparado.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- FLOATING BOTTOM SAVE BAR -->
     <div class="floating-save-bar">
         <div class="d-flex align-items-center gap-2">
@@ -1730,7 +1850,15 @@
                 auto_optimize: {{ !empty($cloudinary['auto_optimize']) ? 'true' : 'false' }},
                 show_secret: false
             },
-            cloudinaryTesting: false
+            cloudinaryTesting: false,
+            reparacion: {
+                activo: {{ !empty($reparacion['activo']) ? 'true' : 'false' }},
+                descontar_stock: {{ !empty($reparacion['descontar_stock']) ? 'true' : 'false' }},
+                garantia_dias_default: {{ (int) ($reparacion['garantia_dias_default'] ?? 30) }},
+                prefijo_orden: @json($reparacion['prefijo_orden'] ?? 'ST-'),
+                condiciones_recepcion: @json($reparacion['condiciones_recepcion'] ?? ''),
+                condiciones_garantia: @json($reparacion['condiciones_garantia'] ?? '')
+            }
         },
         computed: {
             proveedorEfectivo: function () {
@@ -1852,7 +1980,8 @@
                     mail: this.mailPayload(),
                     camara: this.camaraPayload(),
                     mapas: this.mapasPayload(),
-                    cloudinary: this.cloudinaryPayload()
+                    cloudinary: this.cloudinaryPayload(),
+                    reparacion: this.reparacion
                 });
             },
             updateVenta: function () {

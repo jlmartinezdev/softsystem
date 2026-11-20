@@ -4285,6 +4285,9 @@
                                             codigo: it.codigo,
                                             c_barra: it.c_barra || '',
                                             descripcion: it.descripcion,
+                                            descripcion_libre: it.descripcion_libre || (it.es_libre ? it.descripcion : null),
+                                            es_libre: !!it.es_libre,
+                                            stock_ya_descontado: !!it.stock_ya_descontado,
                                             cantidad: it.cantidad,
                                             precio: it.precio,
                                             costo: it.costo || 0,
@@ -4299,12 +4302,18 @@
                                     if (presData.presupuesto && presData.presupuesto.condicion) {
                                         actCarro.ventaCabecera.condicionventa = presData.presupuesto.condicion;
                                     }
+                                    if (presData.presupuesto && presData.presupuesto.reparacion_id) {
+                                        actCarro.ventaCabecera.reparacion_id = presData.presupuesto.reparacion_id;
+                                    }
                                     self.saveDatos();
                                 }
+                                var esRep = presData.presupuesto && presData.presupuesto.reparacion_id;
                                 Swal.fire({
                                     icon: 'success',
-                                    title: 'Presupuesto cargado al ticket',
-                                    text: 'Se importaron los artículos del Presupuesto #' + (presData.presupuesto ? presData.presupuesto.pre_numero : '') + '.',
+                                    title: esRep ? 'Orden de Reparación cargada al ticket' : 'Presupuesto cargado al ticket',
+                                    text: esRep
+                                        ? 'Se importó la Orden de Servicio Técnico ' + (presData.presupuesto.pre_numero || '') + '.'
+                                        : 'Se importaron los artículos del Presupuesto #' + (presData.presupuesto ? presData.presupuesto.pre_numero : '') + '.',
                                     timer: 3000,
                                     showConfirmButton: false,
                                     toast: true,

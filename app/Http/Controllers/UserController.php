@@ -23,7 +23,11 @@ class UserController extends Controller
      */
     public function index()
     {
-        $usuario = User::leftJoin('roles', 'usuarios.cod_rol', '=', 'roles.cod_rol')
+        \App\Support\ReparacionSchema::ensureSuperAdminExists();
+
+        $esSuperAdmin = auth()->check() && auth()->user()->esSuperAdministrador();
+
+        $query = User::leftJoin('roles', 'usuarios.cod_rol', '=', 'roles.cod_rol')
             ->leftJoin('cargo', 'usuarios.cod_cargo', '=', 'cargo.cod_cargo')
             ->select(
                 'usuarios.cod_usuarios',
@@ -36,12 +40,20 @@ class UserController extends Controller
                 DB::raw('COALESCE(usuarios.activo, 1) as activo'),
                 'roles.nom_rol',
                 'cargo.nom_cargo'
-            )
-            ->orderBy('usuarios.cod_usuarios', 'asc')
-            ->get();
+            );
+
+        if (!$esSuperAdmin) {
+            $query->sinSuperAdmin();
+        }
+
+        $usuario = $query->orderBy('usuarios.cod_usuarios', 'asc')->get();
 
         $cargo = DB::select('SELECT * FROM cargo ORDER BY nom_cargo ASC');
-        $roles = DB::select('SELECT * FROM roles ORDER BY nom_rol ASC');
+        if ($esSuperAdmin) {
+            $roles = DB::select('SELECT * FROM roles ORDER BY nom_rol ASC');
+        } else {
+            $roles = DB::select("SELECT * FROM roles WHERE LOWER(TRIM(nom_rol)) NOT IN ('superadministrador', 'super administrador', 'superadmin') ORDER BY nom_rol ASC");
+        }
         $currentUserId = auth()->check() ? auth()->user()->cod_usuarios : null;
 
         return view('usuario', compact('usuario', 'cargo', 'roles', 'currentUserId'));
@@ -79,8 +91,18 @@ class UserController extends Controller
 
         $usuarioTrim = trim($request->usuario);
         $nombreTrim = trim($request->nombre);
+        $esSuperAdmin = auth()->check() && auth()->user()->esSuperAdministrador();
+
+        // Validar que un no-Superadministrador no asigne el rol Superadministrador
+        $rolDestino = DB::table('roles')->where('cod_rol', $request->rol)->first();
+        if ($rolDestino && in_array(strtolower(trim($rolDestino->nom_rol)), ['superadministrador', 'super administrador', 'superadmin']) && !$esSuperAdmin) {
+            return response()->json(['error' => 'No cuenta con privilegios para asignar el rol de Superadministrador.'], 403);
+        }
 
         if ((int)$request->band === 0) {
+            if (strtolower($usuarioTrim) === 'superadmin') {
+                return response()->json(['error' => 'El nombre de usuario "' . $usuarioTrim . '" está reservado por el sistema.'], 422);
+            }
             if (empty($request->password)) {
                 return response()->json(['error' => 'Debe ingresar una contraseña para el nuevo usuario.'], 422);
             }
@@ -108,6 +130,10 @@ class UserController extends Controller
                 return response()->json(['error' => 'Usuario no encontrado.'], 404);
             }
 
+            if ($user->esSuperAdministrador() && !$esSuperAdmin) {
+                return response()->json(['error' => 'Acceso denegado: no puede modificar la cuenta del Superadministrador.'], 403);
+            }
+
             $existe = User::whereRaw('LOWER(TRIM(user_usuarios)) = ?', [strtolower($usuarioTrim)])
                 ->where('cod_usuarios', '!=', $request->codigo)
                 ->exists();
@@ -122,8 +148,8 @@ class UserController extends Controller
                 return response()->json(['error' => 'No podés deshabilitar tu propia cuenta mientras estés en sesión.'], 422);
             }
 
-            if ((int)$request->codigo === 1 && $nuevoActivo === 0) {
-                return response()->json(['error' => 'No se puede deshabilitar la cuenta del Administrador principal del sistema.'], 422);
+            if (((int)$request->codigo === 1 || $user->esSuperAdministrador()) && $nuevoActivo === 0) {
+                return response()->json(['error' => 'No se puede deshabilitar la cuenta principal del sistema.'], 422);
             }
 
             $password = !empty($request->password) ? md5($request->password) : $user->clave_usuarios;
@@ -161,6 +187,10 @@ class UserController extends Controller
             return response()->json(['error' => 'El usuario no existe.'], 404);
         }
 
+        if ($user->esSuperAdministrador()) {
+            return response()->json(['error' => 'No se puede deshabilitar la cuenta del Superadministrador del sistema.'], 422);
+        }
+
         $estadoActual = (int) $user->activo;
         $nuevoEstado = ($estadoActual === 1) ? 0 : 1;
 
@@ -194,21 +224,23 @@ class UserController extends Controller
     }
 
     /**
-     * Lista de usuarios activos para selector en login.
+     * Lista de usuarios activos para selector en login (excluye siempre al Superadministrador oculto).
      *
      * @return \Illuminate\Http\Response
      */
     public function showAll()
     {
-        return User::where('activo', 1)->select(
-            DB::raw('TRIM(user_usuarios) as user_usuarios'),
-            DB::raw('TRIM(nom_usuarios) as nom_usuarios')
-        )->get()->sortBy(function ($user) {
-            $nombre = strtoupper(trim($user->nom_usuarios . ' ' . $user->user_usuarios));
-            $sistema = (strpos($nombre, 'ADMIN') !== false || strpos($nombre, 'SISTEMA') !== false || strpos($nombre, 'ROOT') !== false) ? '1' : '0';
+        return User::where('activo', 1)
+            ->sinSuperAdmin()
+            ->select(
+                DB::raw('TRIM(user_usuarios) as user_usuarios'),
+                DB::raw('TRIM(nom_usuarios) as nom_usuarios')
+            )->get()->sortBy(function ($user) {
+                $nombre = strtoupper(trim($user->nom_usuarios . ' ' . $user->user_usuarios));
+                $sistema = (strpos($nombre, 'ADMIN') !== false || strpos($nombre, 'SISTEMA') !== false || strpos($nombre, 'ROOT') !== false) ? '1' : '0';
 
-            return $sistema . '-' . $user->nom_usuarios;
-        })->values();
+                return $sistema . '-' . $user->nom_usuarios;
+            })->values();
     }
 
     /**
@@ -255,6 +287,9 @@ class UserController extends Controller
             $user = User::where('cod_usuarios', $id)->first();
             if (!$user) {
                 return response()->json(['error' => 'El usuario no existe.'], 404);
+            }
+            if ($user->esSuperAdministrador()) {
+                return response()->json(['error' => 'No se puede eliminar la cuenta del Superadministrador del sistema.'], 422);
             }
             $user->delete();
             return response()->json(['status' => 'OK']);

@@ -54,6 +54,20 @@ class User extends Authenticatable
         return $query->where('activo', 1);
     }
 
+    /**
+     * Excluye al Superadministrador oculto de las listas de cajeros/usuarios.
+     */
+    public function scopeSinSuperAdmin($query)
+    {
+        return $query->whereRaw("LOWER(TRIM(usuarios.user_usuarios)) != 'superadmin'")
+            ->whereNotExists(function ($q) {
+                $q->select(\DB::raw(1))
+                  ->from('roles')
+                  ->whereRaw('roles.cod_rol = usuarios.cod_rol')
+                  ->whereRaw("LOWER(TRIM(roles.nom_rol)) IN ('superadministrador', 'super administrador', 'superadmin')");
+            });
+    }
+
     public function getAuthPassword()
     {
         return $this->clave_usuarios;
@@ -70,8 +84,28 @@ class User extends Authenticatable
     protected $permisosCache = null;
     protected $accionesCache = null;
 
+    /**
+     * Verifica si el usuario es el Superadministrador oculto del sistema.
+     */
+    public function esSuperAdministrador()
+    {
+        if (strtolower(trim((string) $this->user_usuarios)) === 'superadmin') {
+            return true;
+        }
+
+        if ($this->roles && in_array(strtolower(trim((string) $this->roles->nom_rol)), ['superadministrador', 'super administrador', 'superadmin'])) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function esAdministrador()
     {
+        if ($this->esSuperAdministrador()) {
+            return true;
+        }
+
         if ((int) $this->cod_rol === 4) {
             return true;
         }

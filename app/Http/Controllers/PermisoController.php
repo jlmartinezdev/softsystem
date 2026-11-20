@@ -17,6 +17,7 @@ class PermisoController extends Controller
 {
     public function __construct()
     {
+        \App\Support\ReparacionSchema::ensureExists();
         $this->middleware('auth');
         $this->middleware('administrador');
     }
@@ -26,11 +27,23 @@ class PermisoController extends Controller
      */
     public function index(Request $request)
     {
-        $roles = Roles::withCount('us')->orderBy('cod_rol')->get();
-        $formularios = Formulario::where('activo', 1)
+        $esSuperAdministrador = Auth::user()->esSuperAdministrador();
+        $moduloReparacionActivo = \App\Support\ReparacionSettings::isModuloActivo();
+
+        $rolesQuery = Roles::withCount('us')->orderBy('cod_rol');
+        if (!$esSuperAdministrador) {
+            $rolesQuery->whereRaw("LOWER(TRIM(nom_rol)) NOT IN ('superadministrador', 'super administrador', 'superadmin')");
+        }
+        $roles = $rolesQuery->get();
+
+        $formulariosQuery = Formulario::where('activo', 1)
             ->orderBy('for_categoria')
-            ->orderBy('for_orden')
-            ->get();
+            ->orderBy('for_orden');
+
+        if (!$moduloReparacionActivo && !$esSuperAdministrador) {
+            $formulariosQuery->where('for_nombre', '!=', 'reparacion');
+        }
+        $formularios = $formulariosQuery->get();
 
         $acciones = Accion::with('formulario')
             ->orderBy('orden')
@@ -44,7 +57,7 @@ class PermisoController extends Controller
         // Acciones del rol seleccionado
         $accionesRol = AccionRol::where('cod_rol', $rolSeleccionadoId)->get()->keyBy('cod_per');
 
-        return view('permiso', compact('roles', 'formularios', 'acciones', 'rolSeleccionadoId', 'permisosRol', 'accionesRol'));
+        return view('permiso', compact('roles', 'formularios', 'acciones', 'rolSeleccionadoId', 'permisosRol', 'accionesRol', 'moduloReparacionActivo', 'esSuperAdministrador'));
     }
 
     /**
@@ -53,6 +66,13 @@ class PermisoController extends Controller
     public function getPermisosRol($cod_rol)
     {
         $rol = Roles::withCount('us')->findOrFail($cod_rol);
+
+        if (in_array(strtolower(trim($rol->nom_rol)), ['superadministrador', 'super administrador', 'superadmin']) && !Auth::user()->esSuperAdministrador()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Acceso exclusivo para el Superadministrador del sistema.',
+            ], 403);
+        }
 
         $permisosRaw = DB::table('permiso')
             ->where('cod_rol', $cod_rol)
@@ -250,6 +270,13 @@ class PermisoController extends Controller
         }
 
         $rol = Roles::withCount('us')->findOrFail($cod_rol);
+
+        if (in_array(strtolower(trim($rol->nom_rol)), ['superadministrador', 'super administrador', 'superadmin'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se puede eliminar el rol de Superadministrador del sistema.',
+            ], 422);
+        }
 
         if ($rol->us_count > 0) {
             return response()->json([
