@@ -4305,15 +4305,26 @@
                                     if (presData.presupuesto && presData.presupuesto.reparacion_id) {
                                         actCarro.ventaCabecera.reparacion_id = presData.presupuesto.reparacion_id;
                                     }
+                                    if (presData.presupuesto && presData.presupuesto.celular_imei_id) {
+                                        actCarro.ventaCabecera.celular_imei_id = presData.presupuesto.celular_imei_id;
+                                    }
+                                    if (presData.presupuesto && presData.presupuesto.canje_id) {
+                                        actCarro.ventaCabecera.canje_id = presData.presupuesto.canje_id;
+                                    }
                                     self.saveDatos();
                                 }
                                 var esRep = presData.presupuesto && presData.presupuesto.reparacion_id;
+                                var esImei = presData.presupuesto && presData.presupuesto.celular_imei_id;
                                 Swal.fire({
                                     icon: 'success',
-                                    title: esRep ? 'Orden de Reparación cargada al ticket' : 'Presupuesto cargado al ticket',
-                                    text: esRep
-                                        ? 'Se importó la Orden de Servicio Técnico ' + (presData.presupuesto.pre_numero || '') + '.'
-                                        : 'Se importaron los artículos del Presupuesto #' + (presData.presupuesto ? presData.presupuesto.pre_numero : '') + '.',
+                                    title: esImei
+                                        ? 'Equipo por IMEI / Plan Canje cargado al ticket'
+                                        : (esRep ? 'Orden de Reparación cargada al ticket' : 'Presupuesto cargado al ticket'),
+                                    text: esImei
+                                        ? 'Se importó la operación ' + (presData.presupuesto.pre_numero || '') + ' al Punto de Venta.'
+                                        : (esRep
+                                            ? 'Se importó la Orden de Servicio Técnico ' + (presData.presupuesto.pre_numero || '') + '.'
+                                            : 'Se importaron los artículos del Presupuesto #' + (presData.presupuesto ? presData.presupuesto.pre_numero : '') + '.'),
                                     timer: 3000,
                                     showConfirmButton: false,
                                     toast: true,

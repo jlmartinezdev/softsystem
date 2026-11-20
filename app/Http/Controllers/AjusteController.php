@@ -23,7 +23,7 @@ class AjusteController extends Controller
 
     public function index()
     {
-        \App\Support\ReparacionSchema::ensureExists();
+        \App\Support\ComisionSchema::ensureExists();
         $ajuste = Ajuste::whereIn('categoria', ['caja', 'pos'])->orderBy('id')->get();
         $mail = MailSettings::all();
         $mail['password'] = '';
@@ -31,10 +31,12 @@ class AjusteController extends Controller
         $mapas = MapSettings::publicConfig();
         $cloudinary = CloudinarySettings::publicConfig();
         $reparacion = \App\Support\ReparacionSettings::all();
+        $imeiConfig = \App\Support\CelularImeiSettings::all();
+        $comisionConfig = \App\Support\ComisionSettings::all();
         $esAdministrador = \Auth::user()->esAdministrador();
         $esSuperAdministrador = \Auth::user()->esSuperAdministrador();
 
-        return view('configuracion', compact('ajuste', 'mail', 'camara', 'mapas', 'cloudinary', 'reparacion', 'esAdministrador', 'esSuperAdministrador'));
+        return view('configuracion', compact('ajuste', 'mail', 'camara', 'mapas', 'cloudinary', 'reparacion', 'imeiConfig', 'comisionConfig', 'esAdministrador', 'esSuperAdministrador'));
     }
 
     public function update(Request $request)
@@ -66,6 +68,14 @@ class AjusteController extends Controller
 
         if ($request->has('reparacion') && \Auth::user()->esSuperAdministrador()) {
             \App\Support\ReparacionSettings::save($request->reparacion);
+        }
+
+        if ($request->has('imei_config') && \Auth::user()->esSuperAdministrador()) {
+            \App\Support\CelularImeiSettings::save($request->imei_config);
+        }
+
+        if ($request->has('comision_config') && \Auth::user()->esSuperAdministrador()) {
+            \App\Support\ComisionSettings::save($request->comision_config);
         }
 
         return response()->json(['ok' => true, 'message' => 'Ajustes actualizados']);

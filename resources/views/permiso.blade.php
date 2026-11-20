@@ -507,6 +507,108 @@
             </div>
         </div>
     </div>
+
+    <div class="card-modern mb-3 py-2 px-3" :style="moduloImeiActivo ? 'border-left: 4px solid #0284c7;' : 'border-left: 4px solid #e11d48;'">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="d-flex align-items-center">
+                <div class="mr-3 d-flex align-items-center justify-content-center rounded"
+                     :style="moduloImeiActivo ? 'width:40px;height:40px;background:#e0f2fe;color:#0284c7;' : 'width:40px;height:40px;background:#fff1f2;color:#e11d48;'">
+                    <i class="fas fa-exchange-alt fa-lg"></i>
+                </div>
+                <div>
+                    <div class="font-cairo font-weight-bold" style="font-size: 0.98rem;">
+                        Módulo de Compra-Venta de Celulares por IMEI y Plan Canje (Trade-In)
+                        <span class="badge ml-2" :class="moduloImeiActivo ? 'badge-info' : 'badge-danger'">
+                            @{{ moduloImeiActivo ? 'HABILITADO' : 'DESHABILITADO' }}
+                        </span>
+                    </div>
+                    <div class="text-muted small">
+                        Control exclusivo de Superadministrador: habilita o deshabilita el inventario por IMEI, Plan Canje, contratos legales, reacondicionamiento y garantías.
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center">
+                <a v-if="moduloImeiActivo" href="{{ route('imei.index') }}" class="btn btn-xs btn-outline-info font-weight-bold mr-2">
+                    <i class="fas fa-external-link-alt mr-1"></i> Abrir Módulo
+                </a>
+                <button type="button" class="btn btn-sm font-weight-bold font-cairo"
+                        :class="moduloImeiActivo ? 'btn-outline-danger' : 'btn-info'"
+                        :disabled="cambiandoModuloImei"
+                        @click="toggleModuloImei">
+                    <i class="fas mr-1" :class="cambiandoModuloImei ? 'fa-spinner fa-spin' : (moduloImeiActivo ? 'fa-power-off' : 'fa-check-circle')"></i>
+                    @{{ moduloImeiActivo ? 'Deshabilitar Módulo' : 'Habilitar Módulo' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-modern mb-3 py-2 px-3" :style="moduloComisionesActivo ? 'border-left: 4px solid #7e22ce;' : 'border-left: 4px solid #e11d48;'">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="d-flex align-items-center">
+                <div class="mr-3 d-flex align-items-center justify-content-center rounded"
+                     :style="moduloComisionesActivo ? 'width:40px;height:40px;background:#f3e8ff;color:#7e22ce;' : 'width:40px;height:40px;background:#fff1f2;color:#e11d48;'">
+                    <i class="fas fa-percentage fa-lg"></i>
+                </div>
+                <div>
+                    <div class="font-cairo font-weight-bold" style="font-size: 0.98rem;">
+                        Módulo de Comisiones y Liquidaciones de Técnicos y Vendedores
+                        <span class="badge ml-2" :class="moduloComisionesActivo ? 'badge-success' : 'badge-danger'">
+                            @{{ moduloComisionesActivo ? 'HABILITADO' : 'DESHABILITADO' }}
+                        </span>
+                    </div>
+                    <div class="text-muted small">
+                        Control exclusivo de Superadministrador: habilita o deshabilita el cálculo y liquidación de comisiones por Mano de Obra, Ventas POS, IMEI y Cobranzas.
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center">
+                <a v-if="moduloComisionesActivo" href="{{ route('comision.index') }}" class="btn btn-xs btn-outline-primary font-weight-bold mr-2">
+                    <i class="fas fa-external-link-alt mr-1"></i> Abrir Módulo
+                </a>
+                <button type="button" class="btn btn-sm font-weight-bold font-cairo"
+                        :class="moduloComisionesActivo ? 'btn-outline-danger' : 'btn-success'"
+                        :disabled="cambiandoModuloComisiones"
+                        @click="toggleModuloComisiones">
+                    <i class="fas mr-1" :class="cambiandoModuloComisiones ? 'fa-spinner fa-spin' : (moduloComisionesActivo ? 'fa-power-off' : 'fa-check-circle')"></i>
+                    @{{ moduloComisionesActivo ? 'Deshabilitar Módulo' : 'Habilitar Módulo' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-modern mb-3 py-2 px-3" :style="moduloFinanzasActivo ? 'border-left: 4px solid #0d9488;' : 'border-left: 4px solid #e11d48;'">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="d-flex align-items-center">
+                <div class="mr-3 d-flex align-items-center justify-content-center rounded"
+                     :style="moduloFinanzasActivo ? 'width:40px;height:40px;background:#ccfbf1;color:#0d9488;' : 'width:40px;height:40px;background:#fff1f2;color:#e11d48;'">
+                    <i class="fas fa-chart-pie fa-lg"></i>
+                </div>
+                <div>
+                    <div class="font-cairo font-weight-bold" style="font-size: 0.98rem;">
+                        Módulo de Gastos Operativos, Cuentas a Pagar y Estado de Resultados (Ganancia Neta Real)
+                        <span class="badge ml-2" :class="moduloFinanzasActivo ? 'badge-success' : 'badge-danger'">
+                            @{{ moduloFinanzasActivo ? 'HABILITADO' : 'DESHABILITADO' }}
+                        </span>
+                    </div>
+                    <div class="text-muted small">
+                        Control exclusivo de Superadministrador: habilita el registro de gastos fijos/variables, cuentas por pagar a proveedores y el Estado de Resultados consolidado.
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center">
+                <a v-if="moduloFinanzasActivo" href="{{ route('finanzas.index') }}" class="btn btn-xs btn-outline-info font-weight-bold mr-2">
+                    <i class="fas fa-external-link-alt mr-1"></i> Abrir Módulo
+                </a>
+                <button type="button" class="btn btn-sm font-weight-bold font-cairo"
+                        :class="moduloFinanzasActivo ? 'btn-outline-danger' : 'btn-success'"
+                        :disabled="cambiandoModuloFinanzas"
+                        @click="toggleModuloFinanzas">
+                    <i class="fas mr-1" :class="cambiandoModuloFinanzas ? 'fa-spinner fa-spin' : (moduloFinanzasActivo ? 'fa-power-off' : 'fa-check-circle')"></i>
+                    @{{ moduloFinanzasActivo ? 'Deshabilitar Módulo' : 'Habilitar Módulo' }}
+                </button>
+            </div>
+        </div>
+    </div>
     @endif
 
     <!-- ========================================== -->
@@ -1081,6 +1183,12 @@ ALTER TABLE `roles`
             guardando: false,
             moduloReparacionActivo: {{ !empty($moduloReparacionActivo) ? 'true' : 'false' }},
             cambiandoModuloReparacion: false,
+            moduloImeiActivo: {{ !empty($moduloImeiActivo) ? 'true' : 'false' }},
+            cambiandoModuloImei: false,
+            moduloComisionesActivo: {{ !empty($moduloComisionesActivo) ? 'true' : 'false' }},
+            cambiandoModuloComisiones: false,
+            moduloFinanzasActivo: {{ !empty($moduloFinanzasActivo) ? 'true' : 'false' }},
+            cambiandoModuloFinanzas: false,
 
             // Modal Rol
             guardandoRol: false,
@@ -1453,6 +1561,75 @@ ALTER TABLE `roles`
                     Swal.fire('Error', 'No se pudo cambiar el estado del módulo.', 'error');
                 }).finally(function () {
                     self.cambiandoModuloReparacion = false;
+                });
+            },
+            toggleModuloImei: function () {
+                var self = this;
+                this.cambiandoModuloImei = true;
+                axios.post('{{ route("imei.toggle_modulo") }}', {
+                    activo: !this.moduloImeiActivo ? 1 : 0
+                }).then(function (res) {
+                    if (res.data && res.data.success) {
+                        self.moduloImeiActivo = !!res.data.activo;
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: res.data.message,
+                            showConfirmButton: false,
+                            timer: 2500
+                        });
+                    }
+                }).catch(function () {
+                    Swal.fire('Error', 'No se pudo cambiar el estado del módulo.', 'error');
+                }).finally(function () {
+                    self.cambiandoModuloImei = false;
+                });
+            },
+            toggleModuloComisiones: function () {
+                var self = this;
+                this.cambiandoModuloComisiones = true;
+                axios.post('{{ route("comision.toggle_modulo") }}', {
+                    activo: !this.moduloComisionesActivo ? 1 : 0
+                }).then(function (res) {
+                    if (res.data && res.data.success) {
+                        self.moduloComisionesActivo = !!res.data.activo;
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: res.data.message,
+                            showConfirmButton: false,
+                            timer: 2500
+                        });
+                    }
+                }).catch(function () {
+                    Swal.fire('Error', 'No se pudo cambiar el estado del módulo.', 'error');
+                }).finally(function () {
+                    self.cambiandoModuloComisiones = false;
+                });
+            },
+            toggleModuloFinanzas: function () {
+                var self = this;
+                this.cambiandoModuloFinanzas = true;
+                axios.post('{{ route("finanzas.toggle_modulo") }}', {
+                    activo: !this.moduloFinanzasActivo ? 1 : 0
+                }).then(function (res) {
+                    if (res.data && res.data.success) {
+                        self.moduloFinanzasActivo = !!res.data.activo;
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: res.data.message,
+                            showConfirmButton: false,
+                            timer: 2500
+                        });
+                    }
+                }).catch(function () {
+                    Swal.fire('Error', 'No se pudo cambiar el estado del módulo.', 'error');
+                }).finally(function () {
+                    self.cambiandoModuloFinanzas = false;
                 });
             },
             copiarSqlClipboard: function () {

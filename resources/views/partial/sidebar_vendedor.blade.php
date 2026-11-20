@@ -68,6 +68,33 @@
                 </li>
                 @endif
 
+                @if (\App\Support\CelularImeiSettings::isModuloActivo() && Auth::user()->tienePermiso('celulares_imei', 'open'))
+                <li class="nav-item">
+                    <a href="{{ route('imei.index') }}" id="m_imei" class="nav-link">
+                        <i class="nav-icon fas fa-exchange-alt text-primary"></i>
+                        <p>Equipos IMEI / Canje</p>
+                    </a>
+                </li>
+                @endif
+
+                @if (\App\Support\ComisionSettings::isModuloActivo() && Auth::user()->tienePermiso('comisiones', 'open'))
+                <li class="nav-item">
+                    <a href="{{ route('comision.index') }}" id="m_comision" class="nav-link">
+                        <i class="nav-icon fas fa-percentage text-success"></i>
+                        <p>Comisiones</p>
+                    </a>
+                </li>
+                @endif
+
+                @if (\App\Support\FinanzasSettings::isModuloActivo() && Auth::user()->tienePermiso('finanzas', 'open'))
+                <li class="nav-item">
+                    <a href="{{ route('finanzas.index') }}" id="m_finanzas" class="nav-link">
+                        <i class="nav-icon fas fa-chart-pie text-info"></i>
+                        <p>Gastos y Resultados</p>
+                    </a>
+                </li>
+                @endif
+
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link" id="m_caja">
                         <i class="nav-icon fas fa-cash-register"></i>

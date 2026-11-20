@@ -138,6 +138,50 @@ Route::get('caja/movimiento/{id}','MovimientoCajaController@informe')->name('caj
     Route::get('reparacion/{id}/pdf/orden', 'ReparacionController@pdfOrden')->name('reparacion.pdf.orden');
     Route::get('reparacion/{id}/pdf/etiqueta', 'ReparacionController@pdfEtiqueta')->name('reparacion.pdf.etiqueta');
     Route::get('reparacion/{id}/pdf/garantia', 'ReparacionController@pdfGarantia')->name('reparacion.pdf.garantia');
+
+    // COMPRA-VENTA DE CELULARES POR IMEI Y PLAN CANJE (TRADE-IN)
+    Route::post('celulares-imei/toggle-modulo', 'CelularImeiController@toggleModulo')->name('imei.toggle_modulo');
+    Route::get('celulares-imei/stock/buscar', 'CelularImeiController@buscarStockDisponible')->name('imei.stock.buscar');
+    Route::post('celulares-imei/imagen/subir', 'CelularImeiController@subirImagen')->name('imei.imagen.subir');
+    Route::post('celulares-imei/imagen/base64', 'CelularImeiController@subirImagenBase64')->name('imei.imagen.base64');
+    Route::post('celulares-imei/imagen/camara', 'CelularImeiController@capturarImagenCamara')->name('imei.imagen.camara');
+    Route::post('celulares-imei/canje', 'CelularImeiController@registrarPlanCanje')->name('imei.canje.store');
+    Route::get('celulares-imei/canje/{canjeId}/pdf', 'CelularImeiController@pdfContratoCanje')->name('imei.pdf.canje');
+    Route::get('celulares-imei', 'CelularImeiController@index')->name('imei.index');
+    Route::post('celulares-imei', 'CelularImeiController@storeEquipo')->name('imei.store');
+    Route::get('celulares-imei/{id}', 'CelularImeiController@show')->name('imei.show');
+    Route::put('celulares-imei/{id}', 'CelularImeiController@updateEquipo')->name('imei.update');
+    Route::post('celulares-imei/{id}/enviar-taller', 'CelularImeiController@enviarATaller')->name('imei.enviar_taller');
+    Route::post('celulares-imei/{id}/finalizar-taller', 'CelularImeiController@finalizarReacondicionamiento')->name('imei.finalizar_taller');
+    Route::post('celulares-imei/{id}/vender', 'CelularImeiController@venderDirecto')->name('imei.vender');
+    Route::get('celulares-imei/{id}/para-venta', 'CelularImeiController@getParaVenta')->name('imei.paraventa');
+    Route::delete('celulares-imei/{id}/imagen/{imagenId}', 'CelularImeiController@eliminarImagen')->name('imei.imagen.del');
+    Route::delete('celulares-imei/{id}', 'CelularImeiController@destroy')->name('imei.destroy');
+    Route::get('celulares-imei/{id}/pdf/etiqueta', 'CelularImeiController@pdfEtiqueta')->name('imei.pdf.etiqueta');
+    Route::get('celulares-imei/{id}/pdf/garantia', 'CelularImeiController@pdfCertificadoGarantia')->name('imei.pdf.garantia');
+
+    // COMISIONES DE TÉCNICOS Y VENDEDORES
+    Route::post('comisiones/toggle-modulo', 'ComisionController@toggleModulo')->name('comision.toggle_modulo');
+    Route::get('comisiones/calcular', 'ComisionController@calcularPendientes')->name('comision.calcular');
+    Route::put('comisiones/config/{cod_usuarios}', 'ComisionController@guardarConfigUsuario')->name('comision.config.update');
+    Route::get('comisiones', 'ComisionController@index')->name('comision.index');
+    Route::post('comisiones/liquidar', 'ComisionController@storeLiquidacion')->name('comision.liquidar');
+    Route::get('comisiones/liquidacion/{id}', 'ComisionController@showLiquidacion')->name('comision.liquidacion.show');
+    Route::delete('comisiones/liquidacion/{id}', 'ComisionController@anularLiquidacion')->name('comision.liquidacion.anular');
+    Route::get('comisiones/liquidacion/{id}/pdf', 'ComisionController@pdfLiquidacion')->name('comision.pdf.liquidacion');
+
+    // GASTOS OPERATIVOS, CUENTAS A PAGAR Y ESTADO DE RESULTADOS (FINANZAS)
+    Route::post('finanzas/toggle-modulo', 'FinanzasController@toggleModulo')->name('finanzas.toggle_modulo');
+    Route::get('finanzas/resultados', 'FinanzasController@getEstadoResultados')->name('finanzas.resultados');
+    Route::get('finanzas/resultados/pdf', 'FinanzasController@pdfEstadoResultados')->name('finanzas.pdf.resultados');
+    Route::get('finanzas', 'FinanzasController@index')->name('finanzas.index');
+    Route::post('finanzas/gasto', 'FinanzasController@storeGasto')->name('finanzas.gasto.store');
+    Route::post('finanzas/categoria', 'FinanzasController@storeCategoria')->name('finanzas.categoria.store');
+    Route::delete('finanzas/gasto/{id}', 'FinanzasController@anularGasto')->name('finanzas.gasto.anular');
+    Route::post('finanzas/cta-pagar', 'FinanzasController@storeCtaPagar')->name('finanzas.ctapagar.store');
+    Route::get('finanzas/cta-pagar/{id}', 'FinanzasController@showCtaPagar')->name('finanzas.ctapagar.show');
+    Route::post('finanzas/cta-pagar/{id}/pagar', 'FinanzasController@pagarCtaPagar')->name('finanzas.ctapagar.pagar');
+    Route::delete('finanzas/cta-pagar/{id}', 'FinanzasController@anularCtaPagar')->name('finanzas.ctapagar.anular');
     
     //COMPRA
     Route::get('infcompra', 'CompraController@indexInf')->name('infcompra');

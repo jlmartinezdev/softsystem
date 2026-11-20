@@ -81,6 +81,48 @@
                 </li>
                 @endif
 
+                @if (\App\Support\CelularImeiSettings::isModuloActivo() || Auth::user()->esSuperAdministrador())
+                <li class="nav-item">
+                    <a href="{{ route('imei.index') }}" id="m_imei" class="nav-link">
+                        <i class="nav-icon fas fa-exchange-alt text-primary"></i>
+                        <p>
+                            Equipos IMEI / Canje
+                            @if (!\App\Support\CelularImeiSettings::isModuloActivo())
+                                <span class="badge badge-secondary right" title="Módulo deshabilitado (Solo visible para Superadministrador)">OFF</span>
+                            @endif
+                        </p>
+                    </a>
+                </li>
+                @endif
+
+                @if (\App\Support\ComisionSettings::isModuloActivo() || Auth::user()->esSuperAdministrador())
+                <li class="nav-item">
+                    <a href="{{ route('comision.index') }}" id="m_comision" class="nav-link">
+                        <i class="nav-icon fas fa-percentage text-success"></i>
+                        <p>
+                            Comisiones
+                            @if (!\App\Support\ComisionSettings::isModuloActivo())
+                                <span class="badge badge-secondary right" title="Módulo deshabilitado (Solo visible para Superadministrador)">OFF</span>
+                            @endif
+                        </p>
+                    </a>
+                </li>
+                @endif
+
+                @if (\App\Support\FinanzasSettings::isModuloActivo() || Auth::user()->esSuperAdministrador())
+                <li class="nav-item">
+                    <a href="{{ route('finanzas.index') }}" id="m_finanzas" class="nav-link">
+                        <i class="nav-icon fas fa-chart-pie text-info"></i>
+                        <p>
+                            Gastos y Resultados
+                            @if (!\App\Support\FinanzasSettings::isModuloActivo())
+                                <span class="badge badge-secondary right" title="Módulo deshabilitado (Solo visible para Superadministrador)">OFF</span>
+                            @endif
+                        </p>
+                    </a>
+                </li>
+                @endif
+
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link" id="m_caja">
                         <i class="nav-icon fas fa-cash-register"></i>

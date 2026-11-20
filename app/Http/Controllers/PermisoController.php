@@ -17,7 +17,8 @@ class PermisoController extends Controller
 {
     public function __construct()
     {
-        \App\Support\ReparacionSchema::ensureExists();
+        \App\Support\ComisionSchema::ensureExists();
+        \App\Support\FinanzasSchema::ensureExists();
         $this->middleware('auth');
         $this->middleware('administrador');
     }
@@ -29,6 +30,9 @@ class PermisoController extends Controller
     {
         $esSuperAdministrador = Auth::user()->esSuperAdministrador();
         $moduloReparacionActivo = \App\Support\ReparacionSettings::isModuloActivo();
+        $moduloImeiActivo = \App\Support\CelularImeiSettings::isModuloActivo();
+        $moduloComisionesActivo = \App\Support\ComisionSettings::isModuloActivo();
+        $moduloFinanzasActivo = \App\Support\FinanzasSettings::isModuloActivo();
 
         $rolesQuery = Roles::withCount('us')->orderBy('cod_rol');
         if (!$esSuperAdministrador) {
@@ -42,6 +46,15 @@ class PermisoController extends Controller
 
         if (!$moduloReparacionActivo && !$esSuperAdministrador) {
             $formulariosQuery->where('for_nombre', '!=', 'reparacion');
+        }
+        if (!$moduloImeiActivo && !$esSuperAdministrador) {
+            $formulariosQuery->where('for_nombre', '!=', 'celulares_imei');
+        }
+        if (!$moduloComisionesActivo && !$esSuperAdministrador) {
+            $formulariosQuery->where('for_nombre', '!=', 'comisiones');
+        }
+        if (!$moduloFinanzasActivo && !$esSuperAdministrador) {
+            $formulariosQuery->where('for_nombre', '!=', 'finanzas');
         }
         $formularios = $formulariosQuery->get();
 
@@ -57,7 +70,7 @@ class PermisoController extends Controller
         // Acciones del rol seleccionado
         $accionesRol = AccionRol::where('cod_rol', $rolSeleccionadoId)->get()->keyBy('cod_per');
 
-        return view('permiso', compact('roles', 'formularios', 'acciones', 'rolSeleccionadoId', 'permisosRol', 'accionesRol', 'moduloReparacionActivo', 'esSuperAdministrador'));
+        return view('permiso', compact('roles', 'formularios', 'acciones', 'rolSeleccionadoId', 'permisosRol', 'accionesRol', 'moduloReparacionActivo', 'moduloImeiActivo', 'moduloComisionesActivo', 'moduloFinanzasActivo', 'esSuperAdministrador'));
     }
 
     /**

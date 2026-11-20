@@ -1736,6 +1736,70 @@
                 </div>
             </div>
         </div>
+
+        <!-- Card 2: Módulo de Compra-Venta de Celulares por IMEI y Plan Canje -->
+        <div class="settings-card">
+            <div class="card-section-title">
+                <div>
+                    <h5 class="font-cairo"><i class="fa fa-exchange-alt text-primary"></i> Control Maestro: Compra-Venta de Celulares por IMEI y Plan Canje (Trade-In)</h5>
+                    <p class="card-section-desc">Exclusivo Superadministrador. Habilitá o deshabilitá el inventario individualizado por IMEI, operaciones de Plan Canje, contratos legales y garantías de equipos vendidos.</p>
+                </div>
+                <a href="{{ route('imei.index') }}" class="btn btn-outline-primary btn-sm font-weight-bold">
+                    <i class="fa fa-external-link-alt mr-1"></i> Ir a Equipos IMEI / Canje
+                </a>
+            </div>
+
+            <div class="modern-switch" :style="imeiConfig.activo ? 'border-color: #0284c7; background: var(--dash-info-light);' : ''">
+                <div class="switch-label-wrap">
+                    <div class="switch-title font-cairo">
+                        <i class="fa fa-power-off" :class="imeiConfig.activo ? 'text-primary' : 'text-danger'"></i>
+                        <span>Habilitar Módulo de Equipos por IMEI y Plan Canje</span>
+                        <span class="badge ml-2" :class="imeiConfig.activo ? 'badge-primary' : 'badge-danger'">
+                            @{{ imeiConfig.activo ? 'ACTIVO EN EL SISTEMA' : 'DESHABILITADO' }}
+                        </span>
+                    </div>
+                    <span class="switch-desc">
+                        Permite gestionar stock de celulares por IMEI, recibir usados como parte de pago (Plan Canje), enviarlos a Servicio Técnico para reacondicionamiento y emitir contratos legales y garantías.
+                    </span>
+                </div>
+                <label class="switch-ui mb-0">
+                    <input type="checkbox" v-model="imeiConfig.activo">
+                    <span class="switch-slider"></span>
+                </label>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-3 mb-3">
+                    <label class="pos-label"><i class="fa fa-hashtag text-muted"></i> Prefijo Código Equipo</label>
+                    <input type="text" class="pos-input font-cairo" v-model="imeiConfig.prefijo_equipo" placeholder="EQ-" maxlength="10">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="pos-label"><i class="fa fa-exchange-alt text-muted"></i> Prefijo Contrato Canje</label>
+                    <input type="text" class="pos-input font-cairo" v-model="imeiConfig.prefijo_canje" placeholder="CJ-" maxlength="10">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="pos-label"><i class="fa fa-shield-alt text-muted"></i> Garantía Equipos Nuevos (Días)</label>
+                    <input type="number" class="pos-input font-cairo" v-model.number="imeiConfig.garantia_nuevo_dias" min="0" max="730">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="pos-label"><i class="fa fa-shield-alt text-muted"></i> Garantía Seminuevos/Usados (Días)</label>
+                    <input type="number" class="pos-input font-cairo" v-model.number="imeiConfig.garantia_usado_dias" min="0" max="365">
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col-md-6 mb-3">
+                    <label class="pos-label"><i class="fa fa-gavel text-muted"></i> Declaración Jurada del Contrato de Plan Canje / Compra de Usado</label>
+                    <textarea class="pos-input" rows="5" v-model="imeiConfig.clausula_canje"></textarea>
+                    <span class="pos-help-text">Cláusula legal de titularidad y origen lícito que firma el cliente al entregar su celular usado.</span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="pos-label"><i class="fa fa-award text-muted"></i> Cláusulas del Certificado de Garantía de Equipos Vendidos por IMEI</label>
+                    <textarea class="pos-input" rows="5" v-model="imeiConfig.clausula_garantia"></textarea>
+                    <span class="pos-help-text">Términos de cobertura impresos en el Certificado de Venta y Garantía por IMEI.</span>
+                </div>
+            </div>
+        </div>
     </div>
     @endif
 
@@ -1858,6 +1922,15 @@
                 prefijo_orden: @json($reparacion['prefijo_orden'] ?? 'ST-'),
                 condiciones_recepcion: @json($reparacion['condiciones_recepcion'] ?? ''),
                 condiciones_garantia: @json($reparacion['condiciones_garantia'] ?? '')
+            },
+            imeiConfig: {
+                activo: {{ !empty($imeiConfig['activo']) ? 'true' : 'false' }},
+                garantia_nuevo_dias: {{ (int) ($imeiConfig['garantia_nuevo_dias'] ?? 180) }},
+                garantia_usado_dias: {{ (int) ($imeiConfig['garantia_usado_dias'] ?? 60) }},
+                prefijo_equipo: @json($imeiConfig['prefijo_equipo'] ?? 'EQ-'),
+                prefijo_canje: @json($imeiConfig['prefijo_canje'] ?? 'CJ-'),
+                clausula_canje: @json($imeiConfig['clausula_canje'] ?? ''),
+                clausula_garantia: @json($imeiConfig['clausula_garantia'] ?? '')
             }
         },
         computed: {
@@ -1981,7 +2054,8 @@
                     camara: this.camaraPayload(),
                     mapas: this.mapasPayload(),
                     cloudinary: this.cloudinaryPayload(),
-                    reparacion: this.reparacion
+                    reparacion: this.reparacion,
+                    imei_config: this.imeiConfig
                 });
             },
             updateVenta: function () {

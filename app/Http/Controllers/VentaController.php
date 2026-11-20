@@ -427,6 +427,55 @@ class VentaController extends Controller
             }
         }
 
+        // Si la venta proviene del Módulo de Celulares por IMEI o Plan Canje, actualizar estado y garantía
+        if (!empty($cab['celular_imei_id'])) {
+            try {
+                \App\Support\CelularImeiSchema::ensureExists();
+                $eq = \App\CelularImei::find((int) $cab['celular_imei_id']);
+                if ($eq) {
+                    $diasGar = max(0, (int) ($eq->dias_garantia ?: 90));
+                    $vencGar = ($eq->tiene_garantia && $diasGar > 0)
+                        ? date('Y-m-d', strtotime("+{$diasGar} days"))
+                        : null;
+
+                    $eq->estado                     = 'VENDIDO';
+                    $eq->CLIENTES_cod_comprador     = $cab['clienteId'] ?? ($eq->CLIENTES_cod_comprador ?: 1);
+                    $eq->fecha_venta                = date('Y-m-d H:i:s');
+                    $eq->precio_vendido             = $eq->precio_vendido > 0 ? $eq->precio_vendido : $eq->precio_venta_contado;
+                    $eq->saldo_cobrado              = (float) $venta->venta_total;
+                    $eq->nro_fact_ventas            = $venta->nro_fact_ventas;
+                    $eq->cod_usuario_venta          = Auth::user()->cod_usuarios;
+                    $eq->fecha_vencimiento_garantia = $vencGar;
+                    $eq->save();
+
+                    if (!empty($cab['canje_id'])) {
+                        $canje = \App\CelularCanje::find((int) $cab['canje_id']);
+                        if ($canje) {
+                            $canje->estado = 'COMPLETADO';
+                            $canje->nro_fact_ventas = $venta->nro_fact_ventas;
+                            $canje->nro_operacion_caja = $cab['nro_operacion'] ?? null;
+                            $canje->registrar_caja = true;
+                            $canje->save();
+                        }
+                    }
+
+                    \App\CelularImeiHistorial::create([
+                        'celular_imei_id' => $eq->id,
+                        'evento'          => 'VENDIDO',
+                        'titulo'          => 'Facturado en Punto de Venta #' . $venta->nro_fact_ventas,
+                        'detalle'         => 'Monto cobrado en POS: Gs. ' . number_format($venta->venta_total, 0, ',', '.'),
+                        'costo_anterior'  => $eq->costo_total,
+                        'costo_nuevo'     => $eq->costo_total,
+                        'referencia_id'   => $venta->nro_fact_ventas,
+                        'cod_usuarios'    => Auth::user()->cod_usuarios,
+                        'created_at'      => date('Y-m-d H:i:s'),
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                // Silencioso
+            }
+        }
+
         return $venta->nro_fact_ventas;
         
     }
