@@ -2,6 +2,7 @@
 @section('title', 'Articulo')
 @section('style')
 <link href="{{ asset('css/icheck-bootstrap.min.css') }}" rel="stylesheet">
+@include('articulo.modal_style')
 <style>
     @font-face {
         font-family: "Cairo";
@@ -1778,6 +1779,8 @@
             data: {
                 requestSend: false,
                 saving: false,
+                intentoGuardar: false,
+                duplicando: false,
                 toggleMasPrecios: false,
                 precios: [...defaultPrecio],
                 chcuota: false,
@@ -1912,6 +1915,18 @@
                     }
                 },
 
+                recalcularCredito: function() {
+                    // Al activar/desactivar el redondeo, recalcular los planes que tienen margen cargado
+                    if (this.viewPrecio) {
+                        return;
+                    }
+                    for (var i = 0; i < this.precios.length; i++) {
+                        if (parseInt(this.precios[i].m) > 0) {
+                            this.setPrecio(i);
+                        }
+                        this.setCuota(i);
+                    }
+                },
                 setCuota: function(index) {
                     if (this.viewPrecio) {
                         return false;
@@ -2340,6 +2355,17 @@
                         }
                     }
                 },
+                gananciaPrecio: function(i) {
+                    var p = parseFloat(this.articulo['p' + i]) || 0;
+                    var c = parseFloat(this.articulo.costo) || 0;
+                    return Math.round(p - c);
+                },
+                gananciaClase: function(i) {
+                    var p = parseFloat(this.articulo['p' + i]) || 0;
+                    var c = parseFloat(this.articulo.costo) || 0;
+                    if (p <= 0 || c <= 0) return 'is-empty';
+                    return p < c ? 'is-loss' : '';
+                },
                 separador: function(number) {
                     var n = parseFloat(number);
                     return new Intl.NumberFormat().format(n);
@@ -2348,6 +2374,7 @@
                     this.isnew = true;
                     this.viewPrecio = false;
                     this.cleanAll();
+                    this.duplicando = false;
                     if (this.secciones.length > 0) {
                         this.articulo.seccion = this.secciones[0].present_cod;
                     }
@@ -2368,6 +2395,7 @@
                     if (!a) return;
                     this.cleanAll();
                     this.isnew = false;
+                    this.duplicando = false;
                     this.viewPrecio = false;
                     this.setArticulo(a);
                     this.getStock(a.ARTICULOS_cod);
@@ -2413,6 +2441,7 @@
                     if (!a) return;
                     this.cleanAll();
                     this.isnew = true;
+                    this.duplicando = true;
                     this.viewPrecio = false;
                     this.setArticulo(a);
                     this.articulo.codigo = '';
@@ -2620,6 +2649,7 @@
                     }
                     this.articulo = { ...defaultArticulo };
                     this.saving = false;
+                    this.intentoGuardar = false;
                     this.toggleMasPrecios = false;
                 },
                 saveArticulo: function() {
@@ -2684,7 +2714,14 @@
                             });
                         }
                     } else {
-                        Swal.fire('Atención', 'Completá los campos obligatorios: Descripción, Precio de Compra y Precio de Venta 1.', 'warning');
+                        // Marcar los campos faltantes y llevar al usuario a la pestaña correspondiente
+                        this.intentoGuardar = true;
+                        if (!this.articulo.descripcion) {
+                            $('#tab-general-tab').tab('show');
+                            this.$nextTick(function() { $('#txtArticuloDescripcion').focus(); });
+                        } else {
+                            $('#tab-precios-tab').tab('show');
+                        }
                     }
                 },
                 getArticulo: function() {
