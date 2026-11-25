@@ -235,26 +235,39 @@
 
 <!-- Modal Cuotas Crédito -->
 <div class="modal fade" id="modalCuotas" tabindex="-1" role="dialog" aria-labelledby="modalCuotasLabel" aria-hidden="true">
-	<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+	<div class="modal-dialog modal-xl modal-dialog-centered" role="document">
 		<div class="modal-content shadow-lg border-0 modal-moderno">
-			<div class="modal-header bg-dark text-white border-0">
-				<h5 class="modal-title font-weight-bold mb-0 font-cairo" id="modalCuotasLabel">
-					<i class="fas fa-calendar-alt text-warning mr-2"></i> Plan de Cuotas a Crédito
-				</h5>
-				<button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
+			<div class="modal-header">
+				<div class="d-flex align-items-center">
+					<div class="modal-header-icon mr-2">
+						<span class="fas fa-calendar-alt text-success" aria-hidden="true"></span>
+					</div>
+					<div>
+						<h5 class="modal-title font-weight-bold mb-0 font-cairo" id="modalCuotasLabel">Plan de cuotas a crédito</h5>
+						<p class="small text-muted mb-0">Configurá a la izquierda y revisá el cronograma a la derecha</p>
+					</div>
+				</div>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
 			<div class="modal-body p-3">
 				<generar_cuota :total="ventaCabecera.total" :fecha="ventaCabecera.fecha" :calcularcuota="ventaCabecera.generarcuota" :datoscuota="tmpIndexPrecio" ref="generarcuota" @cuotas="setCuotas"/>
 			</div>
-			<div class="modal-footer bg-light-panel border-top">
-				<button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">
-					<i class="fas fa-times mr-1"></i> Cancelar
-				</button>
-				<button type="button" class="btn btn-success font-weight-bold font-cairo" @click="confirmarCuotas" :disabled="!(cuotas && cuotas.length)">
-					<i class="fas fa-check mr-1"></i> Aplicar Plan de Cuotas
-				</button>
+			<div class="modal-footer bg-light-panel border-top d-flex justify-content-between">
+				<div class="small text-muted" v-if="cuotas && cuotas.length">
+					<span class="font-weight-bold text-dark-mode">@{{ cuotas.length }}</span> @{{ cuotas.length === 1 ? 'pago' : 'pagos' }} ·
+					Total <span class="font-weight-bold text-dark-mode">Gs. @{{ new Intl.NumberFormat('de-DE').format(cuotas.reduce(function(a, c) { return a + (Number(c.monto) || 0); }, 0)) }}</span>
+				</div>
+				<div v-else></div>
+				<div>
+					<button type="button" class="btn btn-outline-secondary mr-1" data-dismiss="modal">
+						Cancelar
+					</button>
+					<button type="button" class="btn btn-success font-weight-bold font-cairo px-4" @click="confirmarCuotas" :disabled="!(cuotas && cuotas.length)">
+						<i class="fas fa-check mr-1"></i> Aplicar plan
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>

@@ -112,6 +112,22 @@
     .bg-light-panel {
         background-color: var(--dash-panel-bg) !important;
     }
+    /* Modal cuotas: aprovechar el alto en pantallas bajas (ej. 1366x768) */
+    #modalCuotas .modal-dialog {
+        margin-top: 0.75rem;
+        margin-bottom: 0.75rem;
+        min-height: calc(100% - 1.5rem);
+    }
+    #modalCuotas .modal-header {
+        padding: 0.7rem 1.25rem;
+    }
+    #modalCuotas .modal-footer {
+        padding: 0.6rem 1.25rem;
+    }
+    #modalCuotas .modal-body {
+        max-height: calc(100vh - 156px);
+    }
+    /* fin modal cuotas */
     .text-dark-mode {
         color: var(--dash-text-main) !important;
     }
@@ -1751,8 +1767,8 @@
                                         :aria-label="'Elegí el precio de ' + item.descripcion + '. Unitario Gs. ' + format(item.precio) + '. Total Gs. ' + format(item.precio * item.cantidad)">
                                         <strong class="font-cairo">@{{ format(item.precio * item.cantidad) }}</strong>
                                         <span>Gs. @{{ format(item.precio) }} c/u</span>
-                                        <span v-if="esCredito && item.monto_cuota" class="ticket-cuota-badge" :title="'Cuota estimada: Gs. ' + format(item.monto_cuota)">
-                                            <i class="fa fa-calendar-alt mr-1"></i>@{{ tmpIndexPrecio.cant_cuota }}x Gs. @{{ format(item.monto_cuota) }}
+                                        <span v-if="esCredito && montoCuotaVisible(item)" class="ticket-cuota-badge" :title="'Cuota estimada: Gs. ' + format(montoCuotaVisible(item))">
+                                            <i class="fa fa-calendar-alt mr-1"></i>@{{ tmpIndexPrecio.cant_cuota }}x Gs. @{{ format(montoCuotaVisible(item)) }}
                                         </span>
                                     </button>
                                     <button type="button" class="ticket-quitar" title="Quitar del ticket" :aria-label="'Quitar ' + item.descripcion" @click="delArticulo(item)">
@@ -2797,9 +2813,11 @@
                     var totalAsignado = 0;
 
                     for (var j = 0; j < cantCuota; j++) {
-                        var d = new Date(baseDate);
                         var meses = primeraHoyPrev ? j : (j + 1);
-                        d.setMonth(d.getMonth() + meses);
+                        var diaBase = baseDate.getDate();
+                        var d = new Date(baseDate.getFullYear(), baseDate.getMonth() + meses, 1);
+                        var ultimoDia = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+                        d.setDate(diaBase >= 29 ? ultimoDia : Math.min(diaBase, ultimoDia));
                         var dia = String(d.getDate()).padStart(2, '0');
                         var mes = String(d.getMonth() + 1).padStart(2, '0');
                         var anio = d.getFullYear();
@@ -2854,6 +2872,31 @@
                 },
                 format: function(numero) {
                     return new Intl.NumberFormat("de-DE").format(numero);
+                },
+                montoCuotaVisible: function(item) {
+                    var base = Number(item && item.monto_cuota) || 0;
+                    if (base <= 0) return 0;
+                    var cuotas = this.cuotas || [];
+                    var hayEntrega = false;
+                    var cuotaPlan = 0;
+                    for (var i = 0; i < cuotas.length; i++) {
+                        var c = cuotas[i];
+                        if (!c) continue;
+                        if (c.tipo === 'Entrega' && Number(c.monto) > 0) {
+                            hayEntrega = true;
+                        } else if (!cuotaPlan) {
+                            cuotaPlan = Number(c.monto) || 0;
+                        }
+                    }
+                    if (!hayEntrega || cuotaPlan <= 0) return base;
+                    var suma = 0;
+                    var carro = this.carro || [];
+                    for (var j = 0; j < carro.length; j++) {
+                        suma += (Number(carro[j].monto_cuota) || 0) * (Number(carro[j].cantidad) || 1);
+                    }
+                    if (suma <= 0) return base;
+                    var cant = Number(item.cantidad) || 1;
+                    return Math.round(cuotaPlan * (base * cant) / suma / cant);
                 },
                 getApertura: function() {
                     let idSucursal = $('#sucursal').attr('data-id');
@@ -3271,6 +3314,15 @@
                     }
                 },
                 abrirCuotas: function() {
+                    var self = this;
+                    var copiar = function(lista) {
+                        return (lista || []).map(function(c) { return Object.assign({}, c); });
+                    };
+                    // Respaldo para poder descartar los cambios si se cancela el modal
+                    var respaldoCuotas = copiar(this.cuotas);
+                    var respaldoEstado = this.$refs.generarcuota ? this.$refs.generarcuota.getEstado() : null;
+                    this.cuotasConfirmadas = false;
+
                     if (this.$refs.generarcuota) {
                         if (this.tmpIndexPrecio && this.tmpIndexPrecio.cant_cuota) {
                             this.$refs.generarcuota.cant_cuota = Number(this.tmpIndexPrecio.cant_cuota);
@@ -3278,9 +3330,19 @@
                         if (!this.cuotas || !this.cuotas.length) {
                             this.$refs.generarcuota.generar();
                         } else {
-                            this.$refs.generarcuota.cuotas = this.cuotas.slice();
+                            this.$refs.generarcuota.cuotas = copiar(this.cuotas);
                         }
                     }
+
+                    $('#modalCuotas').off('hidden.bs.modal.cuotas').one('hidden.bs.modal.cuotas', function() {
+                        if (self.cuotasConfirmadas) return;
+                        self.cuotas = respaldoCuotas;
+                        if (self.$refs.generarcuota && respaldoEstado) {
+                            self.$refs.generarcuota.setEstado(respaldoEstado);
+                            self.$refs.generarcuota.cuotas = copiar(respaldoCuotas);
+                        }
+                        self.saveDatos && self.saveDatos();
+                    });
                     $('#modalCuotas').modal('show');
                 },
                 confirmarCuotas: function() {
@@ -3288,6 +3350,28 @@
                         Swal.fire('Faltan cuotas', 'Elegí un plan de cuotas.', 'warning');
                         return;
                     }
+                    var gc = this.$refs.generarcuota;
+                    if (gc && gc.hayDiferencia) {
+                        var selfDif = this;
+                        var dif = gc.diferenciaCuotas;
+                        Swal.fire({
+                            title: 'El plan no cuadra',
+                            html: (dif > 0 ? 'Faltan' : 'Sobran') + ' <b>Gs. ' + new Intl.NumberFormat('de-DE').format(Math.abs(dif)) + '</b> respecto al total.',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Ajustar en la última cuota y aplicar',
+                            cancelButtonText: 'Revisar'
+                        }).then(function(res) {
+                            if (res.value) {
+                                gc.autoAjustarDiferencia();
+                                if (!gc.hayDiferencia) {
+                                    selfDif.confirmarCuotas();
+                                }
+                            }
+                        });
+                        return;
+                    }
+                    this.cuotasConfirmadas = true;
                     if (this.$refs.generarcuota && this.$refs.generarcuota.cant_cuota) {
                         var nuevaCant = Number(this.$refs.generarcuota.cant_cuota);
                         if (nuevaCant !== Number(this.tmpIndexPrecio.cant_cuota)) {

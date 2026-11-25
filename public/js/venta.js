@@ -290,32 +290,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'generar_cuota',
@@ -333,6 +307,22 @@ __webpack_require__.r(__webpack_exports__);
       primerVencimiento: '',
       primeracuotaHoy: false,
       redondear: true,
+      editadoManual: false,
+      opcionesCuotas: [1, 2, 3, 4, 6, 10, 12, 18, 24],
+      opcionesEntrega: [0, 10, 20, 30, 50],
+      opcionesFrecuencia: [{
+        value: 'mensual',
+        label: 'Mensual',
+        title: 'El mismo día de cada mes'
+      }, {
+        value: 'quincenal',
+        label: 'Quincenal',
+        title: 'Cada 15 días'
+      }, {
+        value: 'semanal',
+        label: 'Semanal',
+        title: 'Cada 7 días'
+      }],
       cuotas: []
     };
   },
@@ -364,6 +354,36 @@ __webpack_require__.r(__webpack_exports__);
     },
     hayDiferencia: function hayDiferencia() {
       return Math.abs(this.diferenciaCuotas) >= 1;
+    },
+    cantidadCuotasCredito: function cantidadCuotasCredito() {
+      return this.cuotas.filter(function (c) {
+        return c.tipo !== 'Entrega';
+      }).length;
+    },
+    primeraHoyActiva: function primeraHoyActiva() {
+      return this.primeracuotaHoy && !(Number(this.entrega) > 0);
+    },
+    cuotasPlan: function cuotasPlan() {
+      // Con entrega inicial, esa fila no es una cuota. Con "1ª cuota hoy", sí lo es.
+      if (Number(this.entrega) > 0) {
+        return this.cuotas.filter(function (c) {
+          return c.tipo !== 'Entrega';
+        });
+      }
+
+      return this.cuotas;
+    },
+    montoCuotaReferencia: function montoCuotaReferencia() {
+      var lista = this.cuotasPlan;
+      return lista.length ? Number(lista[0].monto) || 0 : 0;
+    },
+    cuotasDesiguales: function cuotasDesiguales() {
+      var lista = this.cuotasPlan.map(function (c) {
+        return Number(c.monto) || 0;
+      });
+      return lista.some(function (m) {
+        return m !== lista[0];
+      });
     }
   },
   watch: {
@@ -376,8 +396,14 @@ __webpack_require__.r(__webpack_exports__);
         }
       }
     },
-    total: function total() {
-      this.entrega = 0;
+    total: function total(nuevo) {
+      // Mantener la entrega cargada; solo ajustarla si supera el nuevo total.
+      var t = Number(nuevo) || 0;
+
+      if (Number(this.entrega) > t) {
+        this.entrega = t;
+      }
+
       this.initFechaVencimiento();
       this.generar();
     },
@@ -403,12 +429,22 @@ __webpack_require__.r(__webpack_exports__);
 
       if (isNaN(baseDate.getTime())) {
         baseDate = new Date();
-      } // Siguiente mes por defecto
+      }
 
+      this.primerVencimiento = this.formatDateIso(this.sumarMeses(baseDate, 1));
+    },
+    sumarMeses: function sumarMeses(fecha, meses) {
+      var base = fecha instanceof Date ? new Date(fecha.getTime()) : new Date(fecha);
 
-      var nextDate = new Date(baseDate);
-      nextDate.setMonth(nextDate.getMonth() + 1);
-      this.primerVencimiento = this.formatDateIso(nextDate);
+      if (isNaN(base.getTime())) {
+        base = new Date();
+      }
+
+      var dia = base.getDate();
+      var destino = new Date(base.getFullYear(), base.getMonth() + Number(meses || 0), 1);
+      var ultimo = new Date(destino.getFullYear(), destino.getMonth() + 1, 0).getDate();
+      destino.setDate(dia >= 29 ? ultimo : Math.min(dia, ultimo));
+      return destino;
     },
     formatDateIso: function formatDateIso(d) {
       var year = d.getFullYear();
@@ -465,6 +501,11 @@ __webpack_require__.r(__webpack_exports__);
         this.entrega = 0;
       }
 
+      if (Number(this.entrega) > 0) {
+        // La 1ª cuota hoy no aplica cuando hay entrega inicial.
+        this.primeracuotaHoy = false;
+      }
+
       this.generar();
     },
     onFrecuenciaChange: function onFrecuenciaChange() {
@@ -476,7 +517,7 @@ __webpack_require__.r(__webpack_exports__);
       } else if (this.frecuencia === 'quincenal') {
         nextDate.setDate(nextDate.getDate() + 15);
       } else {
-        nextDate.setMonth(nextDate.getMonth() + 1);
+        nextDate = this.sumarMeses(baseDate, 1);
       }
 
       this.primerVencimiento = this.formatDateIso(nextDate);
@@ -489,7 +530,63 @@ __webpack_require__.r(__webpack_exports__);
       this.cant_cuota = n;
       this.generar();
     },
+    onCantidadOtra: function onCantidadOtra(val) {
+      if (val === '' || val === null) return;
+      this.cant_cuota = val;
+      this.onCantidadChange();
+    },
+    onCantidadChange: function onCantidadChange() {
+      var n = parseInt(this.cant_cuota, 10);
+      if (isNaN(n) || n < 1) n = 1;
+      if (n > 60) n = 60;
+      this.cant_cuota = n;
+      this.generar();
+    },
+    onInteresChange: function onInteresChange() {
+      var i = Number(this.interes);
+      if (isNaN(i) || i < 0) i = 0;
+      if (i > 100) i = 100;
+      this.interes = i;
+      this.generar();
+    },
+    setFrecuencia: function setFrecuencia(f) {
+      if (this.frecuencia === f) return;
+      this.frecuencia = f;
+      this.onFrecuenciaChange();
+    },
+    entregaPctActiva: function entregaPctActiva(pct) {
+      var t = Number(this.total) || 0;
+      var e = Number(this.entrega) || 0;
+      if (pct === 0) return e === 0;
+      return t > 0 && e === Math.round(t * pct / 100);
+    },
+    esEntregaInicial: function esEntregaInicial(c) {
+      return c.tipo === 'Entrega' && Number(this.entrega) > 0;
+    },
+    restablecer: function restablecer() {
+      this.generar();
+    },
+    infoFecha: function infoFecha(venc) {
+      var iso = this.toInputDate(venc);
+      if (!iso) return '';
+      var d = new Date(iso + 'T00:00:00');
+      if (isNaN(d.getTime())) return '';
+      var dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+      var base = this.fecha ? new Date(this.fecha + 'T00:00:00') : new Date();
+      if (isNaN(base.getTime())) base = new Date();
+      base.setHours(0, 0, 0, 0);
+      var diff = Math.round((d - base) / 86400000);
+      var rel = diff === 0 ? 'hoy' : diff > 0 ? 'en ' + diff + (diff === 1 ? ' día' : ' días') : 'hace ' + -diff + ' días';
+      return dias[d.getDay()] + ' · ' + rel;
+    },
+    fechaFueraDeOrden: function fechaFueraDeOrden(idx) {
+      if (idx === 0 || !this.cuotas[idx] || !this.cuotas[idx - 1]) return false;
+      var actual = this.toInputDate(this.cuotas[idx].vencimiento);
+      var previa = this.toInputDate(this.cuotas[idx - 1].vencimiento);
+      return !!(actual && previa && actual < previa);
+    },
     generar: function generar() {
+      this.editadoManual = false;
       this.cuotas = [];
       var cantidad = Number(this.cant_cuota) || 1;
       if (cantidad < 1) cantidad = 1;
@@ -523,8 +620,12 @@ __webpack_require__.r(__webpack_exports__);
         montoCuotaBase = Math.floor(saldo / cantidad);
 
         if (this.redondear && montoCuotaBase > 1000) {
-          // Redondear a múltiplos de 1.000
-          montoCuotaBase = Math.round(montoCuotaBase / 1000) * 1000;
+          // Redondear a múltiplos de 1.000, siempre que la última cuota no quede en cero o negativa
+          var redondeado = Math.round(montoCuotaBase / 1000) * 1000;
+
+          if (redondeado * (cantidad - 1) < saldo) {
+            montoCuotaBase = redondeado;
+          }
         }
       } // 3. Calcular fechas de vencimiento según frecuencia
 
@@ -546,15 +647,32 @@ __webpack_require__.r(__webpack_exports__);
           cDate = new Date(fechaVentaIso + 'T00:00:00');
         } else {
           var pasos = primeraHoy ? i - 1 : i;
-          cDate = new Date(dateCursor);
 
-          if (pasos > 0) {
-            if (this.frecuencia === 'semanal') {
+          if (this.frecuencia === 'semanal') {
+            cDate = new Date(dateCursor);
+
+            if (pasos > 0) {
               cDate.setDate(cDate.getDate() + pasos * 7);
-            } else if (this.frecuencia === 'quincenal') {
+            }
+          } else if (this.frecuencia === 'quincenal') {
+            cDate = new Date(dateCursor);
+
+            if (pasos > 0) {
               cDate.setDate(cDate.getDate() + pasos * 15);
+            }
+          } else {
+            var ancla = new Date(fechaVentaIso + 'T00:00:00');
+
+            if (isNaN(ancla.getTime())) {
+              ancla = new Date(dateCursor);
+            }
+
+            var autoPrimero = this.formatDateIso(this.sumarMeses(ancla, 1));
+
+            if (this.primerVencimiento && this.primerVencimiento !== autoPrimero) {
+              cDate = this.sumarMeses(dateCursor, pasos);
             } else {
-              cDate.setMonth(cDate.getMonth() + pasos);
+              cDate = this.sumarMeses(ancla, primeraHoy ? i : i + 1);
             }
           }
         }
@@ -581,6 +699,7 @@ __webpack_require__.r(__webpack_exports__);
     onVencimientoItemChange: function onVencimientoItemChange(idx, nuevaFechaIso) {
       if (this.cuotas[idx]) {
         this.$set(this.cuotas[idx], 'vencimiento', this.toVencimientoFormat(nuevaFechaIso));
+        this.editadoManual = true;
         this.emitCuotas();
       }
     },
@@ -588,11 +707,25 @@ __webpack_require__.r(__webpack_exports__);
       if (this.cuotas[idx]) {
         var val = Number(this.cuotas[idx].monto) || 0;
         this.$set(this.cuotas[idx], 'monto', val);
+        this.editadoManual = true;
         this.emitCuotas();
       }
     },
+    numeroVisible: function numeroVisible(idx) {
+      if (!(Number(this.entrega) > 0)) {
+        return idx + 1;
+      }
+
+      var n = 0;
+
+      for (var i = 0; i <= idx; i++) {
+        if (this.cuotas[i].tipo !== 'Entrega') n++;
+      }
+
+      return n;
+    },
     eliminarCuota: function eliminarCuota(idx) {
-      if (this.cuotas.length <= 1) {
+      if (!this.cuotas[idx] || this.cuotas[idx].tipo === 'Entrega' || this.cantidadCuotasCredito <= 1) {
         return;
       }
 
@@ -604,8 +737,10 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.cant_cuota = this.cuotas.filter(function (c) {
         return c.tipo === 'Cuota';
-      }).length;
+      }).length + (this.primeraHoyActiva ? 1 : 0);
+      this.editadoManual = true;
       this.autoAjustarDiferencia();
+      this.emitCuotas();
     },
     autoAjustarDiferencia: function autoAjustarDiferencia() {
       var diff = this.diferenciaCuotas;
@@ -613,7 +748,7 @@ __webpack_require__.r(__webpack_exports__);
 
       for (var i = this.cuotas.length - 1; i >= 0; i--) {
         if (this.cuotas[i].tipo !== 'Entrega') {
-          var nuevoMonto = this.cuotas[i].monto + diff;
+          var nuevoMonto = (Number(this.cuotas[i].monto) || 0) + diff;
 
           if (nuevoMonto > 0) {
             this.cuotas[i].monto = nuevoMonto;
@@ -625,7 +760,37 @@ __webpack_require__.r(__webpack_exports__);
       this.emitCuotas();
     },
     emitCuotas: function emitCuotas() {
-      this.$emit('cuotas', this.cuotas);
+      // Emitir copias para que el padre no comparta objetos con la edición del modal
+      this.$emit('cuotas', this.cuotas.map(function (c) {
+        return Object.assign({}, c);
+      }));
+    },
+    getEstado: function getEstado() {
+      return {
+        cant_cuota: this.cant_cuota,
+        entrega: this.entrega,
+        interes: this.interes,
+        frecuencia: this.frecuencia,
+        primerVencimiento: this.primerVencimiento,
+        primeracuotaHoy: this.primeracuotaHoy,
+        redondear: this.redondear,
+        cuotas: this.cuotas.map(function (c) {
+          return Object.assign({}, c);
+        })
+      };
+    },
+    setEstado: function setEstado(estado) {
+      if (!estado) return;
+      this.cant_cuota = estado.cant_cuota;
+      this.entrega = estado.entrega;
+      this.interes = estado.interes;
+      this.frecuencia = estado.frecuencia;
+      this.primerVencimiento = estado.primerVencimiento;
+      this.primeracuotaHoy = estado.primeracuotaHoy;
+      this.redondear = estado.redondear;
+      this.cuotas = (estado.cuotas || []).map(function (c) {
+        return Object.assign({}, c);
+      });
     }
   },
   mounted: function mounted() {
@@ -763,7 +928,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.cuota-summary-row .cuota-summary-card[data-v-5a0d83c4] {\n    background: #ffffff;\n    border: 1px solid #e2e8f0;\n    border-radius: 8px;\n    padding: 0.65rem 0.85rem;\n    display: flex;\n    flex-direction: column;\n}\n.cuota-summary-label[data-v-5a0d83c4] {\n    font-size: 0.75rem;\n    font-weight: 700;\n    text-transform: uppercase;\n    color: #64748b;\n    letter-spacing: 0.03em;\n}\n.cuota-summary-val[data-v-5a0d83c4] {\n    font-size: 1.15rem;\n    font-family: inherit;\n    font-variant-numeric: tabular-nums;\n    margin-top: 0.2rem;\n}\n.quick-entrega-chips[data-v-5a0d83c4], .quick-cuotas-chips[data-v-5a0d83c4] {\n    display: flex;\n    flex-wrap: wrap;\n}\n.cuota-table-wrapper[data-v-5a0d83c4] {\n    background: #ffffff;\n}\n.cuota-table-wrapper table thead th[data-v-5a0d83c4] {\n    position: sticky;\n    top: 0;\n    background: #f1f5f9;\n    z-index: 2;\n    font-size: 0.8rem;\n    letter-spacing: 0.02em;\n}\n.cuota-status-bar[data-v-5a0d83c4] {\n    border-radius: 8px;\n    margin-top: 0.75rem;\n}\n.cuota-status-success[data-v-5a0d83c4] {\n    background-color: #e8f5e9 !important;\n    border: 1px solid #c8e6c9 !important;\n}\n.cuota-status-warning[data-v-5a0d83c4] {\n    background-color: #fff3cd !important;\n    border: 1px solid #ffeeba !important;\n}\n", ""]);
+exports.push([module.i, "\n.cuota-pos[data-v-5a0d83c4] {\n    --cp-primary: var(--dash-primary, #0a4d36);\n    --cp-primary-light: var(--dash-primary-light, #eaf3ef);\n    --cp-primary-border: var(--dash-primary-border, #c8dfd5);\n    --cp-accent: var(--dash-accent, #b8860b);\n    --cp-card: var(--dash-card-bg, #ffffff);\n    --cp-panel: var(--dash-panel-bg, #f8fafc);\n    --cp-border: var(--dash-border, #e2e8f0);\n    --cp-text: var(--dash-text-main, #1e293b);\n    --cp-muted: var(--dash-text-muted, #64748b);\n    --cp-danger: var(--dash-danger, #e11d48);\n    --cp-danger-light: var(--dash-danger-light, #fff1f2);\n    --cp-ok: #16a34a;\n    color: var(--cp-text);\n}\n\n/* ---- Pasos de configuración ---- */\n.cp-step[data-v-5a0d83c4] {\n    background: var(--cp-panel);\n    border: 1px solid var(--cp-border);\n    border-radius: 12px;\n    padding: 0.6rem 0.8rem;\n    margin-bottom: 0.5rem;\n}\n.cp-step-head[data-v-5a0d83c4] {\n    display: flex;\n    align-items: center;\n    margin-bottom: 0.45rem;\n}\n.cp-inline[data-v-5a0d83c4] {\n    display: flex;\n    align-items: center;\n    gap: 0.5rem;\n}\n.cp-inline > .cp-money[data-v-5a0d83c4] {\n    flex: 1 1 auto;\n    width: auto;\n    min-width: 120px;\n}\n.cp-inline > .cp-segmented[data-v-5a0d83c4] {\n    flex: 1 1 auto;\n}\n.cp-chips-nowrap[data-v-5a0d83c4] {\n    flex-wrap: nowrap;\n    flex-shrink: 0;\n}\n.cp-chips-nowrap .cp-chip[data-v-5a0d83c4] {\n    padding: 0.2rem 0.45rem;\n}\n.cp-options[data-v-5a0d83c4] {\n    justify-content: space-between;\n    flex-wrap: wrap;\n}\n.cp-switches[data-v-5a0d83c4] {\n    display: flex;\n    flex-direction: column;\n    gap: 0.15rem;\n}\n.cp-step-num[data-v-5a0d83c4] {\n    width: 22px;\n    height: 22px;\n    border-radius: 50%;\n    background: var(--cp-primary);\n    color: #fff;\n    font-size: 0.72rem;\n    font-weight: 700;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    margin-right: 0.5rem;\n    flex-shrink: 0;\n}\n.cp-step-title[data-v-5a0d83c4] {\n    font-weight: 700;\n    font-size: 0.85rem;\n}\n.cp-step-opt[data-v-5a0d83c4] {\n    margin-left: auto;\n    font-size: 0.7rem;\n    color: var(--cp-muted);\n    text-transform: uppercase;\n    letter-spacing: 0.04em;\n}\n.cp-label[data-v-5a0d83c4] {\n    font-size: 0.8rem;\n    color: var(--cp-muted);\n    font-weight: 600;\n}\n.cp-hint[data-v-5a0d83c4] {\n    display: inline-block;\n    margin-top: 0.45rem;\n    font-size: 0.8rem;\n    color: var(--cp-muted);\n}\n.cp-hint strong[data-v-5a0d83c4] {\n    color: var(--cp-primary);\n}\n\n/* ---- Chips ---- */\n.cp-chips[data-v-5a0d83c4] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 0.35rem;\n}\n.cp-chip[data-v-5a0d83c4] {\n    border: 1px solid var(--cp-border);\n    background: var(--cp-card);\n    color: var(--cp-text);\n    border-radius: 999px;\n    padding: 0.2rem 0.7rem;\n    font-size: 0.78rem;\n    font-weight: 600;\n    line-height: 1.4;\n    cursor: pointer;\n    transition: background-color .12s, border-color .12s, color .12s;\n}\n.cp-chip[data-v-5a0d83c4]:hover {\n    border-color: var(--cp-primary);\n    color: var(--cp-primary);\n}\n.cp-chip.active[data-v-5a0d83c4],\n.cp-chip.active[data-v-5a0d83c4]:hover {\n    background: var(--cp-primary);\n    border-color: var(--cp-primary);\n    color: #fff;\n}\n.cp-chip-lg[data-v-5a0d83c4] {\n    min-width: 36px;\n    padding: 0.25rem 0.5rem;\n    font-size: 0.88rem;\n    border-radius: 9px;\n}\n.cp-chip-input[data-v-5a0d83c4] {\n    border: 1px dashed var(--cp-border);\n    border-radius: 10px;\n    background: var(--cp-card);\n    display: flex;\n    align-items: center;\n}\n.cp-chip-input.active[data-v-5a0d83c4] {\n    border: 2px solid var(--cp-primary);\n}\n.cp-chips-grid[data-v-5a0d83c4] {\n    display: grid;\n    grid-template-columns: repeat(5, 1fr);\n}\n.cp-chip-input input[data-v-5a0d83c4] {\n    width: 100%;\n    min-width: 0;\n    border: 0;\n    background: transparent;\n    color: var(--cp-text);\n    text-align: center;\n    font-weight: 700;\n    font-size: 0.9rem;\n    padding: 0.2rem 0.2rem;\n    outline: none;\n}\n\n/* ---- Control segmentado ---- */\n.cp-segmented[data-v-5a0d83c4] {\n    display: flex;\n    background: var(--cp-card);\n    border: 1px solid var(--cp-border);\n    border-radius: 10px;\n    padding: 3px;\n}\n.cp-segmented button[data-v-5a0d83c4] {\n    flex: 1;\n    border: 0;\n    background: transparent;\n    color: var(--cp-muted);\n    border-radius: 7px;\n    padding: 0.3rem 0.4rem;\n    font-size: 0.8rem;\n    font-weight: 600;\n    cursor: pointer;\n}\n.cp-segmented button.active[data-v-5a0d83c4] {\n    background: var(--cp-primary);\n    color: #fff;\n}\n.cp-date[data-v-5a0d83c4] {\n    width: 150px;\n    flex-shrink: 0;\n}\n.cp-interes[data-v-5a0d83c4] {\n    width: 105px;\n}\n.cp-money .input-group-text[data-v-5a0d83c4],\n.cp-interes .input-group-text[data-v-5a0d83c4] {\n    font-size: 0.8rem;\n}\n\n/* ---- Resumen ---- */\n.cp-hero[data-v-5a0d83c4] {\n    background: var(--cp-primary-light);\n    border: 1px solid var(--cp-primary-border);\n    border-radius: 12px;\n    padding: 0.65rem 0.9rem;\n    margin-bottom: 0.6rem;\n    display: flex;\n    align-items: center;\n    gap: 1rem;\n}\n.cp-hero-main[data-v-5a0d83c4] {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 auto;\n    min-width: 0;\n}\n.cp-hero-label[data-v-5a0d83c4] {\n    font-size: 0.72rem;\n    font-weight: 700;\n    text-transform: uppercase;\n    letter-spacing: 0.05em;\n    color: var(--cp-muted);\n}\n.cp-hero-total[data-v-5a0d83c4] {\n    font-size: 1.5rem;\n    font-weight: 800;\n    color: var(--cp-primary);\n    font-variant-numeric: tabular-nums;\n    line-height: 1.2;\n}\n.cp-hero-sub[data-v-5a0d83c4] {\n    font-size: 0.82rem;\n    color: var(--cp-text);\n}\n.cp-hero-grid[data-v-5a0d83c4] {\n    display: grid;\n    grid-template-columns: repeat(2, minmax(90px, auto));\n    gap: 0.3rem 1rem;\n    padding-left: 1rem;\n    border-left: 1px solid var(--cp-primary-border);\n    flex-shrink: 0;\n}\n.cp-hero-grid div[data-v-5a0d83c4] {\n    display: flex;\n    flex-direction: column;\n    min-width: 0;\n}\n.cp-hero-grid span[data-v-5a0d83c4] {\n    font-size: 0.68rem;\n    text-transform: uppercase;\n    letter-spacing: 0.04em;\n    color: var(--cp-muted);\n}\n.cp-hero-grid strong[data-v-5a0d83c4] {\n    font-size: 0.85rem;\n    font-variant-numeric: tabular-nums;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n.cp-pos[data-v-5a0d83c4] { color: var(--cp-ok);\n}\n.cp-neg[data-v-5a0d83c4] { color: var(--cp-accent);\n}\n\n/* ---- Cronograma ---- */\n.cp-schedule-head[data-v-5a0d83c4] {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    margin-bottom: 0.4rem;\n    min-height: 24px;\n}\n.cp-reset[data-v-5a0d83c4] {\n    font-size: 0.8rem;\n    color: var(--cp-primary);\n}\n.cp-schedule[data-v-5a0d83c4] {\n    border: 1px solid var(--cp-border);\n    border-radius: 12px;\n    background: var(--cp-card);\n    max-height: 300px;\n    max-height: clamp(170px, calc(100vh - 400px), 380px);\n    overflow-y: auto;\n}\n.cp-row[data-v-5a0d83c4] {\n    display: flex;\n    align-items: center;\n    gap: 0.5rem;\n    padding: 0.35rem 0.6rem;\n    border-bottom: 1px solid var(--cp-border);\n}\n.cp-row[data-v-5a0d83c4]:last-child {\n    border-bottom: 0;\n}\n.cp-row[data-v-5a0d83c4]:hover {\n    background: var(--cp-panel);\n}\n.cp-row-hoy[data-v-5a0d83c4],\n.cp-row-hoy[data-v-5a0d83c4]:hover {\n    background: rgba(22, 163, 74, 0.08);\n}\n.cp-row-error[data-v-5a0d83c4],\n.cp-row-error[data-v-5a0d83c4]:hover {\n    background: var(--cp-danger-light);\n}\n.cp-row-badge[data-v-5a0d83c4] {\n    width: 28px;\n    height: 28px;\n    border-radius: 8px;\n    background: var(--cp-panel);\n    border: 1px solid var(--cp-border);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 0.78rem;\n    font-weight: 700;\n    flex-shrink: 0;\n}\n.cp-row-hoy .cp-row-badge[data-v-5a0d83c4] {\n    background: var(--cp-ok);\n    border-color: var(--cp-ok);\n    color: #fff;\n}\n.cp-row-info[data-v-5a0d83c4] {\n    flex: 1;\n    min-width: 0;\n    display: flex;\n    flex-direction: column;\n    line-height: 1.25;\n}\n.cp-row-title[data-v-5a0d83c4] {\n    font-size: 0.84rem;\n    font-weight: 600;\n}\n.cp-row-meta[data-v-5a0d83c4] {\n    font-size: 0.72rem;\n    color: var(--cp-muted);\n}\n.cp-row-hoy .cp-row-meta[data-v-5a0d83c4] {\n    color: var(--cp-ok);\n}\n.cp-row-date[data-v-5a0d83c4] {\n    width: 145px;\n    flex-shrink: 0;\n}\n.cp-row-amount[data-v-5a0d83c4] {\n    width: 125px;\n    flex-shrink: 0;\n}\n.cp-row-action[data-v-5a0d83c4] {\n    width: 26px;\n    flex-shrink: 0;\n    text-align: center;\n}\n.cp-icon-btn[data-v-5a0d83c4] {\n    border: 0;\n    background: transparent;\n    color: var(--cp-muted);\n    padding: 0.2rem 0.3rem;\n    border-radius: 6px;\n    cursor: pointer;\n    opacity: 0.5;\n}\n.cp-row:hover .cp-icon-btn[data-v-5a0d83c4]:not(:disabled),\n.cp-icon-btn[data-v-5a0d83c4]:focus {\n    opacity: 1;\n}\n.cp-icon-btn[data-v-5a0d83c4]:hover:not(:disabled) {\n    color: var(--cp-danger);\n    background: var(--cp-danger-light);\n}\n.cp-icon-btn[data-v-5a0d83c4]:disabled {\n    opacity: 0.2;\n    cursor: not-allowed;\n}\n.cp-empty[data-v-5a0d83c4] {\n    text-align: center;\n    color: var(--cp-muted);\n    padding: 2rem 1rem;\n}\n\n/* ---- Balance ---- */\n.cp-balance[data-v-5a0d83c4] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 0.5rem;\n    align-items: center;\n    justify-content: space-between;\n    border-radius: 12px;\n    padding: 0.45rem 0.85rem;\n    margin-top: 0.5rem;\n    font-size: 0.85rem;\n}\n.cp-balance.is-ok[data-v-5a0d83c4] {\n    background: rgba(22, 163, 74, 0.1);\n    border: 1px solid rgba(22, 163, 74, 0.3);\n    color: #15803d;\n}\n.cp-balance.is-warning[data-v-5a0d83c4] {\n    background: rgba(234, 179, 8, 0.12);\n    border: 1px solid rgba(234, 179, 8, 0.45);\n    color: #854d0e;\n}\n.cp-balance .fas[data-v-5a0d83c4] {\n    font-size: 1.2rem;\n}\n@media (max-width: 575.98px) {\n.cp-hero[data-v-5a0d83c4] { flex-direction: column; align-items: stretch; gap: 0.5rem;\n}\n.cp-hero-grid[data-v-5a0d83c4] { grid-template-columns: repeat(2, 1fr); padding-left: 0; border-left: 0; padding-top: 0.5rem; border-top: 1px solid var(--cp-primary-border);\n}\n.cp-inline[data-v-5a0d83c4]:not(.cp-options) { flex-wrap: wrap;\n}\n.cp-inline > .cp-money[data-v-5a0d83c4], .cp-inline > .cp-segmented[data-v-5a0d83c4] { flex-basis: 100%;\n}\n.cp-date[data-v-5a0d83c4] { width: 100%;\n}\n.cp-row[data-v-5a0d83c4] { flex-wrap: wrap;\n}\n.cp-row-info[data-v-5a0d83c4] { flex-basis: calc(100% - 75px);\n}\n.cp-row-date[data-v-5a0d83c4], .cp-row-amount[data-v-5a0d83c4] { flex: 1 1 40%; width: auto;\n}\n}\n", ""]);
 
 // exports
 
@@ -1411,74 +1576,86 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "cuota-pos-container" }, [
-    _c("div", { staticClass: "row cuota-summary-row mb-3" }, [
-      _c("div", { staticClass: "col-sm-3 col-6 mb-2" }, [
-        _c("div", { staticClass: "cuota-summary-card" }, [
-          _c("span", { staticClass: "cuota-summary-label" }, [
-            _vm._v("Total Venta")
-          ]),
+  return _c("div", { staticClass: "cuota-pos" }, [
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-lg-5 mb-3 mb-lg-0" }, [
+        _c("section", { staticClass: "cp-step" }, [
+          _vm._m(0),
           _vm._v(" "),
           _c(
-            "span",
-            { staticClass: "cuota-summary-val font-weight-bold text-dark" },
-            [_vm._v("Gs. " + _vm._s(_vm.formatGs(_vm.total)))]
+            "div",
+            { staticClass: "cp-chips cp-chips-grid" },
+            [
+              _vm._l(_vm.opcionesCuotas, function(n) {
+                return _c(
+                  "button",
+                  {
+                    key: n,
+                    staticClass: "cp-chip cp-chip-lg",
+                    class: { active: Number(_vm.cant_cuota) === n },
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.elegirPlan(n)
+                      }
+                    }
+                  },
+                  [_vm._v(_vm._s(n))]
+                )
+              }),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticClass: "cp-chip-input",
+                  class: {
+                    active:
+                      _vm.opcionesCuotas.indexOf(Number(_vm.cant_cuota)) === -1
+                  }
+                },
+                [
+                  _c("input", {
+                    attrs: {
+                      type: "number",
+                      min: "1",
+                      max: "60",
+                      placeholder: "Otra",
+                      "aria-label": "Otra cantidad de cuotas",
+                      title: "Otra cantidad (1 a 60)"
+                    },
+                    domProps: {
+                      value:
+                        _vm.opcionesCuotas.indexOf(Number(_vm.cant_cuota)) ===
+                        -1
+                          ? _vm.cant_cuota
+                          : ""
+                    },
+                    on: {
+                      change: function($event) {
+                        return _vm.onCantidadOtra($event.target.value)
+                      }
+                    }
+                  })
+                ]
+              )
+            ],
+            2
           )
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-3 col-6 mb-2" }, [
-        _c("div", { staticClass: "cuota-summary-card" }, [
-          _c("span", { staticClass: "cuota-summary-label" }, [
-            _vm._v("Entrega / Anticipo")
-          ]),
+        ]),
+        _vm._v(" "),
+        _c("section", { staticClass: "cp-step" }, [
+          _vm._m(1),
           _vm._v(" "),
-          _c("span", { staticClass: "cuota-summary-val text-success" }, [
-            _vm._v("Gs. " + _vm._s(_vm.formatGs(_vm.entrega)))
-          ])
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-3 col-6 mb-2" }, [
-        _c("div", { staticClass: "cuota-summary-card" }, [
-          _c("span", { staticClass: "cuota-summary-label" }, [
-            _vm._v("Saldo a Financiar")
-          ]),
-          _vm._v(" "),
-          _c("span", { staticClass: "cuota-summary-val text-primary" }, [
-            _vm._v("Gs. " + _vm._s(_vm.formatGs(_vm.saldoNeto)))
-          ])
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-3 col-6 mb-2" }, [
-        _c("div", { staticClass: "cuota-summary-card" }, [
-          _c("span", { staticClass: "cuota-summary-label" }, [
-            _vm._v("Total con Interés")
-          ]),
-          _vm._v(" "),
-          _c("span", { staticClass: "cuota-summary-val text-info" }, [
-            _vm._v("Gs. " + _vm._s(_vm.formatGs(_vm.saldoConInteres)))
-          ])
-        ])
-      ])
-    ]),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "cuota-config-box p-3 mb-3 border rounded bg-light" },
-      [
-        _c("div", { staticClass: "row align-items-end" }, [
-          _c("div", { staticClass: "col-md-4 col-sm-6 mb-2" }, [
-            _vm._m(0),
-            _vm._v(" "),
+          _c("div", { staticClass: "cp-inline" }, [
             _c(
               "div",
-              { staticClass: "input-group input-group-sm" },
+              { staticClass: "input-group input-group-sm cp-money" },
               [
+                _vm._m(2),
+                _vm._v(" "),
                 _c("in-number", {
                   attrs: {
-                    clases: "form-control font-weight-bold text-success",
+                    clases: "form-control font-weight-bold",
                     placeholder: "0"
                   },
                   on: { change: _vm.onEntregaChange },
@@ -1494,203 +1671,72 @@ var render = function() {
               1
             ),
             _vm._v(" "),
-            _c("div", { staticClass: "quick-entrega-chips mt-1" }, [
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-xs btn-outline-secondary mr-1 mb-1",
-                  attrs: { type: "button" },
-                  on: {
-                    click: function($event) {
-                      return _vm.setEntregaPct(0)
-                    }
-                  }
-                },
-                [_vm._v("0%")]
-              ),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-xs btn-outline-secondary mr-1 mb-1",
-                  attrs: { type: "button" },
-                  on: {
-                    click: function($event) {
-                      return _vm.setEntregaPct(10)
-                    }
-                  }
-                },
-                [_vm._v("10%")]
-              ),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-xs btn-outline-secondary mr-1 mb-1",
-                  attrs: { type: "button" },
-                  on: {
-                    click: function($event) {
-                      return _vm.setEntregaPct(20)
-                    }
-                  }
-                },
-                [_vm._v("20%")]
-              ),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-xs btn-outline-secondary mr-1 mb-1",
-                  attrs: { type: "button" },
-                  on: {
-                    click: function($event) {
-                      return _vm.setEntregaPct(30)
-                    }
-                  }
-                },
-                [_vm._v("30%")]
-              ),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-xs btn-outline-secondary mr-1 mb-1",
-                  attrs: { type: "button" },
-                  on: {
-                    click: function($event) {
-                      return _vm.setEntregaPct(50)
-                    }
-                  }
-                },
-                [_vm._v("50%")]
-              )
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-md-4 col-sm-6 mb-2" }, [
-            _vm._m(1),
-            _vm._v(" "),
-            _c("div", { staticClass: "input-group input-group-sm" }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model.number",
-                    value: _vm.cant_cuota,
-                    expression: "cant_cuota",
-                    modifiers: { number: true }
-                  }
-                ],
-                staticClass: "form-control font-weight-bold text-center",
-                attrs: {
-                  type: "number",
-                  min: "1",
-                  max: "60",
-                  placeholder: "1"
-                },
-                domProps: { value: _vm.cant_cuota },
-                on: {
-                  change: _vm.generar,
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
-                    }
-                    _vm.cant_cuota = _vm._n($event.target.value)
-                  },
-                  blur: function($event) {
-                    return _vm.$forceUpdate()
-                  }
-                }
-              }),
-              _vm._v(" "),
-              _vm._m(2)
-            ]),
-            _vm._v(" "),
             _c(
               "div",
-              { staticClass: "quick-cuotas-chips mt-1" },
-              _vm._l([1, 2, 3, 4, 6, 10, 12, 18, 24], function(n) {
+              { staticClass: "cp-chips cp-chips-nowrap" },
+              _vm._l(_vm.opcionesEntrega, function(p) {
                 return _c(
                   "button",
                   {
-                    key: n,
-                    staticClass: "btn btn-xs mr-1 mb-1",
-                    class:
-                      _vm.cant_cuota === n
-                        ? "btn-primary"
-                        : "btn-outline-secondary",
-                    attrs: { type: "button" },
+                    key: p,
+                    staticClass: "cp-chip",
+                    class: { active: _vm.entregaPctActiva(p) },
+                    attrs: {
+                      type: "button",
+                      title: p === 0 ? "Sin entrega" : "Entrega del " + p + "%"
+                    },
                     on: {
                       click: function($event) {
-                        return _vm.elegirPlan(n)
+                        return _vm.setEntregaPct(p)
                       }
                     }
                   },
-                  [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(n) +
-                        "\n                    "
-                    )
-                  ]
+                  [_vm._v(_vm._s(p) + "%")]
                 )
               }),
               0
             )
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-md-4 col-sm-6 mb-2" }, [
-            _vm._m(3),
+          ])
+        ]),
+        _vm._v(" "),
+        _c("section", { staticClass: "cp-step" }, [
+          _c("div", { staticClass: "cp-step-head" }, [
+            _c("span", { staticClass: "cp-step-num" }, [_vm._v("3")]),
             _vm._v(" "),
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.frecuencia,
-                    expression: "frecuencia"
-                  }
-                ],
-                staticClass: "form-control form-control-sm",
-                on: {
-                  change: [
-                    function($event) {
-                      var $$selectedVal = Array.prototype.filter
-                        .call($event.target.options, function(o) {
-                          return o.selected
-                        })
-                        .map(function(o) {
-                          var val = "_value" in o ? o._value : o.value
-                          return val
-                        })
-                      _vm.frecuencia = $event.target.multiple
-                        ? $$selectedVal
-                        : $$selectedVal[0]
-                    },
-                    _vm.onFrecuenciaChange
-                  ]
-                }
-              },
-              [
-                _c("option", { attrs: { value: "mensual" } }, [
-                  _vm._v("Mensual (cada 30 días)")
-                ]),
-                _vm._v(" "),
-                _c("option", { attrs: { value: "quincenal" } }, [
-                  _vm._v("Quincenal (cada 15 días)")
-                ]),
-                _vm._v(" "),
-                _c("option", { attrs: { value: "semanal" } }, [
-                  _vm._v("Semanal (cada 7 días)")
-                ])
-              ]
-            )
+            _c("span", { staticClass: "cp-step-title" }, [
+              _vm._v(
+                "Frecuencia y " +
+                  _vm._s(_vm.primeraHoyActiva ? "2º" : "1er") +
+                  " vencimiento"
+              )
+            ])
           ]),
           _vm._v(" "),
-          _c("div", { staticClass: "col-md-4 col-sm-6 mb-2" }, [
-            _vm._m(4),
+          _c("div", { staticClass: "cp-inline" }, [
+            _c(
+              "div",
+              {
+                staticClass: "cp-segmented",
+                attrs: { role: "group", "aria-label": "Frecuencia de pago" }
+              },
+              _vm._l(_vm.opcionesFrecuencia, function(f) {
+                return _c(
+                  "button",
+                  {
+                    key: f.value,
+                    class: { active: _vm.frecuencia === f.value },
+                    attrs: { type: "button", title: f.title },
+                    on: {
+                      click: function($event) {
+                        return _vm.setFrecuencia(f.value)
+                      }
+                    }
+                  },
+                  [_vm._v(_vm._s(f.label))]
+                )
+              }),
+              0
+            ),
             _vm._v(" "),
             _c("input", {
               directives: [
@@ -1701,8 +1747,17 @@ var render = function() {
                   expression: "primerVencimiento"
                 }
               ],
-              staticClass: "form-control form-control-sm",
-              attrs: { type: "date" },
+              staticClass: "form-control form-control-sm cp-date",
+              attrs: {
+                id: "cpPrimerVenc",
+                type: "date",
+                "aria-label": _vm.primeraHoyActiva
+                  ? "Segundo vencimiento"
+                  : "Primer vencimiento",
+                title: _vm.primeraHoyActiva
+                  ? "Segundo vencimiento"
+                  : "Primer vencimiento"
+              },
               domProps: { value: _vm.primerVencimiento },
               on: {
                 change: _vm.generar,
@@ -1714,407 +1769,487 @@ var render = function() {
                 }
               }
             })
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-md-4 col-sm-6 mb-2" }, [
-            _vm._m(5),
+          ])
+        ]),
+        _vm._v(" "),
+        _c("section", { staticClass: "cp-step mb-0" }, [
+          _c("div", { staticClass: "cp-step-head" }, [
+            _c("span", { staticClass: "cp-step-num" }, [_vm._v("4")]),
             _vm._v(" "),
-            _c("div", { staticClass: "input-group input-group-sm" }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model.number",
-                    value: _vm.interes,
-                    expression: "interes",
-                    modifiers: { number: true }
-                  }
-                ],
-                staticClass: "form-control font-weight-bold",
-                attrs: {
-                  type: "number",
-                  min: "0",
-                  max: "100",
-                  step: "0.5",
-                  placeholder: "0"
-                },
-                domProps: { value: _vm.interes },
-                on: {
-                  input: [
-                    function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.interes = _vm._n($event.target.value)
-                    },
-                    _vm.generar
-                  ],
-                  blur: function($event) {
-                    return _vm.$forceUpdate()
-                  }
-                }
-              }),
-              _vm._v(" "),
-              _vm._m(6)
-            ])
+            _c("span", { staticClass: "cp-step-title" }, [_vm._v("Opciones")]),
+            _vm._v(" "),
+            _vm.montoInteres > 0
+              ? _c("span", { staticClass: "cp-step-opt cp-neg" }, [
+                  _vm._v(
+                    "+ Gs. " +
+                      _vm._s(_vm.formatGs(_vm.montoInteres)) +
+                      " de interés"
+                  )
+                ])
+              : _vm._e()
           ]),
           _vm._v(" "),
-          _c("div", { staticClass: "col-md-4 col-sm-6 mb-2" }, [
-            _c("div", { staticClass: "custom-control custom-checkbox mb-1" }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.redondear,
-                    expression: "redondear"
-                  }
-                ],
-                staticClass: "custom-control-input",
-                attrs: { type: "checkbox", id: "checkRedondear" },
-                domProps: {
-                  checked: Array.isArray(_vm.redondear)
-                    ? _vm._i(_vm.redondear, null) > -1
-                    : _vm.redondear
-                },
-                on: {
-                  change: [
-                    function($event) {
-                      var $$a = _vm.redondear,
-                        $$el = $event.target,
-                        $$c = $$el.checked ? true : false
-                      if (Array.isArray($$a)) {
-                        var $$v = null,
-                          $$i = _vm._i($$a, $$v)
-                        if ($$el.checked) {
-                          $$i < 0 && (_vm.redondear = $$a.concat([$$v]))
-                        } else {
-                          $$i > -1 &&
-                            (_vm.redondear = $$a
-                              .slice(0, $$i)
-                              .concat($$a.slice($$i + 1)))
-                        }
-                      } else {
-                        _vm.redondear = $$c
-                      }
-                    },
-                    _vm.generar
-                  ]
-                }
-              }),
-              _vm._v(" "),
+          _c("div", { staticClass: "cp-inline cp-options" }, [
+            _c("div", { staticClass: "d-flex align-items-center" }, [
               _c(
                 "label",
                 {
-                  staticClass: "custom-control-label small",
-                  attrs: { for: "checkRedondear" }
+                  staticClass: "cp-label mb-0 mr-2",
+                  attrs: { for: "cpInteres" }
                 },
-                [_vm._v("Redondear cuotas a miles")]
+                [_vm._v("Interés")]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "input-group input-group-sm cp-interes" },
+                [
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model.number",
+                        value: _vm.interes,
+                        expression: "interes",
+                        modifiers: { number: true }
+                      }
+                    ],
+                    staticClass: "form-control font-weight-bold text-right",
+                    attrs: {
+                      id: "cpInteres",
+                      type: "number",
+                      min: "0",
+                      max: "100",
+                      step: "0.5",
+                      placeholder: "0"
+                    },
+                    domProps: { value: _vm.interes },
+                    on: {
+                      change: _vm.onInteresChange,
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.interes = _vm._n($event.target.value)
+                      },
+                      blur: function($event) {
+                        return _vm.$forceUpdate()
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _vm._m(3)
+                ]
               )
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "custom-control custom-checkbox" }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.primeracuotaHoy,
-                    expression: "primeracuotaHoy"
-                  }
-                ],
-                staticClass: "custom-control-input",
-                attrs: { type: "checkbox", id: "checkPrimeracuota" },
-                domProps: {
-                  checked: Array.isArray(_vm.primeracuotaHoy)
-                    ? _vm._i(_vm.primeracuotaHoy, null) > -1
-                    : _vm.primeracuotaHoy
-                },
-                on: {
-                  change: [
-                    function($event) {
-                      var $$a = _vm.primeracuotaHoy,
-                        $$el = $event.target,
-                        $$c = $$el.checked ? true : false
-                      if (Array.isArray($$a)) {
-                        var $$v = null,
-                          $$i = _vm._i($$a, $$v)
-                        if ($$el.checked) {
-                          $$i < 0 && (_vm.primeracuotaHoy = $$a.concat([$$v]))
+            _c("div", { staticClass: "cp-switches" }, [
+              _c("div", { staticClass: "custom-control custom-switch" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.redondear,
+                      expression: "redondear"
+                    }
+                  ],
+                  staticClass: "custom-control-input",
+                  attrs: { type: "checkbox", id: "checkRedondear" },
+                  domProps: {
+                    checked: Array.isArray(_vm.redondear)
+                      ? _vm._i(_vm.redondear, null) > -1
+                      : _vm.redondear
+                  },
+                  on: {
+                    change: [
+                      function($event) {
+                        var $$a = _vm.redondear,
+                          $$el = $event.target,
+                          $$c = $$el.checked ? true : false
+                        if (Array.isArray($$a)) {
+                          var $$v = null,
+                            $$i = _vm._i($$a, $$v)
+                          if ($$el.checked) {
+                            $$i < 0 && (_vm.redondear = $$a.concat([$$v]))
+                          } else {
+                            $$i > -1 &&
+                              (_vm.redondear = $$a
+                                .slice(0, $$i)
+                                .concat($$a.slice($$i + 1)))
+                          }
                         } else {
-                          $$i > -1 &&
-                            (_vm.primeracuotaHoy = $$a
-                              .slice(0, $$i)
-                              .concat($$a.slice($$i + 1)))
+                          _vm.redondear = $$c
                         }
-                      } else {
-                        _vm.primeracuotaHoy = $$c
-                      }
-                    },
-                    _vm.onPrimeracuotaHoyChange
-                  ]
-                }
-              }),
+                      },
+                      _vm.generar
+                    ]
+                  }
+                }),
+                _vm._v(" "),
+                _c(
+                  "label",
+                  {
+                    staticClass: "custom-control-label small",
+                    attrs: { for: "checkRedondear" }
+                  },
+                  [_vm._v("Redondear a miles")]
+                )
+              ]),
               _vm._v(" "),
-              _c(
-                "label",
-                {
-                  staticClass: "custom-control-label small",
-                  attrs: { for: "checkPrimeracuota" }
-                },
-                [_vm._v("1ª cuota hoy (al contado)")]
-              )
+              _c("div", { staticClass: "custom-control custom-switch" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.primeracuotaHoy,
+                      expression: "primeracuotaHoy"
+                    }
+                  ],
+                  staticClass: "custom-control-input",
+                  attrs: {
+                    type: "checkbox",
+                    id: "checkPrimeracuota",
+                    disabled: Number(_vm.entrega) > 0
+                  },
+                  domProps: {
+                    checked: Array.isArray(_vm.primeracuotaHoy)
+                      ? _vm._i(_vm.primeracuotaHoy, null) > -1
+                      : _vm.primeracuotaHoy
+                  },
+                  on: {
+                    change: [
+                      function($event) {
+                        var $$a = _vm.primeracuotaHoy,
+                          $$el = $event.target,
+                          $$c = $$el.checked ? true : false
+                        if (Array.isArray($$a)) {
+                          var $$v = null,
+                            $$i = _vm._i($$a, $$v)
+                          if ($$el.checked) {
+                            $$i < 0 && (_vm.primeracuotaHoy = $$a.concat([$$v]))
+                          } else {
+                            $$i > -1 &&
+                              (_vm.primeracuotaHoy = $$a
+                                .slice(0, $$i)
+                                .concat($$a.slice($$i + 1)))
+                          }
+                        } else {
+                          _vm.primeracuotaHoy = $$c
+                        }
+                      },
+                      _vm.onPrimeracuotaHoyChange
+                    ]
+                  }
+                }),
+                _vm._v(" "),
+                _c(
+                  "label",
+                  {
+                    staticClass: "custom-control-label small",
+                    attrs: {
+                      for: "checkPrimeracuota",
+                      title:
+                        Number(_vm.entrega) > 0
+                          ? "No aplica cuando hay entrega inicial"
+                          : ""
+                    }
+                  },
+                  [_vm._v("1ª cuota hoy")]
+                )
+              ])
             ])
           ])
         ])
-      ]
-    ),
-    _vm._v(" "),
-    _c(
-      "div",
-      {
-        staticClass: "cuota-table-wrapper border rounded mb-2"
-      },
-      [
-        _c(
-          "table",
-          { staticClass: "table table-sm table-striped table-hover mb-0" },
-          [
-            _vm._m(7),
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-lg-7" }, [
+        _c("div", { staticClass: "cp-hero" }, [
+          _c("div", { staticClass: "cp-hero-main" }, [
+            _c("span", { staticClass: "cp-hero-label" }, [
+              _vm._v("Total a pagar")
+            ]),
+            _vm._v(" "),
+            _c("span", { staticClass: "cp-hero-total" }, [
+              _vm._v("Gs. " + _vm._s(_vm.formatGs(_vm.totalAFinanciar)))
+            ]),
             _vm._v(" "),
             _c(
-              "tbody",
+              "span",
+              { staticClass: "cp-hero-sub" },
               [
-                _vm._l(_vm.cuotas, function(c, idx) {
-                  return _c(
-                    "tr",
-                    {
-                      key: idx,
-                      class: { "table-success": c.tipo === "Entrega" }
-                    },
-                    [
-                      _c(
-                        "td",
-                        { staticClass: "font-weight-bold align-middle" },
-                        [
-                          c.tipo === "Entrega"
-                            ? _c("span", [_vm._v("Anticipo")])
-                            : _c("span", [_vm._v("Cuota " + _vm._s(c.nro))])
-                        ]
-                      ),
-                      _vm._v(" "),
-                      _c("td", { staticClass: "align-middle" }, [
-                        c.tipo === "Entrega"
-                          ? _c("span", { staticClass: "badge badge-success" }, [
-                              _c("i", { staticClass: "fas fa-check mr-1" }),
-                              _vm._v(" Cobrado Hoy\n                        ")
-                            ])
-                          : _c("span", { staticClass: "badge badge-info" }, [
-                              _vm._v(
-                                "\n                            Crédito\n                        "
-                              )
-                            ])
-                      ]),
-                      _vm._v(" "),
-                      _c("td", { staticClass: "align-middle" }, [
-                        _c("input", {
-                          staticClass:
-                            "form-control form-control-sm d-inline-block",
-                          staticStyle: { "max-width": "160px" },
-                          attrs: { type: "date" },
-                          domProps: { value: _vm.toInputDate(c.vencimiento) },
-                          on: {
-                            change: function($event) {
-                              return _vm.onVencimientoItemChange(
-                                idx,
-                                $event.target.value
-                              )
-                            }
-                          }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c(
-                        "td",
-                        {
-                          staticClass: "text-right align-middle",
-                          staticStyle: { "min-width": "140px" }
-                        },
-                        [
-                          _c("in-number", {
-                            attrs: {
-                              clases:
-                                "form-control form-control-sm text-right font-weight-bold"
-                            },
-                            on: {
-                              change: function($event) {
-                                return _vm.onMontoItemChange(idx)
-                              }
-                            },
-                            model: {
-                              value: c.monto,
-                              callback: function($$v) {
-                                _vm.$set(c, "monto", $$v)
-                              },
-                              expression: "c.monto"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c("td", { staticClass: "text-center align-middle" }, [
-                        c.tipo === "Entrega"
-                          ? _c(
-                              "span",
-                              {
-                                staticClass: "text-muted",
-                                attrs: { title: "Entrega inicial" }
-                              },
-                              [_c("i", { staticClass: "fas fa-lock" })]
-                            )
-                          : _c(
-                              "button",
-                              {
-                                staticClass:
-                                  "btn btn-link btn-xs text-danger p-0",
-                                attrs: {
-                                  type: "button",
-                                  title: "Eliminar cuota"
-                                },
-                                on: {
-                                  click: function($event) {
-                                    return _vm.eliminarCuota(idx)
-                                  }
-                                }
-                              },
-                              [_c("i", { staticClass: "fas fa-times" })]
-                            )
-                      ])
-                    ]
-                  )
-                }),
-                _vm._v(" "),
-                !_vm.cuotas.length ? _c("tr", [_vm._m(8)]) : _vm._e()
-              ],
-              2
-            ),
-            _vm._v(" "),
-            _c("tfoot", { staticClass: "bg-light font-weight-bold" }, [
-              _c("tr", [
-                _c(
-                  "td",
-                  {
-                    staticClass: "text-right align-middle",
-                    attrs: { colspan: "3" }
-                  },
-                  [
-                    _vm._v(
-                      "\n                        Total Suma de Cuotas:\n                    "
-                    )
-                  ]
-                ),
-                _vm._v(" "),
-                _c("td", { staticClass: "text-right align-middle" }, [
+                Number(_vm.entrega) > 0 ? [_vm._v("Entrega + ")] : _vm._e(),
+                _vm._v(_vm._s(_vm.cuotasPlan.length) + " × "),
+                _c("strong", [
                   _vm._v(
-                    "\n                        Gs. " +
-                      _vm._s(_vm.formatGs(_vm.sumaCuotas)) +
-                      "\n                    "
+                    "Gs. " + _vm._s(_vm.formatGs(_vm.montoCuotaReferencia))
                   )
                 ]),
+                _vm.cuotasDesiguales ? [_vm._v(" aprox.")] : _vm._e(),
                 _vm._v(" "),
-                _c("td")
+                _vm.primeraHoyActiva ? [_vm._v(" · 1ª hoy")] : _vm._e()
+              ],
+              2
+            )
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "cp-hero-grid" }, [
+            _c("div", [
+              _c("span", [_vm._v("Total venta")]),
+              _c("strong", [_vm._v(_vm._s(_vm.formatGs(_vm.total)))])
+            ]),
+            _vm._v(" "),
+            _c("div", [
+              _c("span", [_vm._v("Entrega")]),
+              _c("strong", { staticClass: "cp-pos" }, [
+                _vm._v(_vm._s(_vm.formatGs(_vm.entrega)))
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", [
+              _c("span", [_vm._v("Saldo")]),
+              _c("strong", [_vm._v(_vm._s(_vm.formatGs(_vm.saldoNeto)))])
+            ]),
+            _vm._v(" "),
+            _c("div", [
+              _c("span", [_vm._v("Interés")]),
+              _c("strong", { class: { "cp-neg": _vm.montoInteres > 0 } }, [
+                _vm._v(_vm._s(_vm.formatGs(_vm.montoInteres)))
               ])
             ])
-          ]
-        )
-      ]
-    ),
-    _vm._v(" "),
-    _c(
-      "div",
-      {
-        staticClass:
-          "cuota-status-bar d-flex flex-wrap justify-content-between align-items-center p-2 px-3 rounded shadow-sm",
-        class: _vm.hayDiferencia
-          ? "cuota-status-warning"
-          : "cuota-status-success"
-      },
-      [
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "cp-schedule-head" }, [
+          _c("span", { staticClass: "cp-step-title" }, [
+            _vm._v("Cronograma de pagos")
+          ]),
+          _vm._v(" "),
+          _vm.editadoManual
+            ? _c(
+                "button",
+                {
+                  staticClass: "btn btn-link btn-sm p-0 cp-reset",
+                  attrs: {
+                    type: "button",
+                    title:
+                      "Descartar las ediciones manuales y volver a calcular"
+                  },
+                  on: { click: _vm.restablecer }
+                },
+                [
+                  _c("i", { staticClass: "fas fa-undo-alt mr-1" }),
+                  _vm._v(" Restablecer\n                ")
+                ]
+              )
+            : _vm._e()
+        ]),
+        _vm._v(" "),
         _c(
           "div",
-          { staticClass: "d-flex align-items-center" },
+          { staticClass: "cp-schedule" },
           [
-            !_vm.hayDiferencia
-              ? [
-                  _c("i", {
-                    staticClass: "fa fa-check-circle mr-2 text-success",
-                    staticStyle: { "font-size": "1.15rem" }
-                  }),
+            _vm._l(_vm.cuotas, function(c, idx) {
+              return _c(
+                "div",
+                {
+                  key: idx,
+                  staticClass: "cp-row",
+                  class: {
+                    "cp-row-hoy": c.tipo === "Entrega",
+                    "cp-row-error": _vm.fechaFueraDeOrden(idx)
+                  }
+                },
+                [
+                  _c("div", { staticClass: "cp-row-badge" }, [
+                    _vm.esEntregaInicial(c)
+                      ? _c("i", {
+                          staticClass: "fas fa-hand-holding-usd",
+                          attrs: { title: "Entrega inicial" }
+                        })
+                      : _c("span", [_vm._v(_vm._s(_vm.numeroVisible(idx)))])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "cp-row-info" }, [
+                    _c("span", { staticClass: "cp-row-title" }, [
+                      _vm._v(
+                        _vm._s(
+                          _vm.esEntregaInicial(c)
+                            ? "Entrega inicial"
+                            : "Cuota " + _vm.numeroVisible(idx)
+                        )
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "span",
+                      {
+                        staticClass: "cp-row-meta",
+                        class: { "text-danger": _vm.fechaFueraDeOrden(idx) }
+                      },
+                      [
+                        _vm.fechaFueraDeOrden(idx)
+                          ? [
+                              _c("i", {
+                                staticClass: "fas fa-exclamation-circle mr-1"
+                              }),
+                              _vm._v("Antes que la anterior")
+                            ]
+                          : c.tipo === "Entrega"
+                          ? [
+                              _c("i", { staticClass: "fas fa-check mr-1" }),
+                              _vm._v("Se cobra hoy")
+                            ]
+                          : [_vm._v(_vm._s(_vm.infoFecha(c.vencimiento)))]
+                      ],
+                      2
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "cp-row-date" }, [
+                    _c("input", {
+                      staticClass: "form-control form-control-sm",
+                      attrs: {
+                        type: "date",
+                        disabled: c.tipo === "Entrega",
+                        "aria-label":
+                          "Vencimiento de la cuota " + _vm.numeroVisible(idx)
+                      },
+                      domProps: { value: _vm.toInputDate(c.vencimiento) },
+                      on: {
+                        change: function($event) {
+                          return _vm.onVencimientoItemChange(
+                            idx,
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
+                  ]),
                   _vm._v(" "),
                   _c(
-                    "span",
-                    {
-                      staticClass: "font-weight-bold",
-                      staticStyle: { color: "#155724", "font-size": "0.9rem" }
-                    },
+                    "div",
+                    { staticClass: "cp-row-amount" },
                     [
-                      _vm._v(
-                        "\n                    Plan de cuotas balanceado perfectamente con el total.\n                "
-                      )
-                    ]
-                  )
-                ]
-              : [
-                  _c("i", {
-                    staticClass: "fa fa-exclamation-triangle mr-2 text-warning",
-                    staticStyle: { "font-size": "1.15rem" }
-                  }),
+                      _c("in-number", {
+                        attrs: {
+                          clases:
+                            "form-control form-control-sm text-right font-weight-bold"
+                        },
+                        on: {
+                          change: function($event) {
+                            return _vm.onMontoItemChange(idx)
+                          }
+                        },
+                        model: {
+                          value: c.monto,
+                          callback: function($$v) {
+                            _vm.$set(c, "monto", $$v)
+                          },
+                          expression: "c.monto"
+                        }
+                      })
+                    ],
+                    1
+                  ),
                   _vm._v(" "),
-                  _c(
-                    "span",
-                    {
-                      staticClass: "font-weight-bold",
-                      staticStyle: { color: "#856404", "font-size": "0.9rem" }
-                    },
-                    [
-                      _vm._v(
-                        "\n                    Diferencia de Gs. " +
-                          _vm._s(_vm.formatGs(Math.abs(_vm.diferenciaCuotas))) +
-                          "\n                    (" +
-                          _vm._s(
-                            _vm.diferenciaCuotas > 0
-                              ? "Falta asignar a las cuotas"
-                              : "Sobra en las cuotas"
-                          ) +
-                          ")\n                "
-                      )
-                    ]
-                  )
+                  _c("div", { staticClass: "cp-row-action" }, [
+                    c.tipo !== "Entrega"
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "cp-icon-btn",
+                            attrs: {
+                              type: "button",
+                              title: "Quitar cuota",
+                              disabled: _vm.cantidadCuotasCredito <= 1
+                            },
+                            on: {
+                              click: function($event) {
+                                return _vm.eliminarCuota(idx)
+                              }
+                            }
+                          },
+                          [_c("i", { staticClass: "fas fa-trash-alt" })]
+                        )
+                      : _vm._e()
+                  ])
                 ]
+              )
+            }),
+            _vm._v(" "),
+            !_vm.cuotas.length
+              ? _c("div", { staticClass: "cp-empty" }, [
+                  _c("i", { staticClass: "far fa-calendar-times fa-2x mb-2" }),
+                  _vm._v(" "),
+                  _c("p", { staticClass: "mb-0" }, [
+                    _vm._v("Elegí la cantidad de cuotas para armar el plan.")
+                  ])
+                ])
+              : _vm._e()
           ],
           2
         ),
         _vm._v(" "),
-        _vm.hayDiferencia
-          ? _c("div", { staticClass: "mt-1 mt-sm-0" }, [
-              _c(
-                "button",
-                {
-                  staticClass:
-                    "btn btn-sm btn-warning font-weight-bold shadow-sm",
-                  attrs: { type: "button" },
-                  on: { click: _vm.autoAjustarDiferencia }
-                },
-                [
-                  _c("i", { staticClass: "fa fa-magic mr-1" }),
-                  _vm._v(" Auto-ajustar diferencia\n            ")
-                ]
-              )
-            ])
-          : _vm._e()
-      ]
-    )
+        _c(
+          "div",
+          {
+            staticClass: "cp-balance",
+            class: _vm.hayDiferencia ? "is-warning" : "is-ok"
+          },
+          [
+            _c("div", { staticClass: "d-flex align-items-center" }, [
+              _c("i", {
+                staticClass: "fas mr-2",
+                class: _vm.hayDiferencia
+                  ? "fa-exclamation-triangle"
+                  : "fa-check-circle"
+              }),
+              _vm._v(" "),
+              _c("div", [
+                !_vm.hayDiferencia
+                  ? _c("div", { staticClass: "font-weight-bold" }, [
+                      _vm._v("El plan cuadra con el total")
+                    ])
+                  : _c("div", { staticClass: "font-weight-bold" }, [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(
+                            _vm.diferenciaCuotas > 0 ? "Faltan" : "Sobran"
+                          ) +
+                          " Gs. " +
+                          _vm._s(_vm.formatGs(Math.abs(_vm.diferenciaCuotas))) +
+                          "\n                        "
+                      )
+                    ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "small" }, [
+                  _vm._v(
+                    "Suma de pagos: Gs. " + _vm._s(_vm.formatGs(_vm.sumaCuotas))
+                  )
+                ])
+              ])
+            ]),
+            _vm._v(" "),
+            _vm.hayDiferencia
+              ? _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-sm btn-warning font-weight-bold",
+                    attrs: { type: "button" },
+                    on: { click: _vm.autoAjustarDiferencia }
+                  },
+                  [
+                    _c("i", { staticClass: "fas fa-magic mr-1" }),
+                    _vm._v(" Ajustar en la última cuota\n                ")
+                  ]
+                )
+              : _vm._e()
+          ]
+        )
+      ])
+    ])
   ])
 }
 var staticRenderFns = [
@@ -2122,102 +2257,11 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c(
-      "label",
-      { staticClass: "font-weight-bold small text-muted mb-1" },
-      [
-        _c("i", { staticClass: "fas fa-hand-holding-usd text-success mr-1" }),
-        _vm._v(" Entrega Inicial (Gs.)\n                ")
-      ]
-    )
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "label",
-      { staticClass: "font-weight-bold small text-muted mb-1" },
-      [
-        _c("i", { staticClass: "fas fa-calendar-alt text-primary mr-1" }),
-        _vm._v(" Cantidad de Cuotas\n                ")
-      ]
-    )
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "input-group-append" }, [
-      _c("span", { staticClass: "input-group-text small" }, [_vm._v("cuotas")])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "label",
-      { staticClass: "font-weight-bold small text-muted mb-1" },
-      [
-        _c("i", { staticClass: "fas fa-history text-secondary mr-1" }),
-        _vm._v(" Frecuencia\n                ")
-      ]
-    )
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "label",
-      { staticClass: "font-weight-bold small text-muted mb-1" },
-      [
-        _c("i", { staticClass: "far fa-calendar-check mr-1" }),
-        _vm._v(" Primer Vencimiento\n                ")
-      ]
-    )
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "label",
-      { staticClass: "font-weight-bold small text-muted mb-1" },
-      [
-        _c("i", { staticClass: "fas fa-percentage text-danger mr-1" }),
-        _vm._v(" Interés / Recargo (%)\n                ")
-      ]
-    )
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "input-group-append" }, [
-      _c("span", { staticClass: "input-group-text small" }, [_vm._v("%")])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", { staticClass: "thead-light" }, [
-      _c("tr", [
-        _c("th", { staticStyle: { width: "70px" } }, [_vm._v("# Cuota")]),
-        _vm._v(" "),
-        _c("th", { staticStyle: { width: "110px" } }, [_vm._v("Tipo")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Vencimiento")]),
-        _vm._v(" "),
-        _c(
-          "th",
-          { staticClass: "text-right", staticStyle: { width: "170px" } },
-          [_vm._v("Monto (Gs.)")]
-        ),
-        _vm._v(" "),
-        _c("th", { staticClass: "text-center", staticStyle: { width: "50px" } })
+    return _c("div", { staticClass: "cp-step-head" }, [
+      _c("span", { staticClass: "cp-step-num" }, [_vm._v("1")]),
+      _vm._v(" "),
+      _c("span", { staticClass: "cp-step-title" }, [
+        _vm._v("¿En cuántas cuotas?")
       ])
     ])
   },
@@ -2225,17 +2269,29 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c(
-      "td",
-      { staticClass: "text-center py-4 text-muted", attrs: { colspan: "5" } },
-      [
-        _c("i", { staticClass: "far fa-calendar-times fa-2x mb-2 text-muted" }),
-        _vm._v(" "),
-        _c("p", { staticClass: "mb-0" }, [
-          _vm._v("Configurá las cuotas para armar el plan de pago.")
-        ])
-      ]
-    )
+    return _c("div", { staticClass: "cp-step-head" }, [
+      _c("span", { staticClass: "cp-step-num" }, [_vm._v("2")]),
+      _vm._v(" "),
+      _c("span", { staticClass: "cp-step-title" }, [_vm._v("Entrega inicial")]),
+      _vm._v(" "),
+      _c("span", { staticClass: "cp-step-opt" }, [_vm._v("opcional")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "input-group-prepend" }, [
+      _c("span", { staticClass: "input-group-text" }, [_vm._v("Gs.")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "input-group-append" }, [
+      _c("span", { staticClass: "input-group-text" }, [_vm._v("%")])
+    ])
   }
 ]
 render._withStripped = true
