@@ -2798,7 +2798,8 @@
 
                     for (var j = 0; j < cantCuota; j++) {
                         var d = new Date(baseDate);
-                        d.setMonth(d.getMonth() + (j + 1));
+                        var meses = primeraHoyPrev ? j : (j + 1);
+                        d.setMonth(d.getMonth() + meses);
                         var dia = String(d.getDate()).padStart(2, '0');
                         var mes = String(d.getMonth() + 1).padStart(2, '0');
                         var anio = d.getFullYear();

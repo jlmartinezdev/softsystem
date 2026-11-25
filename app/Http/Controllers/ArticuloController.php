@@ -150,7 +150,7 @@ class ArticuloController extends Controller
         $this->middleware('auth');
         $this->middleware('permiso:articulos,open')->only(['index']);
         $this->middleware('permiso:articulos,add')->only(['store', 'capturarImagen', 'subirImagen']);
-        $this->middleware('permiso:articulos,edit')->only(['update', 'toggleActivo']);
+        $this->middleware('permiso:articulos,edit')->only(['update', 'toggleActivo', 'actualizarStock']);
         $this->middleware('permiso:articulos,del')->only(['destroy']);
         $this->middleware('permiso:articulos,export')->only(['export', 'exportPrecio', 'export_costo']);
         $this->middleware('permiso:ajuste,open')->only(['cm', 'cmupdate']);
@@ -484,24 +484,14 @@ class ArticuloController extends Controller
             'producto_c_barra'=>$cbarra
         ]);
         $stock= array();
-        if( Auth::user()->roles()->first()->nom_rol!='Administrador'){
-            for ($i=0; $i <count($request->stock); $i++){
-                $temp= array('sucursal' => $request->stock[$i]['sucursal'], 
-                    'cantidad' => 0,
-                    'vencimiento' => $request->stock[$i]['vencimiento'],
-                    'loteold' => $request->stock[$i]['loteold'],
-                    'lotenew' => $request->stock[$i]['lotenew']);
-                array_push($stock,$temp);
-            }
-        }else{
-            for ($i=0; $i <count($request->stock); $i++){
-                $temp= array('sucursal' => $request->stock[$i]['sucursal'], 
-                    'cantidad' => $request->stock[$i]['cantidad'],
-                    'vencimiento' => $request->stock[$i]['vencimiento'],
-                    'loteold' => $request->stock[$i]['loteold'],
-                    'lotenew' => $request->stock[$i]['lotenew']);
-                array_push($stock,$temp);
-            }
+        $filasStock = is_array($request->stock) ? $request->stock : [];
+        for ($i=0; $i <count($filasStock); $i++){
+            $temp= array('sucursal' => $filasStock[$i]['sucursal'],
+                'cantidad' => $filasStock[$i]['cantidad'],
+                'vencimiento' => $filasStock[$i]['vencimiento'],
+                'loteold' => $filasStock[$i]['loteold'],
+                'lotenew' => $filasStock[$i]['lotenew']);
+            array_push($stock,$temp);
         }
         for ($i=0; $i <count($stock) ; $i++) { 
             $s = new Stock();
@@ -592,25 +582,7 @@ class ArticuloController extends Controller
         }
 
         $ok= Articulo::where('articulos_cod',$id)->update($data);
-        if( Auth::user()->roles()->first()->nom_rol=='Administrador'){
-            for ($i=0; $i < count($request->stock) ; $i++) { 
-                if($request->stock[$i]['id'] > 0){
-                    Stock::where('id_stock',$request->stock[$i]['id'])->update([
-                        'cantidad' =>$request->stock[$i]['cantidad'], 
-                        'stock_fech_venc' => $this->setVencimiento($request->stock[$i]['vencimiento']),
-                        'lote_nro' => $request->stock[$i]['lotenew']
-                    ]);
-                }else{
-                    $stock = new Stock();
-                    $stock->articulos_cod= $id;
-                    $stock->suc_cod=$request->stock[$i]['sucursal'];
-                    $stock->cantidad= $request->stock[$i]['cantidad'];
-                    $stock->stock_fech_venc= $this->setVencimiento($request->stock[$i]['vencimiento']);
-                    $stock->lote_nro= $request->stock[$i]['lotenew'];
-                    $stock->save();
-                }
-            }
-        }
+        $this->guardarStockArticulo($id, $request->input('stock', []));
         $suma = 0;
         for($i=0;$i<=10;$i++){
             $suma += intval($request->precios[$i]["p"]);
@@ -672,6 +644,70 @@ class ArticuloController extends Controller
             return $default;
         }
         return (int) $request->input('articulo.activo') === 0 ? 0 : 1;
+    }
+
+    /**
+     * Guarda las cantidades de stock. Alcanza el permiso de editar artículos.
+     */
+    public function actualizarStock(Request $request, $id)
+    {
+        $articulo = Articulo::where('articulos_cod', $id)->first();
+        if (!$articulo) {
+            return response()->json(['message' => 'Artículo no encontrado.'], 404);
+        }
+
+        $this->guardarStockArticulo($id, $request->input('stock', []));
+        $total = (int) Stock::where('articulos_cod', $id)->sum('cantidad');
+
+        return response()->json([
+            'ok' => true,
+            'stock' => $total,
+        ]);
+    }
+
+    private function guardarStockArticulo($articuloId, $filas)
+    {
+        if (!is_array($filas)) {
+            return;
+        }
+
+        foreach ($filas as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $idStock = isset($row['id']) ? (int) $row['id'] : 0;
+            $cantidad = isset($row['cantidad']) ? (int) $row['cantidad'] : 0;
+            $vencimiento = $this->setVencimiento(isset($row['vencimiento']) ? $row['vencimiento'] : null);
+            $lote = isset($row['lotenew']) ? (string) $row['lotenew'] : '';
+            if (strlen($lote) > 10) {
+                $lote = substr($lote, 0, 10);
+            }
+            $sucursal = isset($row['sucursal']) ? (int) $row['sucursal'] : 0;
+
+            $existe = $idStock > 0
+                && Stock::where('id_stock', $idStock)->where('articulos_cod', $articuloId)->exists();
+
+            if ($existe) {
+                $datos = [
+                    'cantidad' => $cantidad,
+                    'stock_fech_venc' => $vencimiento,
+                    'lote_nro' => $lote,
+                ];
+                if ($sucursal > 0) {
+                    $datos['suc_cod'] = $sucursal;
+                }
+                Stock::where('id_stock', $idStock)->where('articulos_cod', $articuloId)->update($datos);
+            } else {
+                $stock = new Stock();
+                $stock->articulos_cod = $articuloId;
+                $stock->suc_cod = $sucursal > 0 ? $sucursal : 1;
+                $stock->cantidad = $cantidad;
+                $stock->stock_fech_venc = $vencimiento;
+                $stock->lote_nro = $lote;
+                $stock->save();
+            }
+        }
     }
 
     private function setVencimiento($fecha){

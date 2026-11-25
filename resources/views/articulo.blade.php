@@ -2533,17 +2533,50 @@
                     const suc = this.sucursales.find(sucursal => sucursal.suc_cod == id);
                     return suc ? suc.suc_desc : 'Sucursal #' + id;
                 },
-                updateStockA: function() {
+                aplicarEdicionStock: function() {
+                    if (Number(this.bandstock) !== 1 || !this.stock || this.stock.id == null) {
+                        return false;
+                    }
                     const idx = this.stocks.findIndex(s => s.id == this.stock.id);
-                    if (idx !== -1) {
-                        this.$set(this.stocks, idx, {
-                            ...this.stocks[idx],
-                            cantidad: parseInt(this.stock.cantidad || 0),
-                            sucursal: this.stock.sucursal,
-                            lotenew: this.stock.lotenew || 'S/N',
-                            loteold: this.stock.loteold || this.stock.lotenew || 'S/N',
-                            vencimiento: this.validarVenc(this.stock.vencimiento || '')
+                    if (idx === -1) {
+                        return false;
+                    }
+                    this.$set(this.stocks, idx, {
+                        ...this.stocks[idx],
+                        cantidad: parseInt(this.stock.cantidad || 0, 10) || 0,
+                        sucursal: this.stock.sucursal,
+                        lotenew: this.stock.lotenew || 'S/N',
+                        loteold: this.stock.loteold || this.stock.lotenew || 'S/N',
+                        vencimiento: this.validarVenc(this.stock.vencimiento || '')
+                    });
+                    this.limpiarCamposStock();
+                    return true;
+                },
+                updateStockA: function() {
+                    if (!this.aplicarEdicionStock()) {
+                        this.limpiarCamposStock();
+                        return;
+                    }
+                    if (this.isnew || !this.articulo.codigo) {
+                        return;
+                    }
+                    var self = this;
+                    axios.post('articulo/' + this.articulo.codigo + '/stock', {
+                        stock: this.stocks
+                    }).then(function(r) {
+                        var total = r.data && r.data.stock != null ? Number(r.data.stock) : null;
+                        var row = self.rows.find(function(item) {
+                            return String(item.ARTICULOS_cod) === String(self.articulo.codigo);
                         });
+                        if (row && total != null) {
+                            row.stock = total;
+                        }
+                        var art = self.articulos.find(function(item) {
+                            return String(item.ARTICULOS_cod) === String(self.articulo.codigo);
+                        });
+                        if (art && total != null) {
+                            art.cantidad = total;
+                        }
                         const Toast = Swal.mixin({
                             toast: true,
                             position: 'top-end',
@@ -2552,10 +2585,14 @@
                         });
                         Toast.fire({
                             icon: 'success',
-                            title: 'Stock actualizado correctamente'
+                            title: 'Stock actualizado'
                         });
-                    }
-                    this.limpiarCamposStock();
+                    }).catch(function(e) {
+                        var msg = e.response && e.response.data && e.response.data.message
+                            ? e.response.data.message
+                            : 'No se pudo guardar el stock';
+                        Swal.fire('No se guardó', msg, 'error');
+                    });
                 },
                 limpiarCamposStock: function() {
                     this.bandstock = 0;
@@ -2587,6 +2624,7 @@
                 },
                 saveArticulo: function() {
                     if (this.articulo.descripcion && this.articulo.costo !== undefined && this.articulo.p1) {
+                        this.aplicarEdicionStock();
                         this.saving = true;
                         this.error = "";
                         if (this.stocks.length < 1) {

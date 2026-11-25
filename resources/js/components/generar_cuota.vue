@@ -124,7 +124,7 @@
     </div>
 
     <!-- 3. Tabla Interactiva de Cuotas Generadas -->
-    <div class="cuota-table-wrapper border rounded overflow-hidden mb-2">
+    <div class="cuota-table-wrapper border rounded mb-2">
         <table class="table table-sm table-striped table-hover mb-0">
             <thead class="thead-light">
                 <tr>
@@ -427,20 +427,25 @@ export default {
 
             var nroOffset = (entregaMonto > 0) ? 2 : 1;
             var totalAsignado = 0;
+            var primeraHoy = this.primeracuotaHoy && entregaMonto === 0;
 
             for (var i = 0; i < cantidad; i++) {
-                var cDate = new Date(dateCursor);
-                if (i > 0) {
-                    if (this.frecuencia === 'semanal') {
-                        cDate.setDate(cDate.getDate() + (i * 7));
-                    } else if (this.frecuencia === 'quincenal') {
-                        cDate.setDate(cDate.getDate() + (i * 15));
-                    } else {
-                        // Mensual
-                        cDate.setMonth(cDate.getMonth() + i);
-                    }
-                } else if (this.primeracuotaHoy && entregaMonto === 0) {
+                var cDate;
+                if (i === 0 && primeraHoy) {
                     cDate = new Date(fechaVentaIso + 'T00:00:00');
+                } else {
+                    // Con la 1ª cuota hoy, el primer vencimiento ya es el mes siguiente.
+                    var pasos = primeraHoy ? (i - 1) : i;
+                    cDate = new Date(dateCursor);
+                    if (pasos > 0) {
+                        if (this.frecuencia === 'semanal') {
+                            cDate.setDate(cDate.getDate() + (pasos * 7));
+                        } else if (this.frecuencia === 'quincenal') {
+                            cDate.setDate(cDate.getDate() + (pasos * 15));
+                        } else {
+                            cDate.setMonth(cDate.getMonth() + pasos);
+                        }
+                    }
                 }
 
                 var montoLinea = montoCuotaBase;
@@ -455,7 +460,7 @@ export default {
                     interes: this.interes,
                     vencimiento: this.toVencimientoFormat(this.formatDateIso(cDate)),
                     monto: montoLinea,
-                    tipo: (i === 0 && this.primeracuotaHoy && entregaMonto === 0) ? 'Entrega' : 'Cuota'
+                    tipo: (i === 0 && primeraHoy) ? 'Entrega' : 'Cuota'
                 });
             }
 
@@ -544,8 +549,6 @@ export default {
     flex-wrap: wrap;
 }
 .cuota-table-wrapper {
-    max-height: 280px;
-    overflow-y: auto;
     background: #ffffff;
 }
 .cuota-table-wrapper table thead th {

@@ -537,21 +537,26 @@ __webpack_require__.r(__webpack_exports__);
 
       var nroOffset = entregaMonto > 0 ? 2 : 1;
       var totalAsignado = 0;
+      var primeraHoy = this.primeracuotaHoy && entregaMonto === 0;
 
       for (var i = 0; i < cantidad; i++) {
-        var cDate = new Date(dateCursor);
+        var cDate;
 
-        if (i > 0) {
-          if (this.frecuencia === 'semanal') {
-            cDate.setDate(cDate.getDate() + i * 7);
-          } else if (this.frecuencia === 'quincenal') {
-            cDate.setDate(cDate.getDate() + i * 15);
-          } else {
-            // Mensual
-            cDate.setMonth(cDate.getMonth() + i);
-          }
-        } else if (this.primeracuotaHoy && entregaMonto === 0) {
+        if (i === 0 && primeraHoy) {
           cDate = new Date(fechaVentaIso + 'T00:00:00');
+        } else {
+          var pasos = primeraHoy ? i - 1 : i;
+          cDate = new Date(dateCursor);
+
+          if (pasos > 0) {
+            if (this.frecuencia === 'semanal') {
+              cDate.setDate(cDate.getDate() + pasos * 7);
+            } else if (this.frecuencia === 'quincenal') {
+              cDate.setDate(cDate.getDate() + pasos * 15);
+            } else {
+              cDate.setMonth(cDate.getMonth() + pasos);
+            }
+          }
         }
 
         var montoLinea = montoCuotaBase;
@@ -567,7 +572,7 @@ __webpack_require__.r(__webpack_exports__);
           interes: this.interes,
           vencimiento: this.toVencimientoFormat(this.formatDateIso(cDate)),
           monto: montoLinea,
-          tipo: i === 0 && this.primeracuotaHoy && entregaMonto === 0 ? 'Entrega' : 'Cuota'
+          tipo: i === 0 && primeraHoy ? 'Entrega' : 'Cuota'
         });
       }
 
@@ -758,7 +763,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.cuota-summary-row .cuota-summary-card[data-v-5a0d83c4] {\n    background: #ffffff;\n    border: 1px solid #e2e8f0;\n    border-radius: 8px;\n    padding: 0.65rem 0.85rem;\n    display: flex;\n    flex-direction: column;\n}\n.cuota-summary-label[data-v-5a0d83c4] {\n    font-size: 0.75rem;\n    font-weight: 700;\n    text-transform: uppercase;\n    color: #64748b;\n    letter-spacing: 0.03em;\n}\n.cuota-summary-val[data-v-5a0d83c4] {\n    font-size: 1.15rem;\n    font-family: inherit;\n    font-variant-numeric: tabular-nums;\n    margin-top: 0.2rem;\n}\n.quick-entrega-chips[data-v-5a0d83c4], .quick-cuotas-chips[data-v-5a0d83c4] {\n    display: flex;\n    flex-wrap: wrap;\n}\n.cuota-table-wrapper[data-v-5a0d83c4] {\n    max-height: 280px;\n    overflow-y: auto;\n    background: #ffffff;\n}\n.cuota-table-wrapper table thead th[data-v-5a0d83c4] {\n    position: sticky;\n    top: 0;\n    background: #f1f5f9;\n    z-index: 2;\n    font-size: 0.8rem;\n    letter-spacing: 0.02em;\n}\n.cuota-status-bar[data-v-5a0d83c4] {\n    border-radius: 8px;\n    margin-top: 0.75rem;\n}\n.cuota-status-success[data-v-5a0d83c4] {\n    background-color: #e8f5e9 !important;\n    border: 1px solid #c8e6c9 !important;\n}\n.cuota-status-warning[data-v-5a0d83c4] {\n    background-color: #fff3cd !important;\n    border: 1px solid #ffeeba !important;\n}\n", ""]);
+exports.push([module.i, "\n.cuota-summary-row .cuota-summary-card[data-v-5a0d83c4] {\n    background: #ffffff;\n    border: 1px solid #e2e8f0;\n    border-radius: 8px;\n    padding: 0.65rem 0.85rem;\n    display: flex;\n    flex-direction: column;\n}\n.cuota-summary-label[data-v-5a0d83c4] {\n    font-size: 0.75rem;\n    font-weight: 700;\n    text-transform: uppercase;\n    color: #64748b;\n    letter-spacing: 0.03em;\n}\n.cuota-summary-val[data-v-5a0d83c4] {\n    font-size: 1.15rem;\n    font-family: inherit;\n    font-variant-numeric: tabular-nums;\n    margin-top: 0.2rem;\n}\n.quick-entrega-chips[data-v-5a0d83c4], .quick-cuotas-chips[data-v-5a0d83c4] {\n    display: flex;\n    flex-wrap: wrap;\n}\n.cuota-table-wrapper[data-v-5a0d83c4] {\n    background: #ffffff;\n}\n.cuota-table-wrapper table thead th[data-v-5a0d83c4] {\n    position: sticky;\n    top: 0;\n    background: #f1f5f9;\n    z-index: 2;\n    font-size: 0.8rem;\n    letter-spacing: 0.02em;\n}\n.cuota-status-bar[data-v-5a0d83c4] {\n    border-radius: 8px;\n    margin-top: 0.75rem;\n}\n.cuota-status-success[data-v-5a0d83c4] {\n    background-color: #e8f5e9 !important;\n    border: 1px solid #c8e6c9 !important;\n}\n.cuota-status-warning[data-v-5a0d83c4] {\n    background-color: #fff3cd !important;\n    border: 1px solid #ffeeba !important;\n}\n", ""]);
 
 // exports
 
@@ -1868,7 +1873,7 @@ var render = function() {
     _c(
       "div",
       {
-        staticClass: "cuota-table-wrapper border rounded overflow-hidden mb-2"
+        staticClass: "cuota-table-wrapper border rounded mb-2"
       },
       [
         _c(
